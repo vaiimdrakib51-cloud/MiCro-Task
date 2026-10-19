@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>MicroTask — Earn & Grow</title>
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <!-- Google Fonts & FontAwesome 6 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Firebase SDK (Compat Version) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+    <style>
+        :root {
+            --lime: #d8ff38;
+            --ink: #101010;
+            --paper: #f8f8f7;
+            --bg-grad: linear-gradient(145deg, #e0f2fe 0%, #e6f9f0 50%, #f0fdf4 100%);
+            --dash-bg: linear-gradient(180deg, #f0f9ff 0%, #f2fbf7 100%);
+            --card-3d: linear-gradient(180deg, #ffffff 0%, #f8fcfa 100%);
+            --card-border: #cce7f5;
+            --shadow-3d: 0 8px 20px rgba(14, 116, 144, 0.08), inset 0 1px 1px #ffffff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg-grad); color: #0f172a; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 12px 6px; }
+
+        .phone {
+            width: 100%;
+            max-width: 410px;
+            background: #ffffff;
+            border-radius: 42px;
+            border: 3px solid #d4ebf8;
+            box-shadow: 0 20px 50px rgba(12, 74, 110, 0.15), 0 0 0 8px #f1f8fc;
+            overflow: hidden;
+            position: relative;
+            min-height: 750px;
+        }
+
+        /* 1. AUTH SCREEN */
+        .auth-screen { background: var(--paper); color: var(--ink); min-height: 750px; display: flex; flex-direction: column; position: relative; z-index: 10; transition: all 0.3s ease; }
+        .auth-status { height: 30px; display: flex; justify-content: space-between; align-items: center; padding: 10px 22px 0; font-size: 11px; font-weight: 800; color: #666; }
+        .auth-brand { display: flex; align-items: center; justify-content: center; gap: 7px; font-weight: 900; font-size: 21px; margin: 12px 0 0; color: #111; }
+        .auth-main { padding: 0 25px 26px; display: flex; flex-direction: column; flex: 1; }
+        .auth-hero { height: 180px; display: flex; align-items: center; justify-content: center; margin: 5px 0; }
+        .auth-logo-img { width: 130px; height: 130px; object-fit: contain; filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.15)); }
+
+        .auth-intro { text-align: center; }
+        .auth-intro h1 { font-size: 24px; line-height: 1.2; letter-spacing: -1px; margin: 0 0 8px; font-weight: 850; color: #111; }
+        .auth-intro p { font-size: 13px; color: #555; line-height: 1.5; margin: 0 auto; max-width: 270px; }
+        .auth-actions { margin-top: auto; padding-top: 20px; display: grid; gap: 10px; }
+        .auth-btn { border: 1.5px solid #111; border-radius: 999px; height: 48px; width: 100%; font: 700 13px inherit; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; background: transparent; color: #111; transition: transform 0.15s; }
+        .auth-btn:active { transform: scale(0.98); }
+        .auth-btn.primary { background: var(--lime); border-color: var(--lime); font-weight: 850; box-shadow: 0 6px 18px rgba(216, 255, 56, 0.45); }
+        .auth-btn.secondary { background: #fff; border-color: #ddd; }
+        .auth-legal { text-align: center; font-size: 9.5px; line-height: 1.6; color: #666; margin: 14px 5px 0; }
+        .auth-legal a, .auth-link { color: #111; font-weight: 800; text-decoration: underline; cursor: pointer; }
+
+        .sheet { display: none; position: absolute; inset: 0; background: rgba(0, 0, 0, 0.55); backdrop-filter: blur(4px); align-items: flex-end; z-index: 100; }
+        .sheet.open { display: flex; }
+        .panel { width: 100%; background: #f8f8f7; border-radius: 28px 28px 0 0; padding: 16px 22px 25px; max-height: 92%; overflow-y: auto; border-top: 1px solid #ddd; animation: sheetUp 0.25s cubic-bezier(0.16, 1, 0.3, 1); color: #111; position: relative; }
+        @keyframes sheetUp { from { transform: translateY(40px); opacity: 0.5; } to { transform: translateY(0); opacity: 1; } }
+        .handle { width: 42px; height: 4px; border-radius: 9px; background: #ddd; margin: 0 auto 16px; }
+        .panel h2 { text-align: center; font-size: 20px; margin: 0 0 6px; letter-spacing: -0.5px; color: #111; font-weight: 800; }
+        .panel .sub { text-align: center; color: #777; font-size: 12px; margin: 0 0 16px; }
+        .divider { display: flex; align-items: center; gap: 12px; color: #888; font-size: 10px; font-weight: 700; margin: 14px 0; }
+        .divider:before, .divider:after { content: ""; height: 1px; background: #ddd; flex: 1; }
+        .field { margin: 10px 0; text-align: left; }
+        .field label { display: block; font-size: 11px; font-weight: 800; margin: 0 0 6px 3px; color: #222; }
+        .input-wrap { position: relative; }
+        .field input { width: 100%; height: 44px; border: 1.5px solid #d4d4d4; border-radius: 999px; background: #fff; padding: 0 46px 0 16px; font-size: 12px; outline: none; color: #111; }
+        .field input:focus { border-color: #111; }
+        .eye { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); border: 0; width: 32px; height: 32px; background: transparent; display: flex; align-items: center; justify-content: center; color: #555; cursor: pointer; }
+        .eye svg { width: 19px; height: 19px; display: block; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+        .row-between { display: flex; justify-content: space-between; align-items: center; font-size: 11px; margin: 10px 3px; }
+        .check { display: flex; align-items: center; gap: 7px; color: #555; font-size: 11px; }
+        .switch { text-align: center; font-size: 11px; color: #666; margin: 16px 0 2px; }
+        .message { display: none; font-size: 11px; padding: 10px 12px; border-radius: 12px; background: #efffc2; margin: 10px 0; color: #222; font-weight: 600; text-align: center; border: 1px solid #d4ee78; }
+        .message.show { display: block; }
+        .message.error { background: #fee2e2; border-color: #fca5a5; color: #991b1b; }
+        .close-btn-sheet { position: absolute; right: 18px; top: 15px; background: #eee; border: 0; width: 28px; height: 28px; border-radius: 50%; font-size: 18px; color: #333; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .social-bottom { text-align: center; margin: 16px 0 2px; color: #888; font-size: 10px; }
+        .social-icons { display: flex; justify-content: center; gap: 14px; margin-top: 9px; }
+        .social-circle { width: 42px; height: 42px; border-radius: 50%; background: #fff; border: 1.5px solid #dedede; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); font-size: 19px; font-weight: 900; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .social-circle.google { color: #4285f4; }
+        .social-circle.facebook { color: #1877f2; font-family: Arial, sans-serif; font-size: 22px; }
+
+        /* 2. DASHBOARD */
+        .main-dashboard {
+            display: none;
+            flex-direction: column;
+            padding-top: 14px;
+            padding-bottom: 92px;
+            min-height: 750px;
+            background: var(--dash-bg);
+            animation: fadeIn 0.25s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.99); } to { opacity: 1; transform: scale(1); } }
+        
+        .app-body { padding: 0 14px 10px; display: flex; flex-direction: column; gap: 13px; }
+        .custom-icon-fill { width: 100%; height: 100%; object-fit: contain; display: block; }
+
+        /* Header */
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 2px 2px 4px; }
+        .brand { display: flex; align-items: center; gap: 10px; }
+        .brand-logo-box {
+            width: 40px;
+            height: 40px;
+            border-radius: 14px;
+            overflow: hidden;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #bae6fd;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.18), inset 0 1px 1px #fff;
+            flex-shrink: 0;
+            padding: 2px;
+        }
+        .brand-logo-img { width: 100%; height: 100%; object-fit: contain; }
+        .brand-title h1 { font-size: 20px; font-weight: 900; color: #0c4a6e; letter-spacing: -0.4px; line-height: 1.1; }
+        .brand-title h1 span { color: #0284c7; }
+        .brand-title p { font-size: 9.5px; color: #047857; font-weight: 700; }
+        
+        .header-actions { display: flex; align-items: center; gap: 14px; }
+        .notif-btn { position: relative; color: #0369a1; font-size: 21px; cursor: pointer; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
+        .notif-badge { position: absolute; top: -6px; right: -6px; background: #ef4444; color: #fff; font-size: 9px; font-weight: 800; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #ffffff; }
+        .profile-btn { display: flex; align-items: center; gap: 5px; cursor: pointer; }
+        .profile-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0284c7, #10b981);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            border: 2px solid #ffffff;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+        }
+
+        /* Balance Card */
+        .balance-card {
+            background: linear-gradient(135deg, #0284c7 0%, #0d9488 55%, #059669 100%);
+            border-radius: 24px;
+            padding: 16px 16px 14px;
+            box-shadow: 0 12px 28px rgba(13, 148, 136, 0.32), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .balance-top-row { display: flex; justify-content: space-between; align-items: flex-start; width: 100%; }
+        .balance-left-content { display: flex; align-items: center; gap: 12px; }
+        .wallet-circle-3d {
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.22);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1.5px solid rgba(255, 255, 255, 0.45);
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
+            flex-shrink: 0;
+            padding: 7px;
+        }
+        .balance-text-group { display: flex; flex-direction: column; gap: 2px; line-height: 1.2; }
+        .balance-label-line { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; color: #ccfbf1; text-transform: uppercase; letter-spacing: 0.4px; }
+        .eye-toggle-btn { cursor: pointer; color: #99f6e4; font-size: 12px; }
+        .balance-amount-line { font-size: 24px; font-weight: 900; color: #ffffff; letter-spacing: -0.5px; white-space: nowrap; }
+        .balance-bdt-line { font-size: 10.5px; font-weight: 700; color: #d1fae5; letter-spacing: 0.2px; }
+        .user-meta-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+        .user-name-text { font-size: 13.5px; font-weight: 850; color: #ffffff; max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .uid-chip-3d { display: inline-flex; align-items: center; gap: 5px; font-size: 10.5px; font-weight: 800; color: #ffffff; background: rgba(0, 0, 0, 0.22); border: 1px solid rgba(255, 255, 255, 0.35); padding: 3px 9px; border-radius: 20px; cursor: pointer; }
+
+        /* Sub Stats Grid */
+        .balance-sub-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            background: rgba(0, 0, 0, 0.22);
+            border-radius: 16px;
+            padding: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        .sub-stat-box { display: flex; align-items: center; gap: 6px; min-width: 0; background: rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 6px 7px; }
+        .sub-stat-mini-icon { width: 26px; height: 26px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 12px; color: #fff; }
+        .sub-stat-mini-icon.green-glow { background: #10b981; }
+        .sub-stat-mini-icon.blue-glow { background: #0284c7; }
+        .sub-stat-labels { display: flex; flex-direction: column; line-height: 1.15; min-width: 0; overflow: hidden; }
+        .sub-stat-labels span { font-size: 8px; color: #ccfbf1; font-weight: 700; text-transform: uppercase; }
+        .sub-stat-labels strong { font-size: 11px; color: #ffffff; font-weight: 850; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* Unverified/Verified Badge */
+        .verify-badge-pill { display: flex; align-items: center; gap: 5px; min-width: 0; background: rgba(239, 68, 68, 0.25); border: 1px solid #f87171; border-radius: 12px; padding: 5px 6px; cursor: pointer; }
+        .verify-badge-pill.verified { background: rgba(16, 185, 129, 0.25); border-color: #34d399; }
+        .verify-pill-icon { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #ffffff; flex-shrink: 0; background: #ef4444; }
+        .verify-badge-pill.verified .verify-pill-icon { background: #10b981; }
+        .verify-pill-text { display: flex; flex-direction: column; line-height: 1.1; min-width: 0; }
+        .verify-pill-text span { font-size: 7.5px; font-weight: 700; color: #fecaca; text-transform: uppercase; }
+        .verify-badge-pill.verified .verify-pill-text span { color: #a7f3d0; }
+        .verify-pill-text strong { font-size: 9.5px; font-weight: 850; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* Actions Grid */
+        .actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .action-box-3d { border-radius: 20px; padding: 13px 14px; display: flex; align-items: center; justify-content: space-between; color: #fff; cursor: pointer; border: 1px solid rgba(255, 255, 255, 0.3); }
+        .action-box-3d:active { transform: translateY(2px); }
+        .action-box-3d.deposit { background: linear-gradient(135deg, #10b981 0%, #047857 100%); box-shadow: 0 8px 18px rgba(16, 185, 129, 0.35); }
+        .action-box-3d.withdraw { background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); box-shadow: 0 8px 18px rgba(2, 132, 199, 0.35); }
+        .action-left { display: flex; align-items: center; gap: 10px; }
+        .action-icon-wrap { width: 38px; height: 38px; border-radius: 12px; background: rgba(255, 255, 255, 0.22); display: flex; align-items: center; justify-content: center; flex-shrink: 0; padding: 6px; }
+        .action-info h3 { font-size: 14px; font-weight: 850; line-height: 1.1; }
+        .action-info p { font-size: 9px; color: rgba(255, 255, 255, 0.9); font-weight: 600; margin-top: 2px; }
+
+        /* Task Cards */
+        .task-card-3d { background: var(--card-3d); border: 1.5px solid var(--card-border); border-radius: 20px; padding: 12px 14px; box-shadow: var(--shadow-3d); }
+        .task-row-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; }
+        .task-left-meta { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; }
+        .task-symbol-3d { width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 16px; flex-shrink: 0; }
+        .task-symbol-3d.cyan { background: linear-gradient(135deg, #0284c7, #0d9488); }
+        .task-symbol-3d.purple { background: linear-gradient(135deg, #8b5cf6, #6366f1); }
+        .task-symbol-3d.telegram-blue { background: linear-gradient(135deg, #0088cc, #0284c7); }
+        .task-text h4 { font-size: 13px; font-weight: 800; color: #0c4a6e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .task-text p { font-size: 9px; color: #64748b; font-weight: 600; margin-top: 2px; }
+        .task-pill { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; font-size: 10.5px; font-weight: 800; white-space: nowrap; margin-left: auto; cursor: pointer; }
+        .task-pill.green-pill { background: #dcfce7; color: #047857; border: 1px solid #86efac; }
+        .task-pill.blue-pill { background: #e0f2fe; color: #0369a1; border: 1px solid #7dd3fc; }
+        .task-pill.claimed-pill { background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; }
+
+        .video-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 10px; }
+        .video-card-3d { background: #ffffff; border: 1.5px solid #d0e7f5; border-radius: 16px; padding: 10px 4px 8px; display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; }
+        .video-card-3d:active { transform: scale(0.95); }
+        .video-icon { width: 32px; height: 32px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; color: #fff; }
+        .video-icon.yt { background: #ff0000; }
+        .video-icon.fb { background: #1877f2; }
+        .video-icon.ig { background: linear-gradient(45deg, #f09433, #dc2743, #bc1888); }
+        .video-icon.tiktok { background: #000000; }
+        .video-card-3d span { font-size: 9.5px; color: #0f172a; font-weight: 750; margin-top: 2px; }
+        .video-card-3d small { font-size: 8.5px; color: #059669; font-weight: 850; }
+
+        /* Promo Banner */
+        .promo-banner-container { position: relative; width: 100%; height: 120px; border-radius: 20px; overflow: hidden; background: #e2e8f0; border: 1.5px solid #c8e3f2; }
+        .promo-slider-track { display: flex; height: 100%; width: 100%; transition: transform 0.4s ease; }
+        .promo-slide { min-width: 100%; height: 100%; cursor: pointer; }
+        .promo-slide img { width: 100%; height: 100%; object-fit: cover; }
+        .promo-dots { position: absolute; bottom: 8px; right: 12px; display: flex; gap: 5px; z-index: 5; background: rgba(0, 0, 0, 0.45); padding: 3px 6px; border-radius: 12px; }
+        .promo-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255, 255, 255, 0.5); }
+        .promo-dot.active { width: 16px; border-radius: 4px; background: #00d2ff; }
+
+        /* ================= MODERN 3D BOTTOM NAV ================= */
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 74px;
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(12px);
+            border-top: 1.5px solid #d4ebf8;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 6px 8px 4px;
+            z-index: 50;
+            box-shadow: 0 -6px 25px rgba(12, 74, 110, 0.08);
+        }
+        .nav-link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: #64748b;
+            text-decoration: none;
+            font-size: 10px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+        }
+        .nav-link i {
+            font-size: 21px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.06));
+            transition: transform 0.2s;
+        }
+        .nav-link:active i { transform: scale(0.88); }
+        
+        /* Modern Colorful Active States */
+        .nav-link.active { color: #0284c7; }
+        .nav-link.active i { filter: drop-shadow(0 3px 8px rgba(2, 132, 199, 0.4)); }
+        .nav-link.lucky-tab { color: #8b5cf6; }
+        .nav-link.history-tab { color: #059669; }
+        .nav-link.refer-tab { color: #ea580c; }
+
+        /* Center Support Raised Bubble */
+        .nav-link.center-support {
+            position: relative;
+            top: -14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+        }
+        .center-bubble-3d {
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2.5px solid #0284c7;
+            box-shadow: 0 8px 22px rgba(2, 132, 199, 0.38), inset 0 1px 1px #fff;
+            padding: 3px;
+            overflow: hidden;
+            transition: transform 0.2s;
+        }
+        .center-bubble-3d:active { transform: scale(0.92); }
+        .center-bubble-img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+        .center-support-text {
+            font-size: 10px;
+            font-weight: 850;
+            color: #0284c7;
+            letter-spacing: 0.2px;
+        }
+
+        /* 50 BDT Modal */
+        .verify-modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(6px); z-index: 2100; display: none; align-items: center; justify-content: center; padding: 18px; }
+        .verify-modal-overlay.active { display: flex; }
+        .verify-modal-card { background: #ffffff; border-radius: 28px; width: 100%; max-width: 330px; padding: 24px 20px 22px; text-align: center; position: relative; animation: sheetUp 0.25s ease; box-shadow: 0 20px 45px rgba(0,0,0,0.25); }
+        .verify-close-btn { position: absolute; top: 14px; right: 16px; background: #f1f5f9; border: none; width: 30px; height: 30px; border-radius: 50%; font-size: 16px; color: #64748b; cursor: pointer; }
+        .verify-badge-large { width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #f59e0b, #d97706); color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto 14px; }
+        .verify-modal-card h3 { font-size: 18px; font-weight: 850; color: #0f172a; margin-bottom: 6px; }
+        .verify-fee-pill { display: inline-block; background: #fef3c7; border: 1px solid #fde68a; color: #b45309; font-size: 12px; font-weight: 800; padding: 3px 12px; border-radius: 20px; margin-bottom: 12px; }
+        .verify-modal-card p { font-size: 12px; color: #64748b; line-height: 1.5; margin-bottom: 20px; }
+        .btn-verify-now { width: 100%; padding: 13px; border-radius: 16px; border: none; background: linear-gradient(135deg, #10b981, #059669); color: #ffffff; font-size: 14px; font-weight: 800; cursor: pointer; margin-bottom: 8px; }
+        .btn-verify-later { width: 100%; padding: 10px; border-radius: 14px; border: 1px solid #cbd5e1; background: transparent; color: #64748b; font-size: 12px; font-weight: 700; cursor: pointer; }
+
+        /* Logout Modal */
+        .logout-modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(5px); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 20px; }
+        .logout-modal-overlay.active { display: flex; }
+        .logout-modal-card { background: #ffffff; border-radius: 24px; width: 100%; max-width: 320px; padding: 24px 20px 20px; text-align: center; }
+        .logout-icon-box { width: 56px; height: 56px; border-radius: 50%; background: #fee2e2; color: #ef4444; display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 14px; }
+        .logout-modal-card h3 { font-size: 17px; font-weight: 800; color: #0f172a; margin-bottom: 6px; }
+        .logout-modal-card p { font-size: 12px; color: #64748b; margin-bottom: 20px; }
+        .logout-actions { display: flex; gap: 10px; }
+        .btn-cancel-logout { flex: 1; padding: 11px; border-radius: 14px; border: 1px solid #cbd5e1; background: #f8fafc; font-weight: 700; cursor: pointer; }
+        .btn-confirm-logout { flex: 1; padding: 11px; border-radius: 14px; border: none; background: #ef4444; color: #fff; font-weight: 700; cursor: pointer; }
+
+        /* Toast */
+        .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); background: #0f172a; color: #FFF; padding: 10px 18px; border-radius: 30px; font-size: 12.5px; font-weight: 600; transition: all 0.35s ease; z-index: 2500; opacity: 0; white-space: nowrap; }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        .toast.success i { color: #10B981; }
+        .toast.error i { color: #EF4444; }
+        .toast.info i { color: #38bdf8; }
+    </style>
+</head>
+<body>
+
+    <div class="phone">
+
+        <!-- 1. AUTH SCREEN -->
+        <div id="authScreen" class="auth-screen">
+            <div class="auth-status">
+                <span>9:41</span>
+                <span>◆ ▴ ▰</span>
+            </div>
+            <div class="auth-brand">
+                <i class="fa-solid fa-coins" style="color:#d8ff38;"></i> MicroTask.
+            </div>
+            <main class="auth-main">
+                <div class="auth-hero">
+                    <img src="https://i.ibb.co.com/5W2f2xg4/pngtree-money-icon-dollar-coins-cash-payment-online-earning-png-image-7589413.png" alt="MicroTask Logo" class="auth-logo-img">
+                </div>
+                <section class="auth-intro">
+                    <h1>Let’s find good<br>things together.</h1>
+                    <p>Start your journey with a simple, secure MicroTask account.</p>
+                </section>
+                <div class="auth-actions">
+                    <button class="auth-btn primary" onclick="openSheet('register')">Create Account</button>
+                    <button class="auth-btn secondary" onclick="openSheet('login')">Sign In</button>
+                </div>
+                <p class="auth-legal">
+                    By signing up, you agree to our 
+                    <a href="#" onclick="showToast('Terms of Service','info');return false">Terms of Service</a> and 
+                    <a href="#" onclick="showToast('Privacy Policy','info');return false">Privacy Policy</a>.
+                </p>
+            </main>
+
+            <!-- Slide-up Form Sheet -->
+            <div class="sheet" id="sheet" onclick="if(event.target===this)closeSheet()">
+                <section class="panel">
+                    <div class="handle"></div>
+                    <button class="close-btn-sheet" onclick="closeSheet()">×</button>
+                    
+                    <!-- Register Form -->
+                    <div id="registerView">
+                        <h2>Create your account</h2>
+                        <p class="sub">Enter your details to get started</p>
+                        <div class="divider">REGISTER WITH EMAIL / PHONE</div>
+                        <form id="registerForm" onsubmit="handleInvezoRegister(event)">
+                            <div class="field">
+                                <label for="regName">Full name</label>
+                                <input id="regName" placeholder="Enter your full name" autocomplete="name" required>
+                            </div>
+                            <div class="field">
+                                <label for="regIdentity">Email Address or Gmail</label>
+                                <input id="regIdentity" type="email" placeholder="name@gmail.com" autocomplete="username" required>
+                            </div>
+                            <div class="field">
+                                <label for="regPassword">Password</label>
+                                <div class="input-wrap">
+                                    <input id="regPassword" type="password" placeholder="Create a password (6+ characters)" minlength="6" required>
+                                    <button class="eye" type="button" onclick="toggleInvezoPassword('regPassword',this)">
+                                        <svg viewBox="0 0 24 24"><path d="M3 3l18 18"/><path d="M10.6 10.6a2 2 0 0 0 2.8 2.8"/><path d="M9.9 5.2A10.8 10.8 0 0 1 12 5c6.4 0 10 7 10 7a16 16 0 0 1-3.1 3.8"/><path d="M6.2 6.2C3.5 8 2 12 2 12s3.6 7 10 7a10 10 0 0 0 4-.8"/></svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label for="regConfirm">Confirm password</label>
+                                <div class="input-wrap">
+                                    <input id="regConfirm" type="password" placeholder="Enter password again" minlength="6" required>
+                                    <button class="eye" type="button" onclick="toggleInvezoPassword('regConfirm',this)">
+                                        <svg viewBox="0 0 24 24"><path d="M3 3l18 18"/><path d="M10.6 10.6a2 2 0 0 0 2.8 2.8"/><path d="M9.9 5.2A10.8 10.8 0 0 1 12 5c6.4 0 10 7 10 7a16 16 0 0 1-3.1 3.8"/><path d="M6.2 6.2C3.5 8 2 12 2 12s3.6 7 10 7a10 10 0 0 0 4-.8"/></svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="row-between">
+                                <label class="check"><input type="checkbox" id="termsAgree" required> I agree to the Terms</label>
+                            </div>
+                            <div class="message" id="regMessage"></div>
+                            <button class="auth-btn primary" id="regSubmitBtn" type="submit" style="margin-top:10px;">Create Account</button>
+                        </form>
+                        
+                        <div class="social-bottom">
+                            <span>Or continue with</span>
+                            <div class="social-icons">
+                                <button type="button" class="social-circle google" onclick="handleSocialAuth('Google')">G</button>
+                                <button type="button" class="social-circle facebook" onclick="handleSocialAuth('Facebook')">f</button>
+                            </div>
+                        </div>
+
+                        <p class="switch">Already have an account? <span class="auth-link" onclick="showView('login')">Sign In</span></p>
+                    </div>
+
+                    <!-- Login Form -->
+                    <div id="loginView" style="display:none">
+                        <h2>Welcome back</h2>
+                        <p class="sub">Sign in to continue to your account</p>
+                        <div class="divider">SIGN IN WITH EMAIL</div>
+                        <form id="loginForm" onsubmit="handleInvezoLogin(event)">
+                            <div class="field">
+                                <label for="loginIdentity">Email Address</label>
+                                <input id="loginIdentity" type="email" placeholder="name@gmail.com" autocomplete="username" required>
+                            </div>
+                            <div class="field">
+                                <label for="loginPassword">Password</label>
+                                <div class="input-wrap">
+                                    <input id="loginPassword" type="password" placeholder="Enter your password" required>
+                                    <button class="eye" type="button" onclick="toggleInvezoPassword('loginPassword',this)">
+                                        <svg viewBox="0 0 24 24"><path d="M3 3l18 18"/><path d="M10.6 10.6a2 2 0 0 0 2.8 2.8"/><path d="M9.9 5.2A10.8 10.8 0 0 1 12 5c6.4 0 10 7 10 7a16 16 0 0 1-3.1 3.8"/><path d="M6.2 6.2C3.5 8 2 12 2 12s3.6 7 10 7a10 10 0 0 0 4-.8"/></svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="row-between">
+                                <label class="check"><input type="checkbox" checked> Remember me</label>
+                                <span class="auth-link" onclick="showView('forgot')">Forgot password?</span>
+                            </div>
+                            <div class="message" id="loginMessage"></div>
+                            <button class="auth-btn primary" id="loginSubmitBtn" type="submit" style="margin-top:10px;">Sign In</button>
+                        </form>
+
+                        <div class="social-bottom">
+                            <span>Or continue with</span>
+                            <div class="social-icons">
+                                <button type="button" class="social-circle google" onclick="handleSocialAuth('Google')">G</button>
+                                <button type="button" class="social-circle facebook" onclick="handleSocialAuth('Facebook')">f</button>
+                            </div>
+                        </div>
+
+                        <p class="switch">New here? <span class="auth-link" onclick="showView('register')">Create Account</span></p>
+                    </div>
+
+                    <!-- Forgot Password -->
+                    <div id="forgotView" style="display:none">
+                        <h2>Reset password</h2>
+                        <p class="sub">Enter your registered email address</p>
+                        <form id="forgotForm" onsubmit="handleInvezoForgot(event)">
+                            <div class="field">
+                                <label for="forgotIdentity">Email address</label>
+                                <input id="forgotIdentity" type="email" placeholder="name@gmail.com" required>
+                            </div>
+                            <div class="message" id="forgotMessage"></div>
+                            <button class="auth-btn primary" type="submit" style="margin-top:10px;">Send reset instructions</button>
+                        </form>
+                        <p class="switch"><span class="auth-link" onclick="showView('login')">← Back to Sign In</span></p>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- 2. MAIN 3D BLUE-GREEN DASHBOARD -->
+        <div id="mainDashboard" class="main-dashboard">
+            <div class="app-body">
+                
+                <!-- 3D Header -->
+                <div class="header">
+                    <div class="brand">
+                        <div class="brand-logo-box">
+                            <img src="https://i.ibb.co.com/5W2f2xg4/pngtree-money-icon-dollar-coins-cash-payment-online-earning-png-image-7589413.png" alt="MicroTask Logo" class="brand-logo-img">
+                        </div>
+                        <div class="brand-title">
+                            <h1>Micro<span>Task</span></h1>
+                            <p>Small Tasks Big Earnings</p>
+                        </div>
+                    </div>
+                    <div class="header-actions">
+                        <div class="notif-btn" onclick="window.location.href='notifications.html'">
+                            <i class="fa-regular fa-bell"></i>
+                            <span class="notif-badge" id="notifBadgeCount">0</span>
+                        </div>
+                        <div class="profile-btn" onclick="openLogoutModal()" title="Logout">
+                            <div class="profile-avatar">
+                                <i class="fa-solid fa-user"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3D Balance Card -->
+                <div class="balance-card">
+                    <div class="balance-top-row">
+                        <div class="balance-left-content">
+                            <div class="wallet-circle-3d">
+                                <img src="https://img.icons8.com/?size=100&id=L0TH_5m8bo5r&format=png&color=ffffff" alt="Wallet" class="custom-icon-fill">
+                            </div>
+                            <div class="balance-text-group">
+                                <div class="balance-label-line">
+                                    <span>My Balance</span>
+                                    <i class="fa-solid fa-eye eye-toggle-btn" id="eyeIcon" onclick="toggleBalance()"></i>
+                                </div>
+                                <div class="balance-amount-line" id="balanceAmount">$ 0.00</div>
+                                <div class="balance-bdt-line" id="bdtAmount">≈ 0.00 BDT</div>
+                            </div>
+                        </div>
+
+                        <div class="user-meta-right">
+                            <span class="user-name-text" id="dashboardUserName">User</span>
+                            <div class="uid-chip-3d" onclick="copyUID()" title="Click to copy UID">
+                                <span id="uidText">UID: 000000</span>
+                                <i class="fa-regular fa-copy" style="font-size:9.5px;"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="balance-sub-stats-grid">
+                        <div class="sub-stat-box">
+                            <div class="sub-stat-mini-icon green-glow">
+                                <i class="fa-solid fa-arrow-trend-up"></i>
+                            </div>
+                            <div class="sub-stat-labels">
+                                <span>Today</span>
+                                <strong id="todayEarnText">$ 0.00</strong>
+                            </div>
+                        </div>
+
+                        <div class="sub-stat-box">
+                            <div class="sub-stat-mini-icon blue-glow">
+                                <i class="fa-solid fa-sack-dollar"></i>
+                            </div>
+                            <div class="sub-stat-labels">
+                                <span>Total</span>
+                                <strong id="totalEarnText">$ 0.00</strong>
+                            </div>
+                        </div>
+
+                        <div class="verify-badge-pill" id="verifyPillWrapper" onclick="openVerifyModal()" title="Account Verification">
+                            <div class="verify-pill-icon" id="verifyBadgeIcon">
+                                <i class="fa-solid fa-shield"></i>
+                            </div>
+                            <div class="verify-pill-text">
+                                <span>Status</span>
+                                <strong id="verifyBadgeText">Unverified</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3D Actions Grid -->
+                <div class="actions-grid">
+                    <div class="action-box-3d deposit" onclick="handleSecureNav('deposit.html')">
+                        <div class="action-left">
+                            <div class="action-icon-wrap">
+                                <img src="https://img.icons8.com/?size=100&id=SywK0qRgyexK&format=png&color=ffffff" alt="Deposit" class="custom-icon-fill">
+                            </div>
+                            <div class="action-info">
+                                <h3>Deposit</h3>
+                                <p>Add Money</p>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right" style="font-size:12px; opacity:0.85;"></i>
+                    </div>
+
+                    <div class="action-box-3d withdraw" onclick="handleSecureNav('withdraw.html')">
+                        <div class="action-left">
+                            <div class="action-icon-wrap">
+                                <img src="https://img.icons8.com/?size=100&id=KGhSnVZPf0Vl&format=png&color=ffffff" alt="Withdraw" class="custom-icon-fill">
+                            </div>
+                            <div class="action-info">
+                                <h3>Withdraw</h3>
+                                <p>Cash Out</p>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right" style="font-size:12px; opacity:0.85;"></i>
+                    </div>
+                </div>
+
+                <!-- 3D Task Card 1: Videos -->
+                <div class="task-card-3d">
+                    <div class="task-row-header">
+                        <div class="task-left-meta">
+                            <div class="task-symbol-3d cyan">
+                                <i class="fa-solid fa-play"></i>
+                            </div>
+                            <div class="task-text">
+                                <h4>Watch Videos & Earn</h4>
+                                <p>Watch videos from popular platforms</p>
+                            </div>
+                        </div>
+                        <div class="task-pill green-pill">
+                            <span>$0.05 – $0.30</span>
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </div>
+                    </div>
+
+                    <div class="video-grid">
+                        <div class="video-card-3d" onclick="handleSecureNav('youtube-tasks.html')">
+                            <div class="video-icon yt"><i class="fa-brands fa-youtube"></i></div>
+                            <span>YouTube</span>
+                            <small>+ Earn</small>
+                        </div>
+                        <div class="video-card-3d" onclick="handleSecureNav('facebook-tasks.html')">
+                            <div class="video-icon fb"><i class="fa-brands fa-facebook-f"></i></div>
+                            <span>Facebook</span>
+                            <small>+ Earn</small>
+                        </div>
+                        <div class="video-card-3d" onclick="handleSecureNav('instagram-tasks.html')">
+                            <div class="video-icon ig"><i class="fa-brands fa-instagram"></i></div>
+                            <span>Instagram</span>
+                            <small>+ Earn</small>
+                        </div>
+                        <div class="video-card-3d" onclick="handleSecureNav('tiktok-tasks.html')">
+                            <div class="video-icon tiktok"><i class="fa-brands fa-tiktok"></i></div>
+                            <span>TikTok</span>
+                            <small>+ Earn</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3D Task Card 2: Typing -->
+                <div class="task-card-3d" onclick="handleSecureNav('typing')" style="cursor:pointer;">
+                    <div class="task-row-header">
+                        <div class="task-left-meta">
+                            <div class="task-symbol-3d purple">
+                                <i class="fa-solid fa-keyboard"></i>
+                            </div>
+                            <div class="task-text">
+                                <h4>Typing Task</h4>
+                                <p>Paragraphs & Poems • Professional Writing</p>
+                            </div>
+                        </div>
+                        <div class="task-pill blue-pill">
+                            <span>৳100 – ৳3,600</span>
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3D Task Card 3: Telegram Bonus ($0.10) -->
+                <div class="task-card-3d" id="taskTelegramBox" onclick="handleTelegramTaskClick()" style="cursor:pointer;">
+                    <div class="task-row-header">
+                        <div class="task-left-meta">
+                            <div class="task-symbol-3d telegram-blue">
+                                <i class="fa-brands fa-telegram"></i>
+                            </div>
+                            <div class="task-text">
+                                <h4>Telegram Join Bonus</h4>
+                                <p>Join our official channel & claim bonus</p>
+                            </div>
+                        </div>
+                        <div class="task-pill green-pill" id="telegramPillBadge">
+                            <span>+$0.10</span>
+                            <i class="fa-solid fa-gift"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3D Promo Banner Slider -->
+                <div class="promo-banner-container">
+                    <div class="promo-slider-track" id="promoSliderTrack"></div>
+                    <div class="promo-dots" id="promoDots"></div>
+                </div>
+
+            </div>
+
+            <!-- ================= MODERN 3D BOTTOM NAV ================= -->
+            <nav class="bottom-nav">
+                <!-- 1. Home (Modern House Chimney Window) -->
+                <div class="nav-link active" onclick="window.location.href='index.html'">
+                    <i class="fa-solid fa-house-chimney-window"></i>
+                    <span>Home</span>
+                </div>
+                
+                <!-- 2. Lucky (Modern Gaming Dice) -->
+                <div class="nav-link lucky-tab" onclick="handleSecureNav('lucky.html')">
+                    <i class="fa-solid fa-dice-d20"></i>
+                    <span>Lucky</span>
+                </div>
+                
+                <!-- 3. Support (Center 3D Headset Bubble + Label Underneath) -->
+                <div class="nav-link center-support" onclick="window.location.href='support.html'">
+                    <div class="center-bubble-3d">
+                        <img src="https://i.ibb.co.com/DHMB6J4S/file-00000000a6888211aa5b662731e1ff68.png" alt="Support" class="center-bubble-img">
+                    </div>
+                    <span class="center-support-text">Support</span>
+                </div>
+
+                <!-- 4. History (Rotational Transaction History Clock) -->
+                <div class="nav-link history-tab" onclick="window.location.href='history.html'">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                    <span>History</span>
+                </div>
+
+                <!-- 5. Refer (Modern Friends & Community Rays) -->
+                <div class="nav-link refer-tab" onclick="handleSecureNav('refer.html')">
+                    <i class="fa-solid fa-users-rays"></i>
+                    <span>Refer</span>
+                </div>
+            </nav>
+        </div>
+
+    </div>
+
+    <!-- 50 BDT Verification Modal -->
+    <div class="verify-modal-overlay" id="verificationModal">
+        <div class="verify-modal-card">
+            <button type="button" class="verify-close-btn" onclick="closeVerifyModal()">✕</button>
+            <div class="verify-badge-large">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <h3>Account Verification</h3>
+            <span class="verify-fee-pill">ফি মাত্র: ৫০ টাকা</span>
+            <p>আপনার অ্যাকাউন্টটি নিরাপদ রাখতে এবং টাস্ক, ইনকাম ও উইথড্র অপশন আনলক করতে ৫০ টাকা দিয়ে অ্যাকাউন্ট ভেরিফাই সম্পন্ন করুন।</p>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+                <button type="button" class="btn-verify-now" onclick="processAccountVerification()">
+                    <i class="fa-solid fa-circle-check"></i> এখনই ভেরিফাই করুন (৫০৳)
+                </button>
+                <button type="button" class="btn-verify-later" onclick="closeVerifyModal()">পরে করব</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logout Modal -->
+    <div class="logout-modal-overlay" id="logoutModal">
+        <div class="logout-modal-card">
+            <div class="logout-icon-box">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+            </div>
+            <h3>লগআউট নিশ্চিত করুন</h3>
+            <p>আপনি কি সত্যিই আপনার অ্যাকাউন্ট থেকে লগআউট করতে চান?</p>
+            <div class="logout-actions">
+                <button type="button" class="btn-cancel-logout" onclick="closeLogoutModal()">বাতিল</button>
+                <button type="button" class="btn-confirm-logout" onclick="confirmLogout()">লগআউট</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Alert Box -->
+    <div class="toast" id="toastBox">
+        <i class="fa-solid fa-circle-check"></i>
+        <span id="toastMsg">Notification message</span>
+    </div>
+
+    <!-- ================= JAVASCRIPT & FIREBASE INTEGRATION ================= -->
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBrG81DRVjx040QhiT68yyRErGXjuCPdS4",
+            authDomain: "micro-task-2906d.firebaseapp.com",
+            projectId: "micro-task-2906d",
+            storageBucket: "micro-task-2906d.firebasestorage.app",
+            messagingSenderId: "642332420854",
+            appId: "1:642332420854:web:67115930992e7685b49ad7",
+            measurementId: "G-N76WH82XYJ"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // স্থায়ী লোকাল সেশন কনফিগারেশন (লগআউট প্রতিরোধ)
+        auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+
+        let currentUserDoc = null;
+        let isBalanceHidden = false;
+
+        // রিফ্রেশ করলে যেন লগআউট না হয়: ইনস্ট্যান্ট ক্যাশ থেকে ডেটা লোড
+        (function restoreSessionInstantly() {
+            const cachedUser = JSON.parse(localStorage.getItem('microtask_cached_user'));
+            if (cachedUser && cachedUser.uid) {
+                document.getElementById('authScreen').style.display = 'none';
+                document.getElementById('mainDashboard').style.display = 'flex';
+                document.getElementById('dashboardUserName').innerText = cachedUser.name || 'User';
+                document.getElementById('uidText').innerText = `UID: ${cachedUser.uid || '000000'}`;
+                
+                const balUSD = cachedUser.balanceUSD || 0;
+                document.getElementById("balanceAmount").textContent = `$ ${balUSD.toFixed(2)}`;
+                document.getElementById("bdtAmount").textContent = `≈ ${(balUSD * 120).toFixed(2)} BDT`;
+            }
+        })();
+
+        function updateBalanceDisplay() {
+            const balUSD = currentUserDoc ? (currentUserDoc.balanceUSD || 0) : 0;
+            const bdtEquivalent = (balUSD * 120).toFixed(2);
+            document.getElementById("balanceAmount").textContent = isBalanceHidden ? "$ ••••" : `$ ${balUSD.toFixed(2)}`;
+            document.getElementById("bdtAmount").textContent = isBalanceHidden ? "≈ •••• BDT" : `≈ ${bdtEquivalent} BDT`;
+        }
+
+        function toggleBalance() {
+            isBalanceHidden = !isBalanceHidden;
+            const eyeIcon = document.getElementById("eyeIcon");
+            eyeIcon.className = isBalanceHidden ? "fa-solid fa-eye-slash eye-toggle-btn" : "fa-solid fa-eye eye-toggle-btn";
+            updateBalanceDisplay();
+        }
+
+        function isUserVerified() {
+            return currentUserDoc && currentUserDoc.isVerified === true;
+        }
+
+        function updateVerificationUI() {
+            const wrapper = document.getElementById('verifyPillWrapper');
+            const badgeIcon = document.getElementById('verifyBadgeIcon');
+            const badgeText = document.getElementById('verifyBadgeText');
+            if (isUserVerified()) {
+                wrapper.className = "verify-badge-pill verified";
+                badgeIcon.innerHTML = `<i class="fa-solid fa-shield-halved"></i>`;
+                badgeText.textContent = "Verified";
+            } else {
+                wrapper.className = "verify-badge-pill";
+                badgeIcon.innerHTML = `<i class="fa-solid fa-shield"></i>`;
+                badgeText.textContent = "Unverified";
+            }
+        }
+
+        function openVerifyModal() {
+            if (isUserVerified()) {
+                showToast("আপনার অ্যাকাউন্ট ইতিমধ্যে ভেরিফাইড!", "success");
+                return;
+            }
+            document.getElementById('verificationModal').classList.add('active');
+        }
+
+        function closeVerifyModal() {
+            document.getElementById('verificationModal').classList.remove('active');
+        }
+
+        function handleSecureNav(destinationUrl) {
+            if (!isUserVerified()) {
+                showToast("কাজটি করতে প্রথমে ৫০ টাকা দিয়ে অ্যাকাউন্ট ভেরিফাই করুন!", "error");
+                openVerifyModal();
+                return;
+            }
+            if (destinationUrl === 'typing') {
+                showToast("Typing jobs opening...", "info");
+            } else {
+                window.location.href = destinationUrl;
+            }
+        }
+
+        function processAccountVerification() {
+            const user = auth.currentUser;
+            if (!user) return;
+
+            db.collection("users").doc(user.uid).update({
+                isVerified: true
+            }).then(() => {
+                closeVerifyModal();
+                showToast("অভিনন্দন! আপনার অ্যাকাউন্ট ভেরিফাইড হয়েছে!", "success");
+            }).catch(err => {
+                showToast("ভেরিফিকেশনে ত্রুটি হয়েছে!", "error");
+            });
+        }
+
+        function copyUID() {
+            const uidText = document.getElementById('uidText').innerText.replace(/[^0-9]/g, '').trim();
+            if (!uidText || uidText === "000000") {
+                showToast("প্রথমে লগইন বা একাউন্ট তৈরি করুন!", "error");
+                return;
+            }
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(uidText).then(() => {
+                    showToast("UID Copied: " + uidText, "success");
+                }).catch(() => fallbackCopy(uidText));
+            } else {
+                fallbackCopy(uidText);
+            }
+        }
+
+        function fallbackCopy(text) {
+            const textarea = document.createElement("textarea");
+            textarea.value = text;
+            textarea.style.position = "fixed";
+            textarea.style.left = "-9999px";
+            document.body.appendChild(textarea);
+            textarea.focus();
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                showToast("UID Copied: " + text, "success");
+            } catch (err) {
+                showToast("কপি করা যায়নি, ম্যানুয়ালি কপি করুন", "error");
+            }
+            document.body.removeChild(textarea);
+        }
+
+        function checkTelegramClaimState() {
+            const pill = document.getElementById('telegramPillBadge');
+            if (currentUserDoc && currentUserDoc.telegramClaimed) {
+                pill.className = "task-pill claimed-pill";
+                pill.innerHTML = `<span>Claimed</span> <i class="fa-solid fa-check"></i>`;
+            }
+        }
+
+        function handleTelegramTaskClick() {
+            const user = auth.currentUser;
+            if (!user) return;
+
+            if (currentUserDoc && currentUserDoc.telegramClaimed) {
+                window.open('https://t.me/OnlineBD77R', '_blank');
+                return;
+            }
+
+            window.open('https://t.me/OnlineBD77R', '_blank');
+            setTimeout(() => {
+                const newBal = (currentUserDoc.balanceUSD || 0) + 0.10;
+                db.collection("users").doc(user.uid).update({
+                    balanceUSD: newBal,
+                    telegramClaimed: true
+                }).then(() => {
+                    showToast("অভিনন্দন! টেলিগ্রামে জয়েন করার জন্য $0.10 বোনাস যোগ হয়েছে!", "success");
+                });
+            }, 1500);
+        }
+
+        function openLogoutModal() { document.getElementById('logoutModal').classList.add('active'); }
+        function closeLogoutModal() { document.getElementById('logoutModal').classList.remove('active'); }
+        
+        function confirmLogout() {
+            closeLogoutModal();
+            auth.signOut().then(() => {
+                localStorage.removeItem('microtask_cached_user');
+                document.getElementById('mainDashboard').style.display = 'none';
+                document.getElementById('authScreen').style.display = 'flex';
+                showToast('সফলভাবে লগআউট করা হয়েছে।', 'info');
+            });
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toastBox');
+            const toastMsg = document.getElementById('toastMsg');
+            const icon = toast.querySelector('i');
+            toastMsg.innerText = message;
+            toast.className = `toast ${type} show`;
+            if (type === 'success') icon.className = 'fa-solid fa-circle-check';
+            else if (type === 'error') icon.className = 'fa-solid fa-circle-exclamation';
+            else icon.className = 'fa-solid fa-circle-info';
+            setTimeout(() => { toast.classList.remove('show'); }, 3000);
+        }
+
+        const sheet = document.getElementById('sheet');
+        function openSheet(view) { sheet.classList.add('open'); showView(view); }
+        function closeSheet() { sheet.classList.remove('open'); }
+        function showView(view) {
+            ['register','login','forgot'].forEach(v => {
+                const el = document.getElementById(v + 'View');
+                if (el) el.style.display = (v === view ? 'block' : 'none');
+            });
+        }
+        function toggleInvezoPassword(id, btn) {
+            const input = document.getElementById(id);
+            input.type = (input.type === 'password') ? 'text' : 'password';
+        }
+
+        function handleInvezoRegister(e) {
+            e.preventDefault();
+            const name = document.getElementById('regName').value.trim();
+            const email = document.getElementById('regIdentity').value.trim();
+            const password = document.getElementById('regPassword').value;
+            const confirm = document.getElementById('regConfirm').value;
+            const msgEl = document.getElementById('regMessage');
+            const btn = document.getElementById('regSubmitBtn');
+
+            if (password !== confirm) {
+                msgEl.textContent = 'Passwords do not match.';
+                msgEl.className = 'message show error';
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = "Creating account...";
+
+            auth.createUserWithEmailAndPassword(email, password)
+                .then(userCredential => {
+                    const user = userCredential.user;
+                    const randomUID = Math.floor(100000 + Math.random() * 900000).toString();
+
+                    const userPayload = {
+                        name: name,
+                        email: email,
+                        uid: randomUID,
+                        balanceUSD: 0.00,
+                        isVerified: false,
+                        telegramClaimed: false,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    };
+
+                    localStorage.setItem('microtask_cached_user', JSON.stringify(userPayload));
+                    return db.collection("users").doc(user.uid).set(userPayload);
+                })
+                .then(() => {
+                    msgEl.textContent = 'Account created successfully!';
+                    msgEl.className = 'message show';
+                    setTimeout(() => { closeSheet(); }, 600);
+                })
+                .catch(err => {
+                    msgEl.textContent = err.message;
+                    msgEl.className = 'message show error';
+                    btn.disabled = false;
+                    btn.innerText = "Create Account";
+                });
+        }
+
+        function handleInvezoLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginIdentity').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const msgEl = document.getElementById('loginMessage');
+            const btn = document.getElementById('loginSubmitBtn');
+
+            btn.disabled = true;
+            btn.innerText = "Signing in...";
+
+            auth.signInWithEmailAndPassword(email, password)
+                .then(() => { closeSheet(); })
+                .catch(err => {
+                    msgEl.textContent = err.message;
+                    msgEl.className = 'message show error';
+                    btn.disabled = false;
+                    btn.innerText = "Sign In";
+                });
+        }
+
+        function handleSocialAuth(provider) {
+            showToast(`${provider} সাইন-ইন শীঘ্রই আসছে...`, 'info');
+        }
+
+        function handleInvezoForgot(e) {
+            e.preventDefault();
+            const email = document.getElementById('forgotIdentity').value.trim();
+            auth.sendPasswordResetEmail(email)
+                .then(() => {
+                    showToast('পাসওয়ার্ড রিসেট লিঙ্ক ইমেইলে পাঠানো হয়েছে!', 'success');
+                    showView('login');
+                })
+                .catch(err => showToast(err.message, 'error'));
+        }
+
+        // Live Real-Time Firestore Listener
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                db.collection("users").doc(user.uid).onSnapshot(doc => {
+                    if (doc.exists) {
+                        currentUserDoc = doc.data();
+                        localStorage.setItem('microtask_cached_user', JSON.stringify(currentUserDoc));
+
+                        document.getElementById('authScreen').style.display = 'none';
+                        document.getElementById('mainDashboard').style.display = 'flex';
+
+                        document.getElementById('dashboardUserName').innerText = currentUserDoc.name || 'User';
+                        document.getElementById('uidText').innerText = `UID: ${currentUserDoc.uid || '000000'}`;
+
+                        updateBalanceDisplay();
+                        updateVerificationUI();
+                        checkTelegramClaimState();
+
+                        if (!isUserVerified()) {
+                            setTimeout(() => { openVerifyModal(); }, 1200);
+                        }
+                    }
+                });
+            } else {
+                if (!localStorage.getItem('microtask_cached_user')) {
+                    document.getElementById('mainDashboard').style.display = 'none';
+                    document.getElementById('authScreen').style.display = 'flex';
+                }
+            }
+        });
+
+        // Banner Slider
+        const DEFAULT_BANNERS = [
+            { id: 1, image: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiMYjDFVZDdjcwC6sak9GyxRpoQr4T6DplZPlvizJo8QcdoO567NWCBVXCw5ISh4UjIHUBULoQoaz4rAlOHdiRczMQpu1R1JhIeeVdcpGKrMOxeOXPdTc2NUP6MCtIE1y15U4-kW1a8aqNoS1ffr4VOUihkr_3cxlDxaNjYmj8BXBBAJyDdhyphenhyphen2vyw542mkX/s1536/13441.png", action: "deposit.html" },
+            { id: 2, image: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=750&q=80", action: "refer.html" }
+        ];
+
+        let currentBannerIdx = 0;
+        let bannerInterval = null;
+        function renderDynamicBanners() {
+            const track = document.getElementById('promoSliderTrack');
+            const dotsContainer = document.getElementById('promoDots');
+            track.innerHTML = DEFAULT_BANNERS.map((b, i) => `
+                <div class="promo-slide" onclick="handleSecureNav('${b.action}')">
+                    <img src="${b.image}" alt="Banner">
+                </div>
+            `).join('');
+            dotsContainer.innerHTML = DEFAULT_BANNERS.map((_, i) => `<div class="promo-dot ${i === 0 ? 'active' : ''}"></div>`).join('');
+            if (bannerInterval) clearInterval(bannerInterval);
+            bannerInterval = setInterval(() => {
+                currentBannerIdx = (currentBannerIdx + 1) % DEFAULT_BANNERS.length;
+                track.style.transform = `translateX(-${currentBannerIdx * 100}%)`;
+                document.querySelectorAll('.promo-dot').forEach((dot, idx) => dot.classList.toggle('active', idx === currentBannerIdx));
+            }, 3800);
+        }
+
+        renderDynamicBanners();
+    </script>
+</body>
+</html>
