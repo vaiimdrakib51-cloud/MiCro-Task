@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Notifications — MicroTask</title>
+  <!-- Google Fonts & FontAwesome -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: #f1f5f9;
+      display: flex;
+      justify-content: center;
+      padding: 16px 8px;
+      color: #0f172a;
+      min-height: 100vh;
+    }
+
+    /* অ্যাপের মূল ফ্রেম */
+    .app-container {
+      width: 100%;
+      max-width: 415px;
+      background: #ffffff;
+      border-radius: 36px;
+      padding: 20px 16px;
+      box-shadow: 0 16px 40px rgba(12, 74, 110, 0.08);
+      border: 2px solid #e2e8f0;
+      min-height: 680px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* হেডার */
+    .header {
+      margin-bottom: 16px;
+    }
+
+    .title-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 4px;
+    }
+
+    .notif-back-btn {
+      background: #f8fafc;
+      border: 1.5px solid #dce4f2;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      color: #0f172a;
+      cursor: pointer;
+      transition: all 0.2s;
+      flex-shrink: 0;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    }
+    .notif-back-btn:active { transform: scale(0.92); }
+
+    .title-row .bell-icon {
+      font-size: 22px;
+      color: #f59e0b;
+    }
+
+    .title-row h1 {
+      font-size: 20px;
+      font-weight: 850;
+      color: #0f172a;
+      letter-spacing: -0.4px;
+    }
+
+    .badge-count {
+      background-color: #ef4444;
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 800;
+      min-width: 20px;
+      height: 20px;
+      padding: 0 6px;
+      border-radius: 10px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 6px rgba(239, 68, 68, 0.35);
+    }
+
+    .subtitle {
+      color: #64748b;
+      font-size: 11.5px;
+      margin-top: 2px;
+      font-weight: 500;
+    }
+
+    /* ফিল্টার বাটনস */
+    .filters {
+      display: flex;
+      gap: 7px;
+      overflow-x: auto;
+      padding-bottom: 12px;
+      scrollbar-width: none;
+    }
+    .filters::-webkit-scrollbar { display: none; }
+
+    .filter-btn {
+      background: #f8fafc;
+      color: #475569;
+      border: 1.5px solid #e2e8f0;
+      padding: 7px 13px;
+      border-radius: 50px;
+      font-size: 11.5px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+
+    .filter-btn:hover { background: #edf2f7; }
+
+    .filter-btn.active {
+      background: linear-gradient(135deg, #0284c7, #0d9488);
+      color: #ffffff;
+      border-color: #0284c7;
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
+    }
+
+    /* নোটিফিকেশন কার্ড লিস্ট */
+    .notification-list {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      flex: 1;
+    }
+
+    .notif-card {
+      position: relative;
+      background: #ffffff;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 18px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+    }
+    .notif-card:hover {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+      transform: translateY(-1px);
+    }
+
+    .notif-card.read {
+      background: #fbfcfe;
+      border-color: #edf2f7;
+    }
+    .notif-card.read .card-title {
+      color: #64748b;
+    }
+
+    .icon-box {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+      flex-shrink: 0;
+      color: #ffffff;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .card-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .card-header-line {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 2px;
+    }
+
+    .card-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: #0f172a;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .tag {
+      font-size: 9px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 8px;
+      text-transform: capitalize;
+    }
+
+    .tag-earnings { background: #dcfce7; color: #15803d; }
+    .tag-task { background: #e0f2fe; color: #0369a1; }
+    .tag-referral { background: #f3e8ff; color: #7e22ce; }
+    .tag-system { background: #ffedd5; color: #c2410c; }
+
+    .card-desc {
+      font-size: 11px;
+      color: #64748b;
+      line-height: 1.4;
+      margin-bottom: 4px;
+    }
+
+    .card-time {
+      font-size: 10px;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-weight: 600;
+    }
+
+    .card-chevron {
+      color: #cbd5e1;
+      font-size: 12px;
+    }
+
+    .unread-dot {
+      position: absolute;
+      top: 13px;
+      right: 13px;
+      width: 8px;
+      height: 8px;
+      background-color: #ef4444;
+      border-radius: 50%;
+      box-shadow: 0 0 6px rgba(239, 68, 68, 0.6);
+    }
+
+    .bg-green { background: linear-gradient(135deg, #10b981, #059669); }
+    .bg-blue { background: linear-gradient(135deg, #0284c7, #0369a1); }
+    .bg-purple { background: linear-gradient(135deg, #a855f7, #7e22ce); }
+    .bg-orange { background: linear-gradient(135deg, #f97316, #ea580c); }
+
+    /* খালি নোটিফিকেশনের মেসেজ */
+    .empty-msg {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      padding: 70px 10px;
+      color: #94a3b8;
+      text-align: center;
+    }
+    .empty-msg i {
+      font-size: 40px;
+      margin-bottom: 12px;
+      color: #cbd5e1;
+    }
+    .empty-msg p {
+      font-size: 13px;
+      font-weight: 700;
+      color: #64748b;
+    }
+    .empty-msg span {
+      font-size: 11px;
+      color: #94a3b8;
+      margin-top: 3px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- হেডার -->
+    <div class="header">
+      <div class="title-row">
+        <!-- ড্যাশবোর্ডে ফিরে যাওয়ার বাটন -->
+        <button class="notif-back-btn" onclick="window.location.href='index.html'" title="Back to Dashboard">
+          <i class="fa-solid fa-arrow-left"></i>
+        </button>
+        <i class="fa-solid fa-bell bell-icon"></i>
+        <h1>Notifications</h1>
+        <span class="badge-count" id="badgeCount">0</span>
+      </div>
+      <p class="subtitle">Stay updated with your earnings, tasks and more!</p>
+    </div>
+
+    <!-- ক্যাটাগরি ফিল্টার বাটনস -->
+    <div class="filters">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="earnings"><i class="fa-solid fa-wallet"></i> Earnings</button>
+      <button class="filter-btn" data-filter="tasks"><i class="fa-solid fa-square-check"></i> Tasks</button>
+      <button class="filter-btn" data-filter="referral"><i class="fa-solid fa-user-group"></i> Referral</button>
+      <button class="filter-btn" data-filter="system"><i class="fa-solid fa-gear"></i> System</button>
+    </div>
+
+    <!-- ডায়নামিক নোটিফিকেশন লিস্ট -->
+    <div class="notification-list" id="notificationList"></div>
+
+    <!-- খালি নোটিফিকেশনের মেসেজ (ডিফল্টভাবে শো করবে) -->
+    <div class="empty-msg" id="emptyMsg">
+      <i class="fa-regular fa-bell-slash"></i>
+      <p>No notifications found</p>
+      <span>You have no unread or new notifications right now.</span>
+    </div>
+
+  </div>
+
+  <script>
+    // ডেমো নোটিফিকেশন সম্পূর্ণ মুছে ফ্রেশ ও খালি রাখা হয়েছে
+    let notifications = JSON.parse(localStorage.getItem('microtask_notifications')) || [];
+    let currentFilter = 'all';
+
+    function renderNotifications() {
+      const container = document.getElementById('notificationList');
+      const emptyMsg = document.getElementById('emptyMsg');
+      container.innerHTML = '';
+
+      const filtered = notifications.filter(n => currentFilter === 'all' || n.category === currentFilter);
+
+      if (filtered.length === 0) {
+        emptyMsg.style.display = 'flex';
+      } else {
+        emptyMsg.style.display = 'none';
+
+        filtered.forEach(item => {
+          const card = document.createElement('div');
+          card.className = `notif-card ${item.unread ? 'unread' : 'read'}`;
+          card.onclick = () => handleNotificationClick(item.id, item.targetUrl);
+
+          card.innerHTML = `
+            <div class="icon-box ${item.iconBg}">
+              <i class="${item.icon}"></i>
+            </div>
+            <div class="card-content">
+              <div class="card-header-line">
+                <h4 class="card-title">${item.title}</h4>
+                <span class="tag ${item.tagClass}">${item.tag}</span>
+              </div>
+              <p class="card-desc">${item.desc}</p>
+              <span class="card-time"><i class="fa-regular fa-clock"></i> ${item.time}</span>
+            </div>
+            <i class="fa-solid fa-chevron-right card-chevron"></i>
+            ${item.unread ? '<div class="unread-dot"></div>' : ''}
+          `;
+          container.appendChild(card);
+        });
+      }
+
+      updateUnreadBadge();
+    }
+
+    function handleNotificationClick(notifId, targetUrl) {
+      const target = notifications.find(n => n.id === notifId);
+      if (target && target.unread) {
+        target.unread = false;
+        localStorage.setItem('microtask_notifications', JSON.stringify(notifications));
+        updateUnreadBadge();
+      }
+
+      if (targetUrl) {
+        window.location.href = targetUrl;
+      }
+    }
+
+    function updateUnreadBadge() {
+      const unreadTotal = notifications.filter(n => n.unread).length;
+      const badge = document.getElementById('badgeCount');
+      badge.textContent = unreadTotal;
+      
+      localStorage.setItem('microtask_unread_count', unreadTotal);
+
+      if (unreadTotal === 0) {
+        badge.style.display = 'none';
+      } else {
+        badge.style.display = 'flex';
+      }
+    }
+
+    // ক্যাটাগরি ফিল্টার
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    filterButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        filterButtons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+        currentFilter = button.getAttribute('data-filter');
+        renderNotifications();
+      });
+    });
+
+    document.addEventListener('DOMContentLoaded', renderNotifications);
+  </script>
+
+</body>
+</html>
