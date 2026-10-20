@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Lucky Draw — MicroTask</title>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Caveat:wght@700&display=swap" rel="stylesheet">
+  <!-- FontAwesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: #030712;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 16px 10px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* 0. Top Navigation Header with 3D Back Button */
+    .top-nav-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 2px 4px 6px;
+    }
+
+    .back-btn-top {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1.5px solid #1e3a8a;
+      color: #ffffff;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      transition: all 0.2s ease;
+    }
+    .back-btn-top:active { transform: scale(0.92); }
+
+    .top-nav-bar h2 {
+      color: #ffffff;
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+    }
+
+    .card {
+      background: linear-gradient(180deg, #060b24 0%, #030617 100%);
+      border-radius: 20px;
+      padding: 18px;
+      position: relative;
+    }
+
+    /* 1. Next Draw Card */
+    .draw-card {
+      border: 1.5px solid #1e3a8a;
+      box-shadow: 0 0 15px rgba(30, 58, 138, 0.4);
+    }
+
+    .draw-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .live-badge {
+      background: linear-gradient(90deg, #ef4444, #dc2626);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      letter-spacing: 0.5px;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.8; }
+    }
+
+    .draw-title {
+      color: #ffffff;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .schedule {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #f1f5f9;
+      font-size: 13.5px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    .calendar-icon {
+      background: #0ea5e9;
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+    }
+
+    /* Countdown Grid */
+    .countdown-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .count-box {
+      background: #050d26;
+      border: 1.5px solid #1e3a8a;
+      border-radius: 12px;
+      padding: 10px 4px;
+      text-align: center;
+    }
+
+    .count-box .num {
+      display: block;
+      color: #ffffff;
+      font-size: 20px;
+      font-weight: 700;
+      line-height: 1.1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .count-box .label {
+      color: #94a3b8;
+      font-size: 10px;
+      font-weight: 500;
+    }
+
+    /* Join Now Button */
+    .btn-join {
+      width: 100%;
+      background: linear-gradient(180deg, #facc15 0%, #eab308 50%, #ca8a04 100%);
+      color: #000000;
+      font-size: 16px;
+      font-weight: 800;
+      padding: 12px;
+      border: none;
+      border-radius: 25px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(234, 179, 8, 0.4);
+      transition: transform 0.2s;
+    }
+
+    .btn-join:active {
+      transform: scale(0.98);
+    }
+
+    /* 2. Middle Card: Winners */
+    .winners-card {
+      border: 1.5px solid #6366f1;
+      box-shadow: 0 0 15px rgba(99, 102, 241, 0.25);
+    }
+
+    .winners-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #ffffff;
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    .winner-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .winner-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding-bottom: 8px;
+    }
+
+    .winner-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .rank-circle {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .rank-1 { background: #eab308; color: #000; box-shadow: 0 0 8px #eab308; }
+    .rank-2 { background: #93c5fd; color: #000; }
+    .rank-3 { background: #f97316; }
+    .rank-4 { background: #60a5fa; }
+    .rank-5 { background: #38bdf8; }
+
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      object-fit: cover;
+    }
+
+    .border-gold { border-color: #eab308; }
+    .border-silver { border-color: #cbd5e1; }
+    .border-bronze { border-color: #ea580c; }
+    .border-blue { border-color: #3b82f6; }
+    .border-teal { border-color: #06b6d4; }
+
+    .user-info .name {
+      display: block;
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .user-info .amount {
+      color: #facc15;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .badge-icon {
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn-view-all {
+      width: 100%;
+      background: linear-gradient(90deg, #4338ca 0%, #6366f1 100%);
+      color: #ffffff;
+      font-size: 13.5px;
+      font-weight: 700;
+      padding: 10px;
+      border: 1px solid #818cf8;
+      border-radius: 25px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(99, 102, 241, 0.4);
+    }
+
+    /* 3. Bottom Banner */
+    .bottom-banner {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 10px 5px;
+    }
+
+    .gift-box {
+      font-size: 46px;
+      filter: drop-shadow(0 0 12px #a855f7);
+    }
+
+    .banner-text h3 {
+      font-family: 'Caveat', cursive;
+      font-size: 28px;
+      color: #facc15;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .banner-text p {
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    .curved-line {
+      height: 3px;
+      width: 90%;
+      background: linear-gradient(90deg, #facc15, transparent);
+      border-radius: 5px;
+      margin-top: 4px;
+    }
+
+    /* ================= Modal Styling ================= */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(2, 6, 23, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-box {
+      background: linear-gradient(180deg, #0a1130 0%, #030718 100%);
+      border: 1.5px solid #6366f1;
+      box-shadow: 0 0 30px rgba(99, 102, 241, 0.4);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 360px;
+      overflow: hidden;
+      animation: modalFade 0.25s ease-out;
+    }
+
+    @keyframes modalFade {
+      from { transform: scale(0.92); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 18px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .modal-header h4 {
+      color: #facc15;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .btn-close {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      font-size: 24px;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .btn-close:hover { color: #fff; }
+
+    /* Modal Tabs */
+    .modal-tabs {
+      display: flex;
+      background: #04081e;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 11px 4px;
+      background: none;
+      border: none;
+      color: #94a3b8;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s;
+      border-bottom: 2px solid transparent;
+      text-align: center;
+    }
+
+    .tab-btn.active {
+      color: #facc15;
+      border-bottom: 2px solid #facc15;
+      background: rgba(250, 204, 21, 0.05);
+    }
+
+    .modal-body {
+      padding: 16px;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Form Styling */
+    .form-group {
+      margin-bottom: 10px;
+      text-align: left;
+    }
+
+    .form-group label {
+      display: block;
+      color: #cbd5e1;
+      font-size: 11px;
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+
+    .form-control {
+      width: 100%;
+      background: #060e26;
+      border: 1px solid #1e293b;
+      color: #ffffff;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      outline: none;
+    }
+
+    .form-control:focus {
+      border-color: #6366f1;
+    }
+
+    .ticket-price-info {
+      color: #94a3b8;
+      font-size: 12px;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .ticket-price-info strong {
+      color: #38bdf8;
+      font-size: 14px;
+    }
+
+    .btn-confirm-buy {
+      width: 100%;
+      background: linear-gradient(90deg, #10b981, #059669);
+      color: #fff;
+      font-weight: 700;
+      border: none;
+      padding: 10px;
+      border-radius: 20px;
+      font-size: 13.5px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+      margin-top: 8px;
+    }
+
+    /* Prize List */
+    .prize-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .prize-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 8px 12px;
+      border-radius: 10px;
+    }
+
+    .prize-item .rank-title {
+      color: #e2e8f0;
+      font-size: 12.5px;
+      font-weight: 600;
+    }
+
+    .prize-item .prize-val {
+      color: #facc15;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    /* My Tickets History */
+    .ticket-card {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px dashed #6366f1;
+      border-radius: 10px;
+      padding: 10px;
+      margin-bottom: 10px;
+      text-align: left;
+    }
+
+    .ticket-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .ticket-num {
+      background: #facc15;
+      color: #000;
+      font-weight: 800;
+      font-size: 12px;
+      padding: 2px 8px;
+      border-radius: 6px;
+      letter-spacing: 1px;
+    }
+
+    .ticket-date {
+      color: #94a3b8;
+      font-size: 10px;
+    }
+
+    .ticket-details {
+      color: #cbd5e1;
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    .empty-tickets {
+      color: #64748b;
+      font-size: 12px;
+      text-align: center;
+      padding: 30px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    
+    <!-- 0. Header with Back Button to Dashboard -->
+    <div class="top-nav-bar">
+      <button onclick="window.location.href='index.html'" class="back-btn-top" title="Back to Dashboard">
+        <i class="fa-solid fa-arrow-left"></i>
+      </button>
+      <h2>Lucky Draw</h2>
+    </div>
+
+    <!-- 1. Next Draw Card -->
+    <div class="card draw-card">
+      <div class="draw-header">
+        <span class="live-badge">LIVE <span>((•))</span></span>
+        <span class="draw-title">Next Draw</span>
+      </div>
+
+      <div class="schedule">
+        <span class="calendar-icon">📅</span>
+        <span>Sunday, <strong>10:00 PM</strong> (BD Time)</span>
+      </div>
+
+      <!-- Real-Time Countdown Grid -->
+      <div class="countdown-grid">
+        <div class="count-box">
+          <span class="num" id="days">00</span>
+          <span class="label">Days</span>
+        </div>
+        <div class="count-box">
+          <span class="num" id="hours">00</span>
+          <span class="label">Hours</span>
+        </div>
+        <div class="count-box">
+          <span class="num" id="minutes">00</span>
+          <span class="label">Minutes</span>
+        </div>
+        <div class="count-box">
+          <span class="num" id="seconds">00</span>
+          <span class="label">Seconds</span>
+        </div>
+      </div>
+
+      <!-- Join Button -->
+      <button class="btn-join" onclick="openModal('buyTab')">
+        🎟️ Join Now
+      </button>
+    </div>
+
+    <!-- 2. Last Week Winners Card -->
+    <div class="card winners-card">
+      <div class="winners-title">
+        🏆 Last Week Winners
+      </div>
+
+      <div class="winner-list">
+        <!-- Rank 1 -->
+        <div class="winner-row">
+          <div class="winner-left">
+            <span class="rank-circle rank-1">1</span>
+            <img class="avatar border-gold" src="https://i.pravatar.cc/100?img=11" alt="Hriday">
+            <div class="user-info">
+              <span class="name">Hriday***</span>
+              <span class="amount">100 USDT</span>
+            </div>
+          </div>
+          <div class="badge-icon">👑🥇</div>
+        </div>
+
+        <!-- Rank 2 -->
+        <div class="winner-row">
+          <div class="winner-left">
+            <span class="rank-circle rank-2">2</span>
+            <img class="avatar border-silver" src="https://i.pravatar.cc/100?img=12" alt="Sakib">
+            <div class="user-info">
+              <span class="name">Sakib***</span>
+              <span class="amount" style="color: #cbd5e1;">50 USDT</span>
+            </div>
+          </div>
+          <div class="badge-icon">🥈</div>
+        </div>
+
+        <!-- Rank 3 -->
+        <div class="winner-row">
+          <div class="winner-left">
+            <span class="rank-circle rank-3">3</span>
+            <img class="avatar border-bronze" src="https://i.pravatar.cc/100?img=13" alt="Nusrat">
+            <div class="user-info">
+              <span class="name">Nusrat***</span>
+              <span class="amount" style="color: #fb923c;">25 USDT</span>
+            </div>
+          </div>
+          <div class="badge-icon">🥉</div>
+        </div>
+
+        <!-- Rank 4 -->
+        <div class="winner-row">
+          <div class="winner-left">
+            <span class="rank-circle rank-4">4</span>
+            <img class="avatar border-blue" src="https://i.pravatar.cc/100?img=14" alt="MdRafi">
+            <div class="user-info">
+              <span class="name">MdRafi***</span>
+              <span class="amount" style="color: #cbd5e1;">10 USDT</span>
+            </div>
+          </div>
+          <div class="badge-icon">🏅</div>
+        </div>
+
+        <!-- Rank 5 -->
+        <div class="winner-row">
+          <div class="winner-left">
+            <span class="rank-circle rank-5">5</span>
+            <img class="avatar border-teal" src="https://i.pravatar.cc/100?img=15" alt="Tania">
+            <div class="user-info">
+              <span class="name">Tania***</span>
+              <span class="amount" style="color: #2dd4bf;">5 USDT</span>
+            </div>
+          </div>
+          <div class="badge-icon">🟢</div>
+        </div>
+      </div>
+
+      <button class="btn-view-all" onclick="openModal('prizeTab')">
+        View All Winners &rsaquo;
+      </button>
+    </div>
+
+    <!-- 3. Bottom Banner -->
+    <div class="bottom-banner">
+      <div class="gift-box">🎁</div>
+      <div class="banner-text">
+        <h3>Good Luck!</h3>
+        <p>May you be the next winner!</p>
+        <div class="curved-line"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- POPUP MODAL -->
+  <div class="modal-overlay" id="lotteryModal" onclick="closeModalOnOverlay(event)">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h4>🎟️ Lottery Dashboard</h4>
+        <button class="btn-close" onclick="closeModal()">&times;</button>
+      </div>
+
+      <div class="modal-tabs">
+        <button class="tab-btn active" id="btn-buyTab" onclick="switchTab('buyTab')">🎫 Buy Ticket</button>
+        <button class="tab-btn" id="btn-myTicketsTab" onclick="switchTab('myTicketsTab')">🎟️ My Tickets</button>
+        <button class="tab-btn" id="btn-prizeTab" onclick="switchTab('prizeTab')">🏆 Prize Pool</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Tab 1: Buy Ticket -->
+        <div class="tab-content active" id="buyTab">
+          <form id="buyTicketForm" onsubmit="handleTicketPurchase(event)">
+            <p class="ticket-price-info">Ticket Price: <strong>0.20$</strong></p>
+            
+            <div class="form-group">
+              <label>Full Name:</label>
+              <input type="text" id="userName" class="form-control" placeholder="e.g. John Doe" required>
+            </div>
+
+            <div class="form-group">
+              <label>Phone Number:</label>
+              <input type="tel" id="userPhone" class="form-control" placeholder="e.g. +88017xxxxxxxx" required>
+            </div>
+
+            <div class="form-group">
+              <label>Address:</label>
+              <input type="text" id="userAddress" class="form-control" placeholder="City, Street, Area" required>
+            </div>
+
+            <button type="submit" class="btn-confirm-buy">
+              Confirm & Buy Ticket
+            </button>
+          </form>
+        </div>
+
+        <!-- Tab 2: My Tickets -->
+        <div class="tab-content" id="myTicketsTab">
+          <div id="ticketsContainer"></div>
+        </div>
+
+        <!-- Tab 3: Prize Pool -->
+        <div class="tab-content" id="prizeTab">
+          <div class="prize-list">
+            <div class="prize-item">
+              <span class="rank-title">🥇 1st Place</span>
+              <span class="prize-val">100 USDT</span>
+            </div>
+            <div class="prize-item">
+              <span class="rank-title">🥈 2nd Place</span>
+              <span class="prize-val">50 USDT</span>
+            </div>
+            <div class="prize-item">
+              <span class="rank-title">🥉 3rd Place</span>
+              <span class="prize-val">25 USDT</span>
+            </div>
+            <div class="prize-item">
+              <span class="rank-title">🏅 4th Place</span>
+              <span class="prize-val">10 USDT</span>
+            </div>
+            <div class="prize-item">
+              <span class="rank-title">🟢 5th Place</span>
+              <span class="prize-val">5 USDT</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    function getNextSundayTarget() {
+      const now = new Date();
+      const target = new Date();
+      const day = target.getDay();
+      const diffDays = (7 - day) % 7; 
+      target.setDate(target.getDate() + diffDays);
+      target.setHours(22, 0, 0, 0);
+
+      if (target.getTime() <= now.getTime()) {
+        target.setDate(target.getDate() + 7);
+      }
+      return target;
+    }
+
+    let targetDate = getNextSundayTarget();
+
+    function updateCountdown() {
+      const now = new Date().getTime();
+      let diff = targetDate.getTime() - now;
+
+      if (diff <= 0) {
+        targetDate = getNextSundayTarget();
+        diff = targetDate.getTime() - now;
+      }
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+      document.getElementById("days").innerText = String(days).padStart(2, '0');
+      document.getElementById("hours").innerText = String(hours).padStart(2, '0');
+      document.getElementById("minutes").innerText = String(minutes).padStart(2, '0');
+      document.getElementById("seconds").innerText = String(seconds).padStart(2, '0');
+    }
+
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+
+    function openModal(defaultTab = 'buyTab') {
+      document.getElementById('lotteryModal').classList.add('active');
+      switchTab(defaultTab);
+    }
+
+    function closeModal() {
+      document.getElementById('lotteryModal').classList.remove('active');
+    }
+
+    function closeModalOnOverlay(e) {
+      if (e.target.id === 'lotteryModal') closeModal();
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+
+      document.getElementById(tabId).classList.add('active');
+      document.getElementById('btn-' + tabId).classList.add('active');
+
+      if (tabId === 'myTicketsTab') renderTickets();
+    }
+
+    let purchasedTickets = JSON.parse(localStorage.getItem('my_lottery_tickets')) || [];
+
+    function handleTicketPurchase(e) {
+      e.preventDefault();
+
+      const name = document.getElementById('userName').value.trim();
+      const phone = document.getElementById('userPhone').value.trim();
+      const address = document.getElementById('userAddress').value.trim();
+
+      const randomTicketNo = Math.floor(100000 + Math.random() * 900000);
+      
+      const newTicket = {
+        ticketNumber: randomTicketNo,
+        name: name,
+        phone: phone,
+        address: address,
+        price: '0.20$',
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+
+      purchasedTickets.unshift(newTicket);
+      localStorage.setItem('my_lottery_tickets', JSON.stringify(purchasedTickets));
+
+      document.getElementById('buyTicketForm').reset();
+      alert(`Congratulations! Ticket purchased successfully.\nYour Ticket Number: #${randomTicketNo}`);
+      switchTab('myTicketsTab');
+    }
+
+    function renderTickets() {
+      const container = document.getElementById('ticketsContainer');
+      if (purchasedTickets.length === 0) {
+        container.innerHTML = `<div class="empty-tickets">No tickets purchased yet.<br>Buy a ticket to join the draw!</div>`;
+        return;
+      }
+
+      container.innerHTML = purchasedTickets.map(ticket => `
+        <div class="ticket-card">
+          <div class="ticket-header">
+            <span class="ticket-num">#${ticket.ticketNumber}</span>
+            <span class="ticket-date">${ticket.time}</span>
+          </div>
+          <div class="ticket-details">
+            <div><strong>Price:</strong> ${ticket.price}</div>
+            <div><strong>Name:</strong> ${ticket.name}</div>
+            <div><strong>Phone:</strong> ${ticket.phone}</div>
+            <div><strong>Address:</strong> ${ticket.address}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+  </script>
+
+</body>
+</html>
