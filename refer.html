@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MicroTask — Refer & Earn</title>
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome 6 Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: #e6edf5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 14px 6px;
+        }
+
+        /* Phone Screen Outer Frame */
+        .app-screen {
+            width: 100%;
+            max-width: 410px;
+            background: #f1f5f9;
+            border-radius: 36px;
+            border: 2px solid #e2e8f0;
+            box-shadow: 0 18px 45px rgba(15, 30, 60, 0.12);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* ================= 1. TOP HERO IMAGE BANNER WITH 3D BACK BUTTON ================= */
+        .hero-image-banner {
+            width: 100%;
+            overflow: hidden;
+            background: #008761;
+            line-height: 0;
+            border-bottom: 2px solid #00936b;
+            position: relative;
+        }
+
+        /* ড্যাশবোর্ডে ফেরার ব্যাক বাটন */
+        .refer-back-btn {
+            position: absolute;
+            top: 14px;
+            left: 14px;
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(8px);
+            border: 1.5px solid rgba(255, 255, 255, 0.4);
+            color: #ffffff;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            cursor: pointer;
+            z-index: 10;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+            transition: all 0.2s ease;
+        }
+        .refer-back-btn:active {
+            transform: scale(0.92);
+        }
+
+        .banner-img {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: cover;
+        }
+
+        /* ================= 2. MAIN BODY ================= */
+        .main-content {
+            padding: 10px 9px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* CARD 1: 4 STATS ROW */
+        .card-stats-container {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 18px;
+            padding: 8px 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+        }
+
+        .mini-stat-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 6px 2px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .mini-stat-card.green  { background: #e8f9f2; border: 1px solid #cbf4e1; }
+        .mini-stat-card.blue   { background: #eaf4ff; border: 1px solid #d2e7ff; }
+        .mini-stat-card.purple { background: #f3ecff; border: 1px solid #e5d7fc; }
+        .mini-stat-card.orange { background: #fff5e6; border: 1px solid #fee3c5; }
+
+        .stat-icon {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9.5px;
+            color: #ffffff;
+            margin-bottom: 3px;
+            flex-shrink: 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .mini-stat-card.green .stat-icon  { background: linear-gradient(135deg, #00c888, #009e66); }
+        .mini-stat-card.blue .stat-icon   { background: linear-gradient(135deg, #1e88e5, #0d47a1); }
+        .mini-stat-card.purple .stat-icon { background: linear-gradient(135deg, #9c27b0, #6a1b9a); }
+        .mini-stat-card.orange .stat-icon { background: linear-gradient(135deg, #ff9800, #f57c00); }
+
+        .stat-label {
+            font-size: 7.5px;
+            font-weight: 700;
+            color: #475569;
+            line-height: 1.1;
+            min-height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mini-stat-card.green .stat-num  { color: #009e66; }
+        .mini-stat-card.blue .stat-num   { color: #1565c0; }
+        .mini-stat-card.purple .stat-num { color: #7b1fa2; }
+        .mini-stat-card.orange .stat-num { color: #e65100; }
+
+        .stat-num {
+            font-size: 11.5px;
+            font-weight: 900;
+            margin-top: 1px;
+        }
+
+        /* CARD 2: REFERRAL LINK */
+        .card-refer-link {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 18px;
+            padding: 12px 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+        }
+
+        .card-header-line {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .header-circle-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #00aa77;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 12px;
+            flex-shrink: 0;
+            box-shadow: 0 2px 6px rgba(0, 170, 119, 0.25);
+        }
+        .header-title-text h3 {
+            font-size: 13px;
+            font-weight: 800;
+            color: #102a45;
+            line-height: 1.1;
+        }
+        .header-title-text p {
+            font-size: 9px;
+            color: #64748b;
+            font-weight: 500;
+            margin-top: 2px;
+        }
+
+        .link-input-line {
+            display: flex;
+            background: #f1f5f9;
+            border: 1.2px solid #dce4ed;
+            border-radius: 12px;
+            padding: 4px;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+        .link-field {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            padding: 5px 8px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #334155;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .copy-button {
+            background: #00a87a;
+            color: #ffffff;
+            border: none;
+            padding: 7px 14px;
+            border-radius: 9px;
+            font-size: 10.5px;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            box-shadow: 0 2px 6px rgba(0, 168, 122, 0.25);
+            transition: transform 0.15s;
+        }
+        .copy-button:active { transform: scale(0.95); }
+
+        .buttons-row-line {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+        }
+        .social-share-btn {
+            border: none;
+            border-radius: 12px;
+            padding: 8px 3px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            font-size: 8.5px;
+            font-weight: 700;
+            color: #ffffff;
+            cursor: pointer;
+            transition: transform 0.15s;
+        }
+        .social-share-btn:active { transform: scale(0.95); }
+        .social-share-btn i { font-size: 14px; }
+
+        .social-share-btn.whatsapp { background: #25D366; }
+        .social-share-btn.share    { background: #1877F2; }
+        .social-share-btn.copy     { background: #143d6b; }
+        .social-share-btn.more     { background: #f8fafc; border: 1px solid #e2e8f0; color: #475569; }
+
+        /* CARD 3: HOW IT WORKS */
+        .card-how-it-works {
+            background: #ebfcf6;
+            border: 1.2px solid #c5f4e3;
+            border-radius: 18px;
+            padding: 12px 14px;
+            position: relative;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+        }
+
+        .how-header-line {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #008761;
+            font-size: 11.5px;
+            font-weight: 800;
+            margin-bottom: 12px;
+        }
+
+        .steps-container-line {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            padding: 2px 4px 4px;
+        }
+
+        .single-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 5px;
+            flex: 1;
+        }
+
+        .step-badge {
+            width: 24px;
+            height: 24px;
+            background: #00aa77;
+            color: #ffffff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 900;
+            box-shadow: 0 2px 5px rgba(0, 170, 119, 0.25);
+        }
+
+        .step-text {
+            font-size: 8.5px;
+            font-weight: 700;
+            color: #1e3a5f;
+            line-height: 1.2;
+            max-width: 90px;
+        }
+
+        .step-arrow-icon {
+            color: #8ce1c4;
+            font-size: 11px;
+            margin: 0 4px 14px;
+            flex-shrink: 0;
+        }
+
+        /* CARD 4: RECENT REFERRALS */
+        .card-referrals-table {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 18px;
+            padding: 12px 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+        }
+
+        .referrals-header-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .referrals-header-line h3 {
+            font-size: 12.5px;
+            font-weight: 800;
+            color: #102a45;
+        }
+        .referrals-header-line a {
+            font-size: 10px;
+            font-weight: 700;
+            color: #00aa77;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .clean-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .clean-table th {
+            font-size: 8.5px;
+            font-weight: 700;
+            color: #64748b;
+            text-align: left;
+            padding: 4px 2px 7px;
+            border-bottom: 1.5px solid #edf2f7;
+            text-transform: capitalize;
+        }
+
+        .clean-table td {
+            padding: 7px 2px;
+            font-size: 9px;
+            vertical-align: middle;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .clean-table tr:last-child td { border-bottom: none; }
+
+        .user-flex { display: flex; align-items: center; gap: 5px; }
+        .avatar-small { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; border: 1px solid #e2e8f0; flex-shrink: 0; }
+        .user-id-text { font-size: 9px; font-weight: 700; color: #1e293b; white-space: nowrap; }
+        .date-text { font-size: 8px; color: #64748b; font-weight: 600; white-space: nowrap; }
+        .comm-text { font-size: 9.5px; font-weight: 800; color: #1e293b; white-space: nowrap; }
+        .badge-completed { background: #dcfce7; border: 1px solid #bbf7d0; color: #15803d; font-size: 8px; font-weight: 800; padding: 2px 6px; border-radius: 10px; display: inline-block; white-space: nowrap; }
+
+        .empty-history-box { text-align: center; padding: 24px 8px; color: #94a3b8; }
+        .empty-history-icon { font-size: 24px; color: #cbd5e1; margin-bottom: 6px; display: block; }
+        .empty-title { font-size: 11px; font-weight: 700; color: #64748b; display: block; }
+        .empty-sub { font-size: 9px; color: #94a3b8; display: block; margin-top: 2px; }
+
+        .toast {
+            position: fixed;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #111827;
+            color: #ffffff;
+            padding: 9px 16px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+            z-index: 1000;
+            white-space: nowrap;
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+        .toast i { color: #10b981; }
+    </style>
+</head>
+<body>
+
+    <div class="app-screen">
+
+        <!-- ================= 1. BANNER IMAGE WITH 3D BACK BUTTON ================= -->
+        <div class="hero-image-banner">
+            <!-- ড্যাশবোর্ডে ফিরে যাওয়ার বাটন -->
+            <button class="refer-back-btn" onclick="window.location.href='index.html'" title="Back to Dashboard">
+                <i class="fa-solid fa-arrow-left"></i>
+            </button>
+            <img src="https://i.ibb.co.com/m7yZ896/file-00000000d5a48211b3cf794a56119f6f.png" alt="MicroTask Refer & Earn Banner" class="banner-img">
+        </div>
+
+        <!-- ================= 2. MAIN BODY ================= -->
+        <div class="main-content">
+
+            <!-- CARD 1: 4 STATS ROW -->
+            <div class="card-stats-container">
+                <div class="mini-stat-card green">
+                    <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
+                    <div class="stat-label">Total Referrals</div>
+                    <div class="stat-num" id="statTotalReferrals">0</div>
+                </div>
+
+                <div class="mini-stat-card blue">
+                    <div class="stat-icon"><i class="fa-solid fa-sack-dollar"></i></div>
+                    <div class="stat-label">Referral Comm.</div>
+                    <div class="stat-num" id="statReferralCommission">$0.00</div>
+                </div>
+
+                <div class="mini-stat-card purple">
+                    <div class="stat-icon"><i class="fa-solid fa-wallet"></i></div>
+                    <div class="stat-label">Total Earnings</div>
+                    <div class="stat-num" id="statTotalEarnings">$0.00</div>
+                </div>
+
+                <div class="mini-stat-card orange">
+                    <div class="stat-icon"><i class="fa-solid fa-share-nodes"></i></div>
+                    <div class="stat-label">Pending Comm.</div>
+                    <div class="stat-num" id="statPendingCommission">$0.00</div>
+                </div>
+            </div>
+
+            <!-- CARD 2: REFERRAL LINK & ACTIONS -->
+            <div class="card-refer-link">
+                <div class="card-header-line">
+                    <div class="header-circle-icon">
+                        <i class="fa-solid fa-link"></i>
+                    </div>
+                    <div class="header-title-text">
+                        <h3>Your Referral Link</h3>
+                        <p>Share this link with your friends and earn commission</p>
+                    </div>
+                </div>
+
+                <div class="link-input-line">
+                    <input type="text" class="link-field" id="refLinkInput" value="https://microtask.app/ref/" readonly>
+                    <button class="copy-button" onclick="copyReferralLink()">
+                        <i class="fa-regular fa-copy"></i>
+                        <span>Copy</span>
+                    </button>
+                </div>
+
+                <div class="buttons-row-line">
+                    <button class="social-share-btn whatsapp" onclick="openWhatsAppShare()">
+                        <i class="fa-brands fa-whatsapp"></i>
+                        <span>WhatsApp</span>
+                    </button>
+                    <button class="social-share-btn share" onclick="openNativeShare()">
+                        <i class="fa-solid fa-share-nodes"></i>
+                        <span>Share</span>
+                    </button>
+                    <button class="social-share-btn copy" onclick="copyReferralLink()">
+                        <i class="fa-solid fa-link"></i>
+                        <span>Copy Link</span>
+                    </button>
+                    <button class="social-share-btn more" onclick="showToastNotification('More options coming soon!')">
+                        <i class="fa-solid fa-ellipsis"></i>
+                        <span>More</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- CARD 3: HOW IT WORKS -->
+            <div class="card-how-it-works">
+                <div class="how-header-line">
+                    <i class="fa-solid fa-user-plus"></i>
+                    <span>How It Works</span>
+                </div>
+
+                <div class="steps-container-line">
+                    <div class="single-step">
+                        <div class="step-badge">1</div>
+                        <div class="step-text">Share Your Referral Link</div>
+                    </div>
+
+                    <div class="step-arrow-icon"><i class="fa-solid fa-chevron-right"></i></div>
+
+                    <div class="single-step">
+                        <div class="step-badge">2</div>
+                        <div class="step-text">Friends Join & Complete Tasks</div>
+                    </div>
+
+                    <div class="step-arrow-icon"><i class="fa-solid fa-chevron-right"></i></div>
+
+                    <div class="single-step">
+                        <div class="step-badge">3</div>
+                        <div class="step-text">You Get Commission</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CARD 4: RECENT REFERRALS -->
+            <div class="card-referrals-table">
+                <div class="referrals-header-line">
+                    <h3>Recent Referrals</h3>
+                    <a href="#" onclick="showToastNotification('Viewing all referrals'); return false;">
+                        View All <i class="fa-solid fa-chevron-right" style="font-size: 8px;"></i>
+                    </a>
+                </div>
+
+                <table class="clean-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 38%;">User</th>
+                            <th style="width: 32%;">Join Date</th>
+                            <th style="width: 14%;">Commission</th>
+                            <th style="width: 16%; text-align: right;">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="referralsTableBody"></tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Toast Alert -->
+    <div class="toast" id="toastAlert">
+        <i class="fa-solid fa-circle-check"></i>
+        <span id="toastMessage">Referral link copied!</span>
+    </div>
+
+    <!-- JavaScript Actions & Dynamic Integration -->
+    <script>
+        const USER_REFERRAL_STATS = {
+            totalReferrals: 0,
+            referralCommission: 0.00,
+            totalEarnings: 0.00,
+            pendingCommission: 0.00
+        };
+
+        const USER_REFERRAL_HISTORY = [];
+
+        function initReferralScreen() {
+            // ইউজারের আসল UID দিয়ে ডাইনামিক রেফারেল লিংক তৈরি
+            const cachedUser = JSON.parse(localStorage.getItem('microtask_cached_user')) || JSON.parse(localStorage.getItem('microtask_user'));
+            const uid = (cachedUser && cachedUser.uid) ? cachedUser.uid : '000000';
+            
+            // সাইটের আসল লাইভ URL এর সাথে লিংক তৈরি
+            const baseUrl = window.location.origin + window.location.pathname.replace('refer.html', 'index.html');
+            document.getElementById('refLinkInput').value = `${baseUrl}?ref=${uid}`;
+
+            // স্ট্যাটাস আপডেট
+            document.getElementById('statTotalReferrals').innerText = USER_REFERRAL_STATS.totalReferrals;
+            document.getElementById('statReferralCommission').innerText = `$${USER_REFERRAL_STATS.referralCommission.toFixed(2)}`;
+            document.getElementById('statTotalEarnings').innerText = `$${USER_REFERRAL_STATS.totalEarnings.toFixed(2)}`;
+            document.getElementById('statPendingCommission').innerText = `$${USER_REFERRAL_STATS.pendingCommission.toFixed(2)}`;
+
+            // হিস্ট্রি টেবিল
+            const tbody = document.getElementById('referralsTableBody');
+            if (!USER_REFERRAL_HISTORY || USER_REFERRAL_HISTORY.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="4">
+                            <div class="empty-history-box">
+                                <i class="fa-solid fa-user-plus empty-history-icon"></i>
+                                <span class="empty-title">No referrals yet</span>
+                                <span class="empty-sub">Share your referral link to start earning!</span>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            } else {
+                tbody.innerHTML = USER_REFERRAL_HISTORY.map(item => `
+                    <tr>
+                        <td>
+                            <div class="user-flex">
+                                <img src="${item.avatar || 'https://i.pravatar.cc/100?img=1'}" alt="Avatar" class="avatar-small">
+                                <span class="user-id-text">${item.username}</span>
+                            </div>
+                        </td>
+                        <td><span class="date-text">${item.date}</span></td>
+                        <td><span class="comm-text">$${Number(item.commission).toFixed(2)}</span></td>
+                        <td style="text-align: right;"><span class="badge-completed">${item.status}</span></td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        // ১০০% নির্ভরযোগ্য কপি ফাংশন
+        function copyReferralLink() {
+            const inputField = document.getElementById("refLinkInput");
+            const text = inputField.value;
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showToastNotification("Referral link copied to clipboard!");
+                }).catch(() => fallbackCopy(text));
+            } else {
+                fallbackCopy(text);
+            }
+        }
+
+        function fallbackCopy(text) {
+            const textarea = document.createElement("textarea");
+            textarea.value = text;
+            textarea.style.position = "fixed";
+            textarea.style.left = "-9999px";
+            document.body.appendChild(textarea);
+            textarea.focus();
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                showToastNotification("Referral link copied!");
+            } catch (err) {
+                showToastNotification("Failed to copy!");
+            }
+            document.body.removeChild(textarea);
+        }
+
+        function openWhatsAppShare() {
+            const link = document.getElementById("refLinkInput").value;
+            const message = encodeURIComponent(`Join MicroTask and start earning money today! Sign up using my referral link: ${link}`);
+            window.open(`https://api.whatsapp.com/send?text=${message}`, '_blank');
+        }
+
+        function openNativeShare() {
+            const link = document.getElementById("refLinkInput").value;
+            if (navigator.share) {
+                navigator.share({
+                    title: 'MicroTask - Refer & Earn',
+                    text: 'Earn money by completing simple tasks!',
+                    url: link,
+                }).catch(() => {});
+            } else {
+                copyReferralLink();
+            }
+        }
+
+        function showToastNotification(text) {
+            const toast = document.getElementById("toastAlert");
+            const messageSpan = document.getElementById("toastMessage");
+            messageSpan.innerText = text;
+            toast.classList.add("show");
+
+            setTimeout(() => {
+                toast.classList.remove("show");
+            }, 2400);
+        }
+
+        document.addEventListener('DOMContentLoaded', initReferralScreen);
+    </script>
+</body>
+</html>
