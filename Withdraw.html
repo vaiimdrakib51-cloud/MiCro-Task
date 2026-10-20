@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MicroTask — Withdraw Money</title>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDK (Live Balance & Database) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0ea5e9, #10b981); 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 12px 6px;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 400px;
+            background: linear-gradient(135deg, #e0f2fe 0%, #d1fae5 100%); 
+            color: #111827; 
+            min-height: 720px;
+            padding: 16px 14px; 
+            position: relative;
+            overflow-y: auto;
+            border-radius: 36px;
+            border: 2px solid rgba(255, 255, 255, 0.7);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2); 
+            transition: all 0.3s ease;
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px; 
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-left i.fa-chevron-left {
+            font-size: 17px;
+            cursor: pointer;
+            color: #111827;
+            padding: 6px;
+            background: rgba(255,255,255,0.6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            transition: 0.2s;
+        }
+        .header-left i.fa-chevron-left:active { transform: scale(0.9); }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .header-money-icon {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
+            filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.15));
+        }
+
+        .logo-text h1 {
+            font-size: 16px;
+            font-weight: 700;
+            line-height: 1.1;
+            color: #0c4a6e;
+        }
+
+        .logo-text p {
+            font-size: 9.5px;
+            color: #047857; 
+            font-weight: 600;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 12px;
+            font-size: 18px;
+            color: #0369a1;
+        }
+
+        /* Balance Card */
+        .balance-card {
+            background: linear-gradient(135deg, #0284c7 0%, #0d9488 50%, #059669 100%);
+            color: #ffffff; 
+            border-radius: 20px; 
+            padding: 14px 16px; 
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(2, 132, 199, 0.28);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .balance-info p {
+            font-size: 11px; 
+            font-weight: 600;
+            color: #e0f2fe;
+            text-transform: uppercase;
+        }
+
+        .balance-amount {
+            font-size: 22px; 
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 2px 0;
+            letter-spacing: -0.3px;
+        }
+
+        .eye-btn {
+            cursor: pointer;
+            font-size: 14px;
+            color: #bae6fd;
+        }
+
+        .balance-bdt {
+            font-size: 11px; 
+            font-weight: 600;
+            color: #ccfbf1;
+            margin-bottom: 2px;
+        }
+
+        .balance-info small {
+            font-size: 9px;
+            color: rgba(255, 255, 255, 0.85);
+            font-weight: 500;
+        }
+
+        .balance-coin {
+            width: 75px; 
+            height: 75px;
+            object-fit: contain;
+            filter: drop-shadow(0px 6px 12px rgba(0,0,0,0.25));
+        }
+
+        .section-title {
+            font-size: 13.5px; 
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #0f172a;
+        }
+
+        .payment-methods {
+            display: flex;
+            gap: 10px; 
+            margin-bottom: 18px;
+        }
+
+        .method-card {
+            flex: 1;
+            background-color: rgba(255, 255, 255, 0.95);
+            border: 2px solid transparent; 
+            border-radius: 14px;
+            padding: 8px; 
+            height: 65px; 
+            display: flex;
+            align-items: center;
+            justify-content: center; 
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .method-card img {
+            width: 100%;
+            max-width: 75px; 
+            height: 42px; 
+            object-fit: contain;
+        }
+
+        .method-card.active {
+            border: 2px solid #0284c7; 
+            background-color: #ffffff; 
+            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.25);
+            transform: translateY(-2px);
+        }
+
+        .check-icon {
+            display: none;
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: #0284c7; 
+            color: #ffffff;
+            width: 20px; 
+            height: 20px;
+            border-radius: 50%;
+            justify-content: center;
+            align-items: center;
+            font-size: 10px;
+            z-index: 2;
+            border: 2px solid #ffffff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .method-card.active .check-icon { display: flex; }
+
+        .saved-accounts-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .add-new-btn {
+            font-size: 11.5px;
+            color: #0284c7;
+            text-decoration: none;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            padding: 4px 8px;
+            background: #e0f2fe;
+            border-radius: 10px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 22px 14px;
+            background-color: rgba(255, 255, 255, 0.85);
+            border: 2px dashed #38bdf8;
+            border-radius: 14px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        .empty-state i { font-size: 28px; color: #0284c7; margin-bottom: 6px; }
+        .empty-state p { font-size: 12.5px; color: #1e293b; font-weight: 700; }
+        .empty-state span { font-size: 10.5px; color: #64748b; }
+
+        .saved-card {
+            display: flex;
+            align-items: center;
+            background-color: #ffffff;
+            border: 1.5px solid #bbf7d0;
+            border-radius: 14px;
+            padding: 10px 12px;
+            margin-bottom: 9px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .saved-card.active {
+            border: 2px solid #0284c7; 
+            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.2);
+        }
+
+        .saved-logo-img {
+            width: 44px; 
+            height: 44px; 
+            border-radius: 12px;
+            margin-right: 12px;
+            object-fit: contain;
+            background-color: #f8fafc; 
+            padding: 4px; 
+            border: 1px solid #e2e8f0;
+        }
+
+        .saved-info { flex: 1; overflow: hidden; }
+        .saved-info h4 { font-size: 13px; font-weight: 700; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .saved-info .sub-text { font-size: 11.5px; font-weight: 600; color: #0284c7; }
+        .saved-info small { font-size: 9.5px; color: #64748b; font-weight: 600; }
+
+        .badge-default {
+            background-color: #10b981;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 9.5px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .uncheck-circle { width: 18px; height: 18px; border-radius: 50%; border: 2px solid #cbd5e1; }
+
+        .add-form-container {
+            display: none; 
+            background-color: #ffffff;
+            padding: 14px;
+            border-radius: 16px;
+            border: 1.5px solid #bae6fd;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+            margin-bottom: 12px;
+        }
+        .selected-provider-badge {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            padding: 7px 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        .selected-provider-badge span { font-size: 11px; color: #475569; font-weight: 600; }
+        .selected-provider-badge strong { font-size: 12px; color: #0284c7; text-transform: uppercase; }
+        .add-form-container label { display: block; font-size: 11px; font-weight: 700; margin-bottom: 4px; color: #334155; margin-top: 8px; }
+        .add-form-container select, .add-form-container input { width: 100%; padding: 9px 11px; border-radius: 10px; border: 1.5px solid #cbd5e1; font-size: 12px; outline: none; }
+        .form-actions { display: flex; gap: 8px; margin-top: 14px; }
+        .btn-cancel { flex: 1; padding: 10px; border-radius: 10px; border: none; background: #f1f5f9; color: #475569; font-weight: 700; cursor: pointer; }
+        .btn-save { flex: 1; padding: 10px; border-radius: 10px; border: none; background: #10b981; color: #ffffff; font-weight: 700; cursor: pointer; }
+
+        .next-btn {
+            width: 170px;
+            margin: 16px auto 0;
+            background: linear-gradient(135deg, #0284c7, #10b981);
+            color: #ffffff;
+            border: none;
+            padding: 11px 18px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 6px 16px rgba(2, 132, 199, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+        .next-btn:active { transform: scale(0.97); }
+
+        /* STEP 2: WITHDRAW AMOUNT */
+        #step-withdraw { display: none; animation: fadeIn 0.25s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+        .withdraw-title { font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 10px; }
+        .withdraw-input-box {
+            display: flex;
+            align-items: center;
+            background: #ffffff;
+            border: 2px solid #0284c7;
+            border-radius: 14px;
+            padding: 8px 14px;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.12);
+            margin-bottom: 8px;
+        }
+        .currency-symbol { font-size: 22px; font-weight: 800; color: #0284c7; margin-right: 8px; }
+        .withdraw-input-box input { background: transparent; border: none; outline: none; color: #0f172a; font-size: 24px; font-weight: 800; width: 100%; }
+        .clear-btn { color: #94a3b8; font-size: 16px; cursor: pointer; }
+
+        .balance-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding: 0 2px; }
+        .bal-left p { font-size: 11px; color: #64748b; font-weight: 600; }
+        .bal-left h4 { font-size: 14px; color: #047857; font-weight: 800; }
+        .max-btn { background: #e0f2fe; color: #0284c7; border: 1px solid #7dd3fc; padding: 4px 14px; border-radius: 14px; font-size: 11px; font-weight: 800; cursor: pointer; }
+
+        .withdraw-info-card { background: #ffffff; border: 1.5px solid #bbf7d0; border-radius: 16px; padding: 14px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04); }
+        .info-card-header { font-size: 13px; font-weight: 700; color: #0f172a; margin-bottom: 12px; border-bottom: 1px dashed #e2e8f0; padding-bottom: 6px; }
+        .info-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 12px; }
+        .info-label { color: #64748b; font-weight: 600; }
+        .info-val { color: #0f172a; font-weight: 700; }
+        .receive-val { color: #10b981; font-size: 15px; font-weight: 800; }
+
+        .withdraw-next-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #0284c7 0%, #10b981 100%);
+            color: #ffffff;
+            border: none;
+            padding: 12px 18px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 6px 18px rgba(2, 132, 199, 0.28);
+            margin-bottom: 12px;
+        }
+
+        .notice-card { background: rgba(255, 255, 255, 0.9); border: 1px solid #bae6fd; border-radius: 12px; padding: 10px 12px; display: flex; align-items: center; gap: 8px; }
+        .notice-card i { font-size: 16px; color: #0284c7; flex-shrink: 0; }
+        .notice-card p { font-size: 10.5px; color: #475569; line-height: 1.35; font-weight: 500; }
+
+        /* STEP 3: DETAILS REVIEW */
+        #step-instructions { display: none; animation: fadeIn 0.25s ease; }
+        .selected-method-card { background: #ffffff; border: 1.5px solid #bae6fd; border-radius: 16px; padding: 10px 14px; display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+        .method-logo-round { width: 44px; height: 44px; border-radius: 12px; background: #f8fafc; padding: 4px; display: flex; justify-content: center; align-items: center; border: 1px solid #e2e8f0; }
+        .method-logo-round img { width: 100%; height: 100%; object-fit: contain; }
+        .method-card-text h3 { font-size: 14px; font-weight: 800; color: #0f172a; }
+        .method-card-text p { font-size: 10.5px; color: #64748b; }
+
+        .review-card { background: #ffffff; border: 1.5px solid #bbf7d0; border-radius: 16px; padding: 14px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04); }
+        .review-header { font-size: 13px; font-weight: 700; color: #0284c7; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; border-bottom: 1px dashed #e2e8f0; padding-bottom: 6px; }
+        .review-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 12px; }
+        .review-label { color: #64748b; font-weight: 600; }
+        .review-val { color: #0f172a; font-weight: 700; }
+        .review-masked-wallet { color: #0284c7; font-family: monospace; font-size: 13px; letter-spacing: 0.5px; background: #f0f9ff; padding: 2px 6px; border-radius: 6px; border: 1px solid #bae6fd; }
+
+        .confirm-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: #ffffff;
+            border: none;
+            padding: 13px 18px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 6px 18px rgba(16, 185, 129, 0.35);
+        }
+
+        /* STEP 4: SUCCESS RECEIPT */
+        #step-success { display: none; animation: fadeIn 0.25s ease; text-align: center; }
+        .success-top-area { display: flex; flex-direction: column; align-items: center; margin: 6px 0 16px; }
+        .success-check-circle { width: 62px; height: 62px; background: #dcfce7; color: #16a34a; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 30px; margin-bottom: 8px; box-shadow: 0 0 0 6px rgba(34, 197, 94, 0.15); }
+        .success-top-area h2 { font-size: 17px; font-weight: 800; color: #0f172a; }
+        .success-top-area p { font-size: 11px; color: #64748b; max-width: 270px; line-height: 1.35; margin-top: 2px; }
+        .success-amount-badge { font-size: 24px; font-weight: 900; color: #16a34a; margin: 8px 0; }
+
+        .success-receipt-card { background: #ffffff; border: 1.5px solid #bbf7d0; border-radius: 16px; padding: 14px; text-align: left; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04); }
+        .receipt-header-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed #e2e8f0; padding-bottom: 8px; margin-bottom: 10px; }
+        .badge-pending { background: #fef3c7; color: #d97706; border: 1px solid #fde68a; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 700; display: flex; align-items: center; gap: 4px; }
+        .receipt-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 9px; font-size: 12px; }
+        .receipt-label { color: #64748b; font-weight: 600; }
+        .receipt-val { color: #0f172a; font-weight: 700; }
+        .trx-id-wrapper { display: flex; align-items: center; gap: 6px; font-family: monospace; color: #0284c7; font-size: 12.5px; }
+        .copy-trx-icon { cursor: pointer; color: #0284c7; }
+
+        .home-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #0284c7 0%, #10b981 100%);
+            color: #ffffff;
+            border: none;
+            padding: 12px 18px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 6px 18px rgba(2, 132, 199, 0.28);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container" id="app-container">
+        <!-- Header -->
+        <header>
+            <div class="header-left">
+                <!-- ড্যাশবোর্ডে ফিরে যাওয়ার বাটন -->
+                <i class="fa-solid fa-chevron-left" onclick="handleBackNavigation()" title="Back"></i>
+                <div class="logo-area">
+                    <img src="https://i.ibb.co.com/5W2f2xg4/pngtree-money-icon-dollar-coins-cash-payment-online-earning-png-image-7589413.png" alt="MicroTask Logo" class="header-money-icon">
+                    <div class="logo-text">
+                        <h1>MicroTask</h1>
+                        <p>Earn & Grow</p>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <i class="fa-regular fa-bell" onclick="window.location.href='notifications.html'" style="cursor:pointer;"></i>
+                <i class="fa-regular fa-circle-user" onclick="window.location.href='index.html'" style="cursor:pointer;"></i>
+            </div>
+        </header>
+
+        <!-- ================= STEP 1: WALLET SELECTION ================= -->
+        <div id="step-wallet">
+            <div class="balance-card">
+                <div class="balance-info">
+                    <p>My Balance</p>
+                    <div class="balance-amount">
+                        <span id="balance-val">$ 0.00</span> 
+                        <i class="fa-regular fa-eye eye-btn" id="balance-eye-icon" onclick="toggleBalanceVisibility()" title="Toggle Balance"></i>
+                    </div>
+                    <div class="balance-bdt" id="balance-bdt-val">
+                        ≈ ৳ 0.00 BDT
+                    </div>
+                    <small>Available for withdraw</small>
+                </div>
+                
+                <img src="https://i.ibb.co.com/5W2f2xg4/pngtree-money-icon-dollar-coins-cash-payment-online-earning-png-image-7589413.png" alt="Wallet Logo" class="balance-coin">
+            </div>
+
+            <!-- Payment Methods -->
+            <div class="section-title">Select Payment Method</div>
+            <div class="payment-methods">
+                <div class="method-card active" data-provider="nagad" onclick="handleTopMethodClick('nagad')">
+                    <div class="check-icon"><i class="fa-solid fa-check"></i></div>
+                    <img src="https://download.logo.wine/logo/Nagad/Nagad-Logo.wine.png" alt="Nagad">
+                </div>
+                <div class="method-card" data-provider="bkash" onclick="handleTopMethodClick('bkash')">
+                    <div class="check-icon"><i class="fa-solid fa-check"></i></div>
+                    <img src="https://download.logo.wine/logo/BKash/BKash-Logo.wine.png" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/BKash_Logo.svg/512px-BKash_Logo.svg.png';" alt="bKash">
+                </div>
+                <div class="method-card" data-provider="binance" onclick="handleTopMethodClick('binance')">
+                    <div class="check-icon"><i class="fa-solid fa-check"></i></div>
+                    <img src="https://cryptologos.cc/logos/bnb-bnb-logo.png" onerror="this.src='https://cdn.iconout.com/icon/free/png-256/binance-2752076-2284993.png';" alt="Binance">
+                </div>
+            </div>
+
+            <!-- ADD NEW ACCOUNT FORM -->
+            <div class="add-form-container" id="add-form">
+                <div class="section-title">Add Account Details</div>
+                
+                <div class="selected-provider-badge">
+                    <span>Selected Method:</span>
+                    <strong id="display-provider-name">Nagad</strong>
+                </div>
+                <input type="hidden" id="wallet-provider-input" value="nagad">
+
+                <label>Full Name</label>
+                <input type="text" id="wallet-holder-name" placeholder="Full Name">
+
+                <div id="mobile-fields">
+                    <label>Account Number</label>
+                    <input type="number" id="wallet-number" placeholder="e.g. 01700000000">
+
+                    <label>Account Type</label>
+                    <select id="wallet-type">
+                        <option value="Personal">Personal</option>
+                        <option value="Agent">Agent</option>
+                    </select>
+                </div>
+
+                <div id="crypto-fields" style="display: none;">
+                    <label>Wallet Address</label>
+                    <input type="text" id="wallet-address" placeholder="Enter deposit address">
+
+                    <label>Network</label>
+                    <select id="crypto-network">
+                        <option value="TRC20">TRC 20</option>
+                        <option value="BEP20">BEP 20</option>
+                    </select>
+                </div>
+
+                <div class="form-actions">
+                    <button class="btn-cancel" onclick="cancelForm()">Cancel</button>
+                    <button class="btn-save" onclick="saveNewAccount()">Save Account</button>
+                </div>
+            </div>
+
+            <!-- SAVED ACCOUNTS WRAPPER -->
+            <div id="saved-wrapper">
+                <div class="empty-state" id="empty-state" onclick="triggerAddNew()" style="display:none;">
+                    <i class="fa-solid fa-wallet"></i>
+                    <p>No Wallet Saved Yet!</p>
+                    <span>Tap on any payment method above to add</span>
+                </div>
+
+                <div class="saved-accounts-header" id="saved-header">
+                    <div class="section-title">Saved Accounts <span id="wallet-count" style="color: #64748b; font-size: 11px;">(1/3)</span></div>
+                    <div class="add-new-btn" onclick="triggerAddNew()">
+                        <i class="fa-solid fa-plus"></i> Add New
+                    </div>
+                </div>
+
+                <div id="saved-list"></div>
+            </div>
+
+            <button class="next-btn" onclick="goToWithdrawStep()">
+                Next <i class="fa-solid fa-arrow-right"></i>
+            </button>
+        </div>
+
+
+        <!-- ================= STEP 2: WITHDRAW AMOUNT ================= -->
+        <div id="step-withdraw">
+            <div class="withdraw-title">Enter Withdraw Amount</div>
+
+            <div class="withdraw-input-box">
+                <span class="currency-symbol">৳</span>
+                <input type="number" id="withdraw-amount-input" placeholder="00" oninput="calculateWithdrawFee()">
+                <i class="fa-solid fa-circle-xmark clear-btn" onclick="clearAmount()" title="Clear"></i>
+            </div>
+
+            <div class="balance-row">
+                <div class="bal-left">
+                    <p>Available Balance</p>
+                    <h4 id="step2-available-bdt">৳ 0.00</h4>
+                </div>
+                <button class="max-btn" onclick="applyMaxBalance()">Max</button>
+            </div>
+
+            <div class="withdraw-info-card">
+                <div class="info-card-header">Withdrawal Information</div>
+                
+                <div class="info-row">
+                    <span class="info-label">Minimum Amount</span>
+                    <span class="info-val">৳100</span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-label">Maximum Amount</span>
+                    <span class="info-val">৳50,000</span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-label">Withdrawal Fee</span>
+                    <span class="info-val" id="fee-display">৳10.00</span>
+                </div>
+
+                <div class="info-row" style="margin-bottom: 0;">
+                    <span class="info-label">You Will Receive</span>
+                    <span class="info-val receive-val" id="receive-display">৳0.00</span>
+                </div>
+            </div>
+
+            <button class="withdraw-next-btn" onclick="goToInstructionsStep()">
+                <i class="fa-solid fa-arrow-right"></i> Next
+            </button>
+
+            <div class="notice-card">
+                <i class="fa-solid fa-circle-info"></i>
+                <p>The minimum withdrawal amount is ৳100 and the maximum is ৳50,000 per request.</p>
+            </div>
+        </div>
+
+
+        <!-- ================= STEP 3: DETAILS REVIEW ================= -->
+        <div id="step-instructions">
+            <div class="selected-method-card">
+                <div class="method-logo-round">
+                    <img id="step3-method-logo" src="https://download.logo.wine/logo/Nagad/Nagad-Logo.wine.png" alt="Method">
+                </div>
+                <div class="method-card-text">
+                    <h3 id="step3-method-name">Nagad</h3>
+                    <p id="step3-method-sub">Withdraw to Nagad account</p>
+                </div>
+            </div>
+
+            <div class="review-card">
+                <div class="review-header">
+                    <i class="fa-solid fa-receipt"></i>
+                    <span>Withdrawal Confirmation</span>
+                </div>
+
+                <div class="review-row">
+                    <span class="review-label">Account Holder</span>
+                    <span class="review-val" id="step3-holder-name">MD. RAKIB HOSSAIN</span>
+                </div>
+
+                <div class="review-row">
+                    <span class="review-label">Wallet Number</span>
+                    <span class="review-val review-masked-wallet" id="step3-account-number">0171****678</span>
+                </div>
+
+                <div class="review-row">
+                    <span class="review-label">Withdraw Amount</span>
+                    <span class="review-val" id="step3-amount-display">৳0.00</span>
+                </div>
+
+                <div class="review-row">
+                    <span class="review-label">Withdrawal Fee</span>
+                    <span class="review-val" style="color: #ef4444;">৳10.00</span>
+                </div>
+
+                <div class="review-row">
+                    <span class="review-label">You Will Receive</span>
+                    <span class="review-val receive-val" id="step3-receive-display">৳0.00</span>
+                </div>
+
+                <div class="review-row" style="margin-bottom: 0;">
+                    <span class="review-label">Date & Time</span>
+                    <span class="review-val" id="step3-date-display">--</span>
+                </div>
+            </div>
+
+            <button class="confirm-btn" id="finalConfirmBtn" onclick="confirmFinalWithdrawal()">
+                <i class="fa-solid fa-circle-check"></i> Confirm Withdrawal
+            </button>
+        </div>
+
+
+        <!-- ================= STEP 4: SUCCESS / RECEIPT ================= -->
+        <div id="step-success">
+            <div class="success-top-area">
+                <div class="success-check-circle">
+                    <i class="fa-solid fa-check"></i>
+                </div>
+                <h2>Request Submitted!</h2>
+                <p>Your withdrawal request is sent to Admin for approval. It will arrive shortly.</p>
+                <div class="success-amount-badge" id="success-amount-display">৳0.00</div>
+            </div>
+
+            <!-- Receipt Card -->
+            <div class="success-receipt-card">
+                <div class="receipt-header-row">
+                    <span style="font-size:12px; font-weight:700; color:#0c4a6e;">Transaction Details</span>
+                    <div class="badge-pending">
+                        <i class="fa-solid fa-clock"></i> Pending
+                    </div>
+                </div>
+
+                <div class="receipt-row">
+                    <span class="receipt-label">Transaction ID</span>
+                    <div class="trx-id-wrapper">
+                        <span id="success-trx-id">MTX84920194</span>
+                        <i class="fa-regular fa-copy copy-trx-icon" id="copy-trx-btn" onclick="copyTrxId()" title="Copy ID"></i>
+                    </div>
+                </div>
+
+                <div class="receipt-row">
+                    <span class="receipt-label">Payment Method</span>
+                    <span class="receipt-val" id="success-method-name">NAGAD</span>
+                </div>
+
+                <div class="receipt-row">
+                    <span class="receipt-label">Account Holder</span>
+                    <span class="receipt-val" id="success-holder-name">MD. RAKIB HOSSAIN</span>
+                </div>
+
+                <div class="receipt-row">
+                    <span class="receipt-label">Account Number</span>
+                    <span class="receipt-val" id="success-account-number" style="color:#0284c7; font-family:monospace;">0171****678</span>
+                </div>
+
+                <div class="receipt-row">
+                    <span class="receipt-label">Withdraw Fee</span>
+                    <span class="receipt-val" id="success-fee-display" style="color:#ef4444;">৳10.00</span>
+                </div>
+
+                <div class="receipt-row">
+                    <span class="receipt-label">You Will Receive</span>
+                    <span class="receipt-val" id="success-receive-display" style="color:#16a34a; font-weight:700;">৳0.00</span>
+                </div>
+
+                <div class="receipt-row" style="margin-bottom:0;">
+                    <span class="receipt-label">Date & Time</span>
+                    <span class="receipt-val" id="success-date-display" style="font-size:12px;">--</span>
+                </div>
+            </div>
+
+            <!-- ড্যাশবোর্ডে ফিরে যাওয়ার বাটন -->
+            <button class="home-btn" onclick="goToHome()">
+                <i class="fa-solid fa-house"></i> Back to Dashboard
+            </button>
+        </div>
+
+    </div>
+
+    <!-- JavaScript & Firebase Live Connection -->
+    <script>
+        const WITHDRAW_FEE_FIXED = 10.00;
+        let isBalanceHidden = false;
+        let liveBalanceUSD = 0.00;
+        let availableBalanceBDT = 0.00;
+        let currentStep = 1;
+
+        // Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyBrG81DRVjx040QhiT68yyRErGXjuCPdS4",
+            authDomain: "micro-task-2906d.firebaseapp.com",
+            projectId: "micro-task-2906d",
+            storageBucket: "micro-task-2906d.firebasestorage.app",
+            messagingSenderId: "642332420854",
+            appId: "1:642332420854:web:67115930992e7685b49ad7",
+            measurementId: "G-N76WH82XYJ"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // লোকাল ক্যাশ থেকে ব্যালেন্স লোড
+        const cachedUser = JSON.parse(localStorage.getItem('microtask_cached_user'));
+        if (cachedUser) {
+            updateBalanceUI(cachedUser.balanceUSD || 0);
+        }
+
+        // ফায়ারবেস থেকে লাইভ ব্যালেন্স রিড
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                db.collection("users").doc(user.uid).onSnapshot(doc => {
+                    if (doc.exists) {
+                        const data = doc.data();
+                        updateBalanceUI(data.balanceUSD || 0);
+                    }
+                });
+            }
+        });
+
+        function updateBalanceUI(usd) {
+            liveBalanceUSD = usd;
+            availableBalanceBDT = parseFloat((usd * 120).toFixed(2));
+            if (!isBalanceHidden) {
+                document.getElementById('balance-val').innerText = `$ ${liveBalanceUSD.toFixed(2)}`;
+                document.getElementById('balance-bdt-val').innerText = `≈ ৳ ${availableBalanceBDT.toFixed(2)} BDT`;
+            }
+            document.getElementById('step2-available-bdt').innerText = `৳ ${availableBalanceBDT.toFixed(2)}`;
+        }
+
+        function toggleBalanceVisibility() {
+            isBalanceHidden = !isBalanceHidden;
+            const balVal = document.getElementById('balance-val');
+            const balBdt = document.getElementById('balance-bdt-val');
+            const eyeIcon = document.getElementById('balance-eye-icon');
+
+            if (isBalanceHidden) {
+                balVal.innerText = "$ ••••••";
+                balBdt.innerText = "≈ ৳ •••••• BDT";
+                eyeIcon.className = "fa-solid fa-eye-slash eye-btn";
+            } else {
+                balVal.innerText = `$ ${liveBalanceUSD.toFixed(2)}`;
+                balBdt.innerText = `≈ ৳ ${availableBalanceBDT.toFixed(2)} BDT`;
+                eyeIcon.className = "fa-regular fa-eye eye-btn";
+            }
+        }
+
+        const logos = {
+            nagad: "https://download.logo.wine/logo/Nagad/Nagad-Logo.wine.png",
+            bkash: "https://download.logo.wine/logo/BKash/BKash-Logo.wine.png", 
+            binance: "https://cryptologos.cc/logos/bnb-bnb-logo.png"
+        };
+
+        let savedAccounts = JSON.parse(localStorage.getItem('my_saved_wallets')) || [
+            { provider: 'nagad', holder: 'MD. RAKIB HOSSAIN', number: '01712345678', type: 'Personal' }
+        ];
+        let selectedIndex = 0;
+        let pendingProvider = null;
+        const MAX_WALLETS = 3;
+
+        function highlightCard(provider) {
+            document.querySelectorAll('.method-card').forEach(card => {
+                card.classList.toggle('active', card.dataset.provider === provider);
+            });
+        }
+
+        function handleTopMethodClick(provider) {
+            highlightCard(provider);
+            const existingIndex = savedAccounts.findIndex(acc => acc.provider === provider);
+            if (existingIndex !== -1) {
+                selectAccount(existingIndex);
+                toggleForm(false);
+            } else {
+                if (savedAccounts.length >= MAX_WALLETS) {
+                    alert("You cannot add more than 3 wallets!");
+                    syncTopCards();
+                    return;
+                }
+                pendingProvider = provider;
+                toggleForm(true, provider);
+            }
+        }
+
+        function triggerAddNew() {
+            if (savedAccounts.length >= MAX_WALLETS) {
+                alert("Maximum 3 wallets allowed!");
+                return;
+            }
+            const allProviders = ['nagad', 'bkash', 'binance'];
+            const nextAvailable = allProviders.find(p => !savedAccounts.some(acc => acc.provider === p));
+            if (nextAvailable) handleTopMethodClick(nextAvailable);
+        }
+
+        function toggleForm(show, provider = 'nagad') {
+            document.getElementById('add-form').style.display = show ? 'block' : 'none';
+            document.getElementById('saved-wrapper').style.display = show ? 'none' : 'block';
+            if (show) {
+                highlightCard(provider);
+                document.getElementById('wallet-provider-input').value = provider;
+                document.getElementById('display-provider-name').innerText = provider;
+                document.getElementById('wallet-holder-name').value = '';
+                document.getElementById('wallet-number').value = '';
+                document.getElementById('wallet-address').value = '';
+
+                const isBinance = (provider === 'binance');
+                document.getElementById('mobile-fields').style.display = isBinance ? 'none' : 'block';
+                document.getElementById('crypto-fields').style.display = isBinance ? 'block' : 'none';
+            }
+        }
+
+        function cancelForm() {
+            toggleForm(false);
+            syncTopCards();
+        }
+
+        function saveNewAccount() {
+            const provider = document.getElementById('wallet-provider-input').value;
+            const holderName = document.getElementById('wallet-holder-name').value.trim();
+            let number, type;
+
+            if (!holderName) { alert("Please enter Full Name!"); return; }
+
+            if (provider === 'binance') {
+                number = document.getElementById('wallet-address').value.trim();
+                type = document.getElementById('crypto-network').value;
+                if (!number) { alert("Please enter wallet address!"); return; }
+            } else {
+                number = document.getElementById('wallet-number').value.trim();
+                type = document.getElementById('wallet-type').value;
+                if (!number) { alert("Please enter mobile number!"); return; }
+            }
+
+            savedAccounts.push({ provider, holder: holderName, number, type });
+            localStorage.setItem('my_saved_wallets', JSON.stringify(savedAccounts));
+            selectedIndex = savedAccounts.length - 1;
+            toggleForm(false);
+            renderAccounts();
+            syncTopCards();
+        }
+
+        function selectAccount(index) {
+            selectedIndex = index;
+            renderAccounts();
+            syncTopCards();
+        }
+
+        function syncTopCards() {
+            if (selectedIndex !== null && savedAccounts[selectedIndex]) {
+                highlightCard(savedAccounts[selectedIndex].provider);
+            } else {
+                document.querySelectorAll('.method-card').forEach(card => card.classList.remove('active'));
+            }
+        }
+
+        function renderAccounts() {
+            const emptyState = document.getElementById('empty-state');
+            const savedHeader = document.getElementById('saved-header');
+            const savedList = document.getElementById('saved-list');
+            const walletCount = document.getElementById('wallet-count');
+
+            savedList.innerHTML = '';
+            walletCount.innerText = `(${savedAccounts.length}/${MAX_WALLETS})`;
+
+            if (savedAccounts.length === 0) {
+                emptyState.style.display = 'block';
+                savedHeader.style.display = 'none';
+            } else {
+                emptyState.style.display = 'none';
+                savedHeader.style.display = 'flex';
+
+                savedAccounts.forEach((acc, index) => {
+                    const isActive = selectedIndex === index;
+                    const actionHtml = isActive 
+                        ? `<span class="badge-default"><i class="fa-solid fa-check"></i> Selected</span>` 
+                        : `<div class="uncheck-circle"></div>`;
+
+                    const card = document.createElement('div');
+                    card.className = `saved-card ${isActive ? 'active' : ''}`;
+                    card.onclick = () => selectAccount(index);
+                    card.innerHTML = `
+                        <img src="${logos[acc.provider]}" alt="Logo" class="saved-logo-img">
+                        <div class="saved-info">
+                            <h4 title="${acc.holder}">${acc.holder}</h4>
+                            <p class="sub-text">${acc.number}</p>
+                            <small>${acc.type} • ${acc.provider.toUpperCase()}</small>
+                        </div>
+                        <div class="saved-action">${actionHtml}</div>
+                    `;
+                    savedList.appendChild(card);
+                });
+            }
+        }
+
+        function maskWalletNumber(num) {
+            if (!num) return '';
+            const str = String(num);
+            if (str.length <= 6) return str.slice(0, 2) + '****' + str.slice(-1);
+            return `${str.slice(0, 4)}****${str.slice(-3)}`;
+        }
+
+        function goToWithdrawStep() {
+            currentStep = 2;
+            document.getElementById('step-wallet').style.display = 'none';
+            document.getElementById('step-withdraw').style.display = 'block';
+            document.getElementById('step-instructions').style.display = 'none';
+            document.getElementById('step-success').style.display = 'none';
+            calculateWithdrawFee();
+        }
+
+        function goToInstructionsStep() {
+            const amount = parseFloat(document.getElementById('withdraw-amount-input').value) || 0;
+
+            if (amount < 100) {
+                alert("মিনিমাম উইথড্র ৳১০০ হতে হবে!");
+                return;
+            }
+
+            if (amount > availableBalanceBDT) {
+                alert(`পর্যাপ্ত ব্যালেন্স নেই! আপনার ব্যালেন্স মাত্র ৳${availableBalanceBDT.toFixed(2)}`);
+                return;
+            }
+
+            const activeAcc = (savedAccounts && selectedIndex !== null && savedAccounts[selectedIndex]) 
+                ? savedAccounts[selectedIndex] 
+                : { provider: 'nagad', holder: 'User', number: '01700000000', type: 'Personal' };
+
+            const providerKey = activeAcc.provider || 'nagad';
+            
+            document.getElementById('step3-method-logo').src = logos[providerKey] || logos.nagad;
+            document.getElementById('step3-method-name').innerText = providerKey.toUpperCase();
+            document.getElementById('step3-method-sub').innerText = `Withdraw to ${providerKey.toUpperCase()} account`;
+            document.getElementById('step3-holder-name').innerText = activeAcc.holder;
+            document.getElementById('step3-account-number').innerText = maskWalletNumber(activeAcc.number);
+            document.getElementById('step3-amount-display').innerText = `৳${amount.toFixed(2)}`;
+            
+            const youReceive = Math.max(0, amount - WITHDRAW_FEE_FIXED);
+            document.getElementById('step3-receive-display').innerText = `৳${youReceive.toFixed(2)}`;
+
+            const now = new Date();
+            document.getElementById('step3-date-display').innerText = now.toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: true });
+
+            currentStep = 3;
+            document.getElementById('step-wallet').style.display = 'none';
+            document.getElementById('step-withdraw').style.display = 'none';
+            document.getElementById('step-instructions').style.display = 'block';
+            window.scrollTo(0, 0);
+        }
+
+        // কনফার্ম করলে ফায়ারবেস থেকে ব্যালেন্স কর্তন ও রিকোয়েস্ট তৈরি
+        function confirmFinalWithdrawal() {
+            const amount = parseFloat(document.getElementById('withdraw-amount-input').value) || 0;
+            if (amount <= 0 || amount > availableBalanceBDT) {
+                alert("অ্যামাউন্ট যাচাই করুন!");
+                return;
+            }
+
+            const activeAcc = savedAccounts[selectedIndex] || { provider: 'nagad', holder: 'User', number: '01700000000' };
+            const providerKey = activeAcc.provider || 'nagad';
+            const youReceive = Math.max(0, amount - WITHDRAW_FEE_FIXED);
+            const randomTrx = 'MTX' + Math.floor(10000000 + Math.random() * 90000000);
+
+            const confirmBtn = document.getElementById('finalConfirmBtn');
+            confirmBtn.disabled = true;
+            confirmBtn.innerText = "Processing...";
+
+            const user = auth.currentUser;
+            const deductionUSD = amount / 120;
+            const newUSD = Math.max(0, liveBalanceUSD - deductionUSD);
+
+            // ফায়ারবেসে ব্যালেন্স আপডেট এবং উইথড্র রিকোয়েস্ট সেভ
+            if (user) {
+                db.collection("users").doc(user.uid).update({
+                    balanceUSD: newUSD
+                }).then(() => {
+                    return db.collection("withdrawals").add({
+                        uid: user.uid,
+                        holder: activeAcc.holder,
+                        accountNumber: activeAcc.number,
+                        provider: providerKey,
+                        amountBDT: amount,
+                        amountUSD: deductionUSD,
+                        receiveBDT: youReceive,
+                        feeBDT: WITHDRAW_FEE_FIXED,
+                        trxId: randomTrx,
+                        status: "pending",
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }).then(() => {
+                    showSuccessScreen(amount, providerKey, activeAcc, youReceive, randomTrx);
+                }).catch(err => {
+                    alert("উইথড্র রিকোয়েস্ট পাঠাতে সমস্যা হয়েছে!");
+                    confirmBtn.disabled = false;
+                    confirmBtn.innerText = "Confirm Withdrawal";
+                });
+            } else {
+                showSuccessScreen(amount, providerKey, activeAcc, youReceive, randomTrx);
+            }
+        }
+
+        function showSuccessScreen(amount, providerKey, activeAcc, youReceive, randomTrx) {
+            document.getElementById('success-trx-id').innerText = randomTrx;
+            document.getElementById('success-amount-display').innerText = `৳${amount.toFixed(2)}`;
+            document.getElementById('success-method-name').innerText = providerKey.toUpperCase();
+            document.getElementById('success-holder-name').innerText = activeAcc.holder;
+            document.getElementById('success-account-number').innerText = maskWalletNumber(activeAcc.number);
+            document.getElementById('success-fee-display').innerText = `৳${WITHDRAW_FEE_FIXED.toFixed(2)}`;
+            document.getElementById('success-receive-display').innerText = `৳${youReceive.toFixed(2)}`;
+
+            const now = new Date();
+            document.getElementById('success-date-display').innerText = now.toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: true });
+
+            currentStep = 4;
+            document.getElementById('step-instructions').style.display = 'none';
+            document.getElementById('step-success').style.display = 'block';
+            window.scrollTo(0, 0);
+        }
+
+        function copyTrxId() {
+            const trx = document.getElementById('success-trx-id').innerText;
+            navigator.clipboard.writeText(trx).then(() => {
+                const copyBtn = document.getElementById('copy-trx-btn');
+                copyBtn.className = "fa-solid fa-check copy-trx-icon";
+                setTimeout(() => { copyBtn.className = "fa-regular fa-copy copy-trx-icon"; }, 1500);
+            });
+        }
+
+        // সরাসরি মূল ড্যাশবোর্ডে ফিরবে
+        function goToHome() {
+            window.location.href = "index.html";
+        }
+
+        // হেডার ব্যাক বাটন লজিক (প্রথম ধাপে চাপলে ড্যাশবোর্ডে ফিরবে)
+        function handleBackNavigation() {
+            if (currentStep === 4) {
+                goToHome();
+            } else if (currentStep === 3) {
+                currentStep = 2;
+                document.getElementById('step-instructions').style.display = 'none';
+                document.getElementById('step-withdraw').style.display = 'block';
+            } else if (currentStep === 2) {
+                currentStep = 1;
+                document.getElementById('step-withdraw').style.display = 'none';
+                document.getElementById('step-wallet').style.display = 'block';
+            } else {
+                window.location.href = "index.html";
+            }
+        }
+
+        function calculateWithdrawFee() {
+            const inputVal = parseFloat(document.getElementById('withdraw-amount-input').value) || 0;
+            const feeDisplay = document.getElementById('fee-display');
+            const receiveDisplay = document.getElementById('receive-display');
+            feeDisplay.innerText = `৳${WITHDRAW_FEE_FIXED.toFixed(2)}`;
+            if (inputVal <= 0) { receiveDisplay.innerText = "৳0.00"; return; }
+            const youReceive = Math.max(0, inputVal - WITHDRAW_FEE_FIXED);
+            receiveDisplay.innerText = `৳${youReceive.toFixed(2)}`;
+        }
+
+        function clearAmount() {
+            document.getElementById('withdraw-amount-input').value = '';
+            calculateWithdrawFee();
+        }
+
+        function applyMaxBalance() {
+            document.getElementById('withdraw-amount-input').value = availableBalanceBDT;
+            calculateWithdrawFee();
+        }
+
+        renderAccounts();
+        syncTopCards();
+    </script>
+</body>
+</html>
