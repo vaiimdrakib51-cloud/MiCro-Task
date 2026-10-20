@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>TikTok Tasks — MicroTask</title>
+  <!-- Google Fonts & FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Firebase SDK (Live Task & Admin Sync) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; user-select: none; -webkit-tap-highlight-color: transparent; }
+    body { background: #010609; min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 16px 10px; }
+    .app-screen { width: 100%; max-width: 410px; background: radial-gradient(circle at 50% 20%, #032b30 0%, #04141d 60%, #010609 100%); border: 2px solid #00f2fe; border-radius: 28px; padding: 18px 14px; box-shadow: 0 0 25px rgba(0, 242, 254, 0.35), inset 0 0 15px rgba(254, 9, 121, 0.2); display: flex; flex-direction: column; gap: 14px; min-height: 600px; }
+    
+    /* Header */
+    .header { display: flex; align-items: center; gap: 12px; }
+    .back-btn {
+      color: #8cfaff; font-size: 16px; cursor: pointer;
+      width: 34px; height: 34px; border-radius: 50%;
+      background: rgba(0, 242, 254, 0.15); border: 1px solid rgba(0, 242, 254, 0.35);
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+    }
+    .back-btn:active { transform: scale(0.9); }
+
+    .logo-3d { width: 40px; height: 40px; background: linear-gradient(145deg, #00f2fe, #fe0979); border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 22px; color: white; box-shadow: 0 4px 10px rgba(0, 242, 254, 0.5); border: 1px solid rgba(255,255,255,0.3); flex-shrink: 0; }
+    .header-title h2 { color: #ffffff; font-size: 16px; font-weight: 700; }
+    .header-title p { color: #00f2fe; font-size: 10px; font-weight: 500; }
+    
+    .notice-bar { background: rgba(0, 242, 254, 0.12); border: 1px dashed #00f2fe; border-radius: 12px; padding: 8px 12px; font-size: 10.5px; color: #bdf8ff; display: flex; align-items: center; gap: 8px; }
+    .notice-bar i { color: #fe0979; }
+    
+    /* Dynamic Task List */
+    .task-list { display: flex; flex-direction: column; gap: 10px; flex: 1; }
+    .task-card { background: linear-gradient(180deg, #04252d 0%, #020f14 100%); border: 1.5px solid #00c6d4; border-radius: 16px; padding: 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px; cursor: pointer; transition: 0.2s; }
+    .task-card:hover { transform: translateY(-2px); border-color: #fe0979; }
+    .task-card.is-pending { border-color: #e69500 !important; cursor: default; }
+    
+    .task-thumb { width: 66px; height: 52px; border-radius: 10px; background: #07353f; border: 1px solid #00f2fe; position: relative; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .play-circle { width: 20px; height: 20px; background: rgba(254, 9, 121, 0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 8.5px; }
+    .timestamp { position: absolute; bottom: 2px; right: 3px; background: rgba(0, 0, 0, 0.85); color: #fff; font-size: 8px; font-weight: 700; padding: 1px 3px; border-radius: 3px; }
+    
+    .task-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2.5px; }
+    .task-name { color: #ffffff; font-size: 12px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .task-reward { display: flex; align-items: center; gap: 4px; }
+    .mini-coin { width: 12px; height: 12px; background: radial-gradient(circle at 35% 35%, #ffe600, #ff9900 80%); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; color: #633900; font-weight: 900; font-size: 7px; }
+    .reward-coins { color: #ffcc00; font-size: 10.5px; font-weight: 700; }
+    
+    .task-tags { display: flex; gap: 3.5px; margin-top: 1px; }
+    .tag { background: rgba(0, 242, 254, 0.15); border: 0.5px solid #00f2fe; color: #99faff; font-size: 8px; padding: 1.5px 4.5px; border-radius: 4px; font-weight: 600; display: inline-flex; align-items: center; gap: 2.5px; }
+    .tag.completed { background: rgba(0, 230, 118, 0.15) !important; border-color: #00e676 !important; color: #69f0ae !important; }
+    .tag.completed i { color: #00e676; font-size: 7.5px; }
+    
+    .btn-3d { background: linear-gradient(180deg, #00f2fe 0%, #fe0979 100%); border: 1px solid #a4faff; color: white; font-size: 11px; font-weight: 700; padding: 6px 11px; border-radius: 14px; display: flex; align-items: center; gap: 4px; cursor: pointer; white-space: nowrap; box-shadow: 0 3px 8px rgba(254, 9, 121, 0.4); }
+    .btn-pending { background: linear-gradient(180deg, #ffb300 0%, #e67e00 100%); border: 1px solid #ffe082; color: #fff; font-size: 9.5px; font-weight: 700; padding: 5px 8px; border-radius: 12px; display: flex; align-items: center; gap: 3px; white-space: nowrap; }
+
+    .empty-tasks { text-align: center; padding: 40px 10px; color: #7fdee6; font-size: 12px; display: none; }
+    .empty-tasks i { font-size: 32px; color: #00f2fe; margin-bottom: 8px; display: block; }
+    
+    /* Modal */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(2, 10, 15, 0.85); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 100; padding: 15px; }
+    .modal-box { width: 100%; max-width: 390px; background: radial-gradient(circle at 50% 0%, #063942 0%, #03171e 70%, #010609 100%); border: 1.5px solid #00f2fe; border-radius: 22px; padding: 18px 16px; box-shadow: 0 0 25px rgba(0, 242, 254, 0.4); display: flex; flex-direction: column; gap: 12px; position: relative; }
+    .close-btn { position: absolute; top: 15px; right: 16px; color: #8cfaff; font-size: 18px; cursor: pointer; }
+    .modal-title { color: #fff; font-size: 15px; font-weight: 700; }
+    .step-box { background: rgba(5, 45, 55, 0.5); border: 1px solid #009aa3; border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 6px; }
+    .step-header { color: #5ef3fc; font-size: 10.5px; font-weight: 700; display: flex; align-items: center; gap: 5px; }
+    .video-link-btn { display: flex; align-items: center; justify-content: center; gap: 6px; background: linear-gradient(90deg, #00f2fe 0%, #fe0979 100%); color: white; text-decoration: none; padding: 9px; border-radius: 10px; font-size: 11.5px; font-weight: 700; border: 1px solid #bdf8ff; }
+    
+    .upload-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 4px; }
+    .upload-slot { border: 1.5px dashed #00f2fe; background: rgba(6, 40, 50, 0.3); border-radius: 10px; height: 82px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; position: relative; overflow: hidden; }
+    .upload-slot i { font-size: 18px; color: #00f2fe; margin-bottom: 3px; }
+    .upload-slot span { color: #bdf8ff; font-size: 9.5px; font-weight: 600; text-align: center; }
+    .slot-preview { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: none; }
+    .submit-btn { background: linear-gradient(180deg, #00f2fe 0%, #fe0979 100%); border: 1px solid #bdf8ff; color: white; font-size: 13px; font-weight: 700; padding: 10px; border-radius: 18px; cursor: pointer; width: 100%; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="app-screen">
+    <div class="header">
+      <!-- ড্যাশবোর্ডে ফিরে যাওয়ার বাটন -->
+      <div class="back-btn" onclick="window.location.href='index.html'" title="Back to Dashboard">
+        <i class="fa-solid fa-arrow-left"></i>
+      </div>
+      <div class="logo-3d"><i class="fa-brands fa-tiktok"></i></div>
+      <div class="header-title"><h2>TikTok Tasks</h2><p>Watch • Like • Submit 3 Proofs</p></div>
+    </div>
+    
+    <div class="notice-bar">
+      <i class="fa-solid fa-circle-info"></i>
+      <span>Upload 3 screenshots (Like, Follow, Comment) to submit.</span>
+    </div>
+    
+    <!-- ফায়ারবেস থেকে লাইভ টাস্ক লোড -->
+    <div class="task-list" id="taskListContainer">
+      <div class="empty-tasks" id="emptyTasksMsg">
+        <i class="fa-solid fa-clipboard-check"></i>
+        <span>No TikTok tasks available right now.<br>Check back later!</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- প্রুফ সাবমিট মডাল -->
+  <div class="modal-overlay" id="taskModal">
+    <div class="modal-box">
+      <i class="fa-solid fa-xmark close-btn" onclick="closeModal()"></i>
+      <h3 class="modal-title" id="m-title">Complete Task & Submit</h3>
+      <div class="step-box">
+        <div class="step-header"><i class="fa-solid fa-1"></i> Step 1: Open TikTok Video</div>
+        <a href="#" id="m-link" target="_blank" class="video-link-btn"><i class="fa-brands fa-tiktok"></i> Open TikTok Video</a>
+      </div>
+      <div class="step-box">
+        <div class="step-header"><i class="fa-solid fa-2"></i> Step 2: Upload 3 Proof Screenshots</div>
+        <div class="upload-grid">
+          <div class="upload-slot" onclick="triggerInput('file-1')"><i class="fa-solid fa-thumbs-up"></i><span>1. Like</span><img id="prev-1" class="slot-preview"></div>
+          <input type="file" id="file-1" accept="image/*" style="display:none;" onchange="previewSlot(1, event)">
+          <div class="upload-slot" onclick="triggerInput('file-2')"><i class="fa-solid fa-user-plus"></i><span>2. Follow</span><img id="prev-2" class="slot-preview"></div>
+          <input type="file" id="file-2" accept="image/*" style="display:none;" onchange="previewSlot(2, event)">
+          <div class="upload-slot" onclick="triggerInput('file-3')"><i class="fa-solid fa-comment-dots"></i><span>3. Comment</span><img id="prev-3" class="slot-preview"></div>
+          <input type="file" id="file-3" accept="image/*" style="display:none;" onchange="previewSlot(3, event)">
+        </div>
+      </div>
+      <button class="submit-btn" id="submitBtn" onclick="submitProof()"><i class="fa-solid fa-circle-check"></i> Submit for Review</button>
+    </div>
+  </div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBrG81DRVjx040QhiT68yyRErGXjuCPdS4",
+      authDomain: "micro-task-2906d.firebaseapp.com",
+      projectId: "micro-task-2906d",
+      storageBucket: "micro-task-2906d.firebasestorage.app",
+      messagingSenderId: "642332420854",
+      appId: "1:642332420854:web:67115930992e7685b49ad7",
+      measurementId: "G-N76WH82XYJ"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    let activeTaskId = null;
+    let pendingTasks = new Set(JSON.parse(localStorage.getItem('tt_pending_tasks') || '[]'));
+
+    const DEFAULT_TT_TASKS = [
+      { id: 'tt-1', title: 'Trending Sound Dance #1', coins: 25, duration: '0:25', url: 'https://tiktok.com' },
+      { id: 'tt-2', title: 'Viral Comedy Clip #2', coins: 20, duration: '0:40', url: 'https://tiktok.com' }
+    ];
+
+    function listenToLiveTasks() {
+      db.collection("tasks").where("platform", "==", "tiktok").onSnapshot(snapshot => {
+        const container = document.getElementById('taskListContainer');
+        const emptyMsg = document.getElementById('emptyTasksMsg');
+        container.querySelectorAll('.task-card').forEach(c => c.remove());
+
+        if (snapshot.empty) {
+          renderTasksArray(DEFAULT_TT_TASKS);
+        } else {
+          emptyMsg.style.display = 'none';
+          snapshot.forEach(doc => {
+            const data = doc.data();
+            renderSingleTaskCard(doc.id, data.title, data.coins, data.duration || '0:30', data.url || 'https://tiktok.com');
+          });
+        }
+      }, err => {
+        renderTasksArray(DEFAULT_TT_TASKS);
+      });
+    }
+
+    function renderTasksArray(array) {
+      array.forEach(t => renderSingleTaskCard(t.id, t.title, t.coins, t.duration, t.url));
+    }
+
+    function renderSingleTaskCard(id, title, coins, duration, url) {
+      const container = document.getElementById('taskListContainer');
+      const isPending = pendingTasks.has(id);
+
+      const card = document.createElement('div');
+      card.className = `task-card ${isPending ? 'is-pending' : ''}`;
+      card.id = id;
+      card.onclick = () => handleCardClick(id, title, coins, url);
+
+      card.innerHTML = `
+        <div class="task-thumb">
+          <div class="play-circle"><i class="fa-solid fa-play"></i></div>
+          <span class="timestamp">${duration}</span>
+        </div>
+        <div class="task-info">
+          <span class="task-name">${title}</span>
+          <div class="task-reward">
+            <span class="mini-coin">$</span>
+            <span class="reward-coins">+${coins} Coins</span>
+          </div>
+          <div class="task-tags">
+            <span class="tag ${isPending ? 'completed' : ''}">${isPending ? '<i class="fa-solid fa-check"></i> ' : ''}Like</span>
+            <span class="tag ${isPending ? 'completed' : ''}">${isPending ? '<i class="fa-solid fa-check"></i> ' : ''}Follow</span>
+            <span class="tag ${isPending ? 'completed' : ''}">${isPending ? '<i class="fa-solid fa-check"></i> ' : ''}Comment</span>
+          </div>
+        </div>
+        <div class="action-btn-area">
+          ${isPending 
+            ? '<div class="btn-pending"><i class="fa-solid fa-clock"></i> Pending</div>' 
+            : '<button class="btn-3d"><i class="fa-solid fa-play"></i> Start</button>'}
+        </div>
+      `;
+
+      container.appendChild(card);
+    }
+
+    function handleCardClick(id, title, coins, url) {
+      if(pendingTasks.has(id)) { alert("This task is currently Pending review!"); return; }
+      activeTaskId = id;
+      document.getElementById('m-title').innerText = title + " (+" + coins + " Coins)";
+      document.getElementById('m-link').href = url;
+      for(let i=1; i<=3; i++){ 
+        document.getElementById('file-'+i).value=""; 
+        document.getElementById('prev-'+i).style.display="none"; 
+      }
+      document.getElementById('taskModal').style.display = "flex";
+    }
+
+    function triggerInput(id){ document.getElementById(id).click(); }
+    
+    function previewSlot(num, e){
+      if(e.target.files[0]){
+        let r = new FileReader();
+        r.onload = function(ev){ 
+          document.getElementById('prev-'+num).src=ev.target.result; 
+          document.getElementById('prev-'+num).style.display="block"; 
+        };
+        r.readAsDataURL(e.target.files[0]);
+      }
+    }
+
+    function closeModal(){ document.getElementById('taskModal').style.display="none"; }
+
+    function submitProof(){
+      if(!document.getElementById('file-1').files.length || !document.getElementById('file-2').files.length || !document.getElementById('file-3').files.length){
+        alert("Please upload all 3 screenshots!"); return;
+      }
+
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.innerText = "Submitting...";
+      
+      pendingTasks.add(activeTaskId);
+      localStorage.setItem('tt_pending_tasks', JSON.stringify([...pendingTasks]));
+      
+      let card = document.getElementById(activeTaskId);
+      if(card) {
+        card.classList.add('is-pending');
+        card.querySelector('.action-btn-area').innerHTML = '<div class="btn-pending"><i class="fa-solid fa-clock"></i> Pending</div>';
+        card.querySelectorAll('.task-tags .tag').forEach(tag => {
+          tag.classList.add('completed');
+          tag.innerHTML = `<i class="fa-solid fa-check"></i> ${tag.innerText.trim().replace(/^.*?\s/, '')}`;
+        });
+      }
+
+      const user = auth.currentUser;
+      db.collection("task_submissions").add({
+        taskId: activeTaskId,
+        platform: "tiktok",
+        uid: user ? user.uid : "guest",
+        status: "pending",
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).finally(() => {
+        btn.disabled = false;
+        btn.innerText = "Submit for Review";
+        alert("Submitted successfully! Task is Pending review.");
+        closeModal();
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', listenToLiveTasks);
+  </script>
+</body>
+</html>
