@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>History — MicroTask</title>
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome 6 Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Firebase SDK (Live History Sync) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+    <style>
+        :root {
+            --blue-primary: #2563eb;
+            --blue-light: #38bdf8;
+            --blue-glow: rgba(37, 99, 235, 0.45);
+            --green-glow: #00e676;
+            --bg-page: #07132b;
+            --card-blue: #0c1d3f;
+            --card-blue-hover: #102652;
+            --border-blue: rgba(59, 130, 246, 0.28);
+            --text-light: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: #020617;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.22) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(14, 165, 233, 0.15) 0px, transparent 50%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 16px 8px;
+        }
+
+        .phone-frame {
+            width: 100%;
+            max-width: 415px;
+            height: 94vh;
+            max-height: 820px;
+            min-height: 680px;
+            background: var(--bg-page);
+            border-radius: 36px;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7), 0 0 0 7px #0f172a, 0 0 0 9px rgba(59, 130, 246, 0.15);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        @media (max-width: 480px) {
+            body { padding: 0; }
+            .phone-frame {
+                height: 100vh;
+                max-height: 100vh;
+                border-radius: 0;
+                box-shadow: none;
+                border: none;
+            }
+        }
+
+        /* 1. HEADER */
+        .header-section {
+            flex-shrink: 0;
+            background: linear-gradient(180deg, #091a3b 0%, #07132b 100%);
+            padding: 18px 16px 16px;
+            color: #ffffff;
+            position: relative;
+            border-bottom: 1px solid var(--border-blue);
+            z-index: 20;
+        }
+        .header-section::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 15%;
+            right: 15%;
+            height: 1px;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.8) 0%, transparent 100%);
+        }
+
+        .app-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .action-header-btn {
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            width: 36px;
+            height: 36px;
+            border-radius: 12px;
+            color: #ffffff;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            backdrop-filter: blur(8px);
+        }
+        .action-header-btn:active { transform: scale(0.92); }
+
+        .header-spacer { width: 36px; }
+
+        .header-title-group { text-align: center; }
+        .title-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+        }
+        .history-icon-circle {
+            width: 26px;
+            height: 26px;
+            border-radius: 9px;
+            background: linear-gradient(135deg, #38bdf8 0%, #2563eb 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 11px;
+            box-shadow: 0 3px 10px rgba(37, 99, 235, 0.45);
+        }
+        .title-row h1 {
+            font-size: 17px;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+            color: #ffffff;
+        }
+        .header-title-group p {
+            font-size: 9.5px;
+            color: #93a8d1;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        /* 2. FIXED CONTROLS AREA */
+        .top-static-area {
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 13px 12px 10px;
+            background: var(--bg-page);
+            z-index: 10;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            padding: 2px 1px;
+        }
+        .filter-tabs::-webkit-scrollbar { display: none; }
+
+        .tab-pill {
+            flex: 1;
+            border: 1px solid var(--border-blue);
+            background: var(--card-blue);
+            color: #94a3b8;
+            padding: 7px 11px;
+            border-radius: 20px;
+            font-size: 9.5px;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        .tab-pill.active {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            border-color: #3b82f6;
+            color: #ffffff;
+            box-shadow: 0 3px 12px var(--blue-glow);
+        }
+
+        /* 4 Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            padding: 4px 0 2px;
+            position: relative;
+        }
+
+        .stat-card {
+            background: transparent;
+            border: none;
+            padding: 6px 2px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            transition: transform 0.2s;
+        }
+        .stat-card:active { transform: scale(0.92); }
+
+        .stat-card:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            right: -4px;
+            top: 10%;
+            height: 80%;
+            width: 1px;
+            background: linear-gradient(180deg, transparent 0%, rgba(56, 189, 248, 0.4) 50%, transparent 100%);
+        }
+
+        .stat-card-img {
+            width: 52px;
+            height: 52px;
+            object-fit: contain;
+            display: block;
+            filter: drop-shadow(0 5px 12px rgba(0, 0, 0, 0.5));
+        }
+
+        .stat-balance-text {
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--green-glow);
+            margin-top: 5px;
+            text-shadow: 0 0 10px rgba(0, 230, 118, 0.45);
+            white-space: nowrap;
+            text-align: center;
+        }
+
+        .filter-controls-row {
+            display: flex;
+            gap: 7px;
+            align-items: center;
+        }
+
+        .filter-btn-box {
+            background: var(--card-blue);
+            border: 1px solid var(--border-blue);
+            border-radius: 12px;
+            padding: 9px 11px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+        .filter-btn-box.date-range { flex: 1.6; }
+        .filter-btn-box.status-select { flex: 1.1; position: relative; }
+
+        .filter-left-meta {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 9.5px;
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+        .filter-left-meta i { color: #38bdf8; font-size: 11px; }
+        .filter-arrow { font-size: 8.5px; color: #60a5fa; }
+
+        .status-dropdown-select {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+
+        .active-filter-banner {
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(37, 99, 235, 0.18);
+            border: 1px solid rgba(59, 130, 246, 0.45);
+            padding: 7px 12px;
+            border-radius: 12px;
+            font-size: 9.5px;
+            font-weight: 700;
+            color: #93c5fd;
+        }
+        .clear-filter-btn {
+            background: rgba(239, 68, 68, 0.18);
+            border: none;
+            color: #f87171;
+            padding: 3px 8px;
+            border-radius: 16px;
+            font-size: 9px;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        /* 3. TRANSACTION LIST */
+        .history-scroll-area {
+            flex: 1;
+            overflow-y: auto;
+            min-height: 0;
+            padding: 2px 12px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            scrollbar-width: none;
+        }
+        .history-scroll-area::-webkit-scrollbar { display: none; }
+
+        .history-item-card {
+            background: var(--card-blue);
+            border: 1px solid var(--border-blue);
+            border-radius: 14px;
+            padding: 8px 11px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .history-item-card:active { transform: scale(0.98); }
+
+        .item-left {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            min-width: 0;
+            flex: 1;
+        }
+
+        .item-icon-box {
+            width: 36px;
+            height: 36px;
+            border-radius: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #ffffff;
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .brand-logo-img { width: 24px; height: 24px; object-fit: contain; }
+
+        .icon-yt           { background: linear-gradient(135deg, #ff0033 0%, #cc0000 100%); }
+        .icon-tiktok       { background: #000000; border: 1px solid #333; }
+        .icon-bonus-luxury { background: linear-gradient(135deg, #ec4899 0%, #a855f7 100%); }
+        .icon-bkash-box    { background: #ffffff; border: 1px solid #e2136e; }
+        .icon-nagad-box    { background: #ffffff; border: 1px solid #f97316; }
+        .icon-binance-box  { background: #181a20; border: 1px solid #f59e0b; }
+        .icon-typing       { background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); }
+
+        .item-info { min-width: 0; line-height: 1.2; }
+        .item-info h4 { font-size: 11px; font-weight: 700; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .item-info p { font-size: 8.5px; color: #94a3b8; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1.5px; }
+        .item-time { font-size: 7.5px; color: #60a5fa; font-weight: 600; margin-top: 2.5px; display: flex; align-items: center; gap: 3px; }
+
+        .item-right { display: flex; align-items: center; gap: 7px; flex-shrink: 0; text-align: right; }
+        .amount-and-status { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+
+        .amount-text { font-size: 11px; font-weight: 800; }
+        .amount-text.plus  { color: #00e676; }
+        .amount-text.minus { color: #f87171; }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 2.5px;
+            padding: 1.5px 5.5px;
+            border-radius: 8px;
+            font-size: 7.5px;
+            font-weight: 700;
+        }
+        .status-badge.success { background: rgba(0, 230, 118, 0.12); color: #00e676; border: 1px solid rgba(0, 230, 118, 0.3); }
+        .status-badge.processing { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+
+        .chevron-arrow { font-size: 8px; color: #60a5fa; }
+
+        .no-records-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 14px;
+            text-align: center;
+            color: #94a3b8;
+            margin: auto;
+        }
+        .no-records-box .empty-icon-wrap {
+            width: 60px;
+            height: 60px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #0d2249, #091733);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+            border: 1px solid var(--border-blue);
+        }
+        .no-records-box .empty-icon-wrap i { font-size: 26px; color: #38bdf8; }
+        .no-records-box h3 { font-size: 13.5px; font-weight: 800; color: #f1f5f9; }
+        .no-records-box p { font-size: 9.5px; color: #94a3b8; margin-top: 4px; }
+
+        /* 4. DATE MODAL */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(2, 6, 23, 0.85);
+            backdrop-filter: blur(14px);
+            z-index: 1000;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+
+        .modal-panel {
+            width: 100%;
+            max-width: 415px;
+            background: linear-gradient(165deg, #0b1f47 0%, #0a1b3d 50%, #061126 100%);
+            border-radius: 28px 28px 0 0;
+            padding: 16px 20px 24px;
+            border-top: 2px solid #3b82f6;
+            color: #ffffff;
+        }
+
+        .modal-handle { width: 40px; height: 4px; background: #3b82f6; border-radius: 10px; margin: 0 auto 14px; }
+        .modal-title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+        .modal-title-row h3 { font-size: 14px; font-weight: 800; color: #ffffff; display: flex; align-items: center; gap: 6px; }
+        .modal-close-btn { background: rgba(37, 99, 235, 0.2); border: 1px solid rgba(96, 165, 250, 0.35); width: 28px; height: 28px; border-radius: 50%; color: #93c5fd; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 11px; }
+
+        .quick-chips-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+        .date-chip { background: rgba(30, 58, 138, 0.35); border: 1px solid rgba(96, 165, 250, 0.25); padding: 6px 12px; border-radius: 16px; font-size: 9.5px; font-weight: 700; color: #bfdbfe; cursor: pointer; }
+        .date-chip.active { background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: #ffffff; }
+
+        .date-input-group { display: flex; gap: 9px; margin-bottom: 18px; }
+        .date-field { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+        .date-field label { font-size: 8.5px; font-weight: 800; text-transform: uppercase; color: #93c5fd; }
+        .date-field input { width: 100%; padding: 9px 10px; border-radius: 12px; border: 1.5px solid rgba(59, 130, 246, 0.35); font-size: 10.5px; font-weight: 700; color: #ffffff; background: rgba(15, 30, 65, 0.7); outline: none; }
+
+        .modal-action-row { display: flex; gap: 8px; }
+        .btn-modal-reset { flex: 1; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.12); padding: 11px; border-radius: 13px; font-size: 11px; font-weight: 700; color: #94a3b8; cursor: pointer; }
+        .btn-modal-apply { flex: 2; background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); border: none; padding: 11px; border-radius: 13px; font-size: 11px; font-weight: 800; color: #ffffff; cursor: pointer; }
+
+        /* 5. RECEIPT MODAL */
+        .receipt-card { background: linear-gradient(135deg, rgba(37, 99, 235, 0.12) 0%, rgba(30, 58, 138, 0.2) 100%); border: 1px dashed rgba(96, 165, 250, 0.4); border-radius: 16px; padding: 12px 14px; margin: 12px 0 16px; }
+        .receipt-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; font-size: 10px; }
+        .receipt-row span:first-child { color: #93c5fd; font-weight: 600; }
+        .receipt-row span:last-child { color: #ffffff; font-weight: 800; }
+
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(15, 23, 42, 0.95);
+            color: #ffffff;
+            padding: 9px 16px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+            transition: transform 0.3s ease;
+            z-index: 2000;
+            white-space: nowrap;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+        .toast i { color: #38bdf8; }
+    </style>
+</head>
+<body>
+
+    <div class="phone-frame">
+
+        <!-- 1. HEADER -->
+        <header class="header-section">
+            <div class="app-header">
+                <!-- সরাসরি ড্যাশবোর্ডে ফিরে যাওয়ার বাটন -->
+                <button type="button" class="action-header-btn" onclick="window.location.href='index.html'" title="Back to Dashboard">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <div class="header-title-group">
+                    <div class="title-row">
+                        <div class="history-icon-circle">
+                            <i class="fa-solid fa-bolt"></i>
+                        </div>
+                        <h1>History</h1>
+                    </div>
+                    <p>Transactions & Activity Logs</p>
+                </div>
+                <div class="header-spacer"></div>
+            </div>
+        </header>
+
+        <!-- 2. FIXED CONTROLS AREA -->
+        <div class="top-static-area">
+            <div class="filter-tabs">
+                <button class="tab-pill active" onclick="switchCategoryFilter(this, 'all')">All</button>
+                <button class="tab-pill" onclick="switchCategoryFilter(this, 'tasks')">Tasks</button>
+                <button class="tab-pill" onclick="switchCategoryFilter(this, 'deposit')">Deposit</button>
+                <button class="tab-pill" onclick="switchCategoryFilter(this, 'withdraw')">Withdraw</button>
+                <button class="tab-pill" onclick="switchCategoryFilter(this, 'referral')">Referral</button>
+            </div>
+
+            <!-- 4 Icons Grid -->
+            <div class="stats-grid">
+                <div class="stat-card" onclick="switchCategoryFilterByButton('tasks')" title="Tasks">
+                    <img src="https://i.ibb.co.com/SXfM07tV/IMG-20261015-172637-539.png" alt="Tasks" class="stat-card-img">
+                    <div class="stat-balance-text" id="statTasksCount">0</div>
+                </div>
+
+                <div class="stat-card" onclick="switchCategoryFilterByButton('deposit')" title="Deposit">
+                    <img src="https://i.ibb.co.com/dsmshDYj/IMG-20261015-172559-950.png" alt="Deposit" class="stat-card-img">
+                    <div class="stat-balance-text" id="statDepositTotal">৳ 0</div>
+                </div>
+
+                <div class="stat-card" onclick="switchCategoryFilterByButton('withdraw')" title="Withdraw">
+                    <img src="https://i.ibb.co.com/jkpkqBVh/IMG-20261015-172618-955.png" alt="Withdraw" class="stat-card-img">
+                    <div class="stat-balance-text" id="statWithdrawTotal">৳ 0</div>
+                </div>
+
+                <div class="stat-card" onclick="switchCategoryFilterByButton('referral')" title="Referral">
+                    <img src="https://i.ibb.co.com/v4VRDgYQ/IMG-20261015-172656-563.png" alt="Referral" class="stat-card-img">
+                    <div class="stat-balance-text" id="statReferralTotal">৳ 0</div>
+                </div>
+            </div>
+
+            <!-- Filter Controls -->
+            <div class="filter-controls-row">
+                <div class="filter-btn-box date-range" onclick="openDateModal()">
+                    <div class="filter-left-meta">
+                        <i class="fa-regular fa-calendar-days"></i>
+                        <span id="dateFilterLabel">Select Date Range</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right filter-arrow"></i>
+                </div>
+
+                <div class="filter-btn-box status-select">
+                    <span id="statusFilterLabel" style="font-size:9.5px; font-weight:700; color:#f1f5f9;">All Status</span>
+                    <i class="fa-solid fa-chevron-down filter-arrow"></i>
+                    <select class="status-dropdown-select" onchange="handleStatusChange(this.value)">
+                        <option value="all">All Status</option>
+                        <option value="success">Success</option>
+                        <option value="processing">Processing</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="active-filter-banner" id="activeFilterBanner">
+                <span id="activeFilterText">Filtered: Date</span>
+                <button type="button" class="clear-filter-btn" onclick="resetDateFilter()">
+                    <i class="fa-solid fa-xmark"></i> Clear
+                </button>
+            </div>
+        </div>
+
+        <!-- 3. SCROLLABLE TRANSACTION HISTORY LIST -->
+        <main class="history-scroll-area" id="historyItemsContainer">
+            <div class="no-records-box" id="noRecordsBox" style="display: flex;">
+                <div class="empty-icon-wrap">
+                    <i class="fa-regular fa-folder-open"></i>
+                </div>
+                <h3>No Records Found</h3>
+                <p>You don't have any transaction or task history yet.</p>
+            </div>
+        </main>
+
+        <!-- 4. DATE MODAL -->
+        <div class="modal-overlay" id="dateFilterModal">
+            <div class="modal-panel">
+                <div class="modal-handle"></div>
+                <div class="modal-title-row">
+                    <h3><i class="fa-regular fa-calendar-days" style="color: #60a5fa;"></i> Filter by Date</h3>
+                    <button class="modal-close-btn" onclick="closeDateModal()"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+
+                <div class="quick-chips-row">
+                    <button type="button" class="date-chip active" onclick="applyPresetDate('all', this)">All Time</button>
+                    <button type="button" class="date-chip" onclick="applyQuickDays(0, this)">Today</button>
+                    <button type="button" class="date-chip" onclick="applyQuickDays(1, this)">Yesterday</button>
+                    <button type="button" class="date-chip" onclick="applyQuickDays(7, this)">Last 7 Days</button>
+                </div>
+
+                <div class="date-input-group">
+                    <div class="date-field">
+                        <label>From Date</label>
+                        <input type="date" id="inputFromDate">
+                    </div>
+                    <div class="date-field">
+                        <label>To Date</label>
+                        <input type="date" id="inputToDate">
+                    </div>
+                </div>
+
+                <div class="modal-action-row">
+                    <button type="button" class="btn-modal-reset" onclick="resetDateFilter()">Reset</button>
+                    <button type="button" class="btn-modal-apply" onclick="applyCustomDateFilter()">Apply Filter</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. DETAILS RECEIPT MODAL -->
+        <div class="modal-overlay" id="detailsModal">
+            <div class="modal-panel">
+                <div class="modal-handle"></div>
+                <div class="modal-title-row">
+                    <h3><i class="fa-solid fa-receipt" style="color: #60a5fa;"></i> Transaction Receipt</h3>
+                    <button class="modal-close-btn" onclick="closeDetailsModal()"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+
+                <div style="text-align: center; margin: 8px 0 14px;">
+                    <div id="modalIconContainer" class="item-icon-box" style="margin: 0 auto 10px; width: 44px; height: 44px; border-radius: 12px; font-size: 18px;"></div>
+                    <h2 id="modalTitle" style="font-size: 13px; font-weight: 800; color: #ffffff;">Task Title</h2>
+                    <p id="modalAmount" style="font-size: 16px; font-weight: 900; margin-top: 3px; color: #38bdf8;">+ ৳ 0.00</p>
+                </div>
+
+                <div class="receipt-card">
+                    <div class="receipt-row">
+                        <span>Description</span>
+                        <span id="modalDesc">-</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span>Transaction Time</span>
+                        <span id="modalTime">-</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span>Status</span>
+                        <span id="modalStatusBadge">-</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span>Transaction ID</span>
+                        <span id="modalTxnId" style="font-family: monospace; color:#60a5fa;">TXN-#00000000</span>
+                    </div>
+                </div>
+
+                <button type="button" class="btn-modal-apply" style="width: 100%;" onclick="closeDetailsModal()">Close Details</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toastBox">
+        <i class="fa-solid fa-circle-check"></i>
+        <span id="toastMsg">Action Successful</span>
+    </div>
+
+    <!-- JavaScript & Live Firebase Connection -->
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBrG81DRVjx040QhiT68yyRErGXjuCPdS4",
+            authDomain: "micro-task-2906d.firebaseapp.com",
+            projectId: "micro-task-2906d",
+            storageBucket: "micro-task-2906d.firebasestorage.app",
+            messagingSenderId: "642332420854",
+            appId: "1:642332420854:web:67115930992e7685b49ad7",
+            measurementId: "G-N76WH82XYJ"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        let currentCategory = 'all';
+        let currentStatus = 'all';
+        let selectedFromDate = null;
+        let selectedToDate = null;
+        let userTransactions = [];
+
+        // ফায়ারবেস থেকে ইউজারের ডিপোজিট ও উইথড্র লাইভ হিস্ট্রি লোড
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                // ১. ডিপোজিট হিস্ট্রি রিড
+                db.collection("deposits").where("uid", "==", user.uid).onSnapshot(depSnap => {
+                    // ২. উইথড্র হিস্ট্রি রিড
+                    db.collection("withdrawals").where("uid", "==", user.uid).onSnapshot(withSnap => {
+                        userTransactions = [];
+                        let totalDep = 0;
+                        let totalWith = 0;
+
+                        depSnap.forEach(doc => {
+                            const d = doc.data();
+                            const amt = d.amountBDT || 0;
+                            totalDep += amt;
+                            userTransactions.push({
+                                title: `${(d.method || 'Online').toUpperCase()} Deposit`,
+                                desc: 'Deposit request sent',
+                                amount: amt,
+                                type: 'plus',
+                                category: 'deposit',
+                                method: d.method,
+                                status: d.status || 'pending',
+                                time: d.createdAt ? new Date(d.createdAt.toDate()).toLocaleDateString('en-GB') : 'Recent',
+                                date: d.createdAt ? formatDateISO(d.createdAt.toDate()) : formatDateISO(new Date()),
+                                txnId: d.trxId || 'TXN-DEP'
+                            });
+                        });
+
+                        withSnap.forEach(doc => {
+                            const w = doc.data();
+                            const amt = w.amountBDT || 0;
+                            totalWith += amt;
+                            userTransactions.push({
+                                title: `${(w.provider || 'Wallet').toUpperCase()} Withdraw`,
+                                desc: `To: ${w.accountNumber || ''}`,
+                                amount: amt,
+                                type: 'minus',
+                                category: 'withdraw',
+                                method: w.provider,
+                                status: w.status || 'pending',
+                                time: w.createdAt ? new Date(w.createdAt.toDate()).toLocaleDateString('en-GB') : 'Recent',
+                                date: w.createdAt ? formatDateISO(w.createdAt.toDate()) : formatDateISO(new Date()),
+                                txnId: w.trxId || 'TXN-WTH'
+                            });
+                        });
+
+                        document.getElementById('statDepositTotal').innerText = `৳ ${totalDep.toFixed(0)}`;
+                        document.getElementById('statWithdrawTotal').innerText = `৳ ${totalWith.toFixed(0)}`;
+                        
+                        loadTransactions(userTransactions);
+                    });
+                });
+            }
+        });
+
+        function switchCategoryFilter(btn, category) {
+            document.querySelectorAll('.tab-pill').forEach(pill => pill.classList.remove('active'));
+            btn.classList.add('active');
+            currentCategory = category;
+            applyCombinedFilters();
+        }
+
+        function switchCategoryFilterByButton(category) {
+            const btn = Array.from(document.querySelectorAll('.tab-pill')).find(p => p.textContent.toLowerCase().includes(category));
+            if (btn) switchCategoryFilter(btn, category);
+            showToast(`Filter: ${category.toUpperCase()}`);
+        }
+
+        function handleStatusChange(status) {
+            currentStatus = status;
+            const labelMap = { 'all': 'All Status', 'success': 'Success', 'processing': 'Processing' };
+            document.getElementById('statusFilterLabel').innerText = labelMap[status] || 'All Status';
+            applyCombinedFilters();
+            showToast(`Status: ${labelMap[status]}`);
+        }
+
+        function openDateModal() { document.getElementById('dateFilterModal').classList.add('active'); }
+        function closeDateModal() { document.getElementById('dateFilterModal').classList.remove('active'); }
+
+        function openDetailsModal(title, desc, amount, status, time, iconInnerHtml, iconBoxClass, txnId = 'TXN-#00000000') {
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalDesc').innerText = desc;
+            
+            const amtElem = document.getElementById('modalAmount');
+            amtElem.innerText = amount;
+            amtElem.style.color = amount.startsWith('+') ? '#00e676' : '#f87171';
+
+            document.getElementById('modalTime').innerText = time;
+            document.getElementById('modalStatusBadge').innerText = status;
+            document.getElementById('modalTxnId').innerText = txnId;
+            
+            const modalIconBox = document.getElementById('modalIconContainer');
+            modalIconBox.className = 'item-icon-box ' + iconBoxClass;
+            modalIconBox.innerHTML = iconInnerHtml;
+
+            document.getElementById('detailsModal').classList.add('active');
+        }
+        function closeDetailsModal() { document.getElementById('detailsModal').classList.remove('active'); }
+
+        function formatDateISO(date) { return date.toISOString().split('T')[0]; }
+
+        function applyQuickDays(daysAgo, btn) {
+            document.querySelectorAll('.date-chip').forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            const now = new Date();
+            if (daysAgo === 0) {
+                selectedFromDate = selectedToDate = formatDateISO(now);
+            } else if (daysAgo === 1) {
+                const y = new Date(); y.setDate(now.getDate() - 1);
+                selectedFromDate = selectedToDate = formatDateISO(y);
+            } else if (daysAgo === 7) {
+                const p = new Date(); p.setDate(now.getDate() - 7);
+                selectedFromDate = formatDateISO(p);
+                selectedToDate = formatDateISO(now);
+            }
+
+            document.getElementById('inputFromDate').value = selectedFromDate;
+            document.getElementById('inputToDate').value = selectedToDate;
+            document.getElementById('dateFilterLabel').innerText = (selectedFromDate === selectedToDate) ? selectedFromDate : `${selectedFromDate.slice(5)} ~ ${selectedToDate.slice(5)}`;
+            document.getElementById('activeFilterBanner').style.display = 'flex';
+            document.getElementById('activeFilterText').innerText = `Date: ${selectedFromDate} to ${selectedToDate}`;
+
+            closeDateModal();
+            applyCombinedFilters();
+            showToast('Date filter applied');
+        }
+
+        function applyPresetDate(dateStr, btn) {
+            document.querySelectorAll('.date-chip').forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            if (dateStr === 'all') resetDateFilter();
+        }
+
+        function applyCustomDateFilter() {
+            const from = document.getElementById('inputFromDate').value;
+            const to = document.getElementById('inputToDate').value;
+            if (from && to && from > to) { showToast('From date cannot be after To date'); return; }
+
+            selectedFromDate = from || null;
+            selectedToDate = to || null;
+
+            if (selectedFromDate && selectedToDate) {
+                const label = `${selectedFromDate} to ${selectedToDate}`;
+                document.getElementById('dateFilterLabel').innerText = selectedFromDate === selectedToDate ? selectedFromDate : `${selectedFromDate.slice(5)} ~ ${selectedToDate.slice(5)}`;
+                document.getElementById('activeFilterBanner').style.display = 'flex';
+                document.getElementById('activeFilterText').innerText = `Range: ${label}`;
+            }
+
+            closeDateModal();
+            applyCombinedFilters();
+            showToast('Date range filter applied');
+        }
+
+        function resetDateFilter() {
+            selectedFromDate = selectedToDate = null;
+            document.getElementById('inputFromDate').value = '';
+            document.getElementById('inputToDate').value = '';
+            document.getElementById('dateFilterLabel').innerText = 'Select Date Range';
+            document.getElementById('activeFilterBanner').style.display = 'none';
+            document.querySelectorAll('.date-chip').forEach((c, i) => c.classList.toggle('active', i === 0));
+            closeDateModal();
+            applyCombinedFilters();
+            showToast('Showing all history');
+        }
+
+        function applyCombinedFilters() {
+            const items = document.querySelectorAll('.history-item-card');
+            let visibleCount = 0;
+
+            items.forEach(item => {
+                const itemCat = item.getAttribute('data-category');
+                const itemDate = item.getAttribute('data-date');
+                const itemStatus = item.getAttribute('data-status');
+
+                const matchesCat = (currentCategory === 'all' || itemCat === currentCategory);
+                const matchesStatus = (currentStatus === 'all' || itemStatus === currentStatus || (currentStatus === 'success' && (itemStatus === 'completed' || itemStatus === 'success')) || (currentStatus === 'processing' && itemStatus === 'pending'));
+
+                let matchesDate = true;
+                if (selectedFromDate && selectedToDate) {
+                    matchesDate = (itemDate >= selectedFromDate && itemDate <= selectedToDate);
+                }
+
+                if (matchesCat && matchesStatus && matchesDate) {
+                    item.style.display = 'flex';
+                    visibleCount++;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            const noRecordsBox = document.getElementById('noRecordsBox');
+            if (noRecordsBox) noRecordsBox.style.display = (visibleCount === 0) ? 'flex' : 'none';
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById("toastBox");
+            const toastMsg = document.getElementById("toastMsg");
+            toastMsg.innerText = message;
+            toast.className = `toast show`;
+            setTimeout(() => { toast.classList.remove("show"); }, 2100);
+        }
+
+        function getMethodConfig(method) {
+            const m = (method || '').toLowerCase();
+            if (m === 'bkash') {
+                return { boxClass: 'icon-bkash-box', innerHtml: `<img src="https://images.seeklogo.com/logo-png/27/2/bkash-logo-png_seeklogo-273684.png" alt="bKash" class="brand-logo-img">` };
+            } else if (m === 'nagad') {
+                return { boxClass: 'icon-nagad-box', innerHtml: `<img src="https://images.seeklogo.com/logo-png/41/1/nagad-logo-png_seeklogo-411803.png" alt="Nagad" class="brand-logo-img">` };
+            } else if (m === 'binance') {
+                return { boxClass: 'icon-binance-box', innerHtml: `<img src="https://images.seeklogo.com/logo-png/59/1/binance-icon-logo-png_seeklogo-598330.png" alt="Binance" class="brand-logo-img">` };
+            } else if (m === 'youtube') {
+                return { boxClass: 'icon-yt', innerHtml: `<i class="fa-brands fa-youtube"></i>` };
+            } else if (m === 'tiktok') {
+                return { boxClass: 'icon-tiktok', innerHtml: `<i class="fa-brands fa-tiktok"></i>` };
+            } else if (m === 'referral' || m === 'bonus') {
+                return { boxClass: 'icon-bonus-luxury', innerHtml: `<i class="fa-solid fa-gift" style="font-size:15px;"></i>` };
+            } else {
+                return { boxClass: 'icon-typing', innerHtml: `<i class="fa-solid fa-keyboard"></i>` };
+            }
+        }
+
+        function loadTransactions(transactionsArray) {
+            const container = document.getElementById('historyItemsContainer');
+            container.querySelectorAll('.history-item-card').forEach(c => c.remove());
+
+            if (!transactionsArray || transactionsArray.length === 0) {
+                applyCombinedFilters();
+                return;
+            }
+
+            transactionsArray.forEach(txn => {
+                const config = getMethodConfig(txn.method || txn.category);
+                const isPlus = txn.type === 'plus';
+                const amtFormatted = isPlus ? `+ ৳ ${txn.amount}` : `- ৳ ${txn.amount}`;
+                const amtClass = isPlus ? 'plus' : 'minus';
+                const isPending = txn.status === 'pending' || txn.status === 'processing';
+                const statusBadge = isPending
+                    ? `<span class="status-badge processing"><i class="fa-solid fa-arrows-rotate fa-spin"></i> Processing</span>`
+                    : `<span class="status-badge success"><i class="fa-solid fa-circle-check"></i> Success</span>`;
+
+                const card = document.createElement('div');
+                card.className = 'history-item-card';
+                card.setAttribute('data-category', txn.category || 'tasks');
+                card.setAttribute('data-date', txn.date || '');
+                card.setAttribute('data-status', txn.status || 'pending');
+
+                card.innerHTML = `
+                    <div class="item-left">
+                        <div class="item-icon-box ${config.boxClass}">
+                            ${config.innerHtml}
+                        </div>
+                        <div class="item-info">
+                            <h4>${txn.title}</h4>
+                            <p>${txn.desc}</p>
+                            <div class="item-time">
+                                <i class="fa-regular fa-clock"></i>
+                                <span>${txn.time}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item-right">
+                        <div class="amount-and-status">
+                            <span class="amount-text ${amtClass}">${amtFormatted}</span>
+                            ${statusBadge}
+                        </div>
+                        <i class="fa-solid fa-chevron-right chevron-arrow"></i>
+                    </div>
+                `;
+
+                card.onclick = () => {
+                    openDetailsModal(
+                        txn.title,
+                        txn.desc,
+                        amtFormatted,
+                        isPending ? 'Processing' : 'Success',
+                        txn.time,
+                        config.innerHtml,
+                        config.boxClass,
+                        txn.txnId || 'TXN-#00000000'
+                    );
+                };
+
+                container.appendChild(card);
+            });
+
+            applyCombinedFilters();
+        }
+
+        applyCombinedFilters();
+    </script>
+</body>
+</html>
