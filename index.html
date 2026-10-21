@@ -45,15 +45,25 @@
         }
 
         /* 1. AUTH SCREEN */
-        .auth-screen { background: var(--paper); color: var(--ink); min-height: 750px; display: flex; flex-direction: column; position: relative; z-index: 10; transition: all 0.3s ease; }
-        .auth-status { height: 30px; display: flex; justify-content: space-between; align-items: center; padding: 10px 22px 0; font-size: 11px; font-weight: 800; color: #666; }
-        .auth-brand { display: flex; align-items: center; justify-content: center; gap: 7px; font-weight: 900; font-size: 21px; margin: 12px 0 0; color: #111; }
+        .auth-screen { 
+            background: var(--paper); 
+            color: var(--ink); 
+            min-height: 750px; 
+            display: flex; 
+            flex-direction: column; 
+            position: relative; 
+            z-index: 10; 
+            transition: all 0.3s ease;
+            padding-top: 18px; 
+        }
+        
+        .auth-brand { display: flex; align-items: center; justify-content: center; gap: 7px; font-weight: 900; font-size: 22px; margin: 6px 0 0; color: #111; }
         .auth-main { padding: 0 25px 26px; display: flex; flex-direction: column; flex: 1; }
-        .auth-hero { height: 180px; display: flex; align-items: center; justify-content: center; margin: 5px 0; }
+        .auth-hero { height: 185px; display: flex; align-items: center; justify-content: center; margin: 8px 0; }
         .auth-logo-img { width: 130px; height: 130px; object-fit: contain; filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.15)); }
 
         .auth-intro { text-align: center; }
-        .auth-intro h1 { font-size: 24px; line-height: 1.2; letter-spacing: -1px; margin: 0 0 8px; font-weight: 850; color: #111; }
+        .auth-intro h1 { font-size: 24px; line-height: 1.25; letter-spacing: -1px; margin: 0 0 8px; font-weight: 850; color: #111; }
         .auth-intro p { font-size: 13px; color: #555; line-height: 1.5; margin: 0 auto; max-width: 270px; }
         .auth-actions { margin-top: auto; padding-top: 20px; display: grid; gap: 10px; }
         .auth-btn { border: 1.5px solid #111; border-radius: 999px; height: 48px; width: 100%; font: 700 13px inherit; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; background: transparent; color: #111; transition: transform 0.15s; }
@@ -75,10 +85,28 @@
         .field { margin: 10px 0; text-align: left; }
         .field label { display: block; font-size: 11px; font-weight: 800; margin: 0 0 6px 3px; color: #222; }
         .input-wrap { position: relative; }
-        .field input { width: 100%; height: 44px; border: 1.5px solid #d4d4d4; border-radius: 999px; background: #fff; padding: 0 46px 0 16px; font-size: 12px; outline: none; color: #111; }
+        .field input { width: 100%; height: 44px; border: 1.5px solid #d4d4d4; border-radius: 999px; background: #fff; padding: 0 46px 0 16px; font-size: 12.5px; outline: none; color: #111; }
         .field input:focus { border-color: #111; }
-        .eye { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); border: 0; width: 32px; height: 32px; background: transparent; display: flex; align-items: center; justify-content: center; color: #555; cursor: pointer; }
-        .eye svg { width: 19px; height: 19px; display: block; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+        
+        .eye { 
+            position: absolute; 
+            right: 12px; 
+            top: 50%; 
+            transform: translateY(-50%); 
+            border: 0; 
+            width: 34px; 
+            height: 34px; 
+            background: transparent; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            color: #64748b; 
+            cursor: pointer; 
+            font-size: 15px;
+        }
+        .eye:hover { color: #0f172a; }
+        .eye i { pointer-events: none; }
+
         .row-between { display: flex; justify-content: space-between; align-items: center; font-size: 11px; margin: 10px 3px; }
         .check { display: flex; align-items: center; gap: 7px; color: #555; font-size: 11px; }
         .switch { text-align: center; font-size: 11px; color: #666; margin: 16px 0 2px; }
@@ -86,13 +114,15 @@
         .message.show { display: block; }
         .message.error { background: #fee2e2; border-color: #fca5a5; color: #991b1b; }
         .close-btn-sheet { position: absolute; right: 18px; top: 15px; background: #eee; border: 0; width: 28px; height: 28px; border-radius: 50%; font-size: 18px; color: #333; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        
         .social-bottom { text-align: center; margin: 16px 0 2px; color: #888; font-size: 10px; }
         .social-icons { display: flex; justify-content: center; gap: 14px; margin-top: 9px; }
-        .social-circle { width: 42px; height: 42px; border-radius: 50%; background: #fff; border: 1.5px solid #dedede; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); font-size: 19px; font-weight: 900; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .social-circle { width: 44px; height: 44px; border-radius: 50%; background: #fff; border: 1.5px solid #dedede; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); font-size: 19px; font-weight: 900; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.15s; }
+        .social-circle:active { transform: scale(0.92); }
         .social-circle.google { color: #4285f4; }
         .social-circle.facebook { color: #1877f2; font-family: Arial, sans-serif; font-size: 22px; }
 
-        /* 2. DASHBOARD */
+        /* ================= 2. DASHBOARD ================= */
         .main-dashboard {
             display: none;
             flex-direction: column;
@@ -104,7 +134,7 @@
         }
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.99); } to { opacity: 1; transform: scale(1); } }
         
-        .app-body { padding: 0 14px 10px; display: flex; flex-direction: column; gap: 13px; }
+        .app-body { padding: 0 14px 10px; display: flex; flex-direction: column; gap: 14px; }
         .custom-icon-fill { width: 100%; height: 100%; object-fit: contain; display: block; }
 
         /* Header */
@@ -130,7 +160,7 @@
         .brand-title p { font-size: 9.5px; color: #047857; font-weight: 700; }
         
         .header-actions { display: flex; align-items: center; gap: 14px; }
-        .notif-btn { position: relative; color: #0369a1; font-size: 21px; cursor: pointer; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
+        .notif-btn { position: relative; color: #0369a1; font-size: 21px; cursor: pointer; }
         .notif-badge { position: absolute; top: -6px; right: -6px; background: #ef4444; color: #fff; font-size: 9px; font-weight: 800; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #ffffff; }
         .profile-btn { display: flex; align-items: center; gap: 5px; cursor: pointer; }
         .profile-avatar {
@@ -147,7 +177,7 @@
             box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
         }
 
-        /* Balance Card */
+        /* 3D Balance Card */
         .balance-card {
             background: linear-gradient(135deg, #0284c7 0%, #0d9488 55%, #059669 100%);
             border-radius: 24px;
@@ -157,10 +187,10 @@
             color: #ffffff;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 14px;
         }
 
-        .balance-top-row { display: flex; justify-content: space-between; align-items: flex-start; width: 100%; }
+        .balance-top-row { display: flex; justify-content: space-between; align-items: center; width: 100%; }
         .balance-left-content { display: flex; align-items: center; gap: 12px; }
         .wallet-circle-3d {
             width: 48px;
@@ -176,65 +206,118 @@
             flex-shrink: 0;
             padding: 7px;
         }
-        .balance-text-group { display: flex; flex-direction: column; gap: 2px; line-height: 1.2; }
+        
+        .balance-text-group { display: flex; flex-direction: column; gap: 3px; line-height: 1.3; }
         .balance-label-line { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; color: #ccfbf1; text-transform: uppercase; letter-spacing: 0.4px; }
         .eye-toggle-btn { cursor: pointer; color: #99f6e4; font-size: 12px; }
-        .balance-amount-line { font-size: 24px; font-weight: 900; color: #ffffff; letter-spacing: -0.5px; white-space: nowrap; }
-        .balance-bdt-line { font-size: 10.5px; font-weight: 700; color: #d1fae5; letter-spacing: 0.2px; }
-        .user-meta-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
-        .user-name-text { font-size: 13.5px; font-weight: 850; color: #ffffff; max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .uid-chip-3d { display: inline-flex; align-items: center; gap: 5px; font-size: 10.5px; font-weight: 800; color: #ffffff; background: rgba(0, 0, 0, 0.22); border: 1px solid rgba(255, 255, 255, 0.35); padding: 3px 9px; border-radius: 20px; cursor: pointer; }
+        .balance-amount-line { font-size: 23px; font-weight: 900; color: #ffffff; letter-spacing: -0.4px; white-space: nowrap; line-height: 1.2; margin: 1px 0; }
+        .balance-bdt-line { font-size: 10.5px; font-weight: 700; color: #d1fae5; letter-spacing: 0.2px; line-height: 1.2; }
 
-        /* Sub Stats Grid */
+        .user-meta-right { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
+        .user-name-text { font-size: 13.5px; font-weight: 850; color: #ffffff; max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; }
+        .uid-chip-3d { display: inline-flex; align-items: center; gap: 5px; font-size: 10.5px; font-weight: 800; color: #ffffff; background: rgba(0, 0, 0, 0.25); border: 1px solid rgba(255, 255, 255, 0.35); padding: 3px 9px; border-radius: 20px; cursor: pointer; }
+
+        /* 3-Column Sub Stats Grid */
         .balance-sub-stats-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: 1fr 1fr 1.15fr;
             gap: 6px;
             background: rgba(0, 0, 0, 0.22);
             border-radius: 16px;
             padding: 8px;
             border: 1px solid rgba(255, 255, 255, 0.15);
         }
-        .sub-stat-box { display: flex; align-items: center; gap: 6px; min-width: 0; background: rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 6px 7px; }
+        .sub-stat-box { display: flex; align-items: center; gap: 6px; min-width: 0; background: rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 6px 6px; }
         .sub-stat-mini-icon { width: 26px; height: 26px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 12px; color: #fff; }
         .sub-stat-mini-icon.green-glow { background: #10b981; }
         .sub-stat-mini-icon.blue-glow { background: #0284c7; }
-        .sub-stat-labels { display: flex; flex-direction: column; line-height: 1.15; min-width: 0; overflow: hidden; }
-        .sub-stat-labels span { font-size: 8px; color: #ccfbf1; font-weight: 700; text-transform: uppercase; }
-        .sub-stat-labels strong { font-size: 11px; color: #ffffff; font-weight: 850; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .sub-stat-labels { display: flex; flex-direction: column; justify-content: center; line-height: 1.25; min-width: 0; overflow: hidden; }
+        .sub-stat-labels span { font-size: 8px; color: #ccfbf1; font-weight: 700; text-transform: uppercase; margin-bottom: 1px; }
+        .sub-stat-labels strong { font-size: 10.5px; color: #ffffff; font-weight: 850; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* Unverified/Verified Badge */
         .verify-badge-pill { display: flex; align-items: center; gap: 5px; min-width: 0; background: rgba(239, 68, 68, 0.25); border: 1px solid #f87171; border-radius: 12px; padding: 5px 6px; cursor: pointer; }
         .verify-badge-pill.verified { background: rgba(16, 185, 129, 0.25); border-color: #34d399; }
         .verify-pill-icon { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #ffffff; flex-shrink: 0; background: #ef4444; }
         .verify-badge-pill.verified .verify-pill-icon { background: #10b981; }
-        .verify-pill-text { display: flex; flex-direction: column; line-height: 1.1; min-width: 0; }
-        .verify-pill-text span { font-size: 7.5px; font-weight: 700; color: #fecaca; text-transform: uppercase; }
+        .verify-pill-text { display: flex; flex-direction: column; justify-content: center; line-height: 1.2; min-width: 0; }
+        .verify-pill-text span { font-size: 7.5px; font-weight: 700; color: #fecaca; text-transform: uppercase; margin-bottom: 1px; }
         .verify-badge-pill.verified .verify-pill-text span { color: #a7f3d0; }
         .verify-pill-text strong { font-size: 9.5px; font-weight: 850; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* Actions Grid */
-        .actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .action-box-3d { border-radius: 20px; padding: 13px 14px; display: flex; align-items: center; justify-content: space-between; color: #fff; cursor: pointer; border: 1px solid rgba(255, 255, 255, 0.3); }
-        .action-box-3d:active { transform: translateY(2px); }
-        .action-box-3d.deposit { background: linear-gradient(135deg, #10b981 0%, #047857 100%); box-shadow: 0 8px 18px rgba(16, 185, 129, 0.35); }
-        .action-box-3d.withdraw { background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); box-shadow: 0 8px 18px rgba(2, 132, 199, 0.35); }
-        .action-left { display: flex; align-items: center; gap: 10px; }
-        .action-icon-wrap { width: 38px; height: 38px; border-radius: 12px; background: rgba(255, 255, 255, 0.22); display: flex; align-items: center; justify-content: center; flex-shrink: 0; padding: 6px; }
-        .action-info h3 { font-size: 14px; font-weight: 850; line-height: 1.1; }
-        .action-info p { font-size: 9px; color: rgba(255, 255, 255, 0.9); font-weight: 600; margin-top: 2px; }
+        /* ================= 3D WIDE DEPOSIT & WITHDRAW BUTTONS (সাইডে দৈর্ঘ্য বাড়ানো) ================= */
+        .actions-wide-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            width: 100%;
+            margin: 4px 0 2px;
+        }
 
-        /* Task Cards */
-        .task-card-3d { background: var(--card-3d); border: 1.5px solid var(--card-border); border-radius: 20px; padding: 12px 14px; box-shadow: var(--shadow-3d); }
+        .action-wide-card {
+            border-radius: 20px;
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            height: 64px;
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+        }
+        .action-wide-card:active {
+            transform: scale(0.95);
+        }
+
+        .action-wide-card.deposit-card {
+            background: linear-gradient(145deg, #ffffff, #ecfdf5);
+            border: 2px solid #a7f3d0;
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.22), inset 0 2px 2px #ffffff;
+        }
+
+        .action-wide-card.withdraw-card {
+            background: linear-gradient(145deg, #ffffff, #f0f9ff);
+            border: 2px solid #bae6fd;
+            box-shadow: 0 8px 20px rgba(2, 132, 199, 0.22), inset 0 2px 2px #ffffff;
+        }
+
+        .action-wide-card img {
+            width: 44px;
+            height: 44px;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.12));
+            flex-shrink: 0;
+        }
+
+        .action-wide-card span {
+            font-size: 15px;
+            font-weight: 900;
+            letter-spacing: -0.3px;
+        }
+
+        .action-wide-card.deposit-card span { color: #047857; }
+        .action-wide-card.withdraw-card span { color: #0369a1; }
+
+        /* 3D Task Cards */
+        .task-card-3d { 
+            background: var(--card-3d); 
+            border: 1.5px solid var(--card-border); 
+            border-radius: 20px; 
+            padding: 13px 14px; 
+            box-shadow: var(--shadow-3d); 
+        }
         .task-row-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; }
         .task-left-meta { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; }
         .task-symbol-3d { width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 16px; flex-shrink: 0; }
         .task-symbol-3d.cyan { background: linear-gradient(135deg, #0284c7, #0d9488); }
         .task-symbol-3d.purple { background: linear-gradient(135deg, #8b5cf6, #6366f1); }
         .task-symbol-3d.telegram-blue { background: linear-gradient(135deg, #0088cc, #0284c7); }
-        .task-text h4 { font-size: 13px; font-weight: 800; color: #0c4a6e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .task-text p { font-size: 9px; color: #64748b; font-weight: 600; margin-top: 2px; }
-        .task-pill { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; font-size: 10.5px; font-weight: 800; white-space: nowrap; margin-left: auto; cursor: pointer; }
+        
+        .task-text { display: flex; flex-direction: column; justify-content: center; min-width: 0; line-height: 1.3; overflow: hidden; }
+        .task-text h4 { font-size: 13px; font-weight: 800; color: #0c4a6e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
+        .task-text p { font-size: 9.5px; color: #64748b; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        .task-pill { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; font-size: 10.5px; font-weight: 800; white-space: nowrap; margin-left: auto; cursor: pointer; flex-shrink: 0; }
         .task-pill.green-pill { background: #dcfce7; color: #047857; border: 1px solid #86efac; }
         .task-pill.blue-pill { background: #e0f2fe; color: #0369a1; border: 1px solid #7dd3fc; }
         .task-pill.claimed-pill { background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; }
@@ -286,24 +369,17 @@
             font-size: 10px;
             font-weight: 800;
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: all 0.2s;
             position: relative;
         }
-        .nav-link i {
-            font-size: 21px;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.06));
-            transition: transform 0.2s;
-        }
+        .nav-link i { font-size: 20px; }
         .nav-link:active i { transform: scale(0.88); }
         
-        /* Modern Colorful Active States */
         .nav-link.active { color: #0284c7; }
-        .nav-link.active i { filter: drop-shadow(0 3px 8px rgba(2, 132, 199, 0.4)); }
-        .nav-link.lucky-tab { color: #8b5cf6; }
-        .nav-link.history-tab { color: #059669; }
-        .nav-link.refer-tab { color: #ea580c; }
+        .nav-link.lucky-tab { color: #10b981; }
+        .nav-link.history-tab { color: #0284c7; }
+        .nav-link.refer-tab { color: #f59e0b; }
 
-        /* Center Support Raised Bubble */
         .nav-link.center-support {
             position: relative;
             top: -14px;
@@ -328,12 +404,7 @@
         }
         .center-bubble-3d:active { transform: scale(0.92); }
         .center-bubble-img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
-        .center-support-text {
-            font-size: 10px;
-            font-weight: 850;
-            color: #0284c7;
-            letter-spacing: 0.2px;
-        }
+        .center-support-text { font-size: 10px; font-weight: 850; color: #0284c7; letter-spacing: 0.2px; }
 
         /* 50 BDT Modal */
         .verify-modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(6px); z-index: 2100; display: none; align-items: center; justify-content: center; padding: 18px; }
@@ -358,8 +429,24 @@
         .btn-cancel-logout { flex: 1; padding: 11px; border-radius: 14px; border: 1px solid #cbd5e1; background: #f8fafc; font-weight: 700; cursor: pointer; }
         .btn-confirm-logout { flex: 1; padding: 11px; border-radius: 14px; border: none; background: #ef4444; color: #fff; font-weight: 700; cursor: pointer; }
 
-        /* Toast */
-        .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); background: #0f172a; color: #FFF; padding: 10px 18px; border-radius: 30px; font-size: 12.5px; font-weight: 600; transition: all 0.35s ease; z-index: 2500; opacity: 0; white-space: nowrap; }
+        /* Toast Alert */
+        .toast { 
+            position: fixed; 
+            bottom: 24px; 
+            left: 50%; 
+            transform: translateX(-50%) translateY(100px); 
+            background: #0f172a; 
+            color: #FFF; 
+            padding: 8px 14px; 
+            border-radius: 25px; 
+            font-size: 11.5px; 
+            font-weight: 600; 
+            transition: all 0.3s ease; 
+            z-index: 2500; 
+            opacity: 0; 
+            white-space: nowrap; 
+            box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+        }
         .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
         .toast.success i { color: #10B981; }
         .toast.error i { color: #EF4444; }
@@ -372,10 +459,6 @@
 
         <!-- 1. AUTH SCREEN -->
         <div id="authScreen" class="auth-screen">
-            <div class="auth-status">
-                <span>9:41</span>
-                <span>◆ ▴ ▰</span>
-            </div>
             <div class="auth-brand">
                 <i class="fa-solid fa-coins" style="color:#d8ff38;"></i> MicroTask.
             </div>
@@ -393,8 +476,8 @@
                 </div>
                 <p class="auth-legal">
                     By signing up, you agree to our 
-                    <a href="#" onclick="showToast('Terms of Service','info');return false">Terms of Service</a> and 
-                    <a href="#" onclick="showToast('Privacy Policy','info');return false">Privacy Policy</a>.
+                    <a href="#" onclick="showToast('শর্তাবলী ডেমো','info');return false">Terms of Service</a> and 
+                    <a href="#" onclick="showToast('গোপনীয়তা নীতি ডেমো','info');return false">Privacy Policy</a>.
                 </p>
             </main>
 
@@ -418,24 +501,27 @@
                                 <label for="regIdentity">Email Address or Gmail</label>
                                 <input id="regIdentity" type="email" placeholder="name@gmail.com" autocomplete="username" required>
                             </div>
+                            
                             <div class="field">
                                 <label for="regPassword">Password</label>
                                 <div class="input-wrap">
                                     <input id="regPassword" type="password" placeholder="Create a password (6+ characters)" minlength="6" required>
-                                    <button class="eye" type="button" onclick="toggleInvezoPassword('regPassword',this)">
-                                        <svg viewBox="0 0 24 24"><path d="M3 3l18 18"/><path d="M10.6 10.6a2 2 0 0 0 2.8 2.8"/><path d="M9.9 5.2A10.8 10.8 0 0 1 12 5c6.4 0 10 7 10 7a16 16 0 0 1-3.1 3.8"/><path d="M6.2 6.2C3.5 8 2 12 2 12s3.6 7 10 7a10 10 0 0 0 4-.8"/></svg>
+                                    <button class="eye" type="button" onclick="toggleInvezoPassword('regPassword',this)" title="Toggle password visibility">
+                                        <i class="fa-regular fa-eye-slash"></i>
                                     </button>
                                 </div>
                             </div>
+                            
                             <div class="field">
                                 <label for="regConfirm">Confirm password</label>
                                 <div class="input-wrap">
                                     <input id="regConfirm" type="password" placeholder="Enter password again" minlength="6" required>
-                                    <button class="eye" type="button" onclick="toggleInvezoPassword('regConfirm',this)">
-                                        <svg viewBox="0 0 24 24"><path d="M3 3l18 18"/><path d="M10.6 10.6a2 2 0 0 0 2.8 2.8"/><path d="M9.9 5.2A10.8 10.8 0 0 1 12 5c6.4 0 10 7 10 7a16 16 0 0 1-3.1 3.8"/><path d="M6.2 6.2C3.5 8 2 12 2 12s3.6 7 10 7a10 10 0 0 0 4-.8"/></svg>
+                                    <button class="eye" type="button" onclick="toggleInvezoPassword('regConfirm',this)" title="Toggle password visibility">
+                                        <i class="fa-regular fa-eye-slash"></i>
                                     </button>
                                 </div>
                             </div>
+                            
                             <div class="row-between">
                                 <label class="check"><input type="checkbox" id="termsAgree" required> I agree to the Terms</label>
                             </div>
@@ -446,8 +532,8 @@
                         <div class="social-bottom">
                             <span>Or continue with</span>
                             <div class="social-icons">
-                                <button type="button" class="social-circle google" onclick="handleSocialAuth('Google')">G</button>
-                                <button type="button" class="social-circle facebook" onclick="handleSocialAuth('Facebook')">f</button>
+                                <button type="button" class="social-circle google" onclick="handleSocialAuth('Google')" title="Sign in with Google">G</button>
+                                <button type="button" class="social-circle facebook" onclick="handleSocialAuth('Facebook')" title="Sign in with Facebook">f</button>
                             </div>
                         </div>
 
@@ -464,15 +550,17 @@
                                 <label for="loginIdentity">Email Address</label>
                                 <input id="loginIdentity" type="email" placeholder="name@gmail.com" autocomplete="username" required>
                             </div>
+                            
                             <div class="field">
                                 <label for="loginPassword">Password</label>
                                 <div class="input-wrap">
                                     <input id="loginPassword" type="password" placeholder="Enter your password" required>
-                                    <button class="eye" type="button" onclick="toggleInvezoPassword('loginPassword',this)">
-                                        <svg viewBox="0 0 24 24"><path d="M3 3l18 18"/><path d="M10.6 10.6a2 2 0 0 0 2.8 2.8"/><path d="M9.9 5.2A10.8 10.8 0 0 1 12 5c6.4 0 10 7 10 7a16 16 0 0 1-3.1 3.8"/><path d="M6.2 6.2C3.5 8 2 12 2 12s3.6 7 10 7a10 10 0 0 0 4-.8"/></svg>
+                                    <button class="eye" type="button" onclick="toggleInvezoPassword('loginPassword',this)" title="Toggle password visibility">
+                                        <i class="fa-regular fa-eye-slash"></i>
                                     </button>
                                 </div>
                             </div>
+                            
                             <div class="row-between">
                                 <label class="check"><input type="checkbox" checked> Remember me</label>
                                 <span class="auth-link" onclick="showView('forgot')">Forgot password?</span>
@@ -484,8 +572,8 @@
                         <div class="social-bottom">
                             <span>Or continue with</span>
                             <div class="social-icons">
-                                <button type="button" class="social-circle google" onclick="handleSocialAuth('Google')">G</button>
-                                <button type="button" class="social-circle facebook" onclick="handleSocialAuth('Facebook')">f</button>
+                                <button type="button" class="social-circle google" onclick="handleSocialAuth('Google')" title="Sign in with Google">G</button>
+                                <button type="button" class="social-circle facebook" onclick="handleSocialAuth('Facebook')" title="Sign in with Facebook">f</button>
                             </div>
                         </div>
 
@@ -510,7 +598,7 @@
             </div>
         </div>
 
-        <!-- 2. MAIN 3D BLUE-GREEN DASHBOARD -->
+        <!-- 2. MAIN 3D DASHBOARD -->
         <div id="mainDashboard" class="main-dashboard">
             <div class="app-body">
                 
@@ -597,32 +685,18 @@
                     </div>
                 </div>
 
-                <!-- 3D Actions Grid -->
-                <div class="actions-grid">
-                    <div class="action-box-3d deposit" onclick="handleSecureNav('deposit.html')">
-                        <div class="action-left">
-                            <div class="action-icon-wrap">
-                                <img src="https://img.icons8.com/?size=100&id=SywK0qRgyexK&format=png&color=ffffff" alt="Deposit" class="custom-icon-fill">
-                            </div>
-                            <div class="action-info">
-                                <h3>Deposit</h3>
-                                <p>Add Money</p>
-                            </div>
-                        </div>
-                        <i class="fa-solid fa-chevron-right" style="font-size:12px; opacity:0.85;"></i>
+                <!-- ================= 3D WIDE DEPOSIT & WITHDRAW BUTTONS (দুই সাইডে দৈর্ঘ্য বাড়ানো) ================= -->
+                <div class="actions-wide-grid">
+                    <!-- ডিপোজিট লম্বা বাটন (বাম সাইডে) -->
+                    <div class="action-wide-card deposit-card" onclick="window.location.href='deposit.html'" title="Deposit Money">
+                        <img src="https://i.ibb.co.com/kghfWJBN/file-00000000b2dc8211affafc4155f20703.png" alt="Deposit">
+                        <span>Deposit</span>
                     </div>
 
-                    <div class="action-box-3d withdraw" onclick="handleSecureNav('withdraw.html')">
-                        <div class="action-left">
-                            <div class="action-icon-wrap">
-                                <img src="https://img.icons8.com/?size=100&id=KGhSnVZPf0Vl&format=png&color=ffffff" alt="Withdraw" class="custom-icon-fill">
-                            </div>
-                            <div class="action-info">
-                                <h3>Withdraw</h3>
-                                <p>Cash Out</p>
-                            </div>
-                        </div>
-                        <i class="fa-solid fa-chevron-right" style="font-size:12px; opacity:0.85;"></i>
+                    <!-- উইথড্র লম্বা বাটন (ডান সাইডে) -->
+                    <div class="action-wide-card withdraw-card" onclick="handleSecureNav('withdraw.html')" title="Withdraw Money">
+                        <img src="https://i.ibb.co.com/QvvSGNpK/file-00000000a4f08211972bdbaacfea428b.png" alt="Withdraw">
+                        <span>Withdraw</span>
                     </div>
                 </div>
 
@@ -687,7 +761,7 @@
                     </div>
                 </div>
 
-                <!-- 3D Task Card 3: Telegram Bonus ($0.10) -->
+                <!-- 3D Task Card 3: Telegram Bonus -->
                 <div class="task-card-3d" id="taskTelegramBox" onclick="handleTelegramTaskClick()" style="cursor:pointer;">
                     <div class="task-row-header">
                         <div class="task-left-meta">
@@ -716,19 +790,19 @@
 
             <!-- ================= MODERN 3D BOTTOM NAV ================= -->
             <nav class="bottom-nav">
-                <!-- 1. Home (Modern House Chimney Window) -->
+                <!-- 1. Home -->
                 <div class="nav-link active" onclick="window.location.href='index.html'">
-                    <i class="fa-solid fa-house-chimney-window"></i>
+                    <i class="fa-solid fa-house"></i>
                     <span>Home</span>
                 </div>
                 
-                <!-- 2. Lucky (Modern Gaming Dice) -->
-                <div class="nav-link lucky-tab" onclick="handleSecureNav('lucky.html')">
-                    <i class="fa-solid fa-dice-d20"></i>
+                <!-- 2. Lucky (৪ পাতার ৩ডি ক্লোভার আইকন) -->
+                <div class="nav-link lucky-tab" onclick="window.location.href='lucky.html'">
+                    <i class="fa-solid fa-clover"></i>
                     <span>Lucky</span>
                 </div>
                 
-                <!-- 3. Support (Center 3D Headset Bubble + Label Underneath) -->
+                <!-- 3. Support (সাপোর্ট হেডসেট লোগো ও নিচে সাপোর্ট লেখা) -->
                 <div class="nav-link center-support" onclick="window.location.href='support.html'">
                     <div class="center-bubble-3d">
                         <img src="https://i.ibb.co.com/DHMB6J4S/file-00000000a6888211aa5b662731e1ff68.png" alt="Support" class="center-bubble-img">
@@ -736,15 +810,15 @@
                     <span class="center-support-text">Support</span>
                 </div>
 
-                <!-- 4. History (Rotational Transaction History Clock) -->
+                <!-- 4. History (আধুনিক ট্রানজেকশন আইকন) -->
                 <div class="nav-link history-tab" onclick="window.location.href='history.html'">
                     <i class="fa-solid fa-clock-rotate-left"></i>
                     <span>History</span>
                 </div>
 
-                <!-- 5. Refer (Modern Friends & Community Rays) -->
-                <div class="nav-link refer-tab" onclick="handleSecureNav('refer.html')">
-                    <i class="fa-solid fa-users-rays"></i>
+                <!-- 5. Refer (৩ডি গিফট আর্নিং আইকন) -->
+                <div class="nav-link refer-tab" onclick="window.location.href='refer.html'">
+                    <i class="fa-solid fa-gift"></i>
                     <span>Refer</span>
                 </div>
             </nav>
@@ -761,7 +835,7 @@
             </div>
             <h3>Account Verification</h3>
             <span class="verify-fee-pill">ফি মাত্র: ৫০ টাকা</span>
-            <p>আপনার অ্যাকাউন্টটি নিরাপদ রাখতে এবং টাস্ক, ইনকাম ও উইথড্র অপশন আনলক করতে ৫০ টাকা দিয়ে অ্যাকাউন্ট ভেরিফাই সম্পন্ন করুন।</p>
+            <p>আপনার অ্যাকাউন্টটি নিরাপদ রাখতে এবং টাস্ক পূরণ ও উইথড্র অপশন আনলক করতে ৫০ টাকা দিয়ে অ্যাকাউন্ট ভেরিফাই সম্পন্ন করুন।</p>
             <div style="display:flex; flex-direction:column; gap:8px;">
                 <button type="button" class="btn-verify-now" onclick="processAccountVerification()">
                     <i class="fa-solid fa-circle-check"></i> এখনই ভেরিফাই করুন (৫০৳)
@@ -792,7 +866,7 @@
         <span id="toastMsg">Notification message</span>
     </div>
 
-    <!-- ================= JAVASCRIPT & FIREBASE INTEGRATION ================= -->
+    <!-- JavaScript & Firebase -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBrG81DRVjx040QhiT68yyRErGXjuCPdS4",
@@ -808,13 +882,11 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // স্থায়ী লোকাল সেশন কনফিগারেশন (লগআউট প্রতিরোধ)
         auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 
         let currentUserDoc = null;
         let isBalanceHidden = false;
 
-        // রিফ্রেশ করলে যেন লগআউট না হয়: ইনস্ট্যান্ট ক্যাশ থেকে ডেটা লোড
         (function restoreSessionInstantly() {
             const cachedUser = JSON.parse(localStorage.getItem('microtask_cached_user'));
             if (cachedUser && cachedUser.uid) {
@@ -828,6 +900,19 @@
                 document.getElementById("bdtAmount").textContent = `≈ ${(balUSD * 120).toFixed(2)} BDT`;
             }
         })();
+
+        function toggleInvezoPassword(id, btn) {
+            const input = document.getElementById(id);
+            const icon = btn.querySelector('i');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                if (icon) icon.className = 'fa-regular fa-eye';
+            } else {
+                input.type = 'password';
+                if (icon) icon.className = 'fa-regular fa-eye-slash';
+            }
+        }
 
         function updateBalanceDisplay() {
             const balUSD = currentUserDoc ? (currentUserDoc.balanceUSD || 0) : 0;
@@ -864,7 +949,7 @@
 
         function openVerifyModal() {
             if (isUserVerified()) {
-                showToast("আপনার অ্যাকাউন্ট ইতিমধ্যে ভেরিফাইড!", "success");
+                showToast("অ্যাকাউন্ট ভেরিফাইড!", "success");
                 return;
             }
             document.getElementById('verificationModal').classList.add('active');
@@ -876,12 +961,12 @@
 
         function handleSecureNav(destinationUrl) {
             if (!isUserVerified()) {
-                showToast("কাজটি করতে প্রথমে ৫০ টাকা দিয়ে অ্যাকাউন্ট ভেরিফাই করুন!", "error");
+                showToast("টাস্ক ও উইথড্র করতে আগে ৫০৳ দিয়ে ভেরিফাই করুন!", "error");
                 openVerifyModal();
                 return;
             }
             if (destinationUrl === 'typing') {
-                showToast("Typing jobs opening...", "info");
+                showToast("টাস্ক লোড হচ্ছে...", "info");
             } else {
                 window.location.href = destinationUrl;
             }
@@ -895,22 +980,22 @@
                 isVerified: true
             }).then(() => {
                 closeVerifyModal();
-                showToast("অভিনন্দন! আপনার অ্যাকাউন্ট ভেরিফাইড হয়েছে!", "success");
+                showToast("অ্যাকাউন্ট ভেরিফাইড!", "success");
             }).catch(err => {
-                showToast("ভেরিফিকেশনে ত্রুটি হয়েছে!", "error");
+                showToast("ত্রুটি হয়েছে!", "error");
             });
         }
 
         function copyUID() {
             const uidText = document.getElementById('uidText').innerText.replace(/[^0-9]/g, '').trim();
             if (!uidText || uidText === "000000") {
-                showToast("প্রথমে লগইন বা একাউন্ট তৈরি করুন!", "error");
+                showToast("প্রথমে লগইন করুন!", "error");
                 return;
             }
 
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(uidText).then(() => {
-                    showToast("UID Copied: " + uidText, "success");
+                    showToast("UID কপি হয়েছে: " + uidText, "success");
                 }).catch(() => fallbackCopy(uidText));
             } else {
                 fallbackCopy(uidText);
@@ -927,9 +1012,9 @@
             textarea.select();
             try {
                 document.execCommand('copy');
-                showToast("UID Copied: " + text, "success");
+                showToast("UID কপি হয়েছে: " + text, "success");
             } catch (err) {
-                showToast("কপি করা যায়নি, ম্যানুয়ালি কপি করুন", "error");
+                showToast("কপি ব্যর্থ!", "error");
             }
             document.body.removeChild(textarea);
         }
@@ -943,6 +1028,12 @@
         }
 
         function handleTelegramTaskClick() {
+            if (!isUserVerified()) {
+                showToast("টাস্ক বোনাস পেতে আগে ৫০৳ দিয়ে ভেরিফাই করুন!", "error");
+                openVerifyModal();
+                return;
+            }
+
             const user = auth.currentUser;
             if (!user) return;
 
@@ -958,7 +1049,7 @@
                     balanceUSD: newBal,
                     telegramClaimed: true
                 }).then(() => {
-                    showToast("অভিনন্দন! টেলিগ্রামে জয়েন করার জন্য $0.10 বোনাস যোগ হয়েছে!", "success");
+                    showToast("$0.10 বোনাস যোগ হয়েছে!", "success");
                 });
             }, 1500);
         }
@@ -972,7 +1063,7 @@
                 localStorage.removeItem('microtask_cached_user');
                 document.getElementById('mainDashboard').style.display = 'none';
                 document.getElementById('authScreen').style.display = 'flex';
-                showToast('সফলভাবে লগআউট করা হয়েছে।', 'info');
+                showToast('লগআউট সম্পন্ন।', 'info');
             });
         }
 
@@ -985,7 +1076,7 @@
             if (type === 'success') icon.className = 'fa-solid fa-circle-check';
             else if (type === 'error') icon.className = 'fa-solid fa-circle-exclamation';
             else icon.className = 'fa-solid fa-circle-info';
-            setTimeout(() => { toast.classList.remove('show'); }, 3000);
+            setTimeout(() => { toast.classList.remove('show'); }, 2200);
         }
 
         const sheet = document.getElementById('sheet');
@@ -996,10 +1087,6 @@
                 const el = document.getElementById(v + 'View');
                 if (el) el.style.display = (v === view ? 'block' : 'none');
             });
-        }
-        function toggleInvezoPassword(id, btn) {
-            const input = document.getElementById(id);
-            input.type = (input.type === 'password') ? 'text' : 'password';
         }
 
         function handleInvezoRegister(e) {
@@ -1072,7 +1159,50 @@
         }
 
         function handleSocialAuth(provider) {
-            showToast(`${provider} সাইন-ইন শীঘ্রই আসছে...`, 'info');
+            if (provider === 'Google') {
+                const googleProvider = new firebase.auth.GoogleAuthProvider();
+                showToast("গুগল সংযোগ হচ্ছে...", "info");
+                
+                auth.signInWithPopup(googleProvider)
+                    .then(result => {
+                        const user = result.user;
+                        const userRef = db.collection("users").doc(user.uid);
+
+                        return userRef.get().then(doc => {
+                            if (!doc.exists) {
+                                const randomUID = Math.floor(100000 + Math.random() * 900000).toString();
+                                const userPayload = {
+                                    name: user.displayName || 'Google User',
+                                    email: user.email,
+                                    uid: randomUID,
+                                    balanceUSD: 0.00,
+                                    isVerified: false,
+                                    telegramClaimed: false,
+                                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                                };
+
+                                localStorage.setItem('microtask_cached_user', JSON.stringify(userPayload));
+                                return userRef.set(userPayload);
+                            }
+                        });
+                    })
+                    .then(() => {
+                        showToast("লগইন সফল!", "success");
+                        closeSheet();
+                    })
+                    .catch(error => {
+                        console.error("Google Auth Error:", error);
+                        if (error.code === 'auth/unauthorized-domain') {
+                            showToast("ডোমেন পারমিশন দিন!", "error");
+                        } else if (error.code === 'auth/popup-closed-by-user') {
+                            showToast("লগইন বাতিল", "info");
+                        } else {
+                            showToast("লগইন ব্যর্থ!", "error");
+                        }
+                    });
+            } else if (provider === 'Facebook') {
+                showToast("ফেসবুক শীঘ্রই আসছে!", "info");
+            }
         }
 
         function handleInvezoForgot(e) {
@@ -1080,13 +1210,12 @@
             const email = document.getElementById('forgotIdentity').value.trim();
             auth.sendPasswordResetEmail(email)
                 .then(() => {
-                    showToast('পাসওয়ার্ড রিসেট লিঙ্ক ইমেইলে পাঠানো হয়েছে!', 'success');
+                    showToast('রিসেট লিঙ্ক পাঠানো হয়েছে!', 'success');
                     showView('login');
                 })
                 .catch(err => showToast(err.message, 'error'));
         }
 
-        // Live Real-Time Firestore Listener
         auth.onAuthStateChanged(user => {
             if (user) {
                 db.collection("users").doc(user.uid).onSnapshot(doc => {
@@ -1103,10 +1232,6 @@
                         updateBalanceDisplay();
                         updateVerificationUI();
                         checkTelegramClaimState();
-
-                        if (!isUserVerified()) {
-                            setTimeout(() => { openVerifyModal(); }, 1200);
-                        }
                     }
                 });
             } else {
@@ -1129,7 +1254,7 @@
             const track = document.getElementById('promoSliderTrack');
             const dotsContainer = document.getElementById('promoDots');
             track.innerHTML = DEFAULT_BANNERS.map((b, i) => `
-                <div class="promo-slide" onclick="handleSecureNav('${b.action}')">
+                <div class="promo-slide" onclick="window.location.href='${b.action}'">
                     <img src="${b.image}" alt="Banner">
                 </div>
             `).join('');
