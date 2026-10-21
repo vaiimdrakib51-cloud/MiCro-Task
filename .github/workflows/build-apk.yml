@@ -33,7 +33,7 @@ jobs:
           # Download App Icon
           curl -sL "https://i.ibb.co.com/5W2f2xg4/pngtree-money-icon-dollar-coins-cash-payment-online-earning-png-image-7589413.png" -o app/src/main/res/mipmap-xxhdpi/ic_launcher.png
 
-          # Gradle Properties (AndroidX সক্রিয় করা হলো)
+          # Gradle Properties
           cat << 'EOF' > gradle.properties
           android.useAndroidX=true
           android.enableJetifier=true
@@ -67,7 +67,7 @@ jobs:
           }
           EOF
 
-          # App build.gradle
+          # App build.gradle (OneSignal যুক্ত করা হলো)
           cat << 'EOF' > app/build.gradle
           plugins {
               id 'com.android.application'
@@ -99,6 +99,7 @@ jobs:
           dependencies {
               implementation 'androidx.appcompat:appcompat:1.6.1'
               implementation 'com.google.android.material:material:1.11.0'
+              implementation 'com.onesignal:OneSignal:[5.1.0, 5.99.99]'
           }
           EOF
 
@@ -124,6 +125,7 @@ jobs:
           <manifest xmlns:android="http://schemas.android.com/apk/res/android">
               <uses-permission android:name="android.permission.INTERNET" />
               <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+              <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
               <application
                   android:allowBackup="true"
@@ -146,7 +148,7 @@ jobs:
           </manifest>
           EOF
 
-          # MainActivity.java (WebView connected directly to your Live Site)
+          # MainActivity.java (OneSignal App ID সেট করা হলো)
           cat << 'EOF' > app/src/main/java/com/microtask/app/MainActivity.java
           package com.microtask.app;
 
@@ -157,13 +159,24 @@ jobs:
           import android.webkit.WebViewClient;
           import androidx.appcompat.app.AppCompatActivity;
 
+          import com.onesignal.OneSignal;
+          import com.onesignal.Continue;
+          import com.onesignal.debug.LogLevel;
+
           public class MainActivity extends AppCompatActivity {
+              private static final String ONESIGNAL_APP_ID = "e94dc542-7d17-4dd3-a20e-c1925cce7749";
               private WebView myWebView;
 
               @SuppressLint("SetJavaScriptEnabled")
               @Override
               protected void onCreate(Bundle savedInstanceState) {
                   super.onCreate(savedInstanceState);
+
+                  // Initialize OneSignal
+                  OneSignal.getDebug().setLogLevel(LogLevel.VERBOSE);
+                  OneSignal.initWithContext(this, ONESIGNAL_APP_ID);
+                  OneSignal.getNotifications().requestPermission(true, Continue.none());
+
                   myWebView = new WebView(this);
                   setContentView(myWebView);
 
