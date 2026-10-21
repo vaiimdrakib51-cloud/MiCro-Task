@@ -33,6 +33,13 @@ jobs:
           # Download App Icon
           curl -sL "https://i.ibb.co.com/5W2f2xg4/pngtree-money-icon-dollar-coins-cash-payment-online-earning-png-image-7589413.png" -o app/src/main/res/mipmap-xxhdpi/ic_launcher.png
 
+          # Gradle Properties (AndroidX সক্রিয় করা হলো)
+          cat << 'EOF' > gradle.properties
+          android.useAndroidX=true
+          android.enableJetifier=true
+          org.gradle.jvmargs=-Xmx2048m
+          EOF
+
           # Settings.gradle
           cat << 'EOF' > settings.gradle
           pluginManagement {
@@ -182,7 +189,7 @@ jobs:
           EOF
 
       - name: Build Debug APK
-        run: gradle assembleDebug
+        run: gradle assembleDebug --stacktrace
 
       - name: Upload APK File
         uses: actions/upload-artifact@v4
