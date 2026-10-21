@@ -8,773 +8,156 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
-    <!-- Firebase SDK (Live Database) -->
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: #0b1a42; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 16px 10px; }
+        .app-container { background: #ffffff; width: 100%; max-width: 400px; border-radius: 36px; box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35); position: relative; overflow: hidden; min-height: 640px; }
+        .copy-alert-toast { position: absolute; top: 20px; left: 50%; transform: translateX(-50%) translateY(-60px); background: #0f172a; color: #ffffff; padding: 10px 18px; border-radius: 30px; font-size: 12.5px; font-weight: 700; display: flex; align-items: center; gap: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.35); border: 1px solid #22c55e; z-index: 100; opacity: 0; pointer-events: none; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .copy-alert-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        .bottom-wave { position: absolute; bottom: 0; left: 0; right: 0; height: 38px; background: linear-gradient(180deg, rgba(162, 219, 247, 0) 0%, rgba(135, 206, 235, 0.45) 100%); pointer-events: none; z-index: 10; }
+        .screen { display: none; flex-direction: column; width: 100%; }
+        .screen.active-screen { display: flex; animation: fadeIn 0.25s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-        body {
-            background-color: #0b1a42;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 16px 10px;
-        }
-
-        /* মূল মোবাইল কার্ড কনটেইনার */
-        .app-container {
-            background: #ffffff;
-            width: 100%;
-            max-width: 400px;
-            border-radius: 36px;
-            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
-            position: relative;
-            overflow: hidden;
-            min-height: 640px;
-        }
-
-        /* কপি অ্যালার্ট টোস্ট ব্যানার */
-        .copy-alert-toast {
-            position: absolute;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%) translateY(-60px);
-            background: #0f172a;
-            color: #ffffff;
-            padding: 10px 18px;
-            border-radius: 30px;
-            font-size: 12.5px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.35);
-            border: 1px solid #22c55e;
-            z-index: 100;
-            opacity: 0;
-            pointer-events: none;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .copy-alert-toast.show {
-            transform: translateX(-50%) translateY(0);
-            opacity: 1;
-        }
-
-        .copy-alert-toast i {
-            color: #22c55e;
-            font-size: 15px;
-        }
-
-        .bottom-wave {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 38px;
-            background: linear-gradient(180deg, rgba(162, 219, 247, 0) 0%, rgba(135, 206, 235, 0.45) 100%);
-            pointer-events: none;
-            z-index: 10;
-        }
-
-        .screen {
-            display: none;
-            flex-direction: column;
-            width: 100%;
-        }
-
-        .screen.active-screen {
-            display: flex;
-            animation: fadeIn 0.25s ease-in-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* ================= স্ক্রিন ১: মেথড সিলেক্ট ================= */
-        .screen-1-content {
-            padding: 24px 20px 25px 20px;
-        }
-
-        .top-back-bar {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-
-        .btn-screen1-back {
-            background: #f1f5f9;
-            border: 1.5px solid #dce4f2;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 15px;
-            color: #0d1e56;
-            transition: all 0.2s;
-        }
-        .btn-screen1-back:active { transform: scale(0.92); }
-
-        .card-header h2 {
-            font-size: 21px;
-            font-weight: 800;
-            color: #0d1e56;
-            margin-bottom: 4px;
-        }
-
-        .card-header p {
-            font-size: 13px;
-            color: #637394;
-            font-weight: 500;
-            margin-bottom: 20px;
-        }
-
-        .payment-options {
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-            margin-bottom: 24px;
-        }
-
-        .payment-item {
-            position: relative;
-            display: flex;
-            align-items: center;
-            padding: 13px 18px;
-            background: #ffffff;
-            border: 1.5px solid #e2e8f4;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
+        /* স্ক্রিন ১ */
+        .screen-1-content { padding: 24px 20px 25px 20px; }
+        .top-back-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+        .btn-screen1-back { background: #f1f5f9; border: 1.5px solid #dce4f2; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 15px; color: #0d1e56; }
+        .card-header h2 { font-size: 21px; font-weight: 800; color: #0d1e56; margin-bottom: 4px; }
+        .card-header p { font-size: 13px; color: #637394; font-weight: 500; margin-bottom: 20px; }
+        .payment-options { display: flex; flex-direction: column; gap: 14px; margin-bottom: 24px; }
+        .payment-item { position: relative; display: flex; align-items: center; padding: 13px 18px; background: #ffffff; border: 1.5px solid #e2e8f4; border-radius: 20px; cursor: pointer; transition: all 0.2s ease; }
         .payment-item:hover { border-color: #cbd5e1; }
         .payment-item.active { border: 2px solid #00b050; background: #f8fdf9; }
-
-        .check-badge {
-            display: none;
-            position: absolute;
-            top: -10px;
-            right: 18px;
-            background: #00b050;
-            color: #ffffff;
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            align-items: center;
-            justify-content: center;
-            font-size: 11px;
-            border: 2px solid #ffffff;
-        }
-
+        .check-badge { display: none; position: absolute; top: -10px; right: 18px; background: #00b050; color: #ffffff; width: 22px; height: 22px; border-radius: 50%; align-items: center; justify-content: center; font-size: 11px; border: 2px solid #ffffff; }
         .payment-item.active .check-badge { display: flex; }
-
-        .payment-logo {
-            width: 54px;
-            height: 54px;
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 16px;
-            flex-shrink: 0;
-            background: #f8fafc;
-            overflow: hidden;
-        }
-
-        .payment-logo img, .payment-logo svg {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-        }
-
+        .payment-logo { width: 54px; height: 54px; border-radius: 14px; display: flex; align-items: center; justify-content: center; margin-right: 16px; flex-shrink: 0; background: #f8fafc; overflow: hidden; }
+        .payment-logo img, .payment-logo svg { max-width: 100%; max-height: 100%; object-fit: contain; }
         .payment-info { flex-grow: 1; }
         .payment-info h4 { font-size: 16px; font-weight: 700; color: #0b1a42; margin-bottom: 2px; }
         .payment-info p { font-size: 11.5px; color: #637394; font-weight: 500; }
         .arrow-icon { color: #4765a0; font-size: 15px; }
+        .btn-green { width: 100%; background: linear-gradient(90deg, #00b050, #02c75b); color: #ffffff; border: none; padding: 14px; border-radius: 30px; font-size: 15.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 8px 20px rgba(0, 176, 80, 0.3); }
 
-        .btn-green {
-            width: 100%;
-            background: linear-gradient(90deg, #00b050, #02c75b);
-            color: #ffffff;
-            border: none;
-            padding: 14px;
-            border-radius: 30px;
-            font-size: 15.5px;
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            transition: all 0.3s ease;
-            box-shadow: 0 8px 20px rgba(0, 176, 80, 0.3);
-            position: relative;
-            z-index: 2;
-        }
-        .btn-green:active { transform: scale(0.98); }
+        /* ডাইনামিক হেডার */
+        .dynamic-header { padding: 14px 16px; color: #ffffff; position: relative; border-bottom-left-radius: 24px; border-bottom-right-radius: 24px; }
+        .back-btn { position: absolute; top: 14px; left: 16px; background: rgba(255, 255, 255, 0.2); border: none; color: #ffffff; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+        .header-brand { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; }
+        .header-logo-circle { width: 44px; height: 44px; background: #ffffff; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.12); padding: 6px; margin-bottom: 4px; overflow: hidden; }
+        .header-logo-circle img, .header-logo-circle svg { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .header-brand h3 { font-size: 14.5px; font-weight: 700; }
 
-        /* ================= সাধারণ ডাইনামিক হেডার ================= */
-        .dynamic-header {
-            padding: 14px 16px 14px 16px;
-            color: #ffffff;
-            position: relative;
-            border-bottom-left-radius: 24px;
-            border-bottom-right-radius: 24px;
-            transition: background 0.3s ease;
-        }
+        /* স্টেপার */
+        .stepper { display: flex; align-items: center; justify-content: space-between; position: relative; margin: 6px 10px 18px 10px; }
+        .stepper::before { content: ''; position: absolute; top: 14px; left: 20px; right: 20px; height: 2px; background: #e2e8f0; z-index: 1; }
+        .step-item { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .step-circle { width: 28px; height: 28px; border-radius: 50%; background: #ffffff; border: 2px solid #cbd5e1; color: #64748b; font-weight: 700; font-size: 12px; display: flex; align-items: center; justify-content: center; }
+        .step-item.active .step-circle, .step-item.completed .step-circle { background: #00b050; border-color: #00b050; color: #ffffff; }
+        .step-item span { font-size: 11.5px; font-weight: 700; color: #94a3b8; }
+        .step-item.active span, .step-item.completed span { color: #00b050; }
 
-        .back-btn {
-            position: absolute;
-            top: 14px;
-            left: 16px;
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            color: #ffffff;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            transition: 0.2s;
-            z-index: 5;
-        }
-        .back-btn:hover { background: rgba(255, 255, 255, 0.35); }
-
-        .header-brand {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-        }
-
-        .header-logo-circle {
-            width: 44px;
-            height: 44px;
-            background: #ffffff;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.12);
-            padding: 6px;
-            margin-bottom: 4px;
-            overflow: hidden;
-        }
-
-        .header-logo-circle img, .header-logo-circle svg {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-        }
-
-        .header-brand h3 {
-            font-size: 14.5px;
-            font-weight: 700;
-            letter-spacing: 0.2px;
-        }
-
-        /* ================= স্টেপার (Steppers) ================= */
-        .stepper {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: relative;
-            margin: 6px 10px 18px 10px;
-        }
-
-        .stepper::before {
-            content: '';
-            position: absolute;
-            top: 14px;
-            left: 20px;
-            right: 20px;
-            height: 2px;
-            background: #e2e8f0;
-            z-index: 1;
-        }
-
-        .step-item {
-            position: relative;
-            z-index: 2;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .step-circle {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background: #ffffff;
-            border: 2px solid #cbd5e1;
-            color: #64748b;
-            font-weight: 700;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .step-item.active .step-circle, .step-item.completed .step-circle {
-            background: #00b050;
-            border-color: #00b050;
-            color: #ffffff;
-        }
-
-        .step-item span {
-            font-size: 11.5px;
-            font-weight: 700;
-            color: #94a3b8;
-        }
-
-        .step-item.active span, .step-item.completed span {
-            color: #00b050;
-        }
-
-        /* ================= স্ক্রিন ২: অ্যামাউন্ট নির্বাচন ================= */
-        .screen-2-body {
-            padding: 14px 20px 24px 20px;
-            flex-grow: 1;
-        }
-
+        /* স্ক্রিন ২ */
+        .screen-2-body { padding: 14px 20px 24px 20px; flex-grow: 1; }
         .amount-header h3 { font-size: 18px; font-weight: 800; color: #0d429a; margin-bottom: 2px; }
         .amount-header p { font-size: 12px; color: #64748b; font-weight: 500; margin-bottom: 14px; }
-
-        .amount-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 18px;
-        }
-
-        .amount-box {
-            position: relative;
-            background: #ffffff;
-            border: 1.5px solid #e8edf5;
-            border-radius: 16px;
-            padding: 12px 4px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .amount-box:hover { border-color: #cbd5e1; }
+        .amount-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 18px; }
+        .amount-box { position: relative; background: #ffffff; border: 1.5px solid #e8edf5; border-radius: 16px; padding: 12px 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; }
         .amount-box.selected { border: 2px solid #00b050; background: #f0fbf4; }
-
         .amount-icon { margin-bottom: 5px; font-size: 15px; display: flex; align-items: center; justify-content: center; }
         .coin-icon { color: #f59e0b; }
         .selected-check { display: none; color: #00b050; }
         .amount-box.selected .coin-icon { display: none; }
         .amount-box.selected .selected-check { display: block; }
         .amount-box .val { font-size: 14px; font-weight: 800; color: #0d1e56; }
-
         .custom-amount-wrap { margin-bottom: 20px; }
         .custom-label { font-size: 12.5px; font-weight: 700; color: #1e3a8a; display: flex; align-items: center; gap: 7px; margin-bottom: 7px; }
+        .custom-input-box { display: flex; align-items: center; background: #ffffff; border: 1.5px solid #dce4f2; border-radius: 20px; padding: 6px 14px; }
+        .currency-symbol { font-size: 16px; font-weight: 800; color: #1e3a8a; margin-right: 10px; }
+        .custom-input-box input { border: none; outline: none; width: 100%; font-size: 15px; font-weight: 700; color: #0f172a; }
 
-        .custom-input-box {
-            position: relative;
-            display: flex;
-            align-items: center;
-            background: #ffffff;
-            border: 1.5px solid #dce4f2;
-            border-radius: 20px;
-            padding: 6px 14px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
-            transition: border-color 0.2s;
-        }
-
-        .custom-input-box:focus-within { border-color: #00b050; }
-
-        .currency-symbol {
-            font-size: 16px;
-            font-weight: 800;
-            color: #1e3a8a;
-            margin-right: 10px;
-            background: #f1f5f9;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .custom-input-box input {
-            border: none;
-            outline: none;
-            width: 100%;
-            font-size: 15px;
-            font-weight: 700;
-            color: #0f172a;
-        }
-
-        /* ================= স্ক্রিন ৩: পেমেন্ট ডিটেইলস ================= */
-        .screen-3-body {
-            padding: 14px 20px 24px 20px;
-            flex-grow: 1;
-        }
-
-        .step3-amount-card {
-            background: #ffffff;
-            border: 1.5px solid #f1f5f9;
-            border-radius: 20px;
-            padding: 14px 18px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 14px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-        }
-
+        /* স্ক্রিন ৩ */
+        .screen-3-body { padding: 14px 20px 24px 20px; flex-grow: 1; }
+        .step3-amount-card { background: #ffffff; border: 1.5px solid #f1f5f9; border-radius: 20px; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
         .step3-amount-info .label { font-size: 12.5px; font-weight: 700; color: #0b1a42; margin-bottom: 2px; }
-        .step3-amount-info .price { font-size: 26px; font-weight: 800; color: #e60026; letter-spacing: -0.5px; }
-
-        .step3-amount-logo {
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            background: #f8fafc;
-        }
+        .step3-amount-info .price { font-size: 26px; font-weight: 800; color: #e60026; }
+        .step3-amount-logo { width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #f8fafc; }
         .step3-amount-logo img, .step3-amount-logo svg { max-width: 100%; max-height: 100%; object-fit: contain; }
-
-        .step3-details-card {
-            background: #f8fafc;
-            border: 1.5px solid #eef2f7;
-            border-radius: 20px;
-            padding: 14px 16px;
-            margin-bottom: 14px;
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-        }
-
+        .step3-details-card { background: #f8fafc; border: 1.5px solid #eef2f7; border-radius: 20px; padding: 14px 16px; margin-bottom: 14px; display: flex; flex-direction: column; gap: 14px; }
         .detail-row { display: flex; align-items: center; justify-content: space-between; }
-        .detail-left { max-width: 75%; }
         .detail-left .sub { font-size: 11.5px; color: #64748b; font-weight: 600; margin-bottom: 2px; }
-        .detail-left .main { font-size: 16px; font-weight: 800; color: #0d1e56; letter-spacing: 0.3px; }
-
-        .crypto-address-style {
-            font-size: 13px !important;
-            word-break: break-all;
-            line-height: 1.35;
-            color: #b45309 !important;
-            font-family: monospace, sans-serif !important;
-        }
-
-        .copy-btn {
-            background: #ffffff;
-            border: 1px solid #dce4f2;
-            color: #0d1e56;
-            padding: 7px 14px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.2s ease;
-            flex-shrink: 0;
-        }
-        .copy-btn:hover { background: #f1f5f9; border-color: #cbd5e1; }
-        .copy-btn.copied { background: #00b050; color: #ffffff; border-color: #00b050; }
-
+        .detail-left .main { font-size: 16px; font-weight: 800; color: #0d1e56; }
+        .crypto-address-style { font-size: 13px !important; word-break: break-all; color: #b45309 !important; font-family: monospace, sans-serif !important; }
+        .copy-btn { background: #ffffff; border: 1px solid #dce4f2; color: #0d1e56; padding: 7px 14px; border-radius: 12px; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+        .copy-btn.copied { background: #00b050; color: #ffffff; }
         .send-money-type { display: flex; align-items: center; gap: 7px; color: #e60026; font-size: 14.5px; font-weight: 800; }
-        
-        .account-badge {
-            background: #e0f2fe;
-            color: #0369a1;
-            font-size: 11px;
-            font-weight: 700;
-            padding: 4px 10px;
-            border-radius: 12px;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            flex-shrink: 0;
-        }
-
-        .step3-instruction-card {
-            background: #fff5f6;
-            border: 1.5px solid #ffe3e6;
-            border-radius: 20px;
-            padding: 14px 16px;
-            margin-bottom: 20px;
-        }
-
+        .account-badge { background: #e0f2fe; color: #0369a1; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 12px; }
+        .step3-instruction-card { background: #fff5f6; border: 1.5px solid #ffe3e6; border-radius: 20px; padding: 14px 16px; margin-bottom: 20px; }
         .instruction-title { color: #e60026; font-size: 13.5px; font-weight: 800; display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
         .instruction-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
-        .instruction-list li { font-size: 12px; color: #334155; font-weight: 600; display: flex; align-items: flex-start; gap: 8px; line-height: 1.35; }
+        .instruction-list li { font-size: 12px; color: #334155; font-weight: 600; display: flex; align-items: flex-start; gap: 8px; }
         .instruction-list li::before { content: '•'; color: #0d1e56; font-size: 14px; font-weight: bold; }
+        .btn-sent-money { width: 100%; background: linear-gradient(90deg, #e60026, #ff1a40); color: #ffffff; border: none; padding: 15px; border-radius: 30px; font-size: 15.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 8px 20px rgba(230, 0, 38, 0.3); }
 
-        .btn-sent-money {
-            width: 100%;
-            background: linear-gradient(90deg, #e60026, #ff1a40);
-            color: #ffffff;
-            border: none;
-            padding: 15px;
-            border-radius: 30px;
-            font-size: 15.5px;
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            transition: all 0.3s ease;
-            box-shadow: 0 8px 20px rgba(230, 0, 38, 0.3);
-            position: relative;
-            z-index: 2;
-        }
-
-        /* ================= স্ক্রিন ৪: কনফার্ম ও ট্রানজেকশন আইডি ================= */
-        .screen-4-body {
-            padding: 14px 20px 0px 20px;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
-
+        /* স্ক্রিন ৪ */
+        .screen-4-body { padding: 14px 20px 0px 20px; flex-grow: 1; display: flex; flex-direction: column; }
         .trx-header { margin-bottom: 18px; }
         .trx-header h3 { font-size: 18.5px; font-weight: 800; color: #0b1a42; margin-bottom: 4px; }
-        .trx-header p { font-size: 12px; color: #64748b; font-weight: 500; line-height: 1.4; }
-
-        .trx-input-group {
-            display: flex;
-            align-items: center;
-            background: #ffffff;
-            border: 1.5px solid #dce4f2;
-            border-radius: 20px;
-            overflow: hidden;
-            margin-bottom: 20px;
-            transition: border-color 0.2s;
-        }
-        .trx-input-group:focus-within { border-color: #e60026; }
+        .trx-header p { font-size: 12px; color: #64748b; font-weight: 500; }
+        .trx-input-group { display: flex; align-items: center; background: #ffffff; border: 1.5px solid #dce4f2; border-radius: 20px; overflow: hidden; margin-bottom: 20px; }
         .trx-input-group input { flex-grow: 1; border: none; outline: none; padding: 14px 16px; font-size: 14.5px; font-weight: 700; color: #0d1e56; }
-        .trx-input-group input::placeholder { color: #94a3b8; font-weight: 500; }
-
-        .trx-paste-btn {
-            background: transparent;
-            border: none;
-            border-left: 1.5px solid #edf2f7;
-            padding: 12px 18px;
-            cursor: pointer;
-            color: #0d1e56;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .btn-submit-trx {
-            width: 100%;
-            background: linear-gradient(90deg, #e60026, #ff1a40);
-            color: #ffffff;
-            border: none;
-            padding: 15px;
-            border-radius: 30px;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            box-shadow: 0 8px 20px rgba(230, 0, 38, 0.3);
-            margin-bottom: 18px;
-            position: relative;
-            z-index: 2;
-        }
-
-        .info-notice-box {
-            background: #eff6ff;
-            border-radius: 16px;
-            padding: 12px 16px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 25px;
-            position: relative;
-            z-index: 2;
-        }
+        .trx-paste-btn { background: transparent; border: none; border-left: 1.5px solid #edf2f7; padding: 12px 18px; cursor: pointer; color: #0d1e56; font-size: 18px; }
+        .btn-submit-trx { width: 100%; background: linear-gradient(90deg, #e60026, #ff1a40); color: #ffffff; border: none; padding: 15px; border-radius: 30px; font-size: 16px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 8px 20px rgba(230, 0, 38, 0.3); margin-bottom: 18px; }
+        .info-notice-box { background: #eff6ff; border-radius: 16px; padding: 12px 16px; display: flex; align-items: center; gap: 12px; margin-bottom: 25px; }
         .info-notice-box i { color: #0284c7; font-size: 24px; flex-shrink: 0; }
-        .info-notice-box span { font-size: 11.5px; color: #0369a1; font-weight: 600; line-height: 1.4; }
-
-        .skyline-illustration {
-            width: 100%;
-            height: 90px;
-            margin-top: auto;
-            position: relative;
-            display: flex;
-            align-items: flex-end;
-            justify-content: center;
-            opacity: 0.85;
-            pointer-events: none;
-        }
+        .info-notice-box span { font-size: 11.5px; color: #0369a1; font-weight: 600; }
+        .skyline-illustration { width: 100%; height: 90px; margin-top: auto; display: flex; align-items: flex-end; justify-content: center; opacity: 0.85; pointer-events: none; }
         .skyline-illustration svg { width: 100%; height: 100%; }
 
-        /* ================= স্ক্রিন ৫: পেমেন্ট সাবমিটেড ================= */
-        .screen-5-content {
-            background: radial-gradient(circle at 50% 15%, #05484c 0%, #032b2e 55%, #011b1d 100%);
-            min-height: 640px;
-            padding: 26px 20px 22px 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: #ffffff;
-            position: relative;
-        }
-
-        .success-illustration {
-            width: 170px;
-            height: 130px;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 12px;
-        }
+        /* স্ক্রিন ৫: সাকসেস */
+        .screen-5-content { background: radial-gradient(circle at 50% 15%, #05484c 0%, #032b2e 55%, #011b1d 100%); min-height: 640px; padding: 26px 20px 22px 20px; display: flex; flex-direction: column; align-items: center; color: #ffffff; }
+        .success-illustration { width: 170px; height: 130px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; }
         .success-illustration svg { width: 100%; height: 100%; filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.45)); }
-
         .success-title { font-size: 23px; font-weight: 800; color: #ffffff; margin-bottom: 6px; text-align: center; }
         .success-subtitle { font-size: 12.5px; color: #94d2bd; text-align: center; margin-bottom: 20px; font-weight: 500; }
-
-        .success-details-card {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1.5px solid rgba(45, 212, 191, 0.22);
-            border-radius: 22px;
-            width: 100%;
-            padding: 14px 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 13px;
-            margin-bottom: 16px;
-            backdrop-filter: blur(8px);
-        }
-
+        .success-details-card { background: rgba(255, 255, 255, 0.04); border: 1.5px solid rgba(45, 212, 191, 0.22); border-radius: 22px; width: 100%; padding: 14px 16px; display: flex; flex-direction: column; gap: 13px; margin-bottom: 16px; }
         .success-row { display: flex; align-items: center; justify-content: space-between; }
         .success-row-left { display: flex; align-items: center; gap: 12px; }
-
-        .icon-circle {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            flex-shrink: 0;
-            overflow: hidden;
-        }
+        .icon-circle { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
         .icon-user { background: #0284c7; color: #ffffff; }
         .icon-trx { background: #7c3aed; color: #ffffff; border-radius: 10px; }
         .icon-status { background: #059669; color: #ffffff; border-radius: 10px; }
-
-        #finalMethodIconContainer {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: #ffffff;
-            padding: 2px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-            overflow: hidden;
-        }
+        #finalMethodIconContainer { width: 32px; height: 32px; border-radius: 50%; background: #ffffff; padding: 2px; display: flex; align-items: center; justify-content: center; }
         #finalMethodIconContainer img, #finalMethodIconContainer svg { width: 100%; height: 100%; object-fit: contain; }
-        
         .success-label { font-size: 13px; color: #cbd5e1; font-weight: 600; }
         .success-val { font-size: 14.5px; font-weight: 700; color: #ffffff; }
-
-        .pending-badge {
-            background: #f59e0b;
-            color: #0b1a42;
-            font-size: 12px;
-            font-weight: 800;
-            padding: 4px 14px;
-            border-radius: 20px;
-            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.35);
-        }
-
-        .waiting-box {
-            width: 100%;
-            background: rgba(0, 230, 118, 0.05);
-            border: 1.5px solid #00e676;
-            border-radius: 18px;
-            padding: 12px 14px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
+        .pending-badge { background: #f59e0b; color: #0b1a42; font-size: 12px; font-weight: 800; padding: 4px 14px; border-radius: 20px; }
+        .waiting-box { width: 100%; background: rgba(0, 230, 118, 0.05); border: 1.5px solid #00e676; border-radius: 18px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
         .waiting-icon { color: #00e676; font-size: 28px; flex-shrink: 0; }
         .waiting-text p:first-child { font-size: 12.5px; font-weight: 700; color: #00e676; margin-bottom: 2px; }
         .waiting-text p:last-child { font-size: 11.5px; color: #94d2bd; font-weight: 500; }
-
-        .btn-ok {
-            width: 100%;
-            background: linear-gradient(90deg, #00e676, #00c853);
-            color: #ffffff;
-            border: none;
-            padding: 15px;
-            border-radius: 30px;
-            font-size: 16px;
-            font-weight: 800;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 8px 24px rgba(0, 230, 118, 0.4);
-        }
-        .btn-ok:active { transform: scale(0.98); }
+        
+        .success-action-row { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+        .btn-view-hist { width: 100%; background: linear-gradient(90deg, #0284c7, #10b981); color: #ffffff; border: none; padding: 14px; border-radius: 30px; font-size: 15px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-ok { width: 100%; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.25); color: #ffffff; padding: 12px; border-radius: 30px; font-size: 14px; font-weight: 700; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <div class="app-container" id="mainContainer">
 
-        <!-- কপি অ্যালার্ট টোস্ট ব্যানার -->
         <div class="copy-alert-toast" id="copyAlertToast">
             <i class="fa-solid fa-circle-check"></i>
             <span id="copyAlertText">কপি সফল হয়েছে!</span>
         </div>
 
-        <!-- ================= স্ক্রিন ১: মেথড নির্বাচন ================= -->
+        <!-- স্ক্রিন ১ -->
         <div class="screen active-screen" id="screen1">
             <div class="screen-1-content">
-                
-                <!-- ড্যাশবোর্ডে ফিরে যাওয়ার ব্যাক বাটন -->
                 <div class="top-back-bar">
                     <button class="btn-screen1-back" onclick="window.location.href='index.html'" title="Back to Dashboard">
                         <i class="fa-solid fa-arrow-left"></i>
@@ -789,7 +172,6 @@
                 </div>
 
                 <div class="payment-options">
-                    <!-- নগদ -->
                     <div class="payment-item active" data-method="Nagad" onclick="selectPayment(this)">
                         <div class="check-badge"><i class="fa-solid fa-check"></i></div>
                         <div class="payment-logo">
@@ -802,7 +184,6 @@
                         <div class="arrow-icon"><i class="fa-solid fa-chevron-right"></i></div>
                     </div>
 
-                    <!-- বিকাশ -->
                     <div class="payment-item" data-method="bKash" onclick="selectPayment(this)">
                         <div class="check-badge"><i class="fa-solid fa-check"></i></div>
                         <div class="payment-logo">
@@ -815,7 +196,6 @@
                         <div class="arrow-icon"><i class="fa-solid fa-chevron-right"></i></div>
                     </div>
 
-                    <!-- বাইন্যান্স -->
                     <div class="payment-item" data-method="Binance" onclick="selectPayment(this)">
                         <div class="check-badge"><i class="fa-solid fa-check"></i></div>
                         <div class="payment-logo" style="background: #181a20; padding: 10px;">
@@ -839,12 +219,10 @@
             <div class="bottom-wave"></div>
         </div>
 
-        <!-- ================= স্ক্রিন ২: অ্যামাউন্ট নির্বাচন ================= -->
+        <!-- স্ক্রিন ২ -->
         <div class="screen" id="screen2">
             <div class="dynamic-header" id="headerBg2">
-                <button class="back-btn" onclick="goToStep1()" title="Back">
-                    <i class="fa-solid fa-arrow-left"></i>
-                </button>
+                <button class="back-btn" onclick="goToStep1()" title="Back"><i class="fa-solid fa-arrow-left"></i></button>
                 <div class="header-brand">
                     <div class="header-logo-circle" id="selectedLogoContainer2"></div>
                     <h3 id="selectedMethodTitle2">Nagad Payment</h3>
@@ -853,18 +231,9 @@
 
             <div class="screen-2-body">
                 <div class="stepper">
-                    <div class="step-item active">
-                        <div class="step-circle">1</div>
-                        <span>Amount</span>
-                    </div>
-                    <div class="step-item">
-                        <div class="step-circle">2</div>
-                        <span>Pay</span>
-                    </div>
-                    <div class="step-item">
-                        <div class="step-circle">3</div>
-                        <span>Confirm</span>
-                    </div>
+                    <div class="step-item active"><div class="step-circle">1</div><span>Amount</span></div>
+                    <div class="step-item"><div class="step-circle">2</div><span>Pay</span></div>
+                    <div class="step-item"><div class="step-circle">3</div><span>Confirm</span></div>
                 </div>
 
                 <div class="amount-header">
@@ -874,79 +243,48 @@
 
                 <div class="amount-grid">
                     <div class="amount-box" data-amount="50" onclick="selectAmount(50, this)">
-                        <div class="amount-icon">
-                            <i class="fa-solid fa-coins coin-icon"></i>
-                            <i class="fa-solid fa-circle-check selected-check"></i>
-                        </div>
+                        <div class="amount-icon"><i class="fa-solid fa-coins coin-icon"></i><i class="fa-solid fa-circle-check selected-check"></i></div>
                         <span class="val">৳ 50</span>
                     </div>
-
                     <div class="amount-box selected" data-amount="100" onclick="selectAmount(100, this)">
-                        <div class="amount-icon">
-                            <i class="fa-solid fa-coins coin-icon"></i>
-                            <i class="fa-solid fa-circle-check selected-check"></i>
-                        </div>
+                        <div class="amount-icon"><i class="fa-solid fa-coins coin-icon"></i><i class="fa-solid fa-circle-check selected-check"></i></div>
                         <span class="val">৳ 100</span>
                     </div>
-
                     <div class="amount-box" data-amount="200" onclick="selectAmount(200, this)">
-                        <div class="amount-icon">
-                            <i class="fa-solid fa-coins coin-icon"></i>
-                            <i class="fa-solid fa-circle-check selected-check"></i>
-                        </div>
+                        <div class="amount-icon"><i class="fa-solid fa-coins coin-icon"></i><i class="fa-solid fa-circle-check selected-check"></i></div>
                         <span class="val">৳ 200</span>
                     </div>
-
                     <div class="amount-box" data-amount="500" onclick="selectAmount(500, this)">
-                        <div class="amount-icon">
-                            <i class="fa-solid fa-coins coin-icon"></i>
-                            <i class="fa-solid fa-circle-check selected-check"></i>
-                        </div>
+                        <div class="amount-icon"><i class="fa-solid fa-coins coin-icon"></i><i class="fa-solid fa-circle-check selected-check"></i></div>
                         <span class="val">৳ 500</span>
                     </div>
-
                     <div class="amount-box" data-amount="1000" onclick="selectAmount(1000, this)">
-                        <div class="amount-icon">
-                            <i class="fa-solid fa-coins coin-icon"></i>
-                            <i class="fa-solid fa-circle-check selected-check"></i>
-                        </div>
+                        <div class="amount-icon"><i class="fa-solid fa-coins coin-icon"></i><i class="fa-solid fa-circle-check selected-check"></i></div>
                         <span class="val">৳ 1,000</span>
                     </div>
-
                     <div class="amount-box" data-amount="2000" onclick="selectAmount(2000, this)">
-                        <div class="amount-icon">
-                            <i class="fa-solid fa-coins coin-icon"></i>
-                            <i class="fa-solid fa-circle-check selected-check"></i>
-                        </div>
+                        <div class="amount-icon"><i class="fa-solid fa-coins coin-icon"></i><i class="fa-solid fa-circle-check selected-check"></i></div>
                         <span class="val">৳ 2,000</span>
                     </div>
                 </div>
 
                 <div class="custom-amount-wrap">
-                    <div class="custom-label">
-                        <i class="fa-solid fa-wallet"></i>
-                        <span>Custom Amount</span>
-                    </div>
+                    <div class="custom-label"><i class="fa-solid fa-wallet"></i><span>Custom Amount</span></div>
                     <div class="custom-input-box">
                         <span class="currency-symbol">৳</span>
                         <input type="number" id="customAmountInput" value="100" placeholder="Enter amount" oninput="onCustomAmountChange()">
                     </div>
                 </div>
 
-                <button class="btn-green" onclick="goToStep3()">
-                    <span>Next</span>
-                    <i class="fa-solid fa-arrow-right"></i>
-                </button>
+                <button class="btn-green" onclick="goToStep3()"><span>Next</span> <i class="fa-solid fa-arrow-right"></i></button>
             </div>
             <div class="bottom-wave"></div>
         </div>
 
-        <!-- ================= স্ক্রিন ৩: পেমেন্ট ডিটেইলস ================= -->
+        <!-- স্ক্রিন ৩ -->
         <div class="screen" id="screen3">
             <div class="dynamic-header" id="headerBg3">
-                <button class="back-btn" onclick="backToStep2()" title="Back">
-                    <i class="fa-solid fa-arrow-left"></i>
-                </button>
+                <button class="back-btn" onclick="backToStep2()" title="Back"><i class="fa-solid fa-arrow-left"></i></button>
                 <div class="header-brand">
                     <div class="header-logo-circle" id="selectedLogoContainer3"></div>
                     <h3>Payment Details</h3>
@@ -955,18 +293,9 @@
 
             <div class="screen-3-body">
                 <div class="stepper">
-                    <div class="step-item completed">
-                        <div class="step-circle"><i class="fa-solid fa-check"></i></div>
-                        <span>Amount</span>
-                    </div>
-                    <div class="step-item active">
-                        <div class="step-circle">2</div>
-                        <span>Pay</span>
-                    </div>
-                    <div class="step-item">
-                        <div class="step-circle">3</div>
-                        <span>Confirm</span>
-                    </div>
+                    <div class="step-item completed"><div class="step-circle"><i class="fa-solid fa-check"></i></div><span>Amount</span></div>
+                    <div class="step-item active"><div class="step-circle">2</div><span>Pay</span></div>
+                    <div class="step-item"><div class="step-circle">3</div><span>Confirm</span></div>
                 </div>
 
                 <div class="step3-amount-card">
@@ -983,53 +312,36 @@
                             <div class="sub" id="accountLabelText">Send Money To</div>
                             <div class="main" id="accountNumber">01712 345678</div>
                         </div>
-                        <button class="copy-btn" id="btnCopyAddress" onclick="copyAddress(this)">
-                            <i class="fa-regular fa-copy"></i>
-                            <span>Copy</span>
-                        </button>
+                        <button class="copy-btn" id="btnCopyAddress" onclick="copyAddress(this)"><i class="fa-regular fa-copy"></i><span>Copy</span></button>
                     </div>
 
                     <div class="detail-row">
                         <div class="detail-left">
                             <div class="sub" id="typeLabelText">Payment Type</div>
-                            <div class="send-money-type" id="paymentTypeContainer">
-                                <i class="fa-solid fa-paper-plane"></i>
-                                <span>Send Money</span>
-                            </div>
+                            <div class="send-money-type" id="paymentTypeContainer"><i class="fa-solid fa-paper-plane"></i> <span>Send Money</span></div>
                         </div>
-                        <span class="account-badge" id="accountBadge">
-                            <i class="fa-solid fa-user-check"></i> Personal
-                        </span>
+                        <span class="account-badge" id="accountBadge"><i class="fa-solid fa-user-check"></i> Personal</span>
                     </div>
                 </div>
 
                 <div class="step3-instruction-card" id="instructionBox">
-                    <div class="instruction-title">
-                        <i class="fa-solid fa-circle-exclamation"></i>
-                        <span>Important Instructions</span>
-                    </div>
+                    <div class="instruction-title"><i class="fa-solid fa-circle-exclamation"></i><span>Important Instructions</span></div>
                     <ul class="instruction-list" id="instructionList">
                         <li>Send the exact amount <span id="instructionAmountText">৳ 100</span></li>
                         <li>Use your <span id="instructionMethodName">Nagad</span> personal number</li>
                         <li>After sending, enter the Transaction ID</li>
-                        <li>Do not close this page</li>
                     </ul>
                 </div>
 
-                <button class="btn-sent-money" id="btnSentMoney" onclick="goToStep4()">
-                    <span>I have sent the money</span>
-                    <i class="fa-solid fa-arrow-right"></i>
-                </button>
+                <button class="btn-sent-money" id="btnSentMoney" onclick="goToStep4()"><span>I have sent the money</span> <i class="fa-solid fa-arrow-right"></i></button>
             </div>
             <div class="bottom-wave"></div>
         </div>
 
-        <!-- ================= স্ক্রিন ৪: কনফার্ম ও ট্রানজেকশন আইডি ================= -->
+        <!-- স্ক্রিন ৪ -->
         <div class="screen" id="screen4">
             <div class="dynamic-header" id="headerBg4">
-                <button class="back-btn" onclick="backToStep3()" title="Back">
-                    <i class="fa-solid fa-arrow-left"></i>
-                </button>
+                <button class="back-btn" onclick="backToStep3()" title="Back"><i class="fa-solid fa-arrow-left"></i></button>
                 <div class="header-brand">
                     <div class="header-logo-circle" id="selectedLogoContainer4"></div>
                     <h3 id="selectedMethodTitle4">Nagad Payment</h3>
@@ -1038,18 +350,9 @@
 
             <div class="screen-4-body">
                 <div class="stepper">
-                    <div class="step-item completed">
-                        <div class="step-circle"><i class="fa-solid fa-check"></i></div>
-                        <span>Amount</span>
-                    </div>
-                    <div class="step-item completed">
-                        <div class="step-circle"><i class="fa-solid fa-check"></i></div>
-                        <span>Pay</span>
-                    </div>
-                    <div class="step-item active">
-                        <div class="step-circle">3</div>
-                        <span style="color:#00b050; font-weight:800;">Confirm</span>
-                    </div>
+                    <div class="step-item completed"><div class="step-circle"><i class="fa-solid fa-check"></i></div><span>Amount</span></div>
+                    <div class="step-item completed"><div class="step-circle"><i class="fa-solid fa-check"></i></div><span>Pay</span></div>
+                    <div class="step-item active"><div class="step-circle">3</div><span style="color:#00b050; font-weight:800;">Confirm</span></div>
                 </div>
 
                 <div class="trx-header">
@@ -1059,65 +362,24 @@
 
                 <div class="trx-input-group">
                     <input type="text" id="trxIdInput" placeholder="e.g. 9F7K4D3F2G">
-                    <button class="trx-paste-btn" onclick="pasteTrxId()" title="Paste from clipboard">
-                        <i class="fa-regular fa-copy"></i>
-                    </button>
+                    <button class="trx-paste-btn" onclick="pasteTrxId()" title="Paste"><i class="fa-regular fa-copy"></i></button>
                 </div>
 
-                <button class="btn-submit-trx" id="btnSubmitTrx" onclick="submitFinalTransaction()">
-                    <span>Submit</span>
-                    <i class="fa-solid fa-arrow-right"></i>
-                </button>
+                <button class="btn-submit-trx" id="btnSubmitTrx" onclick="submitFinalTransaction()"><span>Submit</span> <i class="fa-solid fa-arrow-right"></i></button>
 
                 <div class="info-notice-box">
                     <i class="fa-solid fa-circle-info"></i>
                     <span>Make sure the Transaction ID is correct before submitting.</span>
                 </div>
-
-                <div class="skyline-illustration">
-                    <svg viewBox="0 0 500 130" fill="#fbcfe8" xmlns="http://www.w3.org/2000/svg">
-                        <polygon points="100,10 70,120 130,120" fill="#f472b6" opacity="0.6"/>
-                        <polygon points="100,25 78,120 122,120" fill="#ec4899" opacity="0.7"/>
-                        <polygon points="100,45 86,120 114,120" fill="#db2777" opacity="0.8"/>
-                        <rect x="180" y="70" width="40" height="50" rx="3" fill="#f472b6" opacity="0.5"/>
-                        <path d="M190,70 Q200,50 210,70 Z" fill="#ec4899" opacity="0.6"/>
-                        <rect x="250" y="40" width="16" height="80" rx="2" fill="#db2777" opacity="0.6"/>
-                        <polygon points="258,20 250,40 266,40" fill="#db2777" opacity="0.7"/>
-                        <rect x="270" y="60" width="20" height="60" rx="2" fill="#f472b6" opacity="0.5"/>
-                        <rect x="360" y="30" width="18" height="90" fill="#db2777" opacity="0.6"/>
-                        <polygon points="369,15 360,30 378,30" fill="#ec4899" opacity="0.7"/>
-                        <rect x="385" y="65" width="55" height="55" rx="4" fill="#f472b6" opacity="0.5"/>
-                        <path d="M400,65 Q412.5,45 425,65 Z" fill="#ec4899" opacity="0.7"/>
-                        <rect x="0" y="118" width="500" height="12" fill="#f472b6" opacity="0.5"/>
-                    </svg>
-                </div>
             </div>
             <div class="bottom-wave"></div>
         </div>
 
-        <!-- ================= স্ক্রিন ৫: পেমেন্ট সাবমিটেড ================= -->
+        <!-- স্ক্রিন ৫: সাকসেস -->
         <div class="screen" id="screen5">
             <div class="screen-5-content">
-                
                 <div class="success-illustration">
-                    <svg viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="35" cy="55" r="7" fill="#fbbf24"/>
-                        <circle cx="165" cy="65" r="6" fill="#fbbf24"/>
-                        <path d="M155,25 L175,18 L168,38 L160,30 Z" fill="#2dd4bf"/>
-                        <circle cx="95" cy="45" r="24" fill="#f59e0b"/>
-                        <circle cx="95" cy="45" r="20" fill="#fbbf24"/>
-                        <text x="95" y="52" font-size="20" font-weight="900" fill="#d97706" text-anchor="middle">$</text>
-                        <rect x="45" y="55" width="105" height="68" rx="18" fill="#0284c7"/>
-                        <rect x="42" y="50" width="105" height="68" rx="18" fill="#38bdf8"/>
-                        <rect x="42" y="64" width="105" height="48" rx="12" fill="#0ea5e9"/>
-                        <g transform="translate(105, 58)">
-                            <circle cx="30" cy="30" r="28" fill="#059669"/>
-                            <circle cx="30" cy="30" r="23" fill="#ffffff"/>
-                            <circle cx="30" cy="30" r="3" fill="#0f172a"/>
-                            <line x1="30" y1="30" x2="30" y2="16" stroke="#0f172a" stroke-width="2.5" stroke-linecap="round"/>
-                            <line x1="30" y1="30" x2="42" y2="24" stroke="#0f172a" stroke-width="2.5" stroke-linecap="round"/>
-                        </g>
-                    </svg>
+                    <svg viewBox="0 0 200 160" fill="none"><circle cx="35" cy="55" r="7" fill="#fbbf24"/><circle cx="165" cy="65" r="6" fill="#fbbf24"/><circle cx="95" cy="45" r="24" fill="#f59e0b"/><rect x="42" y="50" width="105" height="68" rx="18" fill="#38bdf8"/></svg>
                 </div>
 
                 <h2 class="success-title">Payment Submitted!</h2>
@@ -1125,40 +387,19 @@
 
                 <div class="success-details-card">
                     <div class="success-row">
-                        <div class="success-row-left">
-                            <div class="icon-circle icon-user">
-                                <i class="fa-solid fa-user"></i>
-                            </div>
-                            <span class="success-label">Amount</span>
-                        </div>
+                        <div class="success-row-left"><div class="icon-circle icon-user"><i class="fa-solid fa-user"></i></div><span class="success-label">Amount</span></div>
                         <span class="success-val" id="finalDisplayAmount">৳ 100</span>
                     </div>
-
                     <div class="success-row">
-                        <div class="success-row-left">
-                            <div class="icon-circle" id="finalMethodIconContainer"></div>
-                            <span class="success-label">Method</span>
-                        </div>
+                        <div class="success-row-left"><div class="icon-circle" id="finalMethodIconContainer"></div><span class="success-label">Method</span></div>
                         <span class="success-val" id="finalDisplayMethod">Nagad</span>
                     </div>
-
                     <div class="success-row">
-                        <div class="success-row-left">
-                            <div class="icon-circle icon-trx">
-                                <i class="fa-solid fa-up-right-from-square"></i>
-                            </div>
-                            <span class="success-label">Transaction ID</span>
-                        </div>
+                        <div class="success-row-left"><div class="icon-circle icon-trx"><i class="fa-solid fa-up-right-from-square"></i></div><span class="success-label">Transaction ID</span></div>
                         <span class="success-val" id="finalDisplayTrxId">9F7K4D3F2G</span>
                     </div>
-
                     <div class="success-row">
-                        <div class="success-row-left">
-                            <div class="icon-circle icon-status">
-                                <i class="fa-solid fa-qrcode"></i>
-                            </div>
-                            <span class="success-label">Status</span>
-                        </div>
+                        <div class="success-row-left"><div class="icon-circle icon-status"><i class="fa-solid fa-qrcode"></i></div><span class="success-label">Status</span></div>
                         <span class="pending-badge">Pending</span>
                     </div>
                 </div>
@@ -1171,16 +412,21 @@
                     </div>
                 </div>
 
-                <!-- ওকে বাটনে চাপ দিলে ড্যাশবোর্ডে ফিরবে -->
-                <button class="btn-ok" onclick="resetPaymentGateway()">
-                    <span>OK</span>
-                </button>
+                <div class="success-action-row">
+                    <!-- সরাসরি হিস্ট্রি দেখার বাটন -->
+                    <button class="btn-view-hist" onclick="window.location.href='history.html'">
+                        <i class="fa-solid fa-clock-rotate-left"></i> View in History
+                    </button>
+                    <!-- হোমে ফেরার বাটন -->
+                    <button class="btn-ok" onclick="window.location.href='index.html'">
+                        Back to Home
+                    </button>
+                </div>
             </div>
         </div>
 
     </div>
 
-    <!-- স্ক্রিপ্ট ও ফায়ারবেস কানেকশন -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBrG81DRVjx040QhiT68yyRErGXjuCPdS4",
@@ -1196,9 +442,7 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        function getStoredData(key, defaultVal) {
-            return localStorage.getItem(key) || defaultVal;
-        }
+        function getStoredData(key, defaultVal) { return localStorage.getItem(key) || defaultVal; }
 
         const methodData = {
             'Nagad': {
@@ -1216,12 +460,7 @@
                 badgeBg: '#e0f2fe',
                 badgeColor: '#0369a1',
                 placeholder: 'e.g. 9F7K4D3F2G',
-                instructions: [
-                    'Send the exact amount ৳ [amount]',
-                    'Use your Nagad personal number',
-                    'After sending, enter the Transaction ID',
-                    'Do not close this page'
-                ],
+                instructions: ['Send exact amount ৳ [amount]', 'Use Nagad personal number', 'Enter Transaction ID'],
                 logoHtml: `<img src="https://i.ibb.co.com/gZSnQ6Xb/nagad-com-bd-logo.png" alt="Nagad">`,
                 finalLogoHtml: `<img src="https://i.ibb.co.com/gZSnQ6Xb/nagad-com-bd-logo.png" style="width:100%;height:100%;object-fit:contain;" alt="Nagad">`
             },
@@ -1240,12 +479,7 @@
                 badgeBg: '#e0f2fe',
                 badgeColor: '#0369a1',
                 placeholder: 'e.g. BL92K4D1G8',
-                instructions: [
-                    'Send the exact amount ৳ [amount]',
-                    'Use your bKash personal number',
-                    'After sending, enter the Transaction ID',
-                    'Do not close this page'
-                ],
+                instructions: ['Send exact amount ৳ [amount]', 'Use bKash personal number', 'Enter Transaction ID'],
                 logoHtml: `<img src="https://i.ibb.co.com/fzcrRGrf/bkash-com-logo.png" alt="bKash">`,
                 finalLogoHtml: `<img src="https://i.ibb.co.com/fzcrRGrf/bkash-com-logo.png" style="width:100%;height:100%;object-fit:contain;padding:2px;" alt="bKash">`
             },
@@ -1264,24 +498,9 @@
                 badgeBg: '#fef3c7',
                 badgeColor: '#92400e',
                 placeholder: 'e.g. 7f3b... (TxID / Hash)',
-                instructions: [
-                    'Send equivalent amount ৳ [amount] in TRX / USDT',
-                    'Make sure to select TRON (TRC20) Network',
-                    'After transfer, enter your TxID / Transaction Hash',
-                    'Do not close this page'
-                ],
-                logoHtml: `
-                    <div style="background:#181a20; width:100%; height:100%; border-radius:50%; display:flex; align-items:center; justify-content:center; padding:4px;">
-                        <svg viewBox="0 0 120 120" fill="#F3BA2F" width="100%" height="100%">
-                            <path d="M60 17.5L44.5 33L60 48.5L75.5 33L60 17.5ZM24 53.5L8.5 69L24 84.5L39.5 69L24 53.5ZM96 53.5L80.5 69L96 84.5L111.5 69L96 53.5ZM60 53.5L44.5 69L60 84.5L75.5 69L60 53.5ZM60 89.5L44.5 105L60 120.5L75.5 105L60 89.5Z"/>
-                        </svg>
-                    </div>`,
-                finalLogoHtml: `
-                    <div style="background:#181a20; width:100%; height:100%; border-radius:50%; display:flex; align-items:center; justify-content:center; padding:5px;">
-                        <svg viewBox="0 0 120 120" fill="#F3BA2F" width="100%" height="100%">
-                            <path d="M60 17.5L44.5 33L60 48.5L75.5 33L60 17.5ZM24 53.5L8.5 69L24 84.5L39.5 69L24 53.5ZM96 53.5L80.5 69L96 84.5L111.5 69L96 53.5ZM60 53.5L44.5 69L60 84.5L75.5 69L60 53.5ZM60 89.5L44.5 105L60 120.5L75.5 105L60 89.5Z"/>
-                        </svg>
-                    </div>`
+                instructions: ['Send equivalent ৳ [amount] in TRX / USDT', 'Select TRON (TRC20) Network', 'Enter TxID / Hash'],
+                logoHtml: `<div style="background:#181a20; width:100%; height:100%; border-radius:50%; display:flex; align-items:center; justify-content:center; padding:4px;"><svg viewBox="0 0 120 120" fill="#F3BA2F" width="100%" height="100%"><path d="M60 17.5L44.5 33L60 48.5L75.5 33L60 17.5ZM24 53.5L8.5 69L24 84.5L39.5 69L24 53.5ZM96 53.5L80.5 69L96 84.5L111.5 69L96 53.5ZM60 53.5L44.5 69L60 84.5L75.5 69L60 53.5ZM60 89.5L44.5 105L60 120.5L75.5 105L60 89.5Z"/></svg></div>`,
+                finalLogoHtml: `<div style="background:#181a20; width:100%; height:100%; border-radius:50%; display:flex; align-items:center; justify-content:center; padding:5px;"><svg viewBox="0 0 120 120" fill="#F3BA2F" width="100%" height="100%"><path d="M60 17.5L44.5 33L60 48.5L75.5 33L60 17.5ZM24 53.5L8.5 69L24 84.5L39.5 69L24 53.5ZM96 53.5L80.5 69L96 84.5L111.5 69L96 53.5ZM60 53.5L44.5 69L60 84.5L75.5 69L60 53.5ZM60 89.5L44.5 105L60 120.5L75.5 105L60 89.5Z"/></svg></div>`
             }
         };
 
@@ -1300,7 +519,6 @@
             document.getElementById('selectedMethodTitle2').innerText = data.title;
             document.getElementById('selectedLogoContainer2').innerHTML = data.logoHtml;
             document.getElementById('customAmountInput').value = currentAmount;
-
             document.getElementById('screen1').classList.remove('active-screen');
             document.getElementById('screen2').classList.add('active-screen');
         }
@@ -1331,7 +549,6 @@
                 alert("মিনিমাম ডিপোজিট ৫০ টাকা হতে হবে!");
                 return;
             }
-
             const data = methodData[selectedMethod];
             document.getElementById('headerBg3').style.background = data.gradient;
             document.getElementById('selectedLogoContainer3').innerHTML = data.logoHtml;
@@ -1395,11 +612,8 @@
                 const originalHtml = btnElement.innerHTML;
                 btnElement.classList.add('copied');
                 btnElement.innerHTML = `<i class="fa-solid fa-check"></i> <span>Copied!</span>`;
-                showToastAlert(data.isCrypto ? "ওয়ালেট এড্রেস কপি হয়েছে!" : `${selectedMethod} নম্বর কপি হয়েছে: ${data.address}`);
-                setTimeout(() => {
-                    btnElement.classList.remove('copied');
-                    btnElement.innerHTML = originalHtml;
-                }, 1500);
+                showToastAlert(data.isCrypto ? "অ্যাড্রেস কপি হয়েছে!" : `${selectedMethod} নম্বর কপি হয়েছে: ${data.address}`);
+                setTimeout(() => { btnElement.classList.remove('copied'); btnElement.innerHTML = originalHtml; }, 1500);
             });
         }
 
@@ -1420,7 +634,7 @@
             }
         }
 
-        // ফায়ারবেসে ডিপোজিট রিকোয়েস্ট সেভ করা
+        // ফায়ারবেস এবং ইনস্ট্যান্ট লোকাল হিস্ট্রিতে সেভ
         function submitFinalTransaction() {
             const trxId = document.getElementById('trxIdInput').value.trim();
             if (!trxId) {
@@ -1434,8 +648,32 @@
             btn.innerText = "Submitting...";
 
             const user = auth.currentUser;
-            const uid = user ? user.uid : 'guest';
+            const cachedUser = JSON.parse(localStorage.getItem('microtask_cached_user')) || {};
+            const uid = user ? user.uid : (cachedUser.uid || 'guest_user');
 
+            const now = new Date();
+            const dateStr = now.toISOString().split('T')[0];
+            const timeStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+
+            // ১. সাথে সাথে লোকাল হিস্ট্রিতে সেভ করা (যাতে হিস্ট্রিতে সাথে সাথে দৃশ্যমান হয়)
+            const localRecord = {
+                title: `${selectedMethod.toUpperCase()} Deposit`,
+                desc: `TrxID: ${trxId}`,
+                amount: currentAmount,
+                type: 'plus',
+                category: 'deposit',
+                method: selectedMethod,
+                status: 'pending',
+                time: timeStr,
+                date: dateStr,
+                txnId: trxId
+            };
+
+            let localHistory = JSON.parse(localStorage.getItem('microtask_local_history')) || [];
+            localHistory.unshift(localRecord);
+            localStorage.setItem('microtask_local_history', JSON.stringify(localHistory));
+
+            // ২. ফায়ারবেস ক্লাউড ডাটাবেসে সেভ
             db.collection("deposits").add({
                 uid: uid,
                 method: selectedMethod,
@@ -1443,7 +681,7 @@
                 trxId: trxId,
                 status: "pending",
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            }).then(() => {
+            }).finally(() => {
                 document.getElementById('finalDisplayAmount').innerText = `৳ ${currentAmount}`;
                 document.getElementById('finalDisplayMethod').innerText = selectedMethod;
                 document.getElementById('finalMethodIconContainer').innerHTML = data.finalLogoHtml;
@@ -1451,16 +689,7 @@
 
                 document.getElementById('screen4').classList.remove('active-screen');
                 document.getElementById('screen5').classList.add('active-screen');
-            }).catch(err => {
-                alert("সাবমিট করতে সমস্যা হয়েছে!");
-                btn.disabled = false;
-                btn.innerText = "Submit";
             });
-        }
-
-        // ওকে চাপলে সরাসরি মূল ড্যাশবোর্ডে ফিরবে
-        function resetPaymentGateway() {
-            window.location.href = "index.html";
         }
     </script>
 </body>
