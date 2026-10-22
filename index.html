@@ -9,7 +9,7 @@
     <!-- Google Fonts & FontAwesome 6 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <!-- Firebase SDK (Compat Version) -->
@@ -23,276 +23,278 @@
             --ink: #101010;
             --paper: #f8f8f7;
             --bg-grad: linear-gradient(145deg, #e0f2fe 0%, #e6f9f0 50%, #f0fdf4 100%);
-            --dash-bg: linear-gradient(180deg, #f0f9ff 0%, #f2fbf7 100%);
+            --dash-bg: linear-gradient(180deg, #f0f9ff 0%, #f4fbf7 100%);
             --card-3d: linear-gradient(180deg, #ffffff 0%, #f8fcfa 100%);
-            --card-border: #cce7f5;
-            --shadow-3d: 0 8px 20px rgba(14, 116, 144, 0.08), inset 0 1px 1px #ffffff;
+            --card-border: #d2e9f7;
+            --shadow-3d: 0 4px 14px rgba(14, 116, 144, 0.06), inset 0 1px 1px #ffffff;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg-grad); color: #0f172a; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 12px 6px; }
+        body { background: var(--bg-grad); color: #0f172a; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 6px 4px; }
 
         .phone {
             width: 100%;
             max-width: 410px;
             background: #ffffff;
-            border-radius: 42px;
-            border: 3px solid #d4ebf8;
-            box-shadow: 0 20px 50px rgba(12, 74, 110, 0.15), 0 0 0 8px #f1f8fc;
+            border-radius: 36px;
+            border: 2.5px solid #d4ebf8;
+            box-shadow: 0 16px 40px rgba(12, 74, 110, 0.12), 0 0 0 6px #f1f8fc;
             overflow: hidden;
             position: relative;
-            min-height: 750px;
+            min-height: 720px;
         }
 
         /* 1. AUTH SCREEN */
         .auth-screen { 
             background: var(--paper); 
             color: var(--ink); 
-            min-height: 750px; 
+            min-height: 720px; 
             display: flex; 
             flex-direction: column; 
             position: relative; 
             z-index: 10; 
             transition: all 0.3s ease;
-            padding-top: 18px; 
+            padding-top: 14px; 
         }
         
-        .auth-brand { display: flex; align-items: center; justify-content: center; gap: 7px; font-weight: 900; font-size: 22px; margin: 6px 0 0; color: #111; }
-        .auth-main { padding: 0 25px 26px; display: flex; flex-direction: column; flex: 1; }
-        .auth-hero { height: 185px; display: flex; align-items: center; justify-content: center; margin: 8px 0; }
-        .auth-logo-img { width: 130px; height: 130px; object-fit: contain; filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.15)); }
+        .auth-brand { display: flex; align-items: center; justify-content: center; gap: 7px; font-weight: 900; font-size: 21px; margin: 4px 0 0; color: #111; }
+        .auth-main { padding: 0 22px 22px; display: flex; flex-direction: column; flex: 1; }
+        .auth-hero { height: 170px; display: flex; align-items: center; justify-content: center; margin: 4px 0; }
+        .auth-logo-img { width: 120px; height: 120px; object-fit: contain; filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.14)); }
 
         .auth-intro { text-align: center; }
-        .auth-intro h1 { font-size: 24px; line-height: 1.25; letter-spacing: -1px; margin: 0 0 8px; font-weight: 850; color: #111; }
-        .auth-intro p { font-size: 13px; color: #555; line-height: 1.5; margin: 0 auto; max-width: 270px; }
-        .auth-actions { margin-top: auto; padding-top: 20px; display: grid; gap: 10px; }
-        .auth-btn { border: 1.5px solid #111; border-radius: 999px; height: 48px; width: 100%; font: 700 13px inherit; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; background: transparent; color: #111; transition: transform 0.15s; }
+        .auth-intro h1 { font-size: 23px; line-height: 1.25; letter-spacing: -1px; margin: 0 0 6px; font-weight: 850; color: #111; }
+        .auth-intro p { font-size: 12.5px; color: #555; line-height: 1.45; margin: 0 auto; max-width: 270px; }
+        .auth-actions { margin-top: auto; padding-top: 16px; display: grid; gap: 9px; }
+        .auth-btn { border: 1.5px solid #111; border-radius: 999px; height: 46px; width: 100%; font: 700 13px inherit; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 9px; background: transparent; color: #111; transition: transform 0.15s; }
         .auth-btn:active { transform: scale(0.98); }
-        .auth-btn.primary { background: var(--lime); border-color: var(--lime); font-weight: 850; box-shadow: 0 6px 18px rgba(216, 255, 56, 0.45); }
+        .auth-btn.primary { background: var(--lime); border-color: var(--lime); font-weight: 850; box-shadow: 0 6px 16px rgba(216, 255, 56, 0.4); }
         .auth-btn.secondary { background: #fff; border-color: #ddd; }
-        .auth-legal { text-align: center; font-size: 9.5px; line-height: 1.6; color: #666; margin: 14px 5px 0; }
+        .auth-legal { text-align: center; font-size: 9.5px; line-height: 1.5; color: #666; margin: 12px 5px 0; }
         .auth-legal a, .auth-link { color: #111; font-weight: 800; text-decoration: underline; cursor: pointer; }
 
         .sheet { display: none; position: absolute; inset: 0; background: rgba(0, 0, 0, 0.55); backdrop-filter: blur(4px); align-items: flex-end; z-index: 100; }
         .sheet.open { display: flex; }
-        .panel { width: 100%; background: #f8f8f7; border-radius: 28px 28px 0 0; padding: 16px 22px 25px; max-height: 92%; overflow-y: auto; border-top: 1px solid #ddd; animation: sheetUp 0.25s cubic-bezier(0.16, 1, 0.3, 1); color: #111; position: relative; }
+        .panel { width: 100%; background: #f8f8f7; border-radius: 26px 26px 0 0; padding: 14px 20px 22px; max-height: 92%; overflow-y: auto; border-top: 1px solid #ddd; animation: sheetUp 0.25s cubic-bezier(0.16, 1, 0.3, 1); color: #111; position: relative; }
         @keyframes sheetUp { from { transform: translateY(40px); opacity: 0.5; } to { transform: translateY(0); opacity: 1; } }
-        .handle { width: 42px; height: 4px; border-radius: 9px; background: #ddd; margin: 0 auto 16px; }
-        .panel h2 { text-align: center; font-size: 20px; margin: 0 0 6px; letter-spacing: -0.5px; color: #111; font-weight: 800; }
-        .panel .sub { text-align: center; color: #777; font-size: 12px; margin: 0 0 16px; }
-        .divider { display: flex; align-items: center; gap: 12px; color: #888; font-size: 10px; font-weight: 700; margin: 14px 0; }
+        .handle { width: 40px; height: 4px; border-radius: 9px; background: #ddd; margin: 0 auto 14px; }
+        .panel h2 { text-align: center; font-size: 19px; margin: 0 0 5px; letter-spacing: -0.5px; color: #111; font-weight: 800; }
+        .panel .sub { text-align: center; color: #777; font-size: 11.5px; margin: 0 0 14px; }
+        .divider { display: flex; align-items: center; gap: 10px; color: #888; font-size: 10px; font-weight: 700; margin: 12px 0; }
         .divider:before, .divider:after { content: ""; height: 1px; background: #ddd; flex: 1; }
-        .field { margin: 10px 0; text-align: left; }
-        .field label { display: block; font-size: 11px; font-weight: 800; margin: 0 0 6px 3px; color: #222; }
+        .field { margin: 8px 0; text-align: left; }
+        .field label { display: block; font-size: 11px; font-weight: 800; margin: 0 0 5px 3px; color: #222; }
         .input-wrap { position: relative; }
-        .field input { width: 100%; height: 44px; border: 1.5px solid #d4d4d4; border-radius: 999px; background: #fff; padding: 0 46px 0 16px; font-size: 12.5px; outline: none; color: #111; }
+        .field input { width: 100%; height: 42px; border: 1.5px solid #d4d4d4; border-radius: 999px; background: #fff; padding: 0 44px 0 15px; font-size: 12px; outline: none; color: #111; }
         .field input:focus { border-color: #111; }
         
-        .eye { 
-            position: absolute; 
-            right: 12px; 
-            top: 50%; 
-            transform: translateY(-50%); 
-            border: 0; 
-            width: 34px; 
-            height: 34px; 
-            background: transparent; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            color: #64748b; 
-            cursor: pointer; 
-            font-size: 15px;
-        }
+        .eye { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); border: 0; width: 32px; height: 32px; background: transparent; display: flex; align-items: center; justify-content: center; color: #64748b; cursor: pointer; font-size: 14px; }
         .eye:hover { color: #0f172a; }
-        .eye i { pointer-events: none; }
 
-        .row-between { display: flex; justify-content: space-between; align-items: center; font-size: 11px; margin: 10px 3px; }
-        .check { display: flex; align-items: center; gap: 7px; color: #555; font-size: 11px; }
-        .switch { text-align: center; font-size: 11px; color: #666; margin: 16px 0 2px; }
-        .message { display: none; font-size: 11px; padding: 10px 12px; border-radius: 12px; background: #efffc2; margin: 10px 0; color: #222; font-weight: 600; text-align: center; border: 1px solid #d4ee78; }
+        .row-between { display: flex; justify-content: space-between; align-items: center; font-size: 11px; margin: 8px 3px; }
+        .check { display: flex; align-items: center; gap: 6px; color: #555; font-size: 11px; }
+        .switch { text-align: center; font-size: 11px; color: #666; margin: 14px 0 2px; }
+        .message { display: none; font-size: 11px; padding: 8px 12px; border-radius: 12px; background: #efffc2; margin: 8px 0; color: #222; font-weight: 600; text-align: center; border: 1px solid #d4ee78; }
         .message.show { display: block; }
         .message.error { background: #fee2e2; border-color: #fca5a5; color: #991b1b; }
-        .close-btn-sheet { position: absolute; right: 18px; top: 15px; background: #eee; border: 0; width: 28px; height: 28px; border-radius: 50%; font-size: 18px; color: #333; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .close-btn-sheet { position: absolute; right: 16px; top: 14px; background: #eee; border: 0; width: 26px; height: 26px; border-radius: 50%; font-size: 16px; color: #333; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         
-        .social-bottom { text-align: center; margin: 16px 0 2px; color: #888; font-size: 10px; }
-        .social-icons { display: flex; justify-content: center; gap: 14px; margin-top: 9px; }
-        .social-circle { width: 44px; height: 44px; border-radius: 50%; background: #fff; border: 1.5px solid #dedede; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); font-size: 19px; font-weight: 900; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.15s; }
+        .social-bottom { text-align: center; margin: 14px 0 2px; color: #888; font-size: 10px; }
+        .social-icons { display: flex; justify-content: center; gap: 12px; margin-top: 8px; }
+        .social-circle { width: 42px; height: 42px; border-radius: 50%; background: #fff; border: 1.5px solid #dedede; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); font-size: 18px; font-weight: 900; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.15s; }
         .social-circle:active { transform: scale(0.92); }
         .social-circle.google { color: #4285f4; }
-        .social-circle.facebook { color: #1877f2; font-family: Arial, sans-serif; font-size: 22px; }
+        .social-circle.facebook { color: #1877f2; font-family: Arial, sans-serif; font-size: 20px; }
 
         /* ================= 2. DASHBOARD ================= */
         .main-dashboard {
             display: none;
             flex-direction: column;
-            padding-top: 14px;
-            padding-bottom: 92px;
-            min-height: 750px;
+            padding-top: 8px;
+            padding-bottom: 74px;
+            min-height: 720px;
             background: var(--dash-bg);
             animation: fadeIn 0.25s ease;
         }
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.99); } to { opacity: 1; transform: scale(1); } }
         
-        .app-body { padding: 0 14px 10px; display: flex; flex-direction: column; gap: 14px; }
+        .app-body { 
+            padding: 0 11px 4px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 7px;
+        }
         .custom-icon-fill { width: 100%; height: 100%; object-fit: contain; display: block; }
 
         /* Header */
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 2px 2px 4px; }
-        .brand { display: flex; align-items: center; gap: 10px; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 2px 2px 2px; }
+        .brand { display: flex; align-items: center; gap: 8px; }
         .brand-logo-box {
-            width: 40px;
-            height: 40px;
-            border-radius: 14px;
+            width: 36px;
+            height: 36px;
+            border-radius: 12px;
             overflow: hidden;
             background: #ffffff;
             display: flex;
             align-items: center;
             justify-content: center;
             border: 2px solid #bae6fd;
-            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.18), inset 0 1px 1px #fff;
+            box-shadow: 0 3px 10px rgba(2, 132, 199, 0.15), inset 0 1px 1px #fff;
             flex-shrink: 0;
             padding: 2px;
         }
         .brand-logo-img { width: 100%; height: 100%; object-fit: contain; }
-        .brand-title h1 { font-size: 20px; font-weight: 900; color: #0c4a6e; letter-spacing: -0.4px; line-height: 1.1; }
+        .brand-title h1 { font-size: 18px; font-weight: 900; color: #0c4a6e; letter-spacing: -0.4px; line-height: 1.1; }
         .brand-title h1 span { color: #0284c7; }
-        .brand-title p { font-size: 9.5px; color: #047857; font-weight: 700; }
+        .brand-title p { font-size: 9px; color: #047857; font-weight: 700; margin-top: -1px; }
         
-        .header-actions { display: flex; align-items: center; gap: 14px; }
-        .notif-btn { position: relative; color: #0369a1; font-size: 21px; cursor: pointer; }
-        .notif-badge { position: absolute; top: -6px; right: -6px; background: #ef4444; color: #fff; font-size: 9px; font-weight: 800; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #ffffff; }
+        .header-actions { display: flex; align-items: center; gap: 12px; }
+        .notif-btn { position: relative; color: #0369a1; font-size: 20px; cursor: pointer; padding: 3px; }
+        .notif-badge { 
+            position: absolute; 
+            top: -4px; 
+            right: -6px; 
+            background: #ef4444; 
+            color: #fff; 
+            font-size: 9px; 
+            font-weight: 900; 
+            min-width: 17px; 
+            height: 17px; 
+            border-radius: 50%; 
+            display: none; 
+            align-items: center; 
+            justify-content: center; 
+            border: 2px solid #ffffff; 
+            padding: 0 2px;
+        }
         .profile-btn { display: flex; align-items: center; gap: 5px; cursor: pointer; }
         .profile-avatar {
-            width: 38px;
-            height: 38px;
+            width: 35px;
+            height: 35px;
             border-radius: 50%;
             background: linear-gradient(135deg, #0284c7, #10b981);
             color: #fff;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
+            font-size: 15px;
             border: 2px solid #ffffff;
-            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+            box-shadow: 0 4px 10px rgba(2, 132, 199, 0.25);
         }
 
         /* 3D Balance Card */
         .balance-card {
             background: linear-gradient(135deg, #0284c7 0%, #0d9488 55%, #059669 100%);
-            border-radius: 24px;
-            padding: 16px 16px 14px;
-            box-shadow: 0 12px 28px rgba(13, 148, 136, 0.32), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+            border-radius: 20px;
+            padding: 12px 14px 10px;
+            box-shadow: 0 8px 22px rgba(13, 148, 136, 0.28), inset 0 1px 1px rgba(255, 255, 255, 0.4);
             border: 1px solid rgba(255, 255, 255, 0.35);
             color: #ffffff;
             display: flex;
             flex-direction: column;
-            gap: 14px;
+            gap: 9px;
         }
 
         .balance-top-row { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-        .balance-left-content { display: flex; align-items: center; gap: 12px; }
+        .balance-left-content { display: flex; align-items: center; gap: 10px; }
         .wallet-circle-3d {
-            width: 48px;
-            height: 48px;
-            border-radius: 16px;
+            width: 42px;
+            height: 42px;
+            border-radius: 14px;
             background: rgba(255, 255, 255, 0.22);
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(8px);
             display: flex;
             align-items: center;
             justify-content: center;
             border: 1.5px solid rgba(255, 255, 255, 0.45);
-            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.12);
             flex-shrink: 0;
-            padding: 7px;
+            padding: 6px;
         }
         
-        .balance-text-group { display: flex; flex-direction: column; gap: 3px; line-height: 1.3; }
-        .balance-label-line { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; color: #ccfbf1; text-transform: uppercase; letter-spacing: 0.4px; }
-        .eye-toggle-btn { cursor: pointer; color: #99f6e4; font-size: 12px; }
-        .balance-amount-line { font-size: 23px; font-weight: 900; color: #ffffff; letter-spacing: -0.4px; white-space: nowrap; line-height: 1.2; margin: 1px 0; }
-        .balance-bdt-line { font-size: 10.5px; font-weight: 700; color: #d1fae5; letter-spacing: 0.2px; line-height: 1.2; }
+        .balance-text-group { display: flex; flex-direction: column; gap: 2px; line-height: 1.2; }
+        .balance-label-line { display: flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 700; color: #ccfbf1; text-transform: uppercase; letter-spacing: 0.3px; }
+        .eye-toggle-btn { cursor: pointer; color: #99f6e4; font-size: 11px; }
+        .balance-amount-line { font-size: 21px; font-weight: 900; color: #ffffff; letter-spacing: -0.4px; white-space: nowrap; line-height: 1.15; margin: 1px 0; }
+        .balance-bdt-line { font-size: 10px; font-weight: 700; color: #d1fae5; letter-spacing: 0.2px; }
 
-        .user-meta-right { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
-        .user-name-text { font-size: 13.5px; font-weight: 850; color: #ffffff; max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; }
-        .uid-chip-3d { display: inline-flex; align-items: center; gap: 5px; font-size: 10.5px; font-weight: 800; color: #ffffff; background: rgba(0, 0, 0, 0.25); border: 1px solid rgba(255, 255, 255, 0.35); padding: 3px 9px; border-radius: 20px; cursor: pointer; }
+        .user-meta-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+        .user-name-text { font-size: 13px; font-weight: 850; color: #ffffff; max-width: 110px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; }
+        .uid-chip-3d { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 800; color: #ffffff; background: rgba(0, 0, 0, 0.25); border: 1px solid rgba(255, 255, 255, 0.35); padding: 2px 8px; border-radius: 16px; cursor: pointer; }
 
         /* 3-Column Sub Stats Grid */
         .balance-sub-stats-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr 1.15fr;
-            gap: 6px;
+            grid-template-columns: 1fr 1fr 1.1fr;
+            gap: 5px;
             background: rgba(0, 0, 0, 0.22);
-            border-radius: 16px;
-            padding: 8px;
+            border-radius: 14px;
+            padding: 6px;
             border: 1px solid rgba(255, 255, 255, 0.15);
         }
-        .sub-stat-box { display: flex; align-items: center; gap: 6px; min-width: 0; background: rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 6px 6px; }
-        .sub-stat-mini-icon { width: 26px; height: 26px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 12px; color: #fff; }
+        .sub-stat-box { display: flex; align-items: center; gap: 5px; min-width: 0; background: rgba(255, 255, 255, 0.08); border-radius: 10px; padding: 5px 6px; }
+        .sub-stat-mini-icon { width: 24px; height: 24px; border-radius: 7px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 11px; color: #fff; }
         .sub-stat-mini-icon.green-glow { background: #10b981; }
         .sub-stat-mini-icon.blue-glow { background: #0284c7; }
-        .sub-stat-labels { display: flex; flex-direction: column; justify-content: center; line-height: 1.25; min-width: 0; overflow: hidden; }
-        .sub-stat-labels span { font-size: 8px; color: #ccfbf1; font-weight: 700; text-transform: uppercase; margin-bottom: 1px; }
-        .sub-stat-labels strong { font-size: 10.5px; color: #ffffff; font-weight: 850; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .sub-stat-labels { display: flex; flex-direction: column; justify-content: center; line-height: 1.2; min-width: 0; overflow: hidden; }
+        .sub-stat-labels span { font-size: 7.5px; color: #ccfbf1; font-weight: 700; text-transform: uppercase; margin-bottom: 1px; }
+        .sub-stat-labels strong { font-size: 10px; color: #ffffff; font-weight: 850; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        .verify-badge-pill { display: flex; align-items: center; gap: 5px; min-width: 0; background: rgba(239, 68, 68, 0.25); border: 1px solid #f87171; border-radius: 12px; padding: 5px 6px; cursor: pointer; }
+        .verify-badge-pill { display: flex; align-items: center; gap: 5px; min-width: 0; background: rgba(239, 68, 68, 0.25); border: 1px solid #f87171; border-radius: 10px; padding: 5px 6px; cursor: pointer; }
         .verify-badge-pill.verified { background: rgba(16, 185, 129, 0.25); border-color: #34d399; }
-        .verify-pill-icon { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #ffffff; flex-shrink: 0; background: #ef4444; }
+        .verify-pill-icon { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9.5px; color: #ffffff; flex-shrink: 0; background: #ef4444; }
         .verify-badge-pill.verified .verify-pill-icon { background: #10b981; }
-        .verify-pill-text { display: flex; flex-direction: column; justify-content: center; line-height: 1.2; min-width: 0; }
-        .verify-pill-text span { font-size: 7.5px; font-weight: 700; color: #fecaca; text-transform: uppercase; margin-bottom: 1px; }
+        .verify-pill-text { display: flex; flex-direction: column; justify-content: center; line-height: 1.15; min-width: 0; }
+        .verify-pill-text span { font-size: 7.5px; font-weight: 700; color: #fecaca; text-transform: uppercase; }
         .verify-badge-pill.verified .verify-pill-text span { color: #a7f3d0; }
         .verify-pill-text strong { font-size: 9.5px; font-weight: 850; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* ================= 3D WIDE DEPOSIT & WITHDRAW BUTTONS (সাইডে দৈর্ঘ্য বাড়ানো) ================= */
+        /* Actions Grid */
         .actions-wide-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
+            gap: 8px;
             width: 100%;
-            margin: 4px 0 2px;
+            margin: 1px 0;
         }
 
         .action-wide-card {
-            border-radius: 20px;
-            padding: 10px 14px;
+            border-radius: 16px;
+            padding: 6px 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
             cursor: pointer;
-            height: 64px;
+            height: 52px;
             transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-            position: relative;
         }
-        .action-wide-card:active {
-            transform: scale(0.95);
-        }
+        .action-wide-card:active { transform: scale(0.96); }
 
         .action-wide-card.deposit-card {
             background: linear-gradient(145deg, #ffffff, #ecfdf5);
-            border: 2px solid #a7f3d0;
-            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.22), inset 0 2px 2px #ffffff;
+            border: 1.5px solid #a7f3d0;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.16), inset 0 1px 1px #ffffff;
         }
 
         .action-wide-card.withdraw-card {
             background: linear-gradient(145deg, #ffffff, #f0f9ff);
-            border: 2px solid #bae6fd;
-            box-shadow: 0 8px 20px rgba(2, 132, 199, 0.22), inset 0 2px 2px #ffffff;
+            border: 1.5px solid #bae6fd;
+            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.16), inset 0 1px 1px #ffffff;
         }
 
         .action-wide-card img {
-            width: 44px;
-            height: 44px;
+            width: 36px;
+            height: 36px;
             object-fit: contain;
-            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.12));
+            filter: drop-shadow(0 3px 6px rgba(0,0,0,0.1));
             flex-shrink: 0;
         }
 
         .action-wide-card span {
-            font-size: 15px;
-            font-weight: 900;
-            letter-spacing: -0.3px;
+            font-size: 14px;
+            font-weight: 850;
+            letter-spacing: -0.2px;
         }
 
         .action-wide-card.deposit-card span { color: #047857; }
@@ -302,132 +304,265 @@
         .task-card-3d { 
             background: var(--card-3d); 
             border: 1.5px solid var(--card-border); 
-            border-radius: 20px; 
-            padding: 13px 14px; 
+            border-radius: 17px; 
+            padding: 9px 11px; 
             box-shadow: var(--shadow-3d); 
         }
         .task-row-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; }
-        .task-left-meta { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; }
-        .task-symbol-3d { width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 16px; flex-shrink: 0; }
+        .task-left-meta { display: flex; align-items: center; gap: 9px; min-width: 0; flex: 1; }
+        .task-symbol-3d { width: 34px; height: 34px; border-radius: 11px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 14px; flex-shrink: 0; }
         .task-symbol-3d.cyan { background: linear-gradient(135deg, #0284c7, #0d9488); }
         .task-symbol-3d.purple { background: linear-gradient(135deg, #8b5cf6, #6366f1); }
         .task-symbol-3d.telegram-blue { background: linear-gradient(135deg, #0088cc, #0284c7); }
         
-        .task-text { display: flex; flex-direction: column; justify-content: center; min-width: 0; line-height: 1.3; overflow: hidden; }
-        .task-text h4 { font-size: 13px; font-weight: 800; color: #0c4a6e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
-        .task-text p { font-size: 9.5px; color: #64748b; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .task-text { display: flex; flex-direction: column; justify-content: center; min-width: 0; line-height: 1.25; overflow: hidden; }
+        .task-text h4 { font-size: 12.5px; font-weight: 800; color: #0c4a6e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .task-text p { font-size: 9px; color: #64748b; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
         
-        .task-pill { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; font-size: 10.5px; font-weight: 800; white-space: nowrap; margin-left: auto; cursor: pointer; flex-shrink: 0; }
+        .task-pill { display: inline-flex; align-items: center; gap: 3px; padding: 3px 8px; border-radius: 18px; font-size: 10px; font-weight: 800; white-space: nowrap; margin-left: auto; cursor: pointer; flex-shrink: 0; }
         .task-pill.green-pill { background: #dcfce7; color: #047857; border: 1px solid #86efac; }
         .task-pill.blue-pill { background: #e0f2fe; color: #0369a1; border: 1px solid #7dd3fc; }
         .task-pill.claimed-pill { background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; }
 
-        .video-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 10px; }
-        .video-card-3d { background: #ffffff; border: 1.5px solid #d0e7f5; border-radius: 16px; padding: 10px 4px 8px; display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; }
+        .video-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 7px; }
+        .video-card-3d { background: #ffffff; border: 1.5px solid #d0e7f5; border-radius: 13px; padding: 6px 3px 5px; display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; }
         .video-card-3d:active { transform: scale(0.95); }
-        .video-icon { width: 32px; height: 32px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; color: #fff; }
+        .video-icon { width: 28px; height: 28px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #fff; }
         .video-icon.yt { background: #ff0000; }
         .video-icon.fb { background: #1877f2; }
         .video-icon.ig { background: linear-gradient(45deg, #f09433, #dc2743, #bc1888); }
         .video-icon.tiktok { background: #000000; }
-        .video-card-3d span { font-size: 9.5px; color: #0f172a; font-weight: 750; margin-top: 2px; }
-        .video-card-3d small { font-size: 8.5px; color: #059669; font-weight: 850; }
+        .video-card-3d span { font-size: 9px; color: #0f172a; font-weight: 750; margin-top: 1px; }
+        .video-card-3d small { font-size: 8px; color: #059669; font-weight: 850; }
 
-        /* Promo Banner */
-        .promo-banner-container { position: relative; width: 100%; height: 120px; border-radius: 20px; overflow: hidden; background: #e2e8f0; border: 1.5px solid #c8e3f2; }
+        /* ================= PROMO BANNER (সম্পূর্ণ ছবি নিখুঁতভাবে দেখাবে) ================= */
+        .promo-banner-container { 
+            position: relative; 
+            width: 100%; 
+            height: 135px; /* যথেষ্ট উচ্চতা যাতে সম্পূর্ণ ব্যানার পরিষ্কার দেখায় */
+            border-radius: 18px; 
+            overflow: hidden; 
+            background: #08192e; 
+            border: 2px solid #bae6fd; 
+            box-shadow: 0 6px 18px rgba(2, 132, 199, 0.18); 
+        }
         .promo-slider-track { display: flex; height: 100%; width: 100%; transition: transform 0.4s ease; }
-        .promo-slide { min-width: 100%; height: 100%; cursor: pointer; }
-        .promo-slide img { width: 100%; height: 100%; object-fit: cover; }
-        .promo-dots { position: absolute; bottom: 8px; right: 12px; display: flex; gap: 5px; z-index: 5; background: rgba(0, 0, 0, 0.45); padding: 3px 6px; border-radius: 12px; }
-        .promo-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255, 255, 255, 0.5); }
-        .promo-dot.active { width: 16px; border-radius: 4px; background: #00d2ff; }
+        .promo-slide { min-width: 100%; height: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        
+        /* ছবি যত বড়ই হোক পুরোটা ফ্রেমের ভেতর ফিট হয়ে দেখাবে */
+        .promo-slide img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: fill; 
+            display: block; 
+        }
 
-        /* ================= MODERN 3D BOTTOM NAV ================= */
+        .promo-dots { position: absolute; bottom: 6px; right: 10px; display: flex; gap: 4px; z-index: 5; background: rgba(0, 0, 0, 0.55); padding: 2px 6px; border-radius: 10px; }
+        .promo-dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255, 255, 255, 0.5); }
+        .promo-dot.active { width: 14px; border-radius: 4px; background: #00d2ff; }
+
+        /* ================= 3D BOTTOM NAV ================= */
         .bottom-nav {
             position: absolute;
             bottom: 0;
             left: 0;
             width: 100%;
-            height: 74px;
-            background: rgba(255, 255, 255, 0.96);
-            backdrop-filter: blur(12px);
+            height: 66px;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(16px);
             border-top: 1.5px solid #d4ebf8;
             display: flex;
             justify-content: space-around;
             align-items: center;
-            padding: 6px 8px 4px;
+            padding: 4px 6px;
             z-index: 50;
-            box-shadow: 0 -6px 25px rgba(12, 74, 110, 0.08);
+            box-shadow: 0 -8px 24px rgba(12, 74, 110, 0.08);
         }
+
         .nav-link {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
+            justify-content: center;
+            gap: 2px;
             color: #64748b;
             text-decoration: none;
-            font-size: 10px;
-            font-weight: 800;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.22s ease;
             position: relative;
+            flex: 1;
+            padding: 3px 0;
         }
-        .nav-link i { font-size: 20px; }
-        .nav-link:active i { transform: scale(0.88); }
-        
-        .nav-link.active { color: #0284c7; }
-        .nav-link.lucky-tab { color: #10b981; }
-        .nav-link.history-tab { color: #0284c7; }
-        .nav-link.refer-tab { color: #f59e0b; }
 
-        .nav-link.center-support {
-            position: relative;
-            top: -14px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 3px;
-        }
-        .center-bubble-3d {
-            width: 54px;
-            height: 54px;
-            border-radius: 50%;
-            background: #ffffff;
+        .nav-icon-wrap {
+            width: 40px;
+            height: 32px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 2.5px solid #0284c7;
-            box-shadow: 0 8px 22px rgba(2, 132, 199, 0.38), inset 0 1px 1px #fff;
+            font-size: 21px;
+            transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .nav-link span {
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.1px;
+        }
+
+        .nav-link:active .nav-icon-wrap { transform: scale(0.88); }
+
+        /* 1. Home */
+        .nav-link.home-tab.active { color: #0284c7; }
+        .nav-link.home-tab.active .nav-icon-wrap {
+            background: #e0f2fe;
+            color: #0284c7;
+            box-shadow: 0 3px 10px rgba(2, 132, 199, 0.22);
+        }
+
+        /* 2. Lucky (গিফট বক্স আইকন) */
+        .nav-link.lucky-tab { color: #d97706; }
+        .nav-link.lucky-tab .nav-icon-wrap {
+            color: #f59e0b;
+            background: linear-gradient(135deg, #fef3c7, #fef9c3);
+            border: 1px solid #fde68a;
+            box-shadow: 0 3px 8px rgba(245, 158, 11, 0.22);
+        }
+
+        /* 3. Center Support 3D Button */
+        .nav-link.center-support { position: relative; top: -12px; flex: 1.1; }
+        .center-bubble-3d {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #ffffff, #f0f9ff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid #0284c7;
+            box-shadow: 0 8px 20px rgba(2, 132, 199, 0.38), inset 0 2px 2px #fff;
             padding: 3px;
             overflow: hidden;
-            transition: transform 0.2s;
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-        .center-bubble-3d:active { transform: scale(0.92); }
+        .center-bubble-3d:active { transform: scale(0.90); }
         .center-bubble-img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
-        .center-support-text { font-size: 10px; font-weight: 850; color: #0284c7; letter-spacing: 0.2px; }
+        .center-support-text { font-size: 10px; font-weight: 900; color: #0284c7; margin-top: 1px; letter-spacing: 0.2px; }
+
+        /* 4. History */
+        .nav-link.history-tab { color: #0284c7; }
+        .nav-link.history-tab .nav-icon-wrap {
+            color: #0284c7;
+            background: #f0f9ff;
+            box-shadow: 0 3px 8px rgba(2, 132, 199, 0.15);
+        }
+
+        /* 5. Refer (মাইক / প্রচারের মেগাফোন আইকন) */
+        .nav-link.refer-tab { color: #059669; }
+        .nav-link.refer-tab .nav-icon-wrap {
+            color: #10b981;
+            background: #ecfdf5;
+            box-shadow: 0 3px 8px rgba(16, 185, 129, 0.18);
+        }
+
+        /* ================= BKASH-STYLE NOTIFICATIONS MODAL ================= */
+        .notif-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(5px);
+            z-index: 2200;
+            display: none;
+            align-items: flex-end;
+            justify-content: center;
+        }
+        .notif-modal-overlay.active { display: flex; }
+        .notif-modal-card {
+            background: #ffffff;
+            border-radius: 28px 28px 0 0;
+            width: 100%;
+            max-width: 410px;
+            max-height: 85%;
+            display: flex;
+            flex-direction: column;
+            animation: sheetUp 0.25s ease;
+            box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.2);
+            padding: 16px 16px 24px;
+        }
+        .notif-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 12px;
+            border-bottom: 1.5px solid #f1f5f9;
+        }
+        .notif-header h3 { font-size: 17px; font-weight: 850; color: #0f172a; display: flex; align-items: center; gap: 8px; }
+        .notif-header h3 i { color: #0284c7; }
+        .notif-close-btn { background: #f1f5f9; border: none; width: 30px; height: 30px; border-radius: 50%; font-size: 15px; color: #64748b; cursor: pointer; }
+        .notif-list {
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 12px 0 8px;
+            max-height: 400px;
+        }
+        .notif-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 11px 13px;
+            border-radius: 16px;
+            position: relative;
+        }
+        .notif-item.unread {
+            background: #f0f9ff;
+            border-color: #bae6fd;
+        }
+        .notif-item-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #0284c7, #0d9488);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+        .notif-item-body { flex: 1; min-width: 0; }
+        .notif-item-title { font-size: 13px; font-weight: 800; color: #0f172a; margin-bottom: 2px; }
+        .notif-item-desc { font-size: 11px; color: #475569; line-height: 1.4; word-break: break-word; }
+        .notif-item-time { font-size: 9px; color: #94a3b8; font-weight: 700; margin-top: 4px; }
+        .notif-empty { text-align: center; padding: 30px 10px; color: #94a3b8; font-size: 12px; font-weight: 700; }
+        .notif-empty i { font-size: 38px; color: #cbd5e1; margin-bottom: 8px; display: block; }
 
         /* 50 BDT Modal */
         .verify-modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(6px); z-index: 2100; display: none; align-items: center; justify-content: center; padding: 18px; }
         .verify-modal-overlay.active { display: flex; }
-        .verify-modal-card { background: #ffffff; border-radius: 28px; width: 100%; max-width: 330px; padding: 24px 20px 22px; text-align: center; position: relative; animation: sheetUp 0.25s ease; box-shadow: 0 20px 45px rgba(0,0,0,0.25); }
-        .verify-close-btn { position: absolute; top: 14px; right: 16px; background: #f1f5f9; border: none; width: 30px; height: 30px; border-radius: 50%; font-size: 16px; color: #64748b; cursor: pointer; }
-        .verify-badge-large { width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #f59e0b, #d97706); color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto 14px; }
-        .verify-modal-card h3 { font-size: 18px; font-weight: 850; color: #0f172a; margin-bottom: 6px; }
-        .verify-fee-pill { display: inline-block; background: #fef3c7; border: 1px solid #fde68a; color: #b45309; font-size: 12px; font-weight: 800; padding: 3px 12px; border-radius: 20px; margin-bottom: 12px; }
-        .verify-modal-card p { font-size: 12px; color: #64748b; line-height: 1.5; margin-bottom: 20px; }
-        .btn-verify-now { width: 100%; padding: 13px; border-radius: 16px; border: none; background: linear-gradient(135deg, #10b981, #059669); color: #ffffff; font-size: 14px; font-weight: 800; cursor: pointer; margin-bottom: 8px; }
-        .btn-verify-later { width: 100%; padding: 10px; border-radius: 14px; border: 1px solid #cbd5e1; background: transparent; color: #64748b; font-size: 12px; font-weight: 700; cursor: pointer; }
+        .verify-modal-card { background: #ffffff; border-radius: 26px; width: 100%; max-width: 320px; padding: 22px 18px 20px; text-align: center; position: relative; animation: sheetUp 0.25s ease; box-shadow: 0 20px 45px rgba(0,0,0,0.25); }
+        .verify-close-btn { position: absolute; top: 12px; right: 14px; background: #f1f5f9; border: none; width: 28px; height: 28px; border-radius: 50%; font-size: 15px; color: #64748b; cursor: pointer; }
+        .verify-badge-large { width: 58px; height: 58px; border-radius: 50%; background: linear-gradient(135deg, #f59e0b, #d97706); color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 26px; margin: 0 auto 12px; }
+        .verify-modal-card h3 { font-size: 17px; font-weight: 850; color: #0f172a; margin-bottom: 5px; }
+        .verify-fee-pill { display: inline-block; background: #fef3c7; border: 1px solid #fde68a; color: #b45309; font-size: 11.5px; font-weight: 800; padding: 3px 11px; border-radius: 20px; margin-bottom: 10px; }
+        .verify-modal-card p { font-size: 11.5px; color: #64748b; line-height: 1.45; margin-bottom: 18px; }
+        .btn-verify-now { width: 100%; padding: 12px; border-radius: 15px; border: none; background: linear-gradient(135deg, #10b981, #059669); color: #ffffff; font-size: 13.5px; font-weight: 800; cursor: pointer; margin-bottom: 7px; }
+        .btn-verify-later { width: 100%; padding: 9px; border-radius: 13px; border: 1px solid #cbd5e1; background: transparent; color: #64748b; font-size: 11.5px; font-weight: 700; cursor: pointer; }
 
         /* Logout Modal */
         .logout-modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(5px); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 20px; }
         .logout-modal-overlay.active { display: flex; }
-        .logout-modal-card { background: #ffffff; border-radius: 24px; width: 100%; max-width: 320px; padding: 24px 20px 20px; text-align: center; }
-        .logout-icon-box { width: 56px; height: 56px; border-radius: 50%; background: #fee2e2; color: #ef4444; display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 14px; }
-        .logout-modal-card h3 { font-size: 17px; font-weight: 800; color: #0f172a; margin-bottom: 6px; }
-        .logout-modal-card p { font-size: 12px; color: #64748b; margin-bottom: 20px; }
-        .logout-actions { display: flex; gap: 10px; }
-        .btn-cancel-logout { flex: 1; padding: 11px; border-radius: 14px; border: 1px solid #cbd5e1; background: #f8fafc; font-weight: 700; cursor: pointer; }
-        .btn-confirm-logout { flex: 1; padding: 11px; border-radius: 14px; border: none; background: #ef4444; color: #fff; font-weight: 700; cursor: pointer; }
+        .logout-modal-card { background: #ffffff; border-radius: 22px; width: 100%; max-width: 310px; padding: 22px 18px 18px; text-align: center; }
+        .logout-icon-box { width: 52px; height: 52px; border-radius: 50%; background: #fee2e2; color: #ef4444; display: flex; align-items: center; justify-content: center; font-size: 22px; margin: 0 auto 12px; }
+        .logout-modal-card h3 { font-size: 16px; font-weight: 800; color: #0f172a; margin-bottom: 5px; }
+        .logout-modal-card p { font-size: 11.5px; color: #64748b; margin-bottom: 18px; }
+        .logout-actions { display: flex; gap: 9px; }
+        .btn-cancel-logout { flex: 1; padding: 10px; border-radius: 13px; border: 1px solid #cbd5e1; background: #f8fafc; font-weight: 700; cursor: pointer; }
+        .btn-confirm-logout { flex: 1; padding: 10px; border-radius: 13px; border: none; background: #ef4444; color: #fff; font-weight: 700; cursor: pointer; }
 
         /* Toast Alert */
         .toast { 
@@ -602,7 +737,7 @@
         <div id="mainDashboard" class="main-dashboard">
             <div class="app-body">
                 
-                <!-- 3D Header -->
+                <!-- Header -->
                 <div class="header">
                     <div class="brand">
                         <div class="brand-logo-box">
@@ -614,7 +749,7 @@
                         </div>
                     </div>
                     <div class="header-actions">
-                        <div class="notif-btn" onclick="window.location.href='notifications.html'">
+                        <div class="notif-btn" onclick="openNotifModal()" title="Notifications">
                             <i class="fa-regular fa-bell"></i>
                             <span class="notif-badge" id="notifBadgeCount">0</span>
                         </div>
@@ -647,7 +782,7 @@
                             <span class="user-name-text" id="dashboardUserName">User</span>
                             <div class="uid-chip-3d" onclick="copyUID()" title="Click to copy UID">
                                 <span id="uidText">UID: 000000</span>
-                                <i class="fa-regular fa-copy" style="font-size:9.5px;"></i>
+                                <i class="fa-regular fa-copy" style="font-size:9px;"></i>
                             </div>
                         </div>
                     </div>
@@ -685,15 +820,13 @@
                     </div>
                 </div>
 
-                <!-- ================= 3D WIDE DEPOSIT & WITHDRAW BUTTONS (দুই সাইডে দৈর্ঘ্য বাড়ানো) ================= -->
+                <!-- Actions Grid -->
                 <div class="actions-wide-grid">
-                    <!-- ডিপোজিট লম্বা বাটন (বাম সাইডে) -->
                     <div class="action-wide-card deposit-card" onclick="window.location.href='deposit.html'" title="Deposit Money">
                         <img src="https://i.ibb.co.com/kghfWJBN/file-00000000b2dc8211affafc4155f20703.png" alt="Deposit">
                         <span>Deposit</span>
                     </div>
 
-                    <!-- উইথড্র লম্বা বাটন (ডান সাইডে) -->
                     <div class="action-wide-card withdraw-card" onclick="handleSecureNav('withdraw.html')" title="Withdraw Money">
                         <img src="https://i.ibb.co.com/QvvSGNpK/file-00000000a4f08211972bdbaacfea428b.png" alt="Withdraw">
                         <span>Withdraw</span>
@@ -705,7 +838,7 @@
                     <div class="task-row-header">
                         <div class="task-left-meta">
                             <div class="task-symbol-3d cyan">
-                                <i class="fa-solid fa-play"></i>
+                                <i class="fa-solid fa-circle-play"></i>
                             </div>
                             <div class="task-text">
                                 <h4>Watch Videos & Earn</h4>
@@ -780,7 +913,7 @@
                     </div>
                 </div>
 
-                <!-- 3D Promo Banner Slider -->
+                <!-- ================= PROMO BANNER SLIDER (সম্পূর্ণ ছবি নিখুঁতভাবে দেখাবে) ================= -->
                 <div class="promo-banner-container">
                     <div class="promo-slider-track" id="promoSliderTrack"></div>
                     <div class="promo-dots" id="promoDots"></div>
@@ -791,18 +924,22 @@
             <!-- ================= MODERN 3D BOTTOM NAV ================= -->
             <nav class="bottom-nav">
                 <!-- 1. Home -->
-                <div class="nav-link active" onclick="window.location.href='index.html'">
-                    <i class="fa-solid fa-house"></i>
+                <div class="nav-link home-tab active" onclick="window.location.href='index.html'">
+                    <div class="nav-icon-wrap">
+                        <i class="fa-solid fa-house-chimney"></i>
+                    </div>
                     <span>Home</span>
                 </div>
                 
-                <!-- 2. Lucky (৪ পাতার ৩ডি ক্লোভার আইকন) -->
+                <!-- 2. Lucky (গিফট বক্স আইকন) -->
                 <div class="nav-link lucky-tab" onclick="window.location.href='lucky.html'">
-                    <i class="fa-solid fa-clover"></i>
+                    <div class="nav-icon-wrap">
+                        <i class="fa-solid fa-gift"></i>
+                    </div>
                     <span>Lucky</span>
                 </div>
                 
-                <!-- 3. Support (সাপোর্ট হেডসেট লোগো ও নিচে সাপোর্ট লেখা) -->
+                <!-- 3. Support (সেন্ট্রাল ৩ডি বাটন) -->
                 <div class="nav-link center-support" onclick="window.location.href='support.html'">
                     <div class="center-bubble-3d">
                         <img src="https://i.ibb.co.com/DHMB6J4S/file-00000000a6888211aa5b662731e1ff68.png" alt="Support" class="center-bubble-img">
@@ -810,20 +947,40 @@
                     <span class="center-support-text">Support</span>
                 </div>
 
-                <!-- 4. History (আধুনিক ট্রানজেকশন আইকন) -->
+                <!-- 4. History -->
                 <div class="nav-link history-tab" onclick="window.location.href='history.html'">
-                    <i class="fa-solid fa-clock-rotate-left"></i>
+                    <div class="nav-icon-wrap">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                    </div>
                     <span>History</span>
                 </div>
 
-                <!-- 5. Refer (৩ডি গিফট আর্নিং আইকন) -->
+                <!-- 5. Refer (মাইক / প্রচারের মেগাফোন আইকন) -->
                 <div class="nav-link refer-tab" onclick="window.location.href='refer.html'">
-                    <i class="fa-solid fa-gift"></i>
+                    <div class="nav-icon-wrap">
+                        <i class="fa-solid fa-bullhorn"></i>
+                    </div>
                     <span>Refer</span>
                 </div>
             </nav>
         </div>
 
+    </div>
+
+    <!-- ================= BKASH-STYLE NOTIFICATIONS MODAL ================= -->
+    <div class="notif-modal-overlay" id="notifModal">
+        <div class="notif-modal-card">
+            <div class="notif-header">
+                <h3><i class="fa-solid fa-bell"></i> নোটিফিকেশন</h3>
+                <button type="button" class="notif-close-btn" onclick="closeNotifModal()">✕</button>
+            </div>
+            <div class="notif-list" id="notifListContainer">
+                <div class="notif-empty">
+                    <i class="fa-regular fa-bell-slash"></i>
+                    কোনো নতুন নোটিফিকেশন নেই!
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- 50 BDT Verification Modal -->
@@ -836,7 +993,7 @@
             <h3>Account Verification</h3>
             <span class="verify-fee-pill">ফি মাত্র: ৫০ টাকা</span>
             <p>আপনার অ্যাকাউন্টটি নিরাপদ রাখতে এবং টাস্ক পূরণ ও উইথড্র অপশন আনলক করতে ৫০ টাকা দিয়ে অ্যাকাউন্ট ভেরিফাই সম্পন্ন করুন।</p>
-            <div style="display:flex; flex-direction:column; gap:8px;">
+            <div style="display:flex; flex-direction:column; gap:7px;">
                 <button type="button" class="btn-verify-now" onclick="processAccountVerification()">
                     <i class="fa-solid fa-circle-check"></i> এখনই ভেরিফাই করুন (৫০৳)
                 </button>
@@ -886,6 +1043,15 @@
 
         let currentUserDoc = null;
         let isBalanceHidden = false;
+        let allNotifications = [];
+
+        function getTodayString() {
+            const d = new Date();
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
 
         (function restoreSessionInstantly() {
             const cachedUser = JSON.parse(localStorage.getItem('microtask_cached_user'));
@@ -898,13 +1064,18 @@
                 const balUSD = cachedUser.balanceUSD || 0;
                 document.getElementById("balanceAmount").textContent = `$ ${balUSD.toFixed(2)}`;
                 document.getElementById("bdtAmount").textContent = `≈ ${(balUSD * 120).toFixed(2)} BDT`;
+
+                const todayStr = getTodayString();
+                const todayEarn = (cachedUser.lastEarnDate === todayStr) ? (cachedUser.todayEarnUSD || 0) : 0;
+                const totalEarn = cachedUser.totalEarnUSD || 0;
+                document.getElementById("todayEarnText").textContent = `$ ${todayEarn.toFixed(2)}`;
+                document.getElementById("totalEarnText").textContent = `$ ${totalEarn.toFixed(2)}`;
             }
         })();
 
         function toggleInvezoPassword(id, btn) {
             const input = document.getElementById(id);
             const icon = btn.querySelector('i');
-            
             if (input.type === 'password') {
                 input.type = 'text';
                 if (icon) icon.className = 'fa-regular fa-eye';
@@ -919,6 +1090,13 @@
             const bdtEquivalent = (balUSD * 120).toFixed(2);
             document.getElementById("balanceAmount").textContent = isBalanceHidden ? "$ ••••" : `$ ${balUSD.toFixed(2)}`;
             document.getElementById("bdtAmount").textContent = isBalanceHidden ? "≈ •••• BDT" : `≈ ${bdtEquivalent} BDT`;
+
+            const todayStr = getTodayString();
+            const todayEarn = (currentUserDoc && currentUserDoc.lastEarnDate === todayStr) ? (currentUserDoc.todayEarnUSD || 0) : 0;
+            const totalEarn = currentUserDoc ? (currentUserDoc.totalEarnUSD || 0) : 0;
+
+            document.getElementById("todayEarnText").textContent = isBalanceHidden ? "$ ••••" : `$ ${todayEarn.toFixed(2)}`;
+            document.getElementById("totalEarnText").textContent = isBalanceHidden ? "$ ••••" : `$ ${totalEarn.toFixed(2)}`;
         }
 
         function toggleBalance() {
@@ -992,7 +1170,6 @@
                 showToast("প্রথমে লগইন করুন!", "error");
                 return;
             }
-
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(uidText).then(() => {
                     showToast("UID কপি হয়েছে: " + uidText, "success");
@@ -1027,6 +1204,28 @@
             }
         }
 
+        function addEarningToUser(amountUSD) {
+            const user = auth.currentUser;
+            if (!user || !currentUserDoc) return;
+
+            const todayStr = getTodayString();
+            const currentBal = currentUserDoc.balanceUSD || 0;
+            const currentTotal = currentUserDoc.totalEarnUSD || 0;
+            
+            let currentToday = (currentUserDoc.lastEarnDate === todayStr) ? (currentUserDoc.todayEarnUSD || 0) : 0;
+
+            const updatedBal = currentBal + amountUSD;
+            const updatedToday = currentToday + amountUSD;
+            const updatedTotal = currentTotal + amountUSD;
+
+            db.collection("users").doc(user.uid).update({
+                balanceUSD: updatedBal,
+                todayEarnUSD: updatedToday,
+                totalEarnUSD: updatedTotal,
+                lastEarnDate: todayStr
+            });
+        }
+
         function handleTelegramTaskClick() {
             if (!isUserVerified()) {
                 showToast("টাস্ক বোনাস পেতে আগে ৫০৳ দিয়ে ভেরিফাই করুন!", "error");
@@ -1044,9 +1243,8 @@
 
             window.open('https://t.me/OnlineBD77R', '_blank');
             setTimeout(() => {
-                const newBal = (currentUserDoc.balanceUSD || 0) + 0.10;
+                addEarningToUser(0.10);
                 db.collection("users").doc(user.uid).update({
-                    balanceUSD: newBal,
                     telegramClaimed: true
                 }).then(() => {
                     showToast("$0.10 বোনাস যোগ হয়েছে!", "success");
@@ -1111,12 +1309,16 @@
                 .then(userCredential => {
                     const user = userCredential.user;
                     const randomUID = Math.floor(100000 + Math.random() * 900000).toString();
+                    const todayStr = getTodayString();
 
                     const userPayload = {
                         name: name,
                         email: email,
                         uid: randomUID,
                         balanceUSD: 0.00,
+                        todayEarnUSD: 0.00,
+                        totalEarnUSD: 0.00,
+                        lastEarnDate: todayStr,
                         isVerified: false,
                         telegramClaimed: false,
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -1171,11 +1373,15 @@
                         return userRef.get().then(doc => {
                             if (!doc.exists) {
                                 const randomUID = Math.floor(100000 + Math.random() * 900000).toString();
+                                const todayStr = getTodayString();
                                 const userPayload = {
                                     name: user.displayName || 'Google User',
                                     email: user.email,
                                     uid: randomUID,
                                     balanceUSD: 0.00,
+                                    todayEarnUSD: 0.00,
+                                    totalEarnUSD: 0.00,
+                                    lastEarnDate: todayStr,
                                     isVerified: false,
                                     telegramClaimed: false,
                                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -1191,14 +1397,9 @@
                         closeSheet();
                     })
                     .catch(error => {
-                        console.error("Google Auth Error:", error);
-                        if (error.code === 'auth/unauthorized-domain') {
-                            showToast("ডোমেন পারমিশন দিন!", "error");
-                        } else if (error.code === 'auth/popup-closed-by-user') {
-                            showToast("লগইন বাতিল", "info");
-                        } else {
-                            showToast("লগইন ব্যর্থ!", "error");
-                        }
+                        if (error.code === 'auth/unauthorized-domain') showToast("ডোমেন পারমিশন দিন!", "error");
+                        else if (error.code === 'auth/popup-closed-by-user') showToast("লগইন বাতিল", "info");
+                        else showToast("লগইন ব্যর্থ!", "error");
                     });
             } else if (provider === 'Facebook') {
                 showToast("ফেসবুক শীঘ্রই আসছে!", "info");
@@ -1216,11 +1417,21 @@
                 .catch(err => showToast(err.message, 'error'));
         }
 
+        // Auth Listener & Daily Reset
         auth.onAuthStateChanged(user => {
             if (user) {
                 db.collection("users").doc(user.uid).onSnapshot(doc => {
                     if (doc.exists) {
                         currentUserDoc = doc.data();
+                        
+                        const todayStr = getTodayString();
+                        if (currentUserDoc.lastEarnDate !== todayStr && (currentUserDoc.todayEarnUSD || 0) > 0) {
+                            db.collection("users").doc(user.uid).update({
+                                todayEarnUSD: 0.00,
+                                lastEarnDate: todayStr
+                            });
+                        }
+
                         localStorage.setItem('microtask_cached_user', JSON.stringify(currentUserDoc));
 
                         document.getElementById('authScreen').style.display = 'none';
@@ -1242,32 +1453,137 @@
             }
         });
 
-        // Banner Slider
-        const DEFAULT_BANNERS = [
-            { id: 1, image: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiMYjDFVZDdjcwC6sak9GyxRpoQr4T6DplZPlvizJo8QcdoO567NWCBVXCw5ISh4UjIHUBULoQoaz4rAlOHdiRczMQpu1R1JhIeeVdcpGKrMOxeOXPdTc2NUP6MCtIE1y15U4-kW1a8aqNoS1ffr4VOUihkr_3cxlDxaNjYmj8BXBBAJyDdhyphenhyphen2vyw542mkX/s1536/13441.png", action: "deposit.html" },
-            { id: 2, image: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=750&q=80", action: "refer.html" }
+        // ================= DYNAMIC BANNER SYSTEM =================
+        let promoBanners = [
+            { 
+                id: 'default', 
+                image: "https://i.ibb.co.com/tTLNfcH6/file-000000001c1c82089a7b8b791e5b5e0e.png", 
+                action: "deposit.html" 
+            }
         ];
-
         let currentBannerIdx = 0;
         let bannerInterval = null;
+
+        function initBannerSlider() {
+            db.collection("banners").onSnapshot(snapshot => {
+                if (!snapshot.empty) {
+                    const loadedBanners = [];
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        if (data.image) {
+                            loadedBanners.push({
+                                id: doc.id,
+                                image: data.image,
+                                action: data.action || 'deposit.html'
+                            });
+                        }
+                    });
+                    if (loadedBanners.length > 0) {
+                        promoBanners = loadedBanners;
+                    }
+                }
+                renderDynamicBanners();
+            }, err => {
+                renderDynamicBanners();
+            });
+        }
+
         function renderDynamicBanners() {
             const track = document.getElementById('promoSliderTrack');
             const dotsContainer = document.getElementById('promoDots');
-            track.innerHTML = DEFAULT_BANNERS.map((b, i) => `
+            if (!track || !dotsContainer) return;
+
+            track.innerHTML = promoBanners.map(b => `
                 <div class="promo-slide" onclick="window.location.href='${b.action}'">
-                    <img src="${b.image}" alt="Banner">
+                    <img src="${b.image}" alt="Promo Banner" onerror="this.src='https://i.ibb.co.com/tTLNfcH6/file-000000001c1c82089a7b8b791e5b5e0e.png'">
                 </div>
             `).join('');
-            dotsContainer.innerHTML = DEFAULT_BANNERS.map((_, i) => `<div class="promo-dot ${i === 0 ? 'active' : ''}"></div>`).join('');
+
+            dotsContainer.innerHTML = promoBanners.map((_, i) => `<div class="promo-dot ${i === 0 ? 'active' : ''}"></div>`).join('');
+            
             if (bannerInterval) clearInterval(bannerInterval);
-            bannerInterval = setInterval(() => {
-                currentBannerIdx = (currentBannerIdx + 1) % DEFAULT_BANNERS.length;
-                track.style.transform = `translateX(-${currentBannerIdx * 100}%)`;
-                document.querySelectorAll('.promo-dot').forEach((dot, idx) => dot.classList.toggle('active', idx === currentBannerIdx));
-            }, 3800);
+            if (promoBanners.length > 1) {
+                bannerInterval = setInterval(() => {
+                    currentBannerIdx = (currentBannerIdx + 1) % promoBanners.length;
+                    track.style.transform = `translateX(-${currentBannerIdx * 100}%)`;
+                    document.querySelectorAll('.promo-dot').forEach((dot, idx) => dot.classList.toggle('active', idx === currentBannerIdx));
+                }, 4000);
+            }
         }
 
-        renderDynamicBanners();
+        // ================= NOTIFICATION SYSTEM =================
+        function initNotificationSystem() {
+            db.collection("notifications").orderBy("createdAt", "desc").limit(25).onSnapshot(snapshot => {
+                allNotifications = [];
+                snapshot.forEach(doc => {
+                    allNotifications.push({ id: doc.id, ...doc.data() });
+                });
+                updateNotifBadge();
+            }, err => console.log("Notif error:", err));
+        }
+
+        function getReadNotifIds() {
+            try {
+                return JSON.parse(localStorage.getItem('read_notif_ids')) || [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function updateNotifBadge() {
+            const readIds = getReadNotifIds();
+            const unreadCount = allNotifications.filter(n => !readIds.includes(n.id)).length;
+            const badge = document.getElementById('notifBadgeCount');
+            
+            if (unreadCount > 0) {
+                badge.innerText = unreadCount > 9 ? '9+' : unreadCount;
+                badge.style.display = 'flex';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        function openNotifModal() {
+            const modal = document.getElementById('notifModal');
+            const container = document.getElementById('notifListContainer');
+            modal.classList.add('active');
+
+            if (allNotifications.length === 0) {
+                container.innerHTML = `
+                    <div class="notif-empty">
+                        <i class="fa-regular fa-bell-slash"></i>
+                        কোনো নতুন নোটিফিকেশন নেই!
+                    </div>`;
+            } else {
+                const readIds = getReadNotifIds();
+                container.innerHTML = allNotifications.map(n => {
+                    const isUnread = !readIds.includes(n.id);
+                    return `
+                        <div class="notif-item ${isUnread ? 'unread' : ''}">
+                            <div class="notif-item-icon">
+                                <i class="${n.icon || 'fa-solid fa-bullhorn'}"></i>
+                            </div>
+                            <div class="notif-item-body">
+                                <div class="notif-item-title">${n.title || 'বিজ্ঞপ্তি'}</div>
+                                <div class="notif-item-desc">${n.message || ''}</div>
+                                <div class="notif-item-time">${n.time || 'কিছুক্ষণ আগে'}</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                const allIds = allNotifications.map(n => n.id);
+                localStorage.setItem('read_notif_ids', JSON.stringify(allIds));
+                updateNotifBadge();
+            }
+        }
+
+        function closeNotifModal() {
+            document.getElementById('notifModal').classList.remove('active');
+        }
+
+        initBannerSlider();
+        initNotificationSystem();
     </script>
 </body>
 </html>
