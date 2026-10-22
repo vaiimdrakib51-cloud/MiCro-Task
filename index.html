@@ -22,7 +22,6 @@
             --lime: #d8ff38;
             --ink: #101010;
             --paper: #f8f8f7;
-            --bg-grad: linear-gradient(145deg, #e0f2fe 0%, #e6f9f0 50%, #f0fdf4 100%);
             --dash-bg: linear-gradient(180deg, #f0f9ff 0%, #f4fbf7 100%);
             --card-3d: linear-gradient(180deg, #ffffff 0%, #f8fcfa 100%);
             --card-border: #d2e9f7;
@@ -30,108 +29,119 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg-grad); color: #0f172a; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 6px 4px; }
+        
+        /* সম্পূর্ণ স্ক্রিন জুড়ে আসল অ্যাপের মতো ডিসপ্লে */
+        html, body { 
+            width: 100%; 
+            min-height: 100vh; 
+            background: #f0f9ff; 
+            color: #0f172a; 
+            overflow-x: hidden; 
+        }
 
         .phone {
             width: 100%;
-            max-width: 410px;
+            min-height: 100vh;
             background: #ffffff;
-            border-radius: 36px;
-            border: 2.5px solid #d4ebf8;
-            box-shadow: 0 16px 40px rgba(12, 74, 110, 0.12), 0 0 0 6px #f1f8fc;
-            overflow: hidden;
+            border: none;
+            border-radius: 0;
+            box-shadow: none;
             position: relative;
-            min-height: 720px;
+            display: flex;
+            flex-direction: column;
         }
 
         /* 1. AUTH SCREEN */
         .auth-screen { 
             background: var(--paper); 
             color: var(--ink); 
-            min-height: 720px; 
+            min-height: 100vh; 
             display: flex; 
             flex-direction: column; 
             position: relative; 
             z-index: 10; 
-            transition: all 0.3s ease;
-            padding-top: 14px; 
+            padding: 24px 16px 20px; 
         }
         
-        .auth-brand { display: flex; align-items: center; justify-content: center; gap: 7px; font-weight: 900; font-size: 21px; margin: 4px 0 0; color: #111; }
-        .auth-main { padding: 0 22px 22px; display: flex; flex-direction: column; flex: 1; }
-        .auth-hero { height: 170px; display: flex; align-items: center; justify-content: center; margin: 4px 0; }
-        .auth-logo-img { width: 120px; height: 120px; object-fit: contain; filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.14)); }
+        .auth-brand { display: flex; align-items: center; justify-content: center; gap: 7px; font-weight: 900; font-size: 22px; margin: 6px 0 0; color: #111; }
+        .auth-main { padding: 0 16px 20px; display: flex; flex-direction: column; flex: 1; }
+        .auth-hero { height: 180px; display: flex; align-items: center; justify-content: center; margin: 6px 0; }
+        .auth-logo-img { width: 130px; height: 130px; object-fit: contain; filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.14)); }
 
         .auth-intro { text-align: center; }
-        .auth-intro h1 { font-size: 23px; line-height: 1.25; letter-spacing: -1px; margin: 0 0 6px; font-weight: 850; color: #111; }
-        .auth-intro p { font-size: 12.5px; color: #555; line-height: 1.45; margin: 0 auto; max-width: 270px; }
-        .auth-actions { margin-top: auto; padding-top: 16px; display: grid; gap: 9px; }
-        .auth-btn { border: 1.5px solid #111; border-radius: 999px; height: 46px; width: 100%; font: 700 13px inherit; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 9px; background: transparent; color: #111; transition: transform 0.15s; }
+        .auth-intro h1 { font-size: 24px; line-height: 1.25; letter-spacing: -1px; margin: 0 0 6px; font-weight: 850; color: #111; }
+        .auth-intro p { font-size: 13px; color: #555; line-height: 1.45; margin: 0 auto; max-width: 280px; }
+        .auth-actions { margin-top: auto; padding-top: 18px; display: grid; gap: 10px; }
+        .auth-btn { border: 1.5px solid #111; border-radius: 999px; height: 48px; width: 100%; font: 700 13.5px inherit; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 9px; background: transparent; color: #111; transition: transform 0.15s; }
         .auth-btn:active { transform: scale(0.98); }
         .auth-btn.primary { background: var(--lime); border-color: var(--lime); font-weight: 850; box-shadow: 0 6px 16px rgba(216, 255, 56, 0.4); }
         .auth-btn.secondary { background: #fff; border-color: #ddd; }
-        .auth-legal { text-align: center; font-size: 9.5px; line-height: 1.5; color: #666; margin: 12px 5px 0; }
+        .auth-legal { text-align: center; font-size: 10px; line-height: 1.5; color: #666; margin: 14px 5px 0; }
         .auth-legal a, .auth-link { color: #111; font-weight: 800; text-decoration: underline; cursor: pointer; }
 
-        .sheet { display: none; position: absolute; inset: 0; background: rgba(0, 0, 0, 0.55); backdrop-filter: blur(4px); align-items: flex-end; z-index: 100; }
+        .sheet { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.55); backdrop-filter: blur(4px); align-items: flex-end; z-index: 2000; }
         .sheet.open { display: flex; }
-        .panel { width: 100%; background: #f8f8f7; border-radius: 26px 26px 0 0; padding: 14px 20px 22px; max-height: 92%; overflow-y: auto; border-top: 1px solid #ddd; animation: sheetUp 0.25s cubic-bezier(0.16, 1, 0.3, 1); color: #111; position: relative; }
+        .panel { width: 100%; background: #f8f8f7; border-radius: 26px 26px 0 0; padding: 16px 20px 24px; max-height: 90vh; overflow-y: auto; border-top: 1px solid #ddd; animation: sheetUp 0.25s cubic-bezier(0.16, 1, 0.3, 1); color: #111; position: relative; }
         @keyframes sheetUp { from { transform: translateY(40px); opacity: 0.5; } to { transform: translateY(0); opacity: 1; } }
         .handle { width: 40px; height: 4px; border-radius: 9px; background: #ddd; margin: 0 auto 14px; }
-        .panel h2 { text-align: center; font-size: 19px; margin: 0 0 5px; letter-spacing: -0.5px; color: #111; font-weight: 800; }
-        .panel .sub { text-align: center; color: #777; font-size: 11.5px; margin: 0 0 14px; }
+        .panel h2 { text-align: center; font-size: 20px; margin: 0 0 5px; letter-spacing: -0.5px; color: #111; font-weight: 800; }
+        .panel .sub { text-align: center; color: #777; font-size: 12px; margin: 0 0 14px; }
         .divider { display: flex; align-items: center; gap: 10px; color: #888; font-size: 10px; font-weight: 700; margin: 12px 0; }
         .divider:before, .divider:after { content: ""; height: 1px; background: #ddd; flex: 1; }
-        .field { margin: 8px 0; text-align: left; }
+        .field { margin: 9px 0; text-align: left; }
         .field label { display: block; font-size: 11px; font-weight: 800; margin: 0 0 5px 3px; color: #222; }
         .input-wrap { position: relative; }
-        .field input { width: 100%; height: 42px; border: 1.5px solid #d4d4d4; border-radius: 999px; background: #fff; padding: 0 44px 0 15px; font-size: 12px; outline: none; color: #111; }
+        .field input { width: 100%; height: 44px; border: 1.5px solid #d4d4d4; border-radius: 999px; background: #fff; padding: 0 44px 0 16px; font-size: 12.5px; outline: none; color: #111; }
         .field input:focus { border-color: #111; }
         
         .eye { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); border: 0; width: 32px; height: 32px; background: transparent; display: flex; align-items: center; justify-content: center; color: #64748b; cursor: pointer; font-size: 14px; }
         .eye:hover { color: #0f172a; }
 
-        .row-between { display: flex; justify-content: space-between; align-items: center; font-size: 11px; margin: 8px 3px; }
-        .check { display: flex; align-items: center; gap: 6px; color: #555; font-size: 11px; }
-        .switch { text-align: center; font-size: 11px; color: #666; margin: 14px 0 2px; }
-        .message { display: none; font-size: 11px; padding: 8px 12px; border-radius: 12px; background: #efffc2; margin: 8px 0; color: #222; font-weight: 600; text-align: center; border: 1px solid #d4ee78; }
+        .row-between { display: flex; justify-content: space-between; align-items: center; font-size: 11.5px; margin: 9px 3px; }
+        .check { display: flex; align-items: center; gap: 6px; color: #555; font-size: 11.5px; }
+        .switch { text-align: center; font-size: 11.5px; color: #666; margin: 15px 0 2px; }
+        .message { display: none; font-size: 11px; padding: 9px 12px; border-radius: 12px; background: #efffc2; margin: 8px 0; color: #222; font-weight: 600; text-align: center; border: 1px solid #d4ee78; }
         .message.show { display: block; }
         .message.error { background: #fee2e2; border-color: #fca5a5; color: #991b1b; }
-        .close-btn-sheet { position: absolute; right: 16px; top: 14px; background: #eee; border: 0; width: 26px; height: 26px; border-radius: 50%; font-size: 16px; color: #333; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .close-btn-sheet { position: absolute; right: 16px; top: 15px; background: #eee; border: 0; width: 28px; height: 28px; border-radius: 50%; font-size: 16px; color: #333; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         
-        .social-bottom { text-align: center; margin: 14px 0 2px; color: #888; font-size: 10px; }
-        .social-icons { display: flex; justify-content: center; gap: 12px; margin-top: 8px; }
-        .social-circle { width: 42px; height: 42px; border-radius: 50%; background: #fff; border: 1.5px solid #dedede; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); font-size: 18px; font-weight: 900; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.15s; }
+        .social-bottom { text-align: center; margin: 14px 0 2px; color: #888; font-size: 10.5px; }
+        .social-icons { display: flex; justify-content: center; gap: 12px; margin-top: 9px; }
+        .social-circle { width: 44px; height: 44px; border-radius: 50%; background: #fff; border: 1.5px solid #dedede; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); font-size: 19px; font-weight: 900; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.15s; }
         .social-circle:active { transform: scale(0.92); }
         .social-circle.google { color: #4285f4; }
-        .social-circle.facebook { color: #1877f2; font-family: Arial, sans-serif; font-size: 20px; }
+        .social-circle.facebook { color: #1877f2; font-family: Arial, sans-serif; font-size: 21px; }
 
-        /* ================= 2. DASHBOARD ================= */
+        /* ================= 2. DASHBOARD (FULLSCREEN & SMOOTH SCROLL) ================= */
         .main-dashboard {
             display: none;
             flex-direction: column;
-            padding-top: 8px;
-            padding-bottom: 74px;
-            min-height: 720px;
+            width: 100%;
+            min-height: 100vh;
             background: var(--dash-bg);
-            animation: fadeIn 0.25s ease;
+            padding-top: 12px;
+            padding-bottom: 90px; /* যাতে নিচের কনটেন্ট বটম নেভের নিচে না ঢাকা পড়ে */
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.99); } to { opacity: 1; transform: scale(1); } }
         
         .app-body { 
-            padding: 0 11px 4px; 
+            padding: 0 14px 20px; 
             display: flex; 
             flex-direction: column; 
-            gap: 7px;
+            gap: 10px;
+            width: 100%;
+            max-width: 480px; /* বড় স্ক্রিনেও প্রফেশনাল সেন্টার লুক */
+            margin: 0 auto;
         }
         .custom-icon-fill { width: 100%; height: 100%; object-fit: contain; display: block; }
 
         /* Header */
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 2px 2px 2px; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 4px 2px 6px; }
         .brand { display: flex; align-items: center; gap: 8px; }
         .brand-logo-box {
-            width: 36px;
-            height: 36px;
+            width: 38px;
+            height: 38px;
             border-radius: 12px;
             overflow: hidden;
             background: #ffffff;
@@ -144,12 +154,12 @@
             padding: 2px;
         }
         .brand-logo-img { width: 100%; height: 100%; object-fit: contain; }
-        .brand-title h1 { font-size: 18px; font-weight: 900; color: #0c4a6e; letter-spacing: -0.4px; line-height: 1.1; }
+        .brand-title h1 { font-size: 19px; font-weight: 900; color: #0c4a6e; letter-spacing: -0.4px; line-height: 1.1; }
         .brand-title h1 span { color: #0284c7; }
-        .brand-title p { font-size: 9px; color: #047857; font-weight: 700; margin-top: -1px; }
+        .brand-title p { font-size: 9.5px; color: #047857; font-weight: 700; margin-top: -1px; }
         
-        .header-actions { display: flex; align-items: center; gap: 12px; }
-        .notif-btn { position: relative; color: #0369a1; font-size: 20px; cursor: pointer; padding: 3px; }
+        .header-actions { display: flex; align-items: center; gap: 14px; }
+        .notif-btn { position: relative; color: #0369a1; font-size: 21px; cursor: pointer; padding: 2px; }
         .notif-badge { 
             position: absolute; 
             top: -4px; 
@@ -169,15 +179,15 @@
         }
         .profile-btn { display: flex; align-items: center; gap: 5px; cursor: pointer; }
         .profile-avatar {
-            width: 35px;
-            height: 35px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             background: linear-gradient(135deg, #0284c7, #10b981);
             color: #fff;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 15px;
+            font-size: 16px;
             border: 2px solid #ffffff;
             box-shadow: 0 4px 10px rgba(2, 132, 199, 0.25);
         }
@@ -185,21 +195,21 @@
         /* 3D Balance Card */
         .balance-card {
             background: linear-gradient(135deg, #0284c7 0%, #0d9488 55%, #059669 100%);
-            border-radius: 20px;
-            padding: 12px 14px 10px;
+            border-radius: 22px;
+            padding: 14px 15px 12px;
             box-shadow: 0 8px 22px rgba(13, 148, 136, 0.28), inset 0 1px 1px rgba(255, 255, 255, 0.4);
             border: 1px solid rgba(255, 255, 255, 0.35);
             color: #ffffff;
             display: flex;
             flex-direction: column;
-            gap: 9px;
+            gap: 10px;
         }
 
         .balance-top-row { display: flex; justify-content: space-between; align-items: center; width: 100%; }
         .balance-left-content { display: flex; align-items: center; gap: 10px; }
         .wallet-circle-3d {
-            width: 42px;
-            height: 42px;
+            width: 44px;
+            height: 44px;
             border-radius: 14px;
             background: rgba(255, 255, 255, 0.22);
             backdrop-filter: blur(8px);
@@ -213,32 +223,32 @@
         }
         
         .balance-text-group { display: flex; flex-direction: column; gap: 2px; line-height: 1.2; }
-        .balance-label-line { display: flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 700; color: #ccfbf1; text-transform: uppercase; letter-spacing: 0.3px; }
-        .eye-toggle-btn { cursor: pointer; color: #99f6e4; font-size: 11px; }
-        .balance-amount-line { font-size: 21px; font-weight: 900; color: #ffffff; letter-spacing: -0.4px; white-space: nowrap; line-height: 1.15; margin: 1px 0; }
-        .balance-bdt-line { font-size: 10px; font-weight: 700; color: #d1fae5; letter-spacing: 0.2px; }
+        .balance-label-line { display: flex; align-items: center; gap: 5px; font-size: 10.5px; font-weight: 700; color: #ccfbf1; text-transform: uppercase; letter-spacing: 0.3px; }
+        .eye-toggle-btn { cursor: pointer; color: #99f6e4; font-size: 12px; }
+        .balance-amount-line { font-size: 22px; font-weight: 900; color: #ffffff; letter-spacing: -0.4px; white-space: nowrap; line-height: 1.15; margin: 1px 0; }
+        .balance-bdt-line { font-size: 10.5px; font-weight: 700; color: #d1fae5; letter-spacing: 0.2px; }
 
         .user-meta-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
-        .user-name-text { font-size: 13px; font-weight: 850; color: #ffffff; max-width: 110px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; }
-        .uid-chip-3d { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 800; color: #ffffff; background: rgba(0, 0, 0, 0.25); border: 1px solid rgba(255, 255, 255, 0.35); padding: 2px 8px; border-radius: 16px; cursor: pointer; }
+        .user-name-text { font-size: 13.5px; font-weight: 850; color: #ffffff; max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; }
+        .uid-chip-3d { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 800; color: #ffffff; background: rgba(0, 0, 0, 0.25); border: 1px solid rgba(255, 255, 255, 0.35); padding: 3px 9px; border-radius: 16px; cursor: pointer; }
 
         /* 3-Column Sub Stats Grid */
         .balance-sub-stats-grid {
             display: grid;
             grid-template-columns: 1fr 1fr 1.1fr;
-            gap: 5px;
+            gap: 6px;
             background: rgba(0, 0, 0, 0.22);
             border-radius: 14px;
             padding: 6px;
             border: 1px solid rgba(255, 255, 255, 0.15);
         }
-        .sub-stat-box { display: flex; align-items: center; gap: 5px; min-width: 0; background: rgba(255, 255, 255, 0.08); border-radius: 10px; padding: 5px 6px; }
+        .sub-stat-box { display: flex; align-items: center; gap: 6px; min-width: 0; background: rgba(255, 255, 255, 0.08); border-radius: 10px; padding: 6px 6px; }
         .sub-stat-mini-icon { width: 24px; height: 24px; border-radius: 7px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 11px; color: #fff; }
         .sub-stat-mini-icon.green-glow { background: #10b981; }
         .sub-stat-mini-icon.blue-glow { background: #0284c7; }
         .sub-stat-labels { display: flex; flex-direction: column; justify-content: center; line-height: 1.2; min-width: 0; overflow: hidden; }
-        .sub-stat-labels span { font-size: 7.5px; color: #ccfbf1; font-weight: 700; text-transform: uppercase; margin-bottom: 1px; }
-        .sub-stat-labels strong { font-size: 10px; color: #ffffff; font-weight: 850; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .sub-stat-labels span { font-size: 8px; color: #ccfbf1; font-weight: 700; text-transform: uppercase; margin-bottom: 1px; }
+        .sub-stat-labels strong { font-size: 10.5px; color: #ffffff; font-weight: 850; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         .verify-badge-pill { display: flex; align-items: center; gap: 5px; min-width: 0; background: rgba(239, 68, 68, 0.25); border: 1px solid #f87171; border-radius: 10px; padding: 5px 6px; cursor: pointer; }
         .verify-badge-pill.verified { background: rgba(16, 185, 129, 0.25); border-color: #34d399; }
@@ -253,20 +263,20 @@
         .actions-wide-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 8px;
+            gap: 10px;
             width: 100%;
-            margin: 1px 0;
+            margin: 2px 0;
         }
 
         .action-wide-card {
-            border-radius: 16px;
-            padding: 6px 12px;
+            border-radius: 18px;
+            padding: 8px 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 9px;
             cursor: pointer;
-            height: 52px;
+            height: 56px;
             transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
         .action-wide-card:active { transform: scale(0.96); }
@@ -284,15 +294,15 @@
         }
 
         .action-wide-card img {
-            width: 36px;
-            height: 36px;
+            width: 38px;
+            height: 38px;
             object-fit: contain;
             filter: drop-shadow(0 3px 6px rgba(0,0,0,0.1));
             flex-shrink: 0;
         }
 
         .action-wide-card span {
-            font-size: 14px;
+            font-size: 14.5px;
             font-weight: 850;
             letter-spacing: -0.2px;
         }
@@ -304,42 +314,42 @@
         .task-card-3d { 
             background: var(--card-3d); 
             border: 1.5px solid var(--card-border); 
-            border-radius: 17px; 
-            padding: 9px 11px; 
+            border-radius: 18px; 
+            padding: 10px 12px; 
             box-shadow: var(--shadow-3d); 
         }
         .task-row-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; }
-        .task-left-meta { display: flex; align-items: center; gap: 9px; min-width: 0; flex: 1; }
-        .task-symbol-3d { width: 34px; height: 34px; border-radius: 11px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 14px; flex-shrink: 0; }
+        .task-left-meta { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; }
+        .task-symbol-3d { width: 36px; height: 36px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 15px; flex-shrink: 0; }
         .task-symbol-3d.cyan { background: linear-gradient(135deg, #0284c7, #0d9488); }
         .task-symbol-3d.purple { background: linear-gradient(135deg, #8b5cf6, #6366f1); }
         .task-symbol-3d.telegram-blue { background: linear-gradient(135deg, #0088cc, #0284c7); }
         
         .task-text { display: flex; flex-direction: column; justify-content: center; min-width: 0; line-height: 1.25; overflow: hidden; }
-        .task-text h4 { font-size: 12.5px; font-weight: 800; color: #0c4a6e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .task-text p { font-size: 9px; color: #64748b; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
+        .task-text h4 { font-size: 13px; font-weight: 800; color: #0c4a6e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .task-text p { font-size: 9.5px; color: #64748b; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
         
-        .task-pill { display: inline-flex; align-items: center; gap: 3px; padding: 3px 8px; border-radius: 18px; font-size: 10px; font-weight: 800; white-space: nowrap; margin-left: auto; cursor: pointer; flex-shrink: 0; }
+        .task-pill { display: inline-flex; align-items: center; gap: 4px; padding: 4px 9px; border-radius: 18px; font-size: 10.5px; font-weight: 800; white-space: nowrap; margin-left: auto; cursor: pointer; flex-shrink: 0; }
         .task-pill.green-pill { background: #dcfce7; color: #047857; border: 1px solid #86efac; }
         .task-pill.blue-pill { background: #e0f2fe; color: #0369a1; border: 1px solid #7dd3fc; }
         .task-pill.claimed-pill { background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; }
 
-        .video-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 7px; }
-        .video-card-3d { background: #ffffff; border: 1.5px solid #d0e7f5; border-radius: 13px; padding: 6px 3px 5px; display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; }
+        .video-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; margin-top: 8px; }
+        .video-card-3d { background: #ffffff; border: 1.5px solid #d0e7f5; border-radius: 14px; padding: 7px 4px 6px; display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; }
         .video-card-3d:active { transform: scale(0.95); }
-        .video-icon { width: 28px; height: 28px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #fff; }
+        .video-icon { width: 30px; height: 30px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 15px; color: #fff; }
         .video-icon.yt { background: #ff0000; }
         .video-icon.fb { background: #1877f2; }
         .video-icon.ig { background: linear-gradient(45deg, #f09433, #dc2743, #bc1888); }
         .video-icon.tiktok { background: #000000; }
-        .video-card-3d span { font-size: 9px; color: #0f172a; font-weight: 750; margin-top: 1px; }
-        .video-card-3d small { font-size: 8px; color: #059669; font-weight: 850; }
+        .video-card-3d span { font-size: 9.5px; color: #0f172a; font-weight: 750; margin-top: 1px; }
+        .video-card-3d small { font-size: 8.5px; color: #059669; font-weight: 850; }
 
-        /* ================= PROMO BANNER (সম্পূর্ণ ছবি নিখুঁতভাবে দেখাবে) ================= */
+        /* PROMO BANNER (Full width & height auto responsive) */
         .promo-banner-container { 
             position: relative; 
             width: 100%; 
-            height: 135px; /* যথেষ্ট উচ্চতা যাতে সম্পূর্ণ ব্যানার পরিষ্কার দেখায় */
+            height: 145px; 
             border-radius: 18px; 
             overflow: hidden; 
             background: #08192e; 
@@ -348,8 +358,6 @@
         }
         .promo-slider-track { display: flex; height: 100%; width: 100%; transition: transform 0.4s ease; }
         .promo-slide { min-width: 100%; height: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        
-        /* ছবি যত বড়ই হোক পুরোটা ফ্রেমের ভেতর ফিট হয়ে দেখাবে */
         .promo-slide img { 
             width: 100%; 
             height: 100%; 
@@ -357,17 +365,17 @@
             display: block; 
         }
 
-        .promo-dots { position: absolute; bottom: 6px; right: 10px; display: flex; gap: 4px; z-index: 5; background: rgba(0, 0, 0, 0.55); padding: 2px 6px; border-radius: 10px; }
+        .promo-dots { position: absolute; bottom: 7px; right: 12px; display: flex; gap: 4px; z-index: 5; background: rgba(0, 0, 0, 0.55); padding: 2px 6px; border-radius: 10px; }
         .promo-dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255, 255, 255, 0.5); }
         .promo-dot.active { width: 14px; border-radius: 4px; background: #00d2ff; }
 
-        /* ================= 3D BOTTOM NAV ================= */
+        /* ================= 3D BOTTOM NAV (FIXED AT SCREEN BOTTOM) ================= */
         .bottom-nav {
-            position: absolute;
+            position: fixed; /* স্ক্রিনের নিচে লক হয়ে থাকবে */
             bottom: 0;
             left: 0;
             width: 100%;
-            height: 66px;
+            height: 68px;
             background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(16px);
             border-top: 1.5px solid #d4ebf8;
@@ -375,8 +383,8 @@
             justify-content: space-around;
             align-items: center;
             padding: 4px 6px;
-            z-index: 50;
-            box-shadow: 0 -8px 24px rgba(12, 74, 110, 0.08);
+            z-index: 1000;
+            box-shadow: 0 -8px 24px rgba(12, 74, 110, 0.1);
         }
 
         .nav-link {
@@ -413,7 +421,6 @@
 
         .nav-link:active .nav-icon-wrap { transform: scale(0.88); }
 
-        /* 1. Home */
         .nav-link.home-tab.active { color: #0284c7; }
         .nav-link.home-tab.active .nav-icon-wrap {
             background: #e0f2fe;
@@ -421,7 +428,6 @@
             box-shadow: 0 3px 10px rgba(2, 132, 199, 0.22);
         }
 
-        /* 2. Lucky (গিফট বক্স আইকন) */
         .nav-link.lucky-tab { color: #d97706; }
         .nav-link.lucky-tab .nav-icon-wrap {
             color: #f59e0b;
@@ -430,11 +436,10 @@
             box-shadow: 0 3px 8px rgba(245, 158, 11, 0.22);
         }
 
-        /* 3. Center Support 3D Button */
-        .nav-link.center-support { position: relative; top: -12px; flex: 1.1; }
+        .nav-link.center-support { position: relative; top: -14px; flex: 1.1; }
         .center-bubble-3d {
-            width: 52px;
-            height: 52px;
+            width: 54px;
+            height: 54px;
             border-radius: 50%;
             background: linear-gradient(145deg, #ffffff, #f0f9ff);
             display: flex;
@@ -448,9 +453,8 @@
         }
         .center-bubble-3d:active { transform: scale(0.90); }
         .center-bubble-img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
-        .center-support-text { font-size: 10px; font-weight: 900; color: #0284c7; margin-top: 1px; letter-spacing: 0.2px; }
+        .center-support-text { font-size: 10.5px; font-weight: 900; color: #0284c7; margin-top: 1px; letter-spacing: 0.2px; }
 
-        /* 4. History */
         .nav-link.history-tab { color: #0284c7; }
         .nav-link.history-tab .nav-icon-wrap {
             color: #0284c7;
@@ -458,7 +462,6 @@
             box-shadow: 0 3px 8px rgba(2, 132, 199, 0.15);
         }
 
-        /* 5. Refer (মাইক / প্রচারের মেগাফোন আইকন) */
         .nav-link.refer-tab { color: #059669; }
         .nav-link.refer-tab .nav-icon-wrap {
             color: #10b981;
@@ -466,7 +469,7 @@
             box-shadow: 0 3px 8px rgba(16, 185, 129, 0.18);
         }
 
-        /* ================= BKASH-STYLE NOTIFICATIONS MODAL ================= */
+        /* Notifications Modal */
         .notif-modal-overlay {
             position: fixed;
             inset: 0;
@@ -482,8 +485,8 @@
             background: #ffffff;
             border-radius: 28px 28px 0 0;
             width: 100%;
-            max-width: 410px;
-            max-height: 85%;
+            max-width: 480px;
+            max-height: 85vh;
             display: flex;
             flex-direction: column;
             animation: sheetUp 0.25s ease;
@@ -506,7 +509,7 @@
             flex-direction: column;
             gap: 10px;
             padding: 12px 0 8px;
-            max-height: 400px;
+            max-height: 420px;
         }
         .notif-item {
             display: flex;
@@ -733,7 +736,7 @@
             </div>
         </div>
 
-        <!-- 2. MAIN 3D DASHBOARD -->
+        <!-- 2. MAIN 3D DASHBOARD (FULLSCREEN SCROLLABLE) -->
         <div id="mainDashboard" class="main-dashboard">
             <div class="app-body">
                 
@@ -782,7 +785,7 @@
                             <span class="user-name-text" id="dashboardUserName">User</span>
                             <div class="uid-chip-3d" onclick="copyUID()" title="Click to copy UID">
                                 <span id="uidText">UID: 000000</span>
-                                <i class="fa-regular fa-copy" style="font-size:9px;"></i>
+                                <i class="fa-regular fa-copy" style="font-size:9.5px;"></i>
                             </div>
                         </div>
                     </div>
@@ -913,7 +916,7 @@
                     </div>
                 </div>
 
-                <!-- ================= PROMO BANNER SLIDER (সম্পূর্ণ ছবি নিখুঁতভাবে দেখাবে) ================= -->
+                <!-- Promo Banner -->
                 <div class="promo-banner-container">
                     <div class="promo-slider-track" id="promoSliderTrack"></div>
                     <div class="promo-dots" id="promoDots"></div>
@@ -921,7 +924,7 @@
 
             </div>
 
-            <!-- ================= MODERN 3D BOTTOM NAV ================= -->
+            <!-- ================= FIXED BOTTOM NAV ================= -->
             <nav class="bottom-nav">
                 <!-- 1. Home -->
                 <div class="nav-link home-tab active" onclick="window.location.href='index.html'">
@@ -931,7 +934,7 @@
                     <span>Home</span>
                 </div>
                 
-                <!-- 2. Lucky (গিফট বক্স আইকন) -->
+                <!-- 2. Lucky -->
                 <div class="nav-link lucky-tab" onclick="window.location.href='lucky.html'">
                     <div class="nav-icon-wrap">
                         <i class="fa-solid fa-gift"></i>
@@ -939,7 +942,7 @@
                     <span>Lucky</span>
                 </div>
                 
-                <!-- 3. Support (সেন্ট্রাল ৩ডি বাটন) -->
+                <!-- 3. Support -->
                 <div class="nav-link center-support" onclick="window.location.href='support.html'">
                     <div class="center-bubble-3d">
                         <img src="https://i.ibb.co.com/DHMB6J4S/file-00000000a6888211aa5b662731e1ff68.png" alt="Support" class="center-bubble-img">
@@ -955,7 +958,7 @@
                     <span>History</span>
                 </div>
 
-                <!-- 5. Refer (মাইক / প্রচারের মেগাফোন আইকন) -->
+                <!-- 5. Refer -->
                 <div class="nav-link refer-tab" onclick="window.location.href='refer.html'">
                     <div class="nav-icon-wrap">
                         <i class="fa-solid fa-bullhorn"></i>
@@ -967,7 +970,7 @@
 
     </div>
 
-    <!-- ================= BKASH-STYLE NOTIFICATIONS MODAL ================= -->
+    <!-- Notifications Modal -->
     <div class="notif-modal-overlay" id="notifModal">
         <div class="notif-modal-card">
             <div class="notif-header">
@@ -993,7 +996,7 @@
             <h3>Account Verification</h3>
             <span class="verify-fee-pill">ফি মাত্র: ৫০ টাকা</span>
             <p>আপনার অ্যাকাউন্টটি নিরাপদ রাখতে এবং টাস্ক পূরণ ও উইথড্র অপশন আনলক করতে ৫০ টাকা দিয়ে অ্যাকাউন্ট ভেরিফাই সম্পন্ন করুন।</p>
-            <div style="display:flex; flex-direction:column; gap:7px;">
+            <div style="display:flex; flex-direction:column; gap:8px;">
                 <button type="button" class="btn-verify-now" onclick="processAccountVerification()">
                     <i class="fa-solid fa-circle-check"></i> এখনই ভেরিফাই করুন (৫০৳)
                 </button>
