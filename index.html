@@ -4,15 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>MicroTask — Earn & Grow</title>
-    <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
-    <!-- Google Fonts & FontAwesome 6 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-    <!-- Firebase SDK (Compat Version) -->
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -30,25 +28,21 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
         
-        /* সম্পূর্ণ স্ক্রিন জুড়ে আসল অ্যাপের মতো ডিসপ্লে */
+        /* মসৃণ মোবাইল স্ক্রোল নিশ্চিতকরণ */
         html, body { 
             width: 100%; 
-            min-height: 100vh; 
+            min-height: 100%; 
             background: #f0f9ff; 
             color: #0f172a; 
             overflow-x: hidden; 
+            overflow-y: auto !important; /* স্ক্রোল আনলক */
+            -webkit-overflow-scrolling: touch;
         }
 
         .phone {
             width: 100%;
-            min-height: 100vh;
-            background: #ffffff;
-            border: none;
-            border-radius: 0;
-            box-shadow: none;
             position: relative;
-            display: flex;
-            flex-direction: column;
+            background: transparent;
         }
 
         /* 1. AUTH SCREEN */
@@ -112,36 +106,31 @@
         .social-circle.google { color: #4285f4; }
         .social-circle.facebook { color: #1877f2; font-family: Arial, sans-serif; font-size: 21px; }
 
-        /* ================= 2. DASHBOARD (FULLSCREEN & SMOOTH SCROLL) ================= */
+        /* ================= 2. DASHBOARD (NATURAL DOCUMENT SCROLL) ================= */
         .main-dashboard {
             display: none;
-            flex-direction: column;
             width: 100%;
-            min-height: 100vh;
-            background: var(--dash-bg);
-            padding-top: 12px;
-            padding-bottom: 90px; /* যাতে নিচের কনটেন্ট বটম নেভের নিচে না ঢাকা পড়ে */
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
+            padding-top: 8px;
+            padding-bottom: 95px; /* বটম নেভের জন্য পর্যাপ্ত ক্লিয়ারেন্স */
         }
         
         .app-body { 
-            padding: 0 14px 20px; 
+            padding: 0 12px; 
             display: flex; 
             flex-direction: column; 
-            gap: 10px;
+            gap: 8px; /* অতিরিক্ত উচ্চতা কমানো হলো */
             width: 100%;
-            max-width: 480px; /* বড় স্ক্রিনেও প্রফেশনাল সেন্টার লুক */
+            max-width: 480px; 
             margin: 0 auto;
         }
         .custom-icon-fill { width: 100%; height: 100%; object-fit: contain; display: block; }
 
         /* Header */
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 4px 2px 6px; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 2px 2px 4px; }
         .brand { display: flex; align-items: center; gap: 8px; }
         .brand-logo-box {
-            width: 38px;
-            height: 38px;
+            width: 36px;
+            height: 36px;
             border-radius: 12px;
             overflow: hidden;
             background: #ffffff;
@@ -154,9 +143,9 @@
             padding: 2px;
         }
         .brand-logo-img { width: 100%; height: 100%; object-fit: contain; }
-        .brand-title h1 { font-size: 19px; font-weight: 900; color: #0c4a6e; letter-spacing: -0.4px; line-height: 1.1; }
+        .brand-title h1 { font-size: 18px; font-weight: 900; color: #0c4a6e; letter-spacing: -0.4px; line-height: 1.1; }
         .brand-title h1 span { color: #0284c7; }
-        .brand-title p { font-size: 9.5px; color: #047857; font-weight: 700; margin-top: -1px; }
+        .brand-title p { font-size: 9px; color: #047857; font-weight: 700; margin-top: -1px; }
         
         .header-actions { display: flex; align-items: center; gap: 14px; }
         .notif-btn { position: relative; color: #0369a1; font-size: 21px; cursor: pointer; padding: 2px; }
@@ -179,15 +168,15 @@
         }
         .profile-btn { display: flex; align-items: center; gap: 5px; cursor: pointer; }
         .profile-avatar {
-            width: 36px;
-            height: 36px;
+            width: 35px;
+            height: 35px;
             border-radius: 50%;
             background: linear-gradient(135deg, #0284c7, #10b981);
             color: #fff;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
+            font-size: 15px;
             border: 2px solid #ffffff;
             box-shadow: 0 4px 10px rgba(2, 132, 199, 0.25);
         }
@@ -195,88 +184,88 @@
         /* 3D Balance Card */
         .balance-card {
             background: linear-gradient(135deg, #0284c7 0%, #0d9488 55%, #059669 100%);
-            border-radius: 22px;
-            padding: 14px 15px 12px;
-            box-shadow: 0 8px 22px rgba(13, 148, 136, 0.28), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+            border-radius: 20px;
+            padding: 12px 14px 10px;
+            box-shadow: 0 6px 18px rgba(13, 148, 136, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.4);
             border: 1px solid rgba(255, 255, 255, 0.35);
             color: #ffffff;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
 
         .balance-top-row { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-        .balance-left-content { display: flex; align-items: center; gap: 10px; }
+        .balance-left-content { display: flex; align-items: center; gap: 9px; }
         .wallet-circle-3d {
-            width: 44px;
-            height: 44px;
-            border-radius: 14px;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
             background: rgba(255, 255, 255, 0.22);
             backdrop-filter: blur(8px);
             display: flex;
             align-items: center;
             justify-content: center;
             border: 1.5px solid rgba(255, 255, 255, 0.45);
-            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.12);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
             flex-shrink: 0;
-            padding: 6px;
+            padding: 5px;
         }
         
-        .balance-text-group { display: flex; flex-direction: column; gap: 2px; line-height: 1.2; }
-        .balance-label-line { display: flex; align-items: center; gap: 5px; font-size: 10.5px; font-weight: 700; color: #ccfbf1; text-transform: uppercase; letter-spacing: 0.3px; }
-        .eye-toggle-btn { cursor: pointer; color: #99f6e4; font-size: 12px; }
-        .balance-amount-line { font-size: 22px; font-weight: 900; color: #ffffff; letter-spacing: -0.4px; white-space: nowrap; line-height: 1.15; margin: 1px 0; }
-        .balance-bdt-line { font-size: 10.5px; font-weight: 700; color: #d1fae5; letter-spacing: 0.2px; }
+        .balance-text-group { display: flex; flex-direction: column; gap: 1px; line-height: 1.15; }
+        .balance-label-line { display: flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 700; color: #ccfbf1; text-transform: uppercase; letter-spacing: 0.3px; }
+        .eye-toggle-btn { cursor: pointer; color: #99f6e4; font-size: 11px; }
+        .balance-amount-line { font-size: 21px; font-weight: 900; color: #ffffff; letter-spacing: -0.4px; white-space: nowrap; line-height: 1.15; margin: 1px 0; }
+        .balance-bdt-line { font-size: 10px; font-weight: 700; color: #d1fae5; letter-spacing: 0.2px; }
 
-        .user-meta-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
-        .user-name-text { font-size: 13.5px; font-weight: 850; color: #ffffff; max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; }
-        .uid-chip-3d { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 800; color: #ffffff; background: rgba(0, 0, 0, 0.25); border: 1px solid rgba(255, 255, 255, 0.35); padding: 3px 9px; border-radius: 16px; cursor: pointer; }
+        .user-meta-right { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
+        .user-name-text { font-size: 13px; font-weight: 850; color: #ffffff; max-width: 110px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; }
+        .uid-chip-3d { display: inline-flex; align-items: center; gap: 4px; font-size: 9.5px; font-weight: 800; color: #ffffff; background: rgba(0, 0, 0, 0.25); border: 1px solid rgba(255, 255, 255, 0.35); padding: 2px 7px; border-radius: 14px; cursor: pointer; }
 
         /* 3-Column Sub Stats Grid */
         .balance-sub-stats-grid {
             display: grid;
             grid-template-columns: 1fr 1fr 1.1fr;
-            gap: 6px;
+            gap: 5px;
             background: rgba(0, 0, 0, 0.22);
-            border-radius: 14px;
-            padding: 6px;
+            border-radius: 12px;
+            padding: 5px;
             border: 1px solid rgba(255, 255, 255, 0.15);
         }
-        .sub-stat-box { display: flex; align-items: center; gap: 6px; min-width: 0; background: rgba(255, 255, 255, 0.08); border-radius: 10px; padding: 6px 6px; }
-        .sub-stat-mini-icon { width: 24px; height: 24px; border-radius: 7px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 11px; color: #fff; }
+        .sub-stat-box { display: flex; align-items: center; gap: 5px; min-width: 0; background: rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 5px; }
+        .sub-stat-mini-icon { width: 22px; height: 22px; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 10px; color: #fff; }
         .sub-stat-mini-icon.green-glow { background: #10b981; }
         .sub-stat-mini-icon.blue-glow { background: #0284c7; }
         .sub-stat-labels { display: flex; flex-direction: column; justify-content: center; line-height: 1.2; min-width: 0; overflow: hidden; }
-        .sub-stat-labels span { font-size: 8px; color: #ccfbf1; font-weight: 700; text-transform: uppercase; margin-bottom: 1px; }
-        .sub-stat-labels strong { font-size: 10.5px; color: #ffffff; font-weight: 850; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .sub-stat-labels span { font-size: 7.5px; color: #ccfbf1; font-weight: 700; text-transform: uppercase; }
+        .sub-stat-labels strong { font-size: 10px; color: #ffffff; font-weight: 850; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        .verify-badge-pill { display: flex; align-items: center; gap: 5px; min-width: 0; background: rgba(239, 68, 68, 0.25); border: 1px solid #f87171; border-radius: 10px; padding: 5px 6px; cursor: pointer; }
+        .verify-badge-pill { display: flex; align-items: center; gap: 5px; min-width: 0; background: rgba(239, 68, 68, 0.25); border: 1px solid #f87171; border-radius: 8px; padding: 4px 5px; cursor: pointer; }
         .verify-badge-pill.verified { background: rgba(16, 185, 129, 0.25); border-color: #34d399; }
-        .verify-pill-icon { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9.5px; color: #ffffff; flex-shrink: 0; background: #ef4444; }
+        .verify-pill-icon { width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; color: #ffffff; flex-shrink: 0; background: #ef4444; }
         .verify-badge-pill.verified .verify-pill-icon { background: #10b981; }
         .verify-pill-text { display: flex; flex-direction: column; justify-content: center; line-height: 1.15; min-width: 0; }
-        .verify-pill-text span { font-size: 7.5px; font-weight: 700; color: #fecaca; text-transform: uppercase; }
+        .verify-pill-text span { font-size: 7px; font-weight: 700; color: #fecaca; text-transform: uppercase; }
         .verify-badge-pill.verified .verify-pill-text span { color: #a7f3d0; }
-        .verify-pill-text strong { font-size: 9.5px; font-weight: 850; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .verify-pill-text strong { font-size: 9px; font-weight: 850; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         /* Actions Grid */
         .actions-wide-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
+            gap: 8px;
             width: 100%;
-            margin: 2px 0;
+            margin: 1px 0;
         }
 
         .action-wide-card {
-            border-radius: 18px;
-            padding: 8px 14px;
+            border-radius: 16px;
+            padding: 6px 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 9px;
+            gap: 8px;
             cursor: pointer;
-            height: 56px;
+            height: 50px;
             transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
         .action-wide-card:active { transform: scale(0.96); }
@@ -284,107 +273,96 @@
         .action-wide-card.deposit-card {
             background: linear-gradient(145deg, #ffffff, #ecfdf5);
             border: 1.5px solid #a7f3d0;
-            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.16), inset 0 1px 1px #ffffff;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15), inset 0 1px 1px #ffffff;
         }
 
         .action-wide-card.withdraw-card {
             background: linear-gradient(145deg, #ffffff, #f0f9ff);
             border: 1.5px solid #bae6fd;
-            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.16), inset 0 1px 1px #ffffff;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.15), inset 0 1px 1px #ffffff;
         }
 
         .action-wide-card img {
-            width: 38px;
-            height: 38px;
+            width: 34px;
+            height: 34px;
             object-fit: contain;
-            filter: drop-shadow(0 3px 6px rgba(0,0,0,0.1));
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
             flex-shrink: 0;
         }
 
-        .action-wide-card span {
-            font-size: 14.5px;
-            font-weight: 850;
-            letter-spacing: -0.2px;
-        }
-
+        .action-wide-card span { font-size: 14px; font-weight: 850; letter-spacing: -0.2px; }
         .action-wide-card.deposit-card span { color: #047857; }
         .action-wide-card.withdraw-card span { color: #0369a1; }
 
-        /* 3D Task Cards */
+        /* 3D Task Cards (Compact Height) */
         .task-card-3d { 
             background: var(--card-3d); 
             border: 1.5px solid var(--card-border); 
-            border-radius: 18px; 
-            padding: 10px 12px; 
+            border-radius: 16px; 
+            padding: 9px 11px; 
             box-shadow: var(--shadow-3d); 
         }
         .task-row-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; }
-        .task-left-meta { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; }
-        .task-symbol-3d { width: 36px; height: 36px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 15px; flex-shrink: 0; }
+        .task-left-meta { display: flex; align-items: center; gap: 9px; min-width: 0; flex: 1; }
+        .task-symbol-3d { width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 14px; flex-shrink: 0; }
         .task-symbol-3d.cyan { background: linear-gradient(135deg, #0284c7, #0d9488); }
         .task-symbol-3d.purple { background: linear-gradient(135deg, #8b5cf6, #6366f1); }
         .task-symbol-3d.telegram-blue { background: linear-gradient(135deg, #0088cc, #0284c7); }
         
         .task-text { display: flex; flex-direction: column; justify-content: center; min-width: 0; line-height: 1.25; overflow: hidden; }
-        .task-text h4 { font-size: 13px; font-weight: 800; color: #0c4a6e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .task-text p { font-size: 9.5px; color: #64748b; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
+        .task-text h4 { font-size: 12.5px; font-weight: 800; color: #0c4a6e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .task-text p { font-size: 9px; color: #64748b; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
         
-        .task-pill { display: inline-flex; align-items: center; gap: 4px; padding: 4px 9px; border-radius: 18px; font-size: 10.5px; font-weight: 800; white-space: nowrap; margin-left: auto; cursor: pointer; flex-shrink: 0; }
+        .task-pill { display: inline-flex; align-items: center; gap: 3px; padding: 3px 8px; border-radius: 16px; font-size: 10px; font-weight: 800; white-space: nowrap; margin-left: auto; cursor: pointer; flex-shrink: 0; }
         .task-pill.green-pill { background: #dcfce7; color: #047857; border: 1px solid #86efac; }
         .task-pill.blue-pill { background: #e0f2fe; color: #0369a1; border: 1px solid #7dd3fc; }
         .task-pill.claimed-pill { background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; }
 
-        .video-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; margin-top: 8px; }
-        .video-card-3d { background: #ffffff; border: 1.5px solid #d0e7f5; border-radius: 14px; padding: 7px 4px 6px; display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; }
+        .video-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 6px; }
+        .video-card-3d { background: #ffffff; border: 1.5px solid #d0e7f5; border-radius: 12px; padding: 6px 3px 5px; display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; }
         .video-card-3d:active { transform: scale(0.95); }
-        .video-icon { width: 30px; height: 30px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 15px; color: #fff; }
+        .video-icon { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #fff; }
         .video-icon.yt { background: #ff0000; }
         .video-icon.fb { background: #1877f2; }
         .video-icon.ig { background: linear-gradient(45deg, #f09433, #dc2743, #bc1888); }
         .video-icon.tiktok { background: #000000; }
-        .video-card-3d span { font-size: 9.5px; color: #0f172a; font-weight: 750; margin-top: 1px; }
-        .video-card-3d small { font-size: 8.5px; color: #059669; font-weight: 850; }
+        .video-card-3d span { font-size: 9px; color: #0f172a; font-weight: 750; margin-top: 1px; }
+        .video-card-3d small { font-size: 8px; color: #059669; font-weight: 850; }
 
-        /* PROMO BANNER (Full width & height auto responsive) */
+        /* PROMO BANNER */
         .promo-banner-container { 
             position: relative; 
             width: 100%; 
-            height: 145px; 
-            border-radius: 18px; 
+            height: 130px; 
+            border-radius: 16px; 
             overflow: hidden; 
             background: #08192e; 
             border: 2px solid #bae6fd; 
-            box-shadow: 0 6px 18px rgba(2, 132, 199, 0.18); 
+            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.15); 
         }
         .promo-slider-track { display: flex; height: 100%; width: 100%; transition: transform 0.4s ease; }
         .promo-slide { min-width: 100%; height: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .promo-slide img { 
-            width: 100%; 
-            height: 100%; 
-            object-fit: fill; 
-            display: block; 
-        }
-
-        .promo-dots { position: absolute; bottom: 7px; right: 12px; display: flex; gap: 4px; z-index: 5; background: rgba(0, 0, 0, 0.55); padding: 2px 6px; border-radius: 10px; }
+        .promo-slide img { width: 100%; height: 100%; object-fit: fill; display: block; }
+        .promo-dots { position: absolute; bottom: 6px; right: 10px; display: flex; gap: 4px; z-index: 5; background: rgba(0, 0, 0, 0.55); padding: 2px 6px; border-radius: 10px; }
         .promo-dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255, 255, 255, 0.5); }
         .promo-dot.active { width: 14px; border-radius: 4px; background: #00d2ff; }
 
-        /* ================= 3D BOTTOM NAV (FIXED AT SCREEN BOTTOM) ================= */
+        /* FIXED BOTTOM NAV */
         .bottom-nav {
-            position: fixed; /* স্ক্রিনের নিচে লক হয়ে থাকবে */
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 68px;
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(16px);
-            border-top: 1.5px solid #d4ebf8;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            padding: 4px 6px;
-            z-index: 1000;
-            box-shadow: 0 -8px 24px rgba(12, 74, 110, 0.1);
+            position: fixed; 
+            bottom: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 64px; 
+            background: rgba(255, 255, 255, 0.98); 
+            backdrop-filter: blur(16px); 
+            border-top: 1.5px solid #d4ebf8; 
+            display: flex; 
+            justify-content: space-around; 
+            align-items: center; 
+            padding: 3px 6px; 
+            z-index: 1000; 
+            box-shadow: 0 -8px 20px rgba(12, 74, 110, 0.1); 
         }
 
         .nav-link {
@@ -399,192 +377,79 @@
             transition: all 0.22s ease;
             position: relative;
             flex: 1;
-            padding: 3px 0;
+            padding: 2px 0;
         }
 
         .nav-icon-wrap {
-            width: 40px;
-            height: 32px;
-            border-radius: 12px;
+            width: 38px;
+            height: 30px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 21px;
+            font-size: 20px;
             transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        .nav-link span {
-            font-size: 10px;
-            font-weight: 800;
-            letter-spacing: 0.1px;
-        }
-
+        .nav-link span { font-size: 9.5px; font-weight: 800; }
         .nav-link:active .nav-icon-wrap { transform: scale(0.88); }
 
         .nav-link.home-tab.active { color: #0284c7; }
-        .nav-link.home-tab.active .nav-icon-wrap {
-            background: #e0f2fe;
-            color: #0284c7;
-            box-shadow: 0 3px 10px rgba(2, 132, 199, 0.22);
-        }
+        .nav-link.home-tab.active .nav-icon-wrap { background: #e0f2fe; color: #0284c7; box-shadow: 0 3px 8px rgba(2, 132, 199, 0.2); }
 
         .nav-link.lucky-tab { color: #d97706; }
-        .nav-link.lucky-tab .nav-icon-wrap {
-            color: #f59e0b;
-            background: linear-gradient(135deg, #fef3c7, #fef9c3);
-            border: 1px solid #fde68a;
-            box-shadow: 0 3px 8px rgba(245, 158, 11, 0.22);
-        }
+        .nav-link.lucky-tab .nav-icon-wrap { color: #f59e0b; background: linear-gradient(135deg, #fef3c7, #fef9c3); border: 1px solid #fde68a; }
 
-        .nav-link.center-support { position: relative; top: -14px; flex: 1.1; }
+        .nav-link.center-support { position: relative; top: -12px; flex: 1.1; }
         .center-bubble-3d {
-            width: 54px;
-            height: 54px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             background: linear-gradient(145deg, #ffffff, #f0f9ff);
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 3px solid #0284c7;
-            box-shadow: 0 8px 20px rgba(2, 132, 199, 0.38), inset 0 2px 2px #fff;
+            border: 2.5px solid #0284c7;
+            box-shadow: 0 6px 18px rgba(2, 132, 199, 0.35), inset 0 2px 2px #fff;
             padding: 3px;
             overflow: hidden;
             transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
         .center-bubble-3d:active { transform: scale(0.90); }
         .center-bubble-img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
-        .center-support-text { font-size: 10.5px; font-weight: 900; color: #0284c7; margin-top: 1px; letter-spacing: 0.2px; }
+        .center-support-text { font-size: 9.5px; font-weight: 900; color: #0284c7; margin-top: 1px; }
 
         .nav-link.history-tab { color: #0284c7; }
-        .nav-link.history-tab .nav-icon-wrap {
-            color: #0284c7;
-            background: #f0f9ff;
-            box-shadow: 0 3px 8px rgba(2, 132, 199, 0.15);
-        }
+        .nav-link.history-tab .nav-icon-wrap { color: #0284c7; background: #f0f9ff; }
 
         .nav-link.refer-tab { color: #059669; }
-        .nav-link.refer-tab .nav-icon-wrap {
-            color: #10b981;
-            background: #ecfdf5;
-            box-shadow: 0 3px 8px rgba(16, 185, 129, 0.18);
-        }
-
-        /* Notifications Modal */
-        .notif-modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(15, 23, 42, 0.65);
-            backdrop-filter: blur(5px);
-            z-index: 2200;
-            display: none;
-            align-items: flex-end;
-            justify-content: center;
-        }
-        .notif-modal-overlay.active { display: flex; }
-        .notif-modal-card {
-            background: #ffffff;
-            border-radius: 28px 28px 0 0;
-            width: 100%;
-            max-width: 480px;
-            max-height: 85vh;
-            display: flex;
-            flex-direction: column;
-            animation: sheetUp 0.25s ease;
-            box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.2);
-            padding: 16px 16px 24px;
-        }
-        .notif-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding-bottom: 12px;
-            border-bottom: 1.5px solid #f1f5f9;
-        }
-        .notif-header h3 { font-size: 17px; font-weight: 850; color: #0f172a; display: flex; align-items: center; gap: 8px; }
-        .notif-header h3 i { color: #0284c7; }
-        .notif-close-btn { background: #f1f5f9; border: none; width: 30px; height: 30px; border-radius: 50%; font-size: 15px; color: #64748b; cursor: pointer; }
-        .notif-list {
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            padding: 12px 0 8px;
-            max-height: 420px;
-        }
-        .notif-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            padding: 11px 13px;
-            border-radius: 16px;
-            position: relative;
-        }
-        .notif-item.unread {
-            background: #f0f9ff;
-            border-color: #bae6fd;
-        }
-        .notif-item-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 12px;
-            background: linear-gradient(135deg, #0284c7, #0d9488);
-            color: #ffffff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-            flex-shrink: 0;
-        }
-        .notif-item-body { flex: 1; min-width: 0; }
-        .notif-item-title { font-size: 13px; font-weight: 800; color: #0f172a; margin-bottom: 2px; }
-        .notif-item-desc { font-size: 11px; color: #475569; line-height: 1.4; word-break: break-word; }
-        .notif-item-time { font-size: 9px; color: #94a3b8; font-weight: 700; margin-top: 4px; }
-        .notif-empty { text-align: center; padding: 30px 10px; color: #94a3b8; font-size: 12px; font-weight: 700; }
-        .notif-empty i { font-size: 38px; color: #cbd5e1; margin-bottom: 8px; display: block; }
+        .nav-link.refer-tab .nav-icon-wrap { color: #10b981; background: #ecfdf5; }
 
         /* 50 BDT Modal */
         .verify-modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(6px); z-index: 2100; display: none; align-items: center; justify-content: center; padding: 18px; }
         .verify-modal-overlay.active { display: flex; }
-        .verify-modal-card { background: #ffffff; border-radius: 26px; width: 100%; max-width: 320px; padding: 22px 18px 20px; text-align: center; position: relative; animation: sheetUp 0.25s ease; box-shadow: 0 20px 45px rgba(0,0,0,0.25); }
-        .verify-close-btn { position: absolute; top: 12px; right: 14px; background: #f1f5f9; border: none; width: 28px; height: 28px; border-radius: 50%; font-size: 15px; color: #64748b; cursor: pointer; }
-        .verify-badge-large { width: 58px; height: 58px; border-radius: 50%; background: linear-gradient(135deg, #f59e0b, #d97706); color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 26px; margin: 0 auto 12px; }
-        .verify-modal-card h3 { font-size: 17px; font-weight: 850; color: #0f172a; margin-bottom: 5px; }
-        .verify-fee-pill { display: inline-block; background: #fef3c7; border: 1px solid #fde68a; color: #b45309; font-size: 11.5px; font-weight: 800; padding: 3px 11px; border-radius: 20px; margin-bottom: 10px; }
-        .verify-modal-card p { font-size: 11.5px; color: #64748b; line-height: 1.45; margin-bottom: 18px; }
-        .btn-verify-now { width: 100%; padding: 12px; border-radius: 15px; border: none; background: linear-gradient(135deg, #10b981, #059669); color: #ffffff; font-size: 13.5px; font-weight: 800; cursor: pointer; margin-bottom: 7px; }
-        .btn-verify-later { width: 100%; padding: 9px; border-radius: 13px; border: 1px solid #cbd5e1; background: transparent; color: #64748b; font-size: 11.5px; font-weight: 700; cursor: pointer; }
+        .verify-modal-card { background: #ffffff; border-radius: 24px; width: 100%; max-width: 320px; padding: 20px 16px; text-align: center; position: relative; animation: sheetUp 0.25s ease; box-shadow: 0 20px 45px rgba(0,0,0,0.25); }
+        .verify-close-btn { position: absolute; top: 12px; right: 14px; background: #f1f5f9; border: none; width: 26px; height: 26px; border-radius: 50%; font-size: 14px; color: #64748b; cursor: pointer; }
+        .verify-badge-large { width: 54px; height: 54px; border-radius: 50%; background: linear-gradient(135deg, #f59e0b, #d97706); color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 10px; }
+        .verify-modal-card h3 { font-size: 16px; font-weight: 850; color: #0f172a; margin-bottom: 4px; }
+        .verify-fee-pill { display: inline-block; background: #fef3c7; border: 1px solid #fde68a; color: #b45309; font-size: 11px; font-weight: 800; padding: 2px 10px; border-radius: 16px; margin-bottom: 8px; }
+        .verify-modal-card p { font-size: 11px; color: #64748b; line-height: 1.4; margin-bottom: 16px; }
+        .btn-verify-now { width: 100%; padding: 11px; border-radius: 14px; border: none; background: linear-gradient(135deg, #10b981, #059669); color: #ffffff; font-size: 13px; font-weight: 800; cursor: pointer; margin-bottom: 6px; }
+        .btn-verify-later { width: 100%; padding: 8px; border-radius: 12px; border: 1px solid #cbd5e1; background: transparent; color: #64748b; font-size: 11px; font-weight: 700; cursor: pointer; }
 
         /* Logout Modal */
         .logout-modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(5px); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 20px; }
         .logout-modal-overlay.active { display: flex; }
-        .logout-modal-card { background: #ffffff; border-radius: 22px; width: 100%; max-width: 310px; padding: 22px 18px 18px; text-align: center; }
-        .logout-icon-box { width: 52px; height: 52px; border-radius: 50%; background: #fee2e2; color: #ef4444; display: flex; align-items: center; justify-content: center; font-size: 22px; margin: 0 auto 12px; }
-        .logout-modal-card h3 { font-size: 16px; font-weight: 800; color: #0f172a; margin-bottom: 5px; }
-        .logout-modal-card p { font-size: 11.5px; color: #64748b; margin-bottom: 18px; }
-        .logout-actions { display: flex; gap: 9px; }
-        .btn-cancel-logout { flex: 1; padding: 10px; border-radius: 13px; border: 1px solid #cbd5e1; background: #f8fafc; font-weight: 700; cursor: pointer; }
-        .btn-confirm-logout { flex: 1; padding: 10px; border-radius: 13px; border: none; background: #ef4444; color: #fff; font-weight: 700; cursor: pointer; }
+        .logout-modal-card { background: #ffffff; border-radius: 20px; width: 100%; max-width: 300px; padding: 20px 16px; text-align: center; }
+        .logout-icon-box { width: 48px; height: 48px; border-radius: 50%; background: #fee2e2; color: #ef4444; display: flex; align-items: center; justify-content: center; font-size: 20px; margin: 0 auto 10px; }
+        .logout-modal-card h3 { font-size: 15px; font-weight: 800; color: #0f172a; margin-bottom: 4px; }
+        .logout-modal-card p { font-size: 11px; color: #64748b; margin-bottom: 16px; }
+        .logout-actions { display: flex; gap: 8px; }
+        .btn-cancel-logout { flex: 1; padding: 9px; border-radius: 12px; border: 1px solid #cbd5e1; background: #f8fafc; font-weight: 700; font-size: 12px; cursor: pointer; }
+        .btn-confirm-logout { flex: 1; padding: 9px; border-radius: 12px; border: none; background: #ef4444; color: #fff; font-weight: 700; font-size: 12px; cursor: pointer; }
 
         /* Toast Alert */
-        .toast { 
-            position: fixed; 
-            bottom: 24px; 
-            left: 50%; 
-            transform: translateX(-50%) translateY(100px); 
-            background: #0f172a; 
-            color: #FFF; 
-            padding: 8px 14px; 
-            border-radius: 25px; 
-            font-size: 11.5px; 
-            font-weight: 600; 
-            transition: all 0.3s ease; 
-            z-index: 2500; 
-            opacity: 0; 
-            white-space: nowrap; 
-            box-shadow: 0 8px 20px rgba(0,0,0,0.25);
-        }
+        .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); background: #0f172a; color: #FFF; padding: 8px 14px; border-radius: 25px; font-size: 11.5px; font-weight: 600; transition: all 0.3s ease; z-index: 2500; opacity: 0; white-space: nowrap; box-shadow: 0 8px 20px rgba(0,0,0,0.25); }
         .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
         .toast.success i { color: #10B981; }
         .toast.error i { color: #EF4444; }
@@ -619,13 +484,12 @@
                 </p>
             </main>
 
-            <!-- Slide-up Form Sheet -->
+            <!-- Sheet -->
             <div class="sheet" id="sheet" onclick="if(event.target===this)closeSheet()">
                 <section class="panel">
                     <div class="handle"></div>
                     <button class="close-btn-sheet" onclick="closeSheet()">×</button>
                     
-                    <!-- Register Form -->
                     <div id="registerView">
                         <h2>Create your account</h2>
                         <p class="sub">Enter your details to get started</p>
@@ -639,7 +503,6 @@
                                 <label for="regIdentity">Email Address or Gmail</label>
                                 <input id="regIdentity" type="email" placeholder="name@gmail.com" autocomplete="username" required>
                             </div>
-                            
                             <div class="field">
                                 <label for="regPassword">Password</label>
                                 <div class="input-wrap">
@@ -649,7 +512,6 @@
                                     </button>
                                 </div>
                             </div>
-                            
                             <div class="field">
                                 <label for="regConfirm">Confirm password</label>
                                 <div class="input-wrap">
@@ -659,14 +521,12 @@
                                     </button>
                                 </div>
                             </div>
-                            
                             <div class="row-between">
                                 <label class="check"><input type="checkbox" id="termsAgree" required> I agree to the Terms</label>
                             </div>
                             <div class="message" id="regMessage"></div>
                             <button class="auth-btn primary" id="regSubmitBtn" type="submit" style="margin-top:10px;">Create Account</button>
                         </form>
-                        
                         <div class="social-bottom">
                             <span>Or continue with</span>
                             <div class="social-icons">
@@ -674,11 +534,9 @@
                                 <button type="button" class="social-circle facebook" onclick="handleSocialAuth('Facebook')" title="Sign in with Facebook">f</button>
                             </div>
                         </div>
-
                         <p class="switch">Already have an account? <span class="auth-link" onclick="showView('login')">Sign In</span></p>
                     </div>
 
-                    <!-- Login Form -->
                     <div id="loginView" style="display:none">
                         <h2>Welcome back</h2>
                         <p class="sub">Sign in to continue to your account</p>
@@ -688,7 +546,6 @@
                                 <label for="loginIdentity">Email Address</label>
                                 <input id="loginIdentity" type="email" placeholder="name@gmail.com" autocomplete="username" required>
                             </div>
-                            
                             <div class="field">
                                 <label for="loginPassword">Password</label>
                                 <div class="input-wrap">
@@ -698,7 +555,6 @@
                                     </button>
                                 </div>
                             </div>
-                            
                             <div class="row-between">
                                 <label class="check"><input type="checkbox" checked> Remember me</label>
                                 <span class="auth-link" onclick="showView('forgot')">Forgot password?</span>
@@ -706,7 +562,6 @@
                             <div class="message" id="loginMessage"></div>
                             <button class="auth-btn primary" id="loginSubmitBtn" type="submit" style="margin-top:10px;">Sign In</button>
                         </form>
-
                         <div class="social-bottom">
                             <span>Or continue with</span>
                             <div class="social-icons">
@@ -714,11 +569,9 @@
                                 <button type="button" class="social-circle facebook" onclick="handleSocialAuth('Facebook')" title="Sign in with Facebook">f</button>
                             </div>
                         </div>
-
                         <p class="switch">New here? <span class="auth-link" onclick="showView('register')">Create Account</span></p>
                     </div>
 
-                    <!-- Forgot Password -->
                     <div id="forgotView" style="display:none">
                         <h2>Reset password</h2>
                         <p class="sub">Enter your registered email address</p>
@@ -736,7 +589,7 @@
             </div>
         </div>
 
-        <!-- 2. MAIN 3D DASHBOARD (FULLSCREEN SCROLLABLE) -->
+        <!-- 2. MAIN 3D DASHBOARD (NATURAL SCROLL) -->
         <div id="mainDashboard" class="main-dashboard">
             <div class="app-body">
                 
@@ -752,7 +605,8 @@
                         </div>
                     </div>
                     <div class="header-actions">
-                        <div class="notif-btn" onclick="openNotifModal()" title="Notifications">
+                        <!-- notifications.html এ সরাসরি লিঙ্ক -->
+                        <div class="notif-btn" onclick="window.location.href='notifications.html'" title="Notifications">
                             <i class="fa-regular fa-bell"></i>
                             <span class="notif-badge" id="notifBadgeCount">0</span>
                         </div>
@@ -785,7 +639,7 @@
                             <span class="user-name-text" id="dashboardUserName">User</span>
                             <div class="uid-chip-3d" onclick="copyUID()" title="Click to copy UID">
                                 <span id="uidText">UID: 000000</span>
-                                <i class="fa-regular fa-copy" style="font-size:9.5px;"></i>
+                                <i class="fa-regular fa-copy" style="font-size:9px;"></i>
                             </div>
                         </div>
                     </div>
@@ -924,25 +778,18 @@
 
             </div>
 
-            <!-- ================= FIXED BOTTOM NAV ================= -->
+            <!-- FIXED BOTTOM NAV -->
             <nav class="bottom-nav">
-                <!-- 1. Home -->
                 <div class="nav-link home-tab active" onclick="window.location.href='index.html'">
-                    <div class="nav-icon-wrap">
-                        <i class="fa-solid fa-house-chimney"></i>
-                    </div>
+                    <div class="nav-icon-wrap"><i class="fa-solid fa-house-chimney"></i></div>
                     <span>Home</span>
                 </div>
                 
-                <!-- 2. Lucky -->
                 <div class="nav-link lucky-tab" onclick="window.location.href='lucky.html'">
-                    <div class="nav-icon-wrap">
-                        <i class="fa-solid fa-gift"></i>
-                    </div>
+                    <div class="nav-icon-wrap"><i class="fa-solid fa-gift"></i></div>
                     <span>Lucky</span>
                 </div>
                 
-                <!-- 3. Support -->
                 <div class="nav-link center-support" onclick="window.location.href='support.html'">
                     <div class="center-bubble-3d">
                         <img src="https://i.ibb.co.com/DHMB6J4S/file-00000000a6888211aa5b662731e1ff68.png" alt="Support" class="center-bubble-img">
@@ -950,19 +797,13 @@
                     <span class="center-support-text">Support</span>
                 </div>
 
-                <!-- 4. History -->
                 <div class="nav-link history-tab" onclick="window.location.href='history.html'">
-                    <div class="nav-icon-wrap">
-                        <i class="fa-solid fa-clock-rotate-left"></i>
-                    </div>
+                    <div class="nav-icon-wrap"><i class="fa-solid fa-clock-rotate-left"></i></div>
                     <span>History</span>
                 </div>
 
-                <!-- 5. Refer -->
                 <div class="nav-link refer-tab" onclick="window.location.href='refer.html'">
-                    <div class="nav-icon-wrap">
-                        <i class="fa-solid fa-bullhorn"></i>
-                    </div>
+                    <div class="nav-icon-wrap"><i class="fa-solid fa-bullhorn"></i></div>
                     <span>Refer</span>
                 </div>
             </nav>
@@ -970,33 +811,15 @@
 
     </div>
 
-    <!-- Notifications Modal -->
-    <div class="notif-modal-overlay" id="notifModal">
-        <div class="notif-modal-card">
-            <div class="notif-header">
-                <h3><i class="fa-solid fa-bell"></i> নোটিফিকেশন</h3>
-                <button type="button" class="notif-close-btn" onclick="closeNotifModal()">✕</button>
-            </div>
-            <div class="notif-list" id="notifListContainer">
-                <div class="notif-empty">
-                    <i class="fa-regular fa-bell-slash"></i>
-                    কোনো নতুন নোটিফিকেশন নেই!
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 50 BDT Verification Modal -->
+    <!-- 50 BDT Modal -->
     <div class="verify-modal-overlay" id="verificationModal">
         <div class="verify-modal-card">
             <button type="button" class="verify-close-btn" onclick="closeVerifyModal()">✕</button>
-            <div class="verify-badge-large">
-                <i class="fa-solid fa-shield-halved"></i>
-            </div>
+            <div class="verify-badge-large"><i class="fa-solid fa-shield-halved"></i></div>
             <h3>Account Verification</h3>
             <span class="verify-fee-pill">ফি মাত্র: ৫০ টাকা</span>
             <p>আপনার অ্যাকাউন্টটি নিরাপদ রাখতে এবং টাস্ক পূরণ ও উইথড্র অপশন আনলক করতে ৫০ টাকা দিয়ে অ্যাকাউন্ট ভেরিফাই সম্পন্ন করুন।</p>
-            <div style="display:flex; flex-direction:column; gap:8px;">
+            <div style="display:flex; flex-direction:column; gap:6px;">
                 <button type="button" class="btn-verify-now" onclick="processAccountVerification()">
                     <i class="fa-solid fa-circle-check"></i> এখনই ভেরিফাই করুন (৫০৳)
                 </button>
@@ -1008,9 +831,7 @@
     <!-- Logout Modal -->
     <div class="logout-modal-overlay" id="logoutModal">
         <div class="logout-modal-card">
-            <div class="logout-icon-box">
-                <i class="fa-solid fa-arrow-right-from-bracket"></i>
-            </div>
+            <div class="logout-icon-box"><i class="fa-solid fa-arrow-right-from-bracket"></i></div>
             <h3>লগআউট নিশ্চিত করুন</h3>
             <p>আপনি কি সত্যিই আপনার অ্যাকাউন্ট থেকে লগআউট করতে চান?</p>
             <div class="logout-actions">
@@ -1046,7 +867,6 @@
 
         let currentUserDoc = null;
         let isBalanceHidden = false;
-        let allNotifications = [];
 
         function getTodayString() {
             const d = new Date();
@@ -1060,7 +880,7 @@
             const cachedUser = JSON.parse(localStorage.getItem('microtask_cached_user'));
             if (cachedUser && cachedUser.uid) {
                 document.getElementById('authScreen').style.display = 'none';
-                document.getElementById('mainDashboard').style.display = 'flex';
+                document.getElementById('mainDashboard').style.display = 'block';
                 document.getElementById('dashboardUserName').innerText = cachedUser.name || 'User';
                 document.getElementById('uidText').innerText = `UID: ${cachedUser.uid || '000000'}`;
                 
@@ -1109,9 +929,7 @@
             updateBalanceDisplay();
         }
 
-        function isUserVerified() {
-            return currentUserDoc && currentUserDoc.isVerified === true;
-        }
+        function isUserVerified() { return currentUserDoc && currentUserDoc.isVerified === true; }
 
         function updateVerificationUI() {
             const wrapper = document.getElementById('verifyPillWrapper');
@@ -1136,9 +954,7 @@
             document.getElementById('verificationModal').classList.add('active');
         }
 
-        function closeVerifyModal() {
-            document.getElementById('verificationModal').classList.remove('active');
-        }
+        function closeVerifyModal() { document.getElementById('verificationModal').classList.remove('active'); }
 
         function handleSecureNav(destinationUrl) {
             if (!isUserVerified()) {
@@ -1156,30 +972,19 @@
         function processAccountVerification() {
             const user = auth.currentUser;
             if (!user) return;
-
-            db.collection("users").doc(user.uid).update({
-                isVerified: true
-            }).then(() => {
+            db.collection("users").doc(user.uid).update({ isVerified: true })
+            .then(() => {
                 closeVerifyModal();
                 showToast("অ্যাকাউন্ট ভেরিফাইড!", "success");
-            }).catch(err => {
-                showToast("ত্রুটি হয়েছে!", "error");
-            });
+            }).catch(err => showToast("ত্রুটি হয়েছে!", "error"));
         }
 
         function copyUID() {
             const uidText = document.getElementById('uidText').innerText.replace(/[^0-9]/g, '').trim();
-            if (!uidText || uidText === "000000") {
-                showToast("প্রথমে লগইন করুন!", "error");
-                return;
-            }
+            if (!uidText || uidText === "000000") { showToast("প্রথমে লগইন করুন!", "error"); return; }
             if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(uidText).then(() => {
-                    showToast("UID কপি হয়েছে: " + uidText, "success");
-                }).catch(() => fallbackCopy(uidText));
-            } else {
-                fallbackCopy(uidText);
-            }
+                navigator.clipboard.writeText(uidText).then(() => showToast("UID কপি হয়েছে: " + uidText, "success")).catch(() => fallbackCopy(uidText));
+            } else { fallbackCopy(uidText); }
         }
 
         function fallbackCopy(text) {
@@ -1190,12 +995,7 @@
             document.body.appendChild(textarea);
             textarea.focus();
             textarea.select();
-            try {
-                document.execCommand('copy');
-                showToast("UID কপি হয়েছে: " + text, "success");
-            } catch (err) {
-                showToast("কপি ব্যর্থ!", "error");
-            }
+            try { document.execCommand('copy'); showToast("UID কপি হয়েছে: " + text, "success"); } catch (err) { showToast("কপি ব্যর্থ!", "error"); }
             document.body.removeChild(textarea);
         }
 
@@ -1214,17 +1014,12 @@
             const todayStr = getTodayString();
             const currentBal = currentUserDoc.balanceUSD || 0;
             const currentTotal = currentUserDoc.totalEarnUSD || 0;
-            
             let currentToday = (currentUserDoc.lastEarnDate === todayStr) ? (currentUserDoc.todayEarnUSD || 0) : 0;
 
-            const updatedBal = currentBal + amountUSD;
-            const updatedToday = currentToday + amountUSD;
-            const updatedTotal = currentTotal + amountUSD;
-
             db.collection("users").doc(user.uid).update({
-                balanceUSD: updatedBal,
-                todayEarnUSD: updatedToday,
-                totalEarnUSD: updatedTotal,
+                balanceUSD: currentBal + amountUSD,
+                todayEarnUSD: currentToday + amountUSD,
+                totalEarnUSD: currentTotal + amountUSD,
                 lastEarnDate: todayStr
             });
         }
@@ -1235,21 +1030,14 @@
                 openVerifyModal();
                 return;
             }
-
             const user = auth.currentUser;
             if (!user) return;
-
-            if (currentUserDoc && currentUserDoc.telegramClaimed) {
-                window.open('https://t.me/OnlineBD77R', '_blank');
-                return;
-            }
+            if (currentUserDoc && currentUserDoc.telegramClaimed) { window.open('https://t.me/OnlineBD77R', '_blank'); return; }
 
             window.open('https://t.me/OnlineBD77R', '_blank');
             setTimeout(() => {
                 addEarningToUser(0.10);
-                db.collection("users").doc(user.uid).update({
-                    telegramClaimed: true
-                }).then(() => {
+                db.collection("users").doc(user.uid).update({ telegramClaimed: true }).then(() => {
                     showToast("$0.10 বোনাস যোগ হয়েছে!", "success");
                 });
             }, 1500);
@@ -1367,12 +1155,10 @@
             if (provider === 'Google') {
                 const googleProvider = new firebase.auth.GoogleAuthProvider();
                 showToast("গুগল সংযোগ হচ্ছে...", "info");
-                
                 auth.signInWithPopup(googleProvider)
                     .then(result => {
                         const user = result.user;
                         const userRef = db.collection("users").doc(user.uid);
-
                         return userRef.get().then(doc => {
                             if (!doc.exists) {
                                 const randomUID = Math.floor(100000 + Math.random() * 900000).toString();
@@ -1389,16 +1175,12 @@
                                     telegramClaimed: false,
                                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                                 };
-
                                 localStorage.setItem('microtask_cached_user', JSON.stringify(userPayload));
                                 return userRef.set(userPayload);
                             }
                         });
                     })
-                    .then(() => {
-                        showToast("লগইন সফল!", "success");
-                        closeSheet();
-                    })
+                    .then(() => { showToast("লগইন সফল!", "success"); closeSheet(); })
                     .catch(error => {
                         if (error.code === 'auth/unauthorized-domain') showToast("ডোমেন পারমিশন দিন!", "error");
                         else if (error.code === 'auth/popup-closed-by-user') showToast("লগইন বাতিল", "info");
@@ -1413,10 +1195,7 @@
             e.preventDefault();
             const email = document.getElementById('forgotIdentity').value.trim();
             auth.sendPasswordResetEmail(email)
-                .then(() => {
-                    showToast('রিসেট লিঙ্ক পাঠানো হয়েছে!', 'success');
-                    showView('login');
-                })
+                .then(() => { showToast('রিসেট লিঙ্ক পাঠানো হয়েছে!', 'success'); showView('login'); })
                 .catch(err => showToast(err.message, 'error'));
         }
 
@@ -1426,19 +1205,14 @@
                 db.collection("users").doc(user.uid).onSnapshot(doc => {
                     if (doc.exists) {
                         currentUserDoc = doc.data();
-                        
                         const todayStr = getTodayString();
                         if (currentUserDoc.lastEarnDate !== todayStr && (currentUserDoc.todayEarnUSD || 0) > 0) {
-                            db.collection("users").doc(user.uid).update({
-                                todayEarnUSD: 0.00,
-                                lastEarnDate: todayStr
-                            });
+                            db.collection("users").doc(user.uid).update({ todayEarnUSD: 0.00, lastEarnDate: todayStr });
                         }
 
                         localStorage.setItem('microtask_cached_user', JSON.stringify(currentUserDoc));
-
                         document.getElementById('authScreen').style.display = 'none';
-                        document.getElementById('mainDashboard').style.display = 'flex';
+                        document.getElementById('mainDashboard').style.display = 'block';
 
                         document.getElementById('dashboardUserName').innerText = currentUserDoc.name || 'User';
                         document.getElementById('uidText').innerText = `UID: ${currentUserDoc.uid || '000000'}`;
@@ -1457,13 +1231,7 @@
         });
 
         // ================= DYNAMIC BANNER SYSTEM =================
-        let promoBanners = [
-            { 
-                id: 'default', 
-                image: "https://i.ibb.co.com/tTLNfcH6/file-000000001c1c82089a7b8b791e5b5e0e.png", 
-                action: "deposit.html" 
-            }
-        ];
+        let promoBanners = [{ id: 'default', image: "https://i.ibb.co.com/tTLNfcH6/file-000000001c1c82089a7b8b791e5b5e0e.png", action: "deposit.html" }];
         let currentBannerIdx = 0;
         let bannerInterval = null;
 
@@ -1474,21 +1242,13 @@
                     snapshot.forEach(doc => {
                         const data = doc.data();
                         if (data.image) {
-                            loadedBanners.push({
-                                id: doc.id,
-                                image: data.image,
-                                action: data.action || 'deposit.html'
-                            });
+                            loadedBanners.push({ id: doc.id, image: data.image, action: data.action || 'deposit.html' });
                         }
                     });
-                    if (loadedBanners.length > 0) {
-                        promoBanners = loadedBanners;
-                    }
+                    if (loadedBanners.length > 0) promoBanners = loadedBanners;
                 }
                 renderDynamicBanners();
-            }, err => {
-                renderDynamicBanners();
-            });
+            }, err => renderDynamicBanners());
         }
 
         function renderDynamicBanners() {
@@ -1514,79 +1274,26 @@
             }
         }
 
-        // ================= NOTIFICATION SYSTEM =================
-        function initNotificationSystem() {
-            db.collection("notifications").orderBy("createdAt", "desc").limit(25).onSnapshot(snapshot => {
-                allNotifications = [];
+        // নোটিফিকেশন কাউন্ট (Unread Count)
+        function initNotificationBadge() {
+            db.collection("notifications").onSnapshot(snapshot => {
+                const readIds = JSON.parse(localStorage.getItem('read_notif_ids') || '[]');
+                let unreadCount = 0;
                 snapshot.forEach(doc => {
-                    allNotifications.push({ id: doc.id, ...doc.data() });
+                    if (!readIds.includes(doc.id)) unreadCount++;
                 });
-                updateNotifBadge();
-            }, err => console.log("Notif error:", err));
-        }
-
-        function getReadNotifIds() {
-            try {
-                return JSON.parse(localStorage.getItem('read_notif_ids')) || [];
-            } catch (e) {
-                return [];
-            }
-        }
-
-        function updateNotifBadge() {
-            const readIds = getReadNotifIds();
-            const unreadCount = allNotifications.filter(n => !readIds.includes(n.id)).length;
-            const badge = document.getElementById('notifBadgeCount');
-            
-            if (unreadCount > 0) {
-                badge.innerText = unreadCount > 9 ? '9+' : unreadCount;
-                badge.style.display = 'flex';
-            } else {
-                badge.style.display = 'none';
-            }
-        }
-
-        function openNotifModal() {
-            const modal = document.getElementById('notifModal');
-            const container = document.getElementById('notifListContainer');
-            modal.classList.add('active');
-
-            if (allNotifications.length === 0) {
-                container.innerHTML = `
-                    <div class="notif-empty">
-                        <i class="fa-regular fa-bell-slash"></i>
-                        কোনো নতুন নোটিফিকেশন নেই!
-                    </div>`;
-            } else {
-                const readIds = getReadNotifIds();
-                container.innerHTML = allNotifications.map(n => {
-                    const isUnread = !readIds.includes(n.id);
-                    return `
-                        <div class="notif-item ${isUnread ? 'unread' : ''}">
-                            <div class="notif-item-icon">
-                                <i class="${n.icon || 'fa-solid fa-bullhorn'}"></i>
-                            </div>
-                            <div class="notif-item-body">
-                                <div class="notif-item-title">${n.title || 'বিজ্ঞপ্তি'}</div>
-                                <div class="notif-item-desc">${n.message || ''}</div>
-                                <div class="notif-item-time">${n.time || 'কিছুক্ষণ আগে'}</div>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-
-                const allIds = allNotifications.map(n => n.id);
-                localStorage.setItem('read_notif_ids', JSON.stringify(allIds));
-                updateNotifBadge();
-            }
-        }
-
-        function closeNotifModal() {
-            document.getElementById('notifModal').classList.remove('active');
+                const badge = document.getElementById('notifBadgeCount');
+                if (unreadCount > 0) {
+                    badge.innerText = unreadCount > 9 ? '9+' : unreadCount;
+                    badge.style.display = 'flex';
+                } else {
+                    badge.style.display = 'none';
+                }
+            });
         }
 
         initBannerSlider();
-        initNotificationSystem();
+        initNotificationBadge();
     </script>
 </body>
 </html>
