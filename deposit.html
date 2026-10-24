@@ -634,7 +634,7 @@
             }
         }
 
-        // ফায়ারবেস এবং ইনস্ট্যান্ট লোকাল হিস্ট্রিতে সেভ
+        // ফায়ারবেস এবং ইনস্ট্যান্ট লোকাল হিস্ট্রিতে সেভ (ড্যাশবোর্ডের ৬ ডিজিট UID ফিক্স সহ)
         function submitFinalTransaction() {
             const trxId = document.getElementById('trxIdInput').value.trim();
             if (!trxId) {
@@ -647,15 +647,16 @@
             btn.disabled = true;
             btn.innerText = "Submitting...";
 
-            const user = auth.currentUser;
+            // ড্যাশবোর্ডের ক্যাশ থেকে ৬ ডিজিটের আসল UID (যেমন: 455115) এবং নাম নেওয়া হচ্ছে
             const cachedUser = JSON.parse(localStorage.getItem('microtask_cached_user')) || {};
-            const uid = user ? user.uid : (cachedUser.uid || 'guest_user');
+            const uid = cachedUser.uid || (auth.currentUser ? auth.currentUser.uid : '000000');
+            const userName = cachedUser.name || 'User';
 
             const now = new Date();
             const dateStr = now.toISOString().split('T')[0];
             const timeStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
 
-            // ১. সাথে সাথে লোকাল হিস্ট্রিতে সেভ করা (যাতে হিস্ট্রিতে সাথে সাথে দৃশ্যমান হয়)
+            // ১. ইনস্ট্যান্ট লোকাল হিস্ট্রিতে সেভ করা
             const localRecord = {
                 title: `${selectedMethod.toUpperCase()} Deposit`,
                 desc: `TrxID: ${trxId}`,
@@ -673,9 +674,10 @@
             localHistory.unshift(localRecord);
             localStorage.setItem('microtask_local_history', JSON.stringify(localHistory));
 
-            // ২. ফায়ারবেস ক্লাউড ডাটাবেসে সেভ
+            // ২. ফায়ারবেস ক্লাউড ডাটাবেসে সেভ (এখন ড্যাশবোর্ডের ৬ ডিজিট UID যাবে)
             db.collection("deposits").add({
-                uid: uid,
+                uid: String(uid).trim(),   // ড্যাশবোর্ডের ৬ ডিজিট UID (যেমন: 455115)
+                userName: userName,        // ইউজারের নাম (MD rakib)
                 method: selectedMethod,
                 amountBDT: currentAmount,
                 trxId: trxId,
