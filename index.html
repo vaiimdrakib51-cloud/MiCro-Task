@@ -4,13 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>MicroTask — Earn & Grow</title>
+    <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
+    <!-- Google Fonts & FontAwesome 6 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-    <!-- Firebase SDK -->
+    <!-- Firebase SDK (Compat Version) -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -28,21 +30,32 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
         
-        /* মসৃণ মোবাইল স্ক্রোল নিশ্চিতকরণ */
-        html, body { 
+        html { 
             width: 100%; 
             min-height: 100%; 
             background: #f0f9ff; 
+            overflow-x: hidden; 
+            overflow-y: scroll;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        body { 
+            width: 100%; 
+            min-height: 100vh; 
+            background: #f0f9ff; 
             color: #0f172a; 
             overflow-x: hidden; 
-            overflow-y: auto !important; /* স্ক্রোল আনলক */
-            -webkit-overflow-scrolling: touch;
+            overflow-y: visible;
+            position: relative;
         }
 
         .phone {
             width: 100%;
+            max-width: 440px;
+            margin: 0 auto;
             position: relative;
             background: transparent;
+            min-height: 100vh;
         }
 
         /* 1. AUTH SCREEN */
@@ -106,31 +119,30 @@
         .social-circle.google { color: #4285f4; }
         .social-circle.facebook { color: #1877f2; font-family: Arial, sans-serif; font-size: 21px; }
 
-        /* ================= 2. DASHBOARD (NATURAL DOCUMENT SCROLL) ================= */
+        /* ================= 2. DASHBOARD ================= */
         .main-dashboard {
             display: none;
             width: 100%;
             padding-top: 8px;
-            padding-bottom: 95px; /* বটম নেভের জন্য পর্যাপ্ত ক্লিয়ারেন্স */
+            padding-bottom: 105px;
         }
         
         .app-body { 
             padding: 0 12px; 
             display: flex; 
             flex-direction: column; 
-            gap: 8px; /* অতিরিক্ত উচ্চতা কমানো হলো */
+            gap: 10px;
             width: 100%;
-            max-width: 480px; 
+            max-width: 440px; 
             margin: 0 auto;
         }
-        .custom-icon-fill { width: 100%; height: 100%; object-fit: contain; display: block; }
 
         /* Header */
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 2px 2px 4px; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 4px 2px 2px; }
         .brand { display: flex; align-items: center; gap: 8px; }
         .brand-logo-box {
-            width: 36px;
-            height: 36px;
+            width: 38px;
+            height: 38px;
             border-radius: 12px;
             overflow: hidden;
             background: #ffffff;
@@ -145,9 +157,9 @@
         .brand-logo-img { width: 100%; height: 100%; object-fit: contain; }
         .brand-title h1 { font-size: 18px; font-weight: 900; color: #0c4a6e; letter-spacing: -0.4px; line-height: 1.1; }
         .brand-title h1 span { color: #0284c7; }
-        .brand-title p { font-size: 9px; color: #047857; font-weight: 700; margin-top: -1px; }
+        .brand-title p { font-size: 9.5px; color: #047857; font-weight: 700; margin-top: -1px; }
         
-        .header-actions { display: flex; align-items: center; gap: 14px; }
+        .header-actions { display: flex; align-items: center; gap: 12px; }
         .notif-btn { position: relative; color: #0369a1; font-size: 21px; cursor: pointer; padding: 2px; }
         .notif-badge { 
             position: absolute; 
@@ -160,7 +172,7 @@
             min-width: 17px; 
             height: 17px; 
             border-radius: 50%; 
-            display: none; 
+            display: flex; 
             align-items: center; 
             justify-content: center; 
             border: 2px solid #ffffff; 
@@ -168,38 +180,40 @@
         }
         .profile-btn { display: flex; align-items: center; gap: 5px; cursor: pointer; }
         .profile-avatar {
-            width: 35px;
-            height: 35px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             background: linear-gradient(135deg, #0284c7, #10b981);
             color: #fff;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 15px;
+            font-size: 16px;
             border: 2px solid #ffffff;
             box-shadow: 0 4px 10px rgba(2, 132, 199, 0.25);
         }
 
-        /* 3D Balance Card */
+        /* 3D Balance Card with New Wallet Icon */
         .balance-card {
             background: linear-gradient(135deg, #0284c7 0%, #0d9488 55%, #059669 100%);
             border-radius: 20px;
-            padding: 12px 14px 10px;
-            box-shadow: 0 6px 18px rgba(13, 148, 136, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+            padding: 13px 15px 11px;
+            box-shadow: 0 8px 20px rgba(13, 148, 136, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.4);
             border: 1px solid rgba(255, 255, 255, 0.35);
             color: #ffffff;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 10px;
         }
 
         .balance-top-row { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-        .balance-left-content { display: flex; align-items: center; gap: 9px; }
+        .balance-left-content { display: flex; align-items: center; gap: 10px; }
+        
+        /* নতুন ওয়ালেট আইকন কন্টেইনার */
         .wallet-circle-3d {
-            width: 40px;
-            height: 40px;
-            border-radius: 12px;
+            width: 46px;
+            height: 46px;
+            border-radius: 14px;
             background: rgba(255, 255, 255, 0.22);
             backdrop-filter: blur(8px);
             display: flex;
@@ -208,40 +222,47 @@
             border: 1.5px solid rgba(255, 255, 255, 0.45);
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
             flex-shrink: 0;
-            padding: 5px;
+            padding: 4px; /* পারফেক্ট ফিটিং এর জন্য */
+            overflow: hidden;
+        }
+        .wallet-circle-3d img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
         }
         
-        .balance-text-group { display: flex; flex-direction: column; gap: 1px; line-height: 1.15; }
-        .balance-label-line { display: flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 700; color: #ccfbf1; text-transform: uppercase; letter-spacing: 0.3px; }
-        .eye-toggle-btn { cursor: pointer; color: #99f6e4; font-size: 11px; }
-        .balance-amount-line { font-size: 21px; font-weight: 900; color: #ffffff; letter-spacing: -0.4px; white-space: nowrap; line-height: 1.15; margin: 1px 0; }
-        .balance-bdt-line { font-size: 10px; font-weight: 700; color: #d1fae5; letter-spacing: 0.2px; }
+        .balance-text-group { display: flex; flex-direction: column; gap: 2px; line-height: 1.2; }
+        .balance-label-line { display: flex; align-items: center; gap: 6px; font-size: 10.5px; font-weight: 700; color: #ccfbf1; text-transform: uppercase; letter-spacing: 0.3px; }
+        .eye-toggle-btn { cursor: pointer; color: #99f6e4; font-size: 12px; }
+        .balance-amount-line { font-size: 22px; font-weight: 900; color: #ffffff; letter-spacing: -0.4px; white-space: nowrap; line-height: 1.15; margin: 1px 0; }
+        .balance-bdt-line { font-size: 10.5px; font-weight: 700; color: #d1fae5; letter-spacing: 0.2px; }
 
-        .user-meta-right { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
-        .user-name-text { font-size: 13px; font-weight: 850; color: #ffffff; max-width: 110px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; }
-        .uid-chip-3d { display: inline-flex; align-items: center; gap: 4px; font-size: 9.5px; font-weight: 800; color: #ffffff; background: rgba(0, 0, 0, 0.25); border: 1px solid rgba(255, 255, 255, 0.35); padding: 2px 7px; border-radius: 14px; cursor: pointer; }
+        .user-meta-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+        .user-name-text { font-size: 13.5px; font-weight: 850; color: #ffffff; max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; }
+        .uid-chip-3d { display: inline-flex; align-items: center; gap: 4px; font-size: 9.5px; font-weight: 800; color: #ffffff; background: rgba(0, 0, 0, 0.25); border: 1px solid rgba(255, 255, 255, 0.35); padding: 2px 8px; border-radius: 14px; cursor: pointer; }
 
         /* 3-Column Sub Stats Grid */
         .balance-sub-stats-grid {
             display: grid;
             grid-template-columns: 1fr 1fr 1.1fr;
-            gap: 5px;
+            gap: 6px;
             background: rgba(0, 0, 0, 0.22);
             border-radius: 12px;
-            padding: 5px;
+            padding: 6px;
             border: 1px solid rgba(255, 255, 255, 0.15);
         }
-        .sub-stat-box { display: flex; align-items: center; gap: 5px; min-width: 0; background: rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 5px; }
-        .sub-stat-mini-icon { width: 22px; height: 22px; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 10px; color: #fff; }
+        .sub-stat-box { display: flex; align-items: center; gap: 6px; min-width: 0; background: rgba(255, 255, 255, 0.08); border-radius: 9px; padding: 5px 6px; }
+        .sub-stat-mini-icon { width: 24px; height: 24px; border-radius: 7px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 11px; color: #fff; }
         .sub-stat-mini-icon.green-glow { background: #10b981; }
         .sub-stat-mini-icon.blue-glow { background: #0284c7; }
         .sub-stat-labels { display: flex; flex-direction: column; justify-content: center; line-height: 1.2; min-width: 0; overflow: hidden; }
         .sub-stat-labels span { font-size: 7.5px; color: #ccfbf1; font-weight: 700; text-transform: uppercase; }
         .sub-stat-labels strong { font-size: 10px; color: #ffffff; font-weight: 850; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        .verify-badge-pill { display: flex; align-items: center; gap: 5px; min-width: 0; background: rgba(239, 68, 68, 0.25); border: 1px solid #f87171; border-radius: 8px; padding: 4px 5px; cursor: pointer; }
+        .verify-badge-pill { display: flex; align-items: center; gap: 5px; min-width: 0; background: rgba(239, 68, 68, 0.25); border: 1px solid #f87171; border-radius: 9px; padding: 5px 6px; cursor: pointer; }
         .verify-badge-pill.verified { background: rgba(16, 185, 129, 0.25); border-color: #34d399; }
-        .verify-pill-icon { width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; color: #ffffff; flex-shrink: 0; background: #ef4444; }
+        .verify-pill-icon { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #ffffff; flex-shrink: 0; background: #ef4444; }
         .verify-badge-pill.verified .verify-pill-icon { background: #10b981; }
         .verify-pill-text { display: flex; flex-direction: column; justify-content: center; line-height: 1.15; min-width: 0; }
         .verify-pill-text span { font-size: 7px; font-weight: 700; color: #fecaca; text-transform: uppercase; }
@@ -252,20 +273,19 @@
         .actions-wide-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 8px;
+            gap: 10px;
             width: 100%;
-            margin: 1px 0;
         }
 
         .action-wide-card {
-            border-radius: 16px;
-            padding: 6px 12px;
+            border-radius: 18px;
+            padding: 8px 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 10px;
             cursor: pointer;
-            height: 50px;
+            height: 54px;
             transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
         .action-wide-card:active { transform: scale(0.96); }
@@ -273,68 +293,81 @@
         .action-wide-card.deposit-card {
             background: linear-gradient(145deg, #ffffff, #ecfdf5);
             border: 1.5px solid #a7f3d0;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15), inset 0 1px 1px #ffffff;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.16), inset 0 1px 1px #ffffff;
         }
 
         .action-wide-card.withdraw-card {
             background: linear-gradient(145deg, #ffffff, #f0f9ff);
             border: 1.5px solid #bae6fd;
-            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.15), inset 0 1px 1px #ffffff;
+            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.16), inset 0 1px 1px #ffffff;
         }
 
         .action-wide-card img {
-            width: 34px;
-            height: 34px;
+            width: 38px;
+            height: 38px;
             object-fit: contain;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.12));
             flex-shrink: 0;
         }
 
-        .action-wide-card span { font-size: 14px; font-weight: 850; letter-spacing: -0.2px; }
+        .action-wide-card span { font-size: 14.5px; font-weight: 850; letter-spacing: -0.2px; }
         .action-wide-card.deposit-card span { color: #047857; }
         .action-wide-card.withdraw-card span { color: #0369a1; }
 
-        /* 3D Task Cards (Compact Height) */
+        /* 3D Task Cards */
         .task-card-3d { 
             background: var(--card-3d); 
             border: 1.5px solid var(--card-border); 
-            border-radius: 16px; 
-            padding: 9px 11px; 
+            border-radius: 18px; 
+            padding: 10px 12px; 
             box-shadow: var(--shadow-3d); 
         }
         .task-row-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; }
         .task-left-meta { display: flex; align-items: center; gap: 9px; min-width: 0; flex: 1; }
-        .task-symbol-3d { width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 14px; flex-shrink: 0; }
+        .task-symbol-3d { width: 36px; height: 36px; border-radius: 11px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 15px; flex-shrink: 0; }
         .task-symbol-3d.cyan { background: linear-gradient(135deg, #0284c7, #0d9488); }
         .task-symbol-3d.purple { background: linear-gradient(135deg, #8b5cf6, #6366f1); }
         .task-symbol-3d.telegram-blue { background: linear-gradient(135deg, #0088cc, #0284c7); }
         
         .task-text { display: flex; flex-direction: column; justify-content: center; min-width: 0; line-height: 1.25; overflow: hidden; }
-        .task-text h4 { font-size: 12.5px; font-weight: 800; color: #0c4a6e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .task-text p { font-size: 9px; color: #64748b; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
+        .task-text h4 { font-size: 13px; font-weight: 800; color: #0c4a6e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .task-text p { font-size: 9.5px; color: #64748b; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
         
-        .task-pill { display: inline-flex; align-items: center; gap: 3px; padding: 3px 8px; border-radius: 16px; font-size: 10px; font-weight: 800; white-space: nowrap; margin-left: auto; cursor: pointer; flex-shrink: 0; }
+        .task-pill { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 16px; font-size: 10.5px; font-weight: 800; white-space: nowrap; margin-left: auto; cursor: pointer; flex-shrink: 0; }
         .task-pill.green-pill { background: #dcfce7; color: #047857; border: 1px solid #86efac; }
         .task-pill.blue-pill { background: #e0f2fe; color: #0369a1; border: 1px solid #7dd3fc; }
         .task-pill.claimed-pill { background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; }
 
-        .video-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 6px; }
-        .video-card-3d { background: #ffffff; border: 1.5px solid #d0e7f5; border-radius: 12px; padding: 6px 3px 5px; display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; }
+        /* 4 Cards: YouTube, Facebook, Instagram, Boost */
+        .video-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; margin-top: 8px; }
+        .video-card-3d { background: #ffffff; border: 1.5px solid #d0e7f5; border-radius: 14px; padding: 8px 3px 6px; display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; }
         .video-card-3d:active { transform: scale(0.95); }
-        .video-icon { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #fff; }
+        .video-icon { width: 32px; height: 32px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 16px; color: #fff; }
         .video-icon.yt { background: #ff0000; }
         .video-icon.fb { background: #1877f2; }
         .video-icon.ig { background: linear-gradient(45deg, #f09433, #dc2743, #bc1888); }
-        .video-icon.tiktok { background: #000000; }
-        .video-card-3d span { font-size: 9px; color: #0f172a; font-weight: 750; margin-top: 1px; }
-        .video-card-3d small { font-size: 8px; color: #059669; font-weight: 850; }
+        
+        /* নতুন Boost আইকন স্টাইল */
+        .video-icon.boost-box { 
+            background: linear-gradient(135deg, #f59e0b, #d97706); 
+            padding: 4px;
+            box-shadow: 0 2px 6px rgba(245, 158, 11, 0.35);
+        }
+        .video-icon.boost-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .video-card-3d span { font-size: 9.5px; color: #0f172a; font-weight: 750; margin-top: 1px; }
+        .video-card-3d small { font-size: 8.5px; color: #059669; font-weight: 850; }
 
         /* PROMO BANNER */
         .promo-banner-container { 
             position: relative; 
             width: 100%; 
-            height: 130px; 
-            border-radius: 16px; 
+            height: 135px; 
+            border-radius: 18px; 
             overflow: hidden; 
             background: #08192e; 
             border: 2px solid #bae6fd; 
@@ -342,27 +375,27 @@
         }
         .promo-slider-track { display: flex; height: 100%; width: 100%; transition: transform 0.4s ease; }
         .promo-slide { min-width: 100%; height: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .promo-slide img { width: 100%; height: 100%; object-fit: fill; display: block; }
+        .promo-slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
         .promo-dots { position: absolute; bottom: 6px; right: 10px; display: flex; gap: 4px; z-index: 5; background: rgba(0, 0, 0, 0.55); padding: 2px 6px; border-radius: 10px; }
         .promo-dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255, 255, 255, 0.5); }
         .promo-dot.active { width: 14px; border-radius: 4px; background: #00d2ff; }
 
-        /* FIXED BOTTOM NAV */
+        /* PROPORTIONAL BOTTOM NAVIGATION */
         .bottom-nav {
             position: fixed; 
             bottom: 0; 
             left: 0; 
             width: 100%; 
-            height: 64px; 
+            height: 68px; 
             background: rgba(255, 255, 255, 0.98); 
             backdrop-filter: blur(16px); 
             border-top: 1.5px solid #d4ebf8; 
             display: flex; 
             justify-content: space-around; 
             align-items: center; 
-            padding: 3px 6px; 
+            padding: 4px 6px 2px; 
             z-index: 1000; 
-            box-shadow: 0 -8px 20px rgba(12, 74, 110, 0.1); 
+            box-shadow: 0 -6px 22px rgba(12, 74, 110, 0.08); 
         }
 
         .nav-link {
@@ -374,50 +407,48 @@
             color: #64748b;
             text-decoration: none;
             cursor: pointer;
-            transition: all 0.22s ease;
-            position: relative;
+            transition: all 0.2s ease;
             flex: 1;
-            padding: 2px 0;
         }
 
         .nav-icon-wrap {
-            width: 38px;
-            height: 30px;
-            border-radius: 10px;
+            width: 44px;
+            height: 32px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
-            transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+            font-size: 21px; 
+            transition: all 0.2s ease;
         }
 
-        .nav-link span { font-size: 9.5px; font-weight: 800; }
-        .nav-link:active .nav-icon-wrap { transform: scale(0.88); }
+        .nav-link span { font-size: 10px; font-weight: 800; }
+        .nav-link:active .nav-icon-wrap { transform: scale(0.90); }
 
         .nav-link.home-tab.active { color: #0284c7; }
-        .nav-link.home-tab.active .nav-icon-wrap { background: #e0f2fe; color: #0284c7; box-shadow: 0 3px 8px rgba(2, 132, 199, 0.2); }
+        .nav-link.home-tab.active .nav-icon-wrap { background: #e0f2fe; color: #0284c7; }
 
         .nav-link.lucky-tab { color: #d97706; }
-        .nav-link.lucky-tab .nav-icon-wrap { color: #f59e0b; background: linear-gradient(135deg, #fef3c7, #fef9c3); border: 1px solid #fde68a; }
+        .nav-link.lucky-tab .nav-icon-wrap { color: #f59e0b; background: #fef3c7; }
 
-        .nav-link.center-support { position: relative; top: -12px; flex: 1.1; }
+        .nav-link.center-support { position: relative; top: -14px; flex: 1.1; }
         .center-bubble-3d {
-            width: 50px;
-            height: 50px;
+            width: 52px;
+            height: 52px;
             border-radius: 50%;
-            background: linear-gradient(145deg, #ffffff, #f0f9ff);
+            background: #ffffff;
             display: flex;
             align-items: center;
             justify-content: center;
             border: 2.5px solid #0284c7;
-            box-shadow: 0 6px 18px rgba(2, 132, 199, 0.35), inset 0 2px 2px #fff;
+            box-shadow: 0 6px 18px rgba(2, 132, 199, 0.38), inset 0 2px 2px #fff;
             padding: 3px;
             overflow: hidden;
-            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: transform 0.2s;
         }
         .center-bubble-3d:active { transform: scale(0.90); }
         .center-bubble-img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
-        .center-support-text { font-size: 9.5px; font-weight: 900; color: #0284c7; margin-top: 1px; }
+        .center-support-text { font-size: 10px; font-weight: 900; color: #0284c7; margin-top: 1px; }
 
         .nav-link.history-tab { color: #0284c7; }
         .nav-link.history-tab .nav-icon-wrap { color: #0284c7; background: #f0f9ff; }
@@ -448,8 +479,8 @@
         .btn-cancel-logout { flex: 1; padding: 9px; border-radius: 12px; border: 1px solid #cbd5e1; background: #f8fafc; font-weight: 700; font-size: 12px; cursor: pointer; }
         .btn-confirm-logout { flex: 1; padding: 9px; border-radius: 12px; border: none; background: #ef4444; color: #fff; font-weight: 700; font-size: 12px; cursor: pointer; }
 
-        /* Toast Alert */
-        .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); background: #0f172a; color: #FFF; padding: 8px 14px; border-radius: 25px; font-size: 11.5px; font-weight: 600; transition: all 0.3s ease; z-index: 2500; opacity: 0; white-space: nowrap; box-shadow: 0 8px 20px rgba(0,0,0,0.25); }
+        /* Toast */
+        .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(100px); background: #0f172a; color: #FFF; padding: 8px 14px; border-radius: 25px; font-size: 11.5px; font-weight: 600; transition: all 0.3s ease; z-index: 2500; opacity: 0; white-space: nowrap; box-shadow: 0 8px 20px rgba(0,0,0,0.25); }
         .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
         .toast.success i { color: #10B981; }
         .toast.error i { color: #EF4444; }
@@ -521,6 +552,15 @@
                                     </button>
                                 </div>
                             </div>
+                            
+                            <!-- রেফার কোড (UID) ইনপুট ফিল্ড -->
+                            <div class="field">
+                                <label for="regReferCode">Referral Code (Optional)</label>
+                                <div class="input-wrap">
+                                    <input id="regReferCode" placeholder="Enter Referrer UID (e.g. 118603)" maxlength="10">
+                                </div>
+                            </div>
+
                             <div class="row-between">
                                 <label class="check"><input type="checkbox" id="termsAgree" required> I agree to the Terms</label>
                             </div>
@@ -589,7 +629,7 @@
             </div>
         </div>
 
-        <!-- 2. MAIN 3D DASHBOARD (NATURAL SCROLL) -->
+        <!-- 2. MAIN 3D DASHBOARD -->
         <div id="mainDashboard" class="main-dashboard">
             <div class="app-body">
                 
@@ -605,7 +645,6 @@
                         </div>
                     </div>
                     <div class="header-actions">
-                        <!-- notifications.html এ সরাসরি লিঙ্ক -->
                         <div class="notif-btn" onclick="window.location.href='notifications.html'" title="Notifications">
                             <i class="fa-regular fa-bell"></i>
                             <span class="notif-badge" id="notifBadgeCount">0</span>
@@ -618,12 +657,13 @@
                     </div>
                 </div>
 
-                <!-- 3D Balance Card -->
+                <!-- 3D Balance Card (নতুন ওয়ালেট আইকনযুক্ত) -->
                 <div class="balance-card">
                     <div class="balance-top-row">
                         <div class="balance-left-content">
+                            <!-- আপনার দেওয়া নতুন সুন্দর ৩ডি ওয়ালেট আইকন -->
                             <div class="wallet-circle-3d">
-                                <img src="https://img.icons8.com/?size=100&id=L0TH_5m8bo5r&format=png&color=ffffff" alt="Wallet" class="custom-icon-fill">
+                                <img src="https://i.ibb.co.com/CpmVs7PB/wallet.png" alt="Wallet">
                             </div>
                             <div class="balance-text-group">
                                 <div class="balance-label-line">
@@ -639,7 +679,7 @@
                             <span class="user-name-text" id="dashboardUserName">User</span>
                             <div class="uid-chip-3d" onclick="copyUID()" title="Click to copy UID">
                                 <span id="uidText">UID: 000000</span>
-                                <i class="fa-regular fa-copy" style="font-size:9px;"></i>
+                                <i class="fa-regular fa-copy" style="font-size:9.5px;"></i>
                             </div>
                         </div>
                     </div>
@@ -677,7 +717,7 @@
                     </div>
                 </div>
 
-                <!-- Actions Grid -->
+                <!-- Actions Grid (Deposit & Withdraw) -->
                 <div class="actions-wide-grid">
                     <div class="action-wide-card deposit-card" onclick="window.location.href='deposit.html'" title="Deposit Money">
                         <img src="https://i.ibb.co.com/kghfWJBN/file-00000000b2dc8211affafc4155f20703.png" alt="Deposit">
@@ -690,7 +730,7 @@
                     </div>
                 </div>
 
-                <!-- 3D Task Card 1: Videos -->
+                <!-- 3D Task Card 1: Videos (TikTok এর জায়গায় Boost যুক্ত) -->
                 <div class="task-card-3d">
                     <div class="task-row-header">
                         <div class="task-left-meta">
@@ -724,9 +764,13 @@
                             <span>Instagram</span>
                             <small>+ Earn</small>
                         </div>
-                        <div class="video-card-3d" onclick="handleSecureNav('tiktok-tasks.html')">
-                            <div class="video-icon tiktok"><i class="fa-brands fa-tiktok"></i></div>
-                            <span>TikTok</span>
+                        
+                        <!-- টিকটকের বদলে নতুন Boost অপশন -->
+                        <div class="video-card-3d" onclick="handleBoostClick()">
+                            <div class="video-icon boost-box">
+                                <img src="https://i.ibb.co.com/S71wYZrD/capital-gain.png" alt="Boost">
+                            </div>
+                            <span>Boost</span>
                             <small>+ Earn</small>
                         </div>
                     </div>
@@ -778,7 +822,7 @@
 
             </div>
 
-            <!-- FIXED BOTTOM NAV -->
+            <!-- PROPORTIONAL BOTTOM NAVIGATION -->
             <nav class="bottom-nav">
                 <div class="nav-link home-tab active" onclick="window.location.href='index.html'">
                     <div class="nav-icon-wrap"><i class="fa-solid fa-house-chimney"></i></div>
@@ -876,6 +920,7 @@
             return `${year}-${month}-${day}`;
         }
 
+        // ইনস্ট্যান্ট সেশন রিস্টোর
         (function restoreSessionInstantly() {
             const cachedUser = JSON.parse(localStorage.getItem('microtask_cached_user'));
             if (cachedUser && cachedUser.uid) {
@@ -894,7 +939,24 @@
                 document.getElementById("todayEarnText").textContent = `$ ${todayEarn.toFixed(2)}`;
                 document.getElementById("totalEarnText").textContent = `$ ${totalEarn.toFixed(2)}`;
             }
+
+            // রেফারেল লিঙ্ক থেকে আসলে অটো-ফিল কোড
+            const urlParams = new URLSearchParams(window.location.search);
+            const refParam = urlParams.get('ref');
+            if (refParam) {
+                const regReferInput = document.getElementById('regReferCode');
+                if (regReferInput) regReferInput.value = refParam;
+            }
         })();
+
+        // গুগল রিডাইরেক্ট রেজাল্ট চেক
+        auth.getRedirectResult().then(result => {
+            if (result && result.user) {
+                handleUserFirestoreSync(result.user, result.user.displayName || 'Google User');
+            }
+        }).catch(err => {
+            console.error("Redirect login error: ", err);
+        });
 
         function toggleInvezoPassword(id, btn) {
             const input = document.getElementById(id);
@@ -967,6 +1029,15 @@
             } else {
                 window.location.href = destinationUrl;
             }
+        }
+
+        function handleBoostClick() {
+            if (!isUserVerified()) {
+                showToast("বুস্ট অপশন পেতে আগে ৫০৳ দিয়ে ভেরিফাই করুন!", "error");
+                openVerifyModal();
+                return;
+            }
+            showToast("বুস্ট ফিচার খুব শীঘ্রই লাইভ হচ্ছে!", "info");
         }
 
         function processAccountVerification() {
@@ -1078,12 +1149,14 @@
             });
         }
 
+        // রেজিস্ট্রেশন হ্যান্ডলার (রেফার কোড সিঙ্কসহ)
         function handleInvezoRegister(e) {
             e.preventDefault();
             const name = document.getElementById('regName').value.trim();
             const email = document.getElementById('regIdentity').value.trim();
             const password = document.getElementById('regPassword').value;
             const confirm = document.getElementById('regConfirm').value;
+            const referCode = document.getElementById('regReferCode').value.trim();
             const msgEl = document.getElementById('regMessage');
             const btn = document.getElementById('regSubmitBtn');
 
@@ -1112,8 +1185,22 @@
                         lastEarnDate: todayStr,
                         isVerified: false,
                         telegramClaimed: false,
+                        referredBy: referCode || null,
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     };
+
+                    // রেফার কোড থাকলে রেফারার ইউজারের রেফারেল কাউন্ট বাড়ানো
+                    if (referCode) {
+                        db.collection("users").where("uid", "==", referCode).get().then(snap => {
+                            if (!snap.empty) {
+                                snap.forEach(rDoc => {
+                                    rDoc.ref.update({
+                                        totalReferrals: firebase.firestore.FieldValue.increment(1)
+                                    });
+                                });
+                            }
+                        });
+                    }
 
                     localStorage.setItem('microtask_cached_user', JSON.stringify(userPayload));
                     return db.collection("users").doc(user.uid).set(userPayload);
@@ -1151,43 +1238,59 @@
                 });
         }
 
+        function handleUserFirestoreSync(user, defaultName) {
+            const userRef = db.collection("users").doc(user.uid);
+            userRef.get().then(doc => {
+                if (!doc.exists) {
+                    const randomUID = Math.floor(100000 + Math.random() * 900000).toString();
+                    const todayStr = getTodayString();
+                    const userPayload = {
+                        name: user.displayName || defaultName || 'User',
+                        email: user.email || '',
+                        uid: randomUID,
+                        balanceUSD: 0.00,
+                        todayEarnUSD: 0.00,
+                        totalEarnUSD: 0.00,
+                        lastEarnDate: todayStr,
+                        isVerified: false,
+                        telegramClaimed: false,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    };
+                    localStorage.setItem('microtask_cached_user', JSON.stringify(userPayload));
+                    userRef.set(userPayload).then(() => {
+                        showToast("লগইন সফল!", "success");
+                        closeSheet();
+                    });
+                } else {
+                    showToast("লগইন সফল!", "success");
+                    closeSheet();
+                }
+            });
+        }
+
         function handleSocialAuth(provider) {
             if (provider === 'Google') {
                 const googleProvider = new firebase.auth.GoogleAuthProvider();
                 showToast("গুগল সংযোগ হচ্ছে...", "info");
+                
                 auth.signInWithPopup(googleProvider)
                     .then(result => {
-                        const user = result.user;
-                        const userRef = db.collection("users").doc(user.uid);
-                        return userRef.get().then(doc => {
-                            if (!doc.exists) {
-                                const randomUID = Math.floor(100000 + Math.random() * 900000).toString();
-                                const todayStr = getTodayString();
-                                const userPayload = {
-                                    name: user.displayName || 'Google User',
-                                    email: user.email,
-                                    uid: randomUID,
-                                    balanceUSD: 0.00,
-                                    todayEarnUSD: 0.00,
-                                    totalEarnUSD: 0.00,
-                                    lastEarnDate: todayStr,
-                                    isVerified: false,
-                                    telegramClaimed: false,
-                                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                                };
-                                localStorage.setItem('microtask_cached_user', JSON.stringify(userPayload));
-                                return userRef.set(userPayload);
-                            }
-                        });
+                        handleUserFirestoreSync(result.user, 'Google User');
                     })
-                    .then(() => { showToast("লগইন সফল!", "success"); closeSheet(); })
                     .catch(error => {
-                        if (error.code === 'auth/unauthorized-domain') showToast("ডোমেন পারমিশন দিন!", "error");
-                        else if (error.code === 'auth/popup-closed-by-user') showToast("লগইন বাতিল", "info");
-                        else showToast("লগইন ব্যর্থ!", "error");
+                        console.warn("Popup blocked or failed, trying redirect: ", error);
+                        if (error.code === 'auth/popup-blocked' || error.code === 'auth/operation-not-supported-in-this-environment') {
+                            auth.signInWithRedirect(googleProvider);
+                        } else if (error.code === 'auth/unauthorized-domain') {
+                            showToast("ফায়ারবেসে ডোমেন পারমিশন দিতে হবে!", "error");
+                        } else if (error.code === 'auth/popup-closed-by-user') {
+                            showToast("লগইন বাতিল", "info");
+                        } else {
+                            showToast("লগইন ব্যর্থ!", "error");
+                        }
                     });
             } else if (provider === 'Facebook') {
-                showToast("ফেসবুক শীঘ্রই আসছে!", "info");
+                showToast("ফেসবুক সাইন-ইন শীঘ্রই আসছে!", "info");
             }
         }
 
@@ -1199,7 +1302,7 @@
                 .catch(err => showToast(err.message, 'error'));
         }
 
-        // Auth Listener & Daily Reset
+        // Auth Listener & Real-time Sync
         auth.onAuthStateChanged(user => {
             if (user) {
                 db.collection("users").doc(user.uid).onSnapshot(doc => {
@@ -1230,7 +1333,7 @@
             }
         });
 
-        // ================= DYNAMIC BANNER SYSTEM =================
+        // Banner Slider
         let promoBanners = [{ id: 'default', image: "https://i.ibb.co.com/tTLNfcH6/file-000000001c1c82089a7b8b791e5b5e0e.png", action: "deposit.html" }];
         let currentBannerIdx = 0;
         let bannerInterval = null;
@@ -1274,7 +1377,7 @@
             }
         }
 
-        // নোটিফিকেশন কাউন্ট (Unread Count)
+        // নোটিফিকেশন কাউন্ট
         function initNotificationBadge() {
             db.collection("notifications").onSnapshot(snapshot => {
                 const readIds = JSON.parse(localStorage.getItem('read_notif_ids') || '[]');
