@@ -97,9 +97,11 @@
         .amount-text { font-size: 11px; font-weight: 800; }
         .amount-text.plus { color: #00e676; }
         .amount-text.minus { color: #f87171; }
-        .status-badge { display: inline-flex; align-items: center; gap: 2.5px; padding: 1.5px 5.5px; border-radius: 8px; font-size: 7.5px; font-weight: 700; }
-        .status-badge.success { background: rgba(0, 230, 118, 0.12); color: #00e676; border: 1px solid rgba(0, 230, 118, 0.3); }
-        .status-badge.processing { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+        
+        .status-badge { display: inline-flex; align-items: center; gap: 2.5px; padding: 2px 6.5px; border-radius: 8px; font-size: 8px; font-weight: 800; }
+        .status-badge.success { background: rgba(0, 230, 118, 0.15); color: #00e676; border: 1px solid rgba(0, 230, 118, 0.35); }
+        .status-badge.processing { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.35); }
+        .status-badge.rejected { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.35); }
         .chevron-arrow { font-size: 8px; color: #60a5fa; }
 
         .no-records-box { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 14px; text-align: center; color: #94a3b8; margin: auto; }
@@ -199,6 +201,7 @@
                         <option value="all">All Status</option>
                         <option value="success">Success</option>
                         <option value="processing">Processing</option>
+                        <option value="rejected">Rejected</option>
                     </select>
                 </div>
             </div>
@@ -287,7 +290,7 @@
         let selectedToDate = null;
         let allTransactions = [];
 
-        // ১. ইনস্ট্যান্ট লোকাল হিস্ট্রি লোড (যাতে সাথে সাথে দেখা যায়)
+        // ১. ইনস্ট্যান্ট লোকাল হিস্ট্রি লোড
         function loadLocalFallbackHistory() {
             const localList = JSON.parse(localStorage.getItem('microtask_local_history')) || [];
             allTransactions = [...localList];
@@ -295,17 +298,24 @@
             loadTransactions(allTransactions);
         }
 
-        // ২. ফায়ারবেস থেকে লাইভ ডাটাবেস লোড
+        // ২. ফায়ারবেস থেকে লাইভ ডাটাবেস লোড (৬-ডিজিট ড্যাশবোর্ড UID সহ)
         auth.onAuthStateChanged(user => {
             loadLocalFallbackHistory();
 
-            if (user) {
-                // ডিপোজিট কালেকশন
-                db.collection("deposits").where("uid", "==", user.uid).onSnapshot(depSnap => {
-                    // উইথড্র কালেকশন
-                    db.collection("withdrawals").where("uid", "==", user.uid).onSnapshot(withSnap => {
-                        // টাস্ক সাবমিশন কালেকশন
-                        db.collection("task_submissions").where("uid", "==", user.uid).onSnapshot(taskSnap => {
+            const cachedUser = JSON.parse(localStorage.getItem('microtask_cached_user')) || {};
+            const sixDigitUid = String(cachedUser.uid || '').trim();
+            const authUid = user ? user.uid : '';
+
+            // ড্যাশবোর্ডের ৬ সংখ্যার UID অথবা Auth UID দুটোই সাপোর্ট করবে
+            const validUids = [sixDigitUid, authUid].filter(Boolean);
+
+            if (validUids.length > 0) {
+                // ১. ডিপোজিট কালেকশন সিঙ্ক
+                db.collection("deposits").where("uid", "in", validUids).onSnapshot(depSnap => {
+                    // ২. উইথড্র কালেকশন সিঙ্ক
+                    db.collection("withdrawals").where("uid", "in", validUids).onSnapshot(withSnap => {
+                        // ৩. টাস্ক সাবমিশন কালেকশন সিঙ্ক
+                        db.collection("task_submissions").where("uid", "in", validUids).onSnapshot(taskSnap => {
                             let cloudList = [];
 
                             depSnap.forEach(doc => {
@@ -317,10 +327,10 @@
                                     type: 'plus',
                                     category: 'deposit',
                                     method: d.method,
-                                    status: d.status || 'pending',
+                                    status: d.status || 'pending', // pending, completed, rejected
                                     time: d.createdAt ? new Date(d.createdAt.toDate()).toLocaleDateString('en-GB') : 'Recent',
                                     date: d.createdAt ? formatDateISO(d.createdAt.toDate()) : formatDateISO(new Date()),
-                                    txnId: d.trxId || 'TXN-DEP'
+                                    txnId: d.trxId || doc.id
                                 });
                             });
 
@@ -336,7 +346,7 @@
                                     status: w.status || 'pending',
                                     time: w.createdAt ? new Date(w.createdAt.toDate()).toLocaleDateString('en-GB') : 'Recent',
                                     date: w.createdAt ? formatDateISO(w.createdAt.toDate()) : formatDateISO(new Date()),
-                                    txnId: w.trxId || 'TXN-WTH'
+                                    txnId: w.trxId || doc.id
                                 });
                             });
 
@@ -356,17 +366,9 @@
                                 });
                             });
 
-                            // লোকাল ও ক্লাউড ডাটা মার্জ করা
-                            const localList = JSON.parse(localStorage.getItem('microtask_local_history')) || [];
-                            const combined = [...localList];
-
-                            cloudList.forEach(cItem => {
-                                if (!combined.some(item => item.txnId === cItem.txnId)) {
-                                    combined.push(cItem);
-                                }
-                            });
-
-                            allTransactions = combined;
+                            // ফায়ারবেস থেকে লাইভ স্ট্যাটাস দিয়ে হিস্ট্রি ও লোকাল ক্যাশ আপডেট করা
+                            allTransactions = cloudList;
+                            localStorage.setItem('microtask_local_history', JSON.stringify(cloudList));
                             refreshSummaryStats();
                             loadTransactions(allTransactions);
                         });
@@ -405,7 +407,7 @@
 
         function handleStatusChange(status) {
             currentStatus = status;
-            const labelMap = { 'all': 'All Status', 'success': 'Success', 'processing': 'Processing' };
+            const labelMap = { 'all': 'All Status', 'success': 'Success', 'processing': 'Processing', 'rejected': 'Rejected' };
             document.getElementById('statusFilterLabel').innerText = labelMap[status] || 'All Status';
             applyCombinedFilters();
         }
@@ -488,7 +490,11 @@
                 const itemStatus = item.getAttribute('data-status');
 
                 const matchesCat = (currentCategory === 'all' || itemCat === currentCategory);
-                const matchesStatus = (currentStatus === 'all' || itemStatus === currentStatus || (currentStatus === 'success' && (itemStatus === 'completed' || itemStatus === 'success')) || (currentStatus === 'processing' && itemStatus === 'pending'));
+                const matchesStatus = (currentStatus === 'all' ||
+                    itemStatus === currentStatus ||
+                    (currentStatus === 'success' && (itemStatus === 'completed' || itemStatus === 'success')) ||
+                    (currentStatus === 'processing' && (itemStatus === 'pending' || itemStatus === 'processing')) ||
+                    (currentStatus === 'rejected' && itemStatus === 'rejected'));
 
                 let matchesDate = true;
                 if (selectedFromDate && selectedToDate) {
@@ -533,10 +539,23 @@
                 const isPlus = txn.type === 'plus';
                 const amtFormatted = isPlus ? `+ ৳ ${txn.amount}` : `- ৳ ${txn.amount}`;
                 const amtClass = isPlus ? 'plus' : 'minus';
+                
                 const isPending = txn.status === 'pending' || txn.status === 'processing';
-                const statusBadge = isPending
-                    ? `<span class="status-badge processing"><i class="fa-solid fa-arrows-rotate fa-spin"></i> Pending</span>`
-                    : `<span class="status-badge success"><i class="fa-solid fa-circle-check"></i> Success</span>`;
+                const isRejected = txn.status === 'rejected';
+
+                let statusBadge = '';
+                let statusText = 'Success';
+
+                if (isPending) {
+                    statusBadge = `<span class="status-badge processing"><i class="fa-solid fa-arrows-rotate fa-spin"></i> Pending</span>`;
+                    statusText = 'Pending Review';
+                } else if (isRejected) {
+                    statusBadge = `<span class="status-badge rejected"><i class="fa-solid fa-circle-xmark"></i> Rejected</span>`;
+                    statusText = 'Rejected';
+                } else {
+                    statusBadge = `<span class="status-badge success"><i class="fa-solid fa-circle-check"></i> Success</span>`;
+                    statusText = 'Success';
+                }
 
                 const card = document.createElement('div');
                 card.className = 'history-item-card';
@@ -572,7 +591,7 @@
                         txn.title,
                         txn.desc,
                         amtFormatted,
-                        isPending ? 'Pending Review' : 'Success',
+                        statusText,
                         txn.time,
                         config.innerHtml,
                         config.boxClass,
