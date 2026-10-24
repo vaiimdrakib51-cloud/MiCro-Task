@@ -3,258 +3,60 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Notifications</title>
+  <title>Notifications — MicroTask</title>
   <!-- Google Fonts & FontAwesome -->
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    body {
-      background-color: #f0f9ff;
-      color: #0f172a;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      padding: 12px 10px 30px;
-    }
-
-    .app-container {
-      width: 100%;
-      max-width: 480px;
-      background: #ffffff;
-      border-radius: 24px;
-      padding: 18px 15px;
-      box-shadow: 0 8px 30px rgba(2, 132, 199, 0.08);
-      border: 1.5px solid #d4ebf8;
-      min-height: 90vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* হেডার */
-    .header {
-      margin-bottom: 16px;
-    }
-
-    .title-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 4px;
-    }
-
-    .back-btn {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: #f1f5f9;
-      border: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-      color: #0284c7;
-      cursor: pointer;
-      margin-right: 2px;
-      transition: transform 0.15s;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background-color: #f0f9ff; color: #0f172a; min-height: 100vh; display: flex; justify-content: center; padding: 12px 10px 30px; }
+    .app-container { width: 100%; max-width: 480px; background: #ffffff; border-radius: 24px; padding: 18px 15px; box-shadow: 0 8px 30px rgba(2, 132, 199, 0.08); border: 1.5px solid #d4ebf8; min-height: 90vh; display: flex; flex-direction: column; }
+    
+    .header { margin-bottom: 16px; }
+    .title-row { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+    .back-btn { width: 36px; height: 36px; border-radius: 50%; background: #f1f5f9; border: none; display: flex; align-items: center; justify-content: center; font-size: 16px; color: #0284c7; cursor: pointer; margin-right: 2px; }
     .back-btn:active { transform: scale(0.92); }
+    .title-row .bell-icon { font-size: 22px; color: #f59e0b; }
+    .title-row h1 { font-size: 20px; font-weight: 850; color: #0f172a; }
+    .badge-count { background-color: #ef4444; color: #ffffff; font-size: 11px; font-weight: 800; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+    .subtitle { color: #64748b; font-size: 12px; margin-left: 48px; }
 
-    .title-row .bell-icon {
-      font-size: 22px;
-      color: #f59e0b;
-    }
-
-    .title-row h1 {
-      font-size: 20px;
-      font-weight: 850;
-      color: #0f172a;
-    }
-
-    .badge-count {
-      background-color: #ef4444;
-      color: #ffffff;
-      font-size: 11px;
-      font-weight: 800;
-      min-width: 22px;
-      height: 22px;
-      padding: 0 6px;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .subtitle {
-      color: #64748b;
-      font-size: 12px;
-      margin-left: 48px;
-    }
-
-    /* ফিল্টার বাটনস */
-    .filters {
-      display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      padding-bottom: 12px;
-      scrollbar-width: none;
-    }
+    .filters { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 12px; scrollbar-width: none; }
     .filters::-webkit-scrollbar { display: none; }
+    .filter-btn { background: #f8fafc; color: #475569; border: 1px solid #e2e8f0; padding: 7px 13px; border-radius: 50px; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 5px; cursor: pointer; white-space: nowrap; transition: all 0.2s ease; }
+    .filter-btn.active { background: #0284c7; color: #ffffff; border-color: #0284c7; box-shadow: 0 4px 10px rgba(2, 132, 199, 0.25); }
 
-    .filter-btn {
-      background: #f8fafc;
-      color: #475569;
-      border: 1px solid #e2e8f0;
-      padding: 7px 13px;
-      border-radius: 50px;
-      font-size: 12px;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: all 0.2s ease;
-    }
-
-    .filter-btn.active {
-      background: #0284c7;
-      color: #ffffff;
-      border-color: #0284c7;
-      box-shadow: 0 4px 10px rgba(2, 132, 199, 0.25);
-    }
-
-    /* নোটিফিকেশন কার্ড লিস্ট */
-    .notification-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      flex: 1;
-    }
-
-    .notif-card {
-      position: relative;
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 16px;
-      padding: 13px 14px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
+    .notification-list { display: flex; flex-direction: column; gap: 10px; flex: 1; }
+    .notif-card { position: relative; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 13px 14px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all 0.2s ease; }
     .notif-card:active { transform: scale(0.98); }
-    .notif-card:hover { border-color: #bae6fd; }
+    .notif-card.unread { background: #f0f9ff; border-color: #bae6fd; }
 
-    .notif-card.unread {
-      background: #f0f9ff;
-      border-color: #bae6fd;
-    }
-
-    .icon-box {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 17px;
-      flex-shrink: 0;
-      color: #ffffff;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-    }
-
+    .icon-box { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; color: #ffffff; }
     .card-content { flex: 1; min-width: 0; }
-
-    .card-header-line {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      margin-bottom: 3px;
-    }
-
-    .card-title {
-      font-size: 13.5px;
-      font-weight: 800;
-      color: #0f172a;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .tag {
-      font-size: 9.5px;
-      font-weight: 800;
-      padding: 2px 7px;
-      border-radius: 6px;
-      text-transform: capitalize;
-    }
-
+    .card-header-line { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; }
+    .card-title { font-size: 13.5px; font-weight: 800; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .tag { font-size: 9.5px; font-weight: 800; padding: 2px 7px; border-radius: 6px; text-transform: capitalize; }
     .tag-earnings { background: #dcfce7; color: #15803d; }
     .tag-tasks { background: #e0f2fe; color: #0369a1; }
     .tag-referral { background: #f3e8ff; color: #7e22ce; }
     .tag-system { background: #ffedd5; color: #c2410c; }
 
-    .card-desc {
-      font-size: 11.5px;
-      color: #475569;
-      line-height: 1.4;
-      margin-bottom: 4px;
-    }
-
-    .card-time {
-      font-size: 10px;
-      color: #94a3b8;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      font-weight: 600;
-    }
-
-    .card-arrow {
-      color: #94a3b8;
-      font-size: 12px;
-      margin-left: 4px;
-    }
-
-    .unread-dot {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      width: 8px;
-      height: 8px;
-      background-color: #ef4444;
-      border-radius: 50%;
-    }
+    .card-desc { font-size: 11.5px; color: #475569; line-height: 1.4; margin-bottom: 4px; }
+    .card-time { font-size: 10px; color: #94a3b8; display: flex; align-items: center; gap: 4px; font-weight: 600; }
+    .unread-dot { position: absolute; top: 12px; right: 12px; width: 8px; height: 8px; background-color: #ef4444; border-radius: 50%; }
 
     .bg-green { background: linear-gradient(135deg, #10b981, #059669); }
     .bg-blue { background: linear-gradient(135deg, #0284c7, #0369a1); }
     .bg-purple { background: linear-gradient(135deg, #a855f7, #7c3aed); }
     .bg-orange { background: linear-gradient(135deg, #f97316, #ea580c); }
 
-    .empty-msg {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      flex: 1;
-      padding: 60px 10px;
-      color: #94a3b8;
-      text-align: center;
-    }
+    .empty-msg { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; padding: 60px 10px; color: #94a3b8; text-align: center; }
     .empty-msg i { font-size: 38px; margin-bottom: 10px; color: #cbd5e1; }
     .empty-msg p { font-size: 13.5px; font-weight: 600; }
   </style>
@@ -262,8 +64,6 @@
 <body>
 
   <div class="app-container">
-    
-    <!-- হেডার (ব্যাক বাটনসহ) -->
     <div class="header">
       <div class="title-row">
         <button type="button" class="back-btn" onclick="window.location.href='index.html'" title="Back to Dashboard">
@@ -273,27 +73,24 @@
         <h1>Notifications</h1>
         <span class="badge-count" id="badgeCount">0</span>
       </div>
-      <p class="subtitle">Stay updated with your earnings, tasks and deposits!</p>
+      <p class="subtitle">Personal earnings, tasks & system updates</p>
     </div>
 
     <!-- ক্যাটাগরি ফিল্টার -->
     <div class="filters">
       <button class="filter-btn active" data-filter="all">All</button>
-      <button class="filter-btn" data-filter="system"><i class="fa-solid fa-gear"></i> System</button>
       <button class="filter-btn" data-filter="earnings"><i class="fa-solid fa-wallet"></i> Earnings</button>
       <button class="filter-btn" data-filter="tasks"><i class="fa-solid fa-square-check"></i> Tasks</button>
       <button class="filter-btn" data-filter="referral"><i class="fa-solid fa-user-group"></i> Referral</button>
+      <button class="filter-btn" data-filter="system"><i class="fa-solid fa-gear"></i> System</button>
     </div>
 
-    <!-- নোটিফিকেশন কার্ড লিস্ট -->
     <div class="notification-list" id="notificationList"></div>
 
-    <!-- খালি মেসেজ -->
     <div class="empty-msg" id="emptyMsg">
       <i class="fa-regular fa-bell-slash"></i>
       <p>No notifications found</p>
     </div>
-
   </div>
 
   <script>
@@ -308,6 +105,7 @@
     };
 
     firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
     const db = firebase.firestore();
 
     const filterButtons = document.querySelectorAll('.filter-btn');
@@ -317,12 +115,12 @@
 
     let allNotifs = [];
     let currentFilter = 'all';
+    let userSignupTime = 0; // একাউন্ট তৈরির সময়
 
     function getReadIds() {
       try { return JSON.parse(localStorage.getItem('read_notif_ids') || '[]'); } catch(e) { return []; }
     }
 
-    // আইকন ও কালার ক্যাটাগরি ম্যাপিং
     function getCategoryMeta(cat) {
       switch((cat || '').toLowerCase()) {
         case 'earnings': return { icon: 'fa-wallet', bg: 'bg-green', tagClass: 'tag-earnings', text: 'Earnings' };
@@ -334,16 +132,34 @@
 
     function renderNotifications() {
       const readIds = getReadIds();
-      
-      // ড্যাশবোর্ডের ক্যাশ থেকে ৬ ডিজিটের ইউআইডি নেওয়া
       const cachedUser = JSON.parse(localStorage.getItem('microtask_cached_user')) || {};
       const myUID = String(cachedUser.uid || '').trim();
 
-      // ইউজারের নির্দিষ্ট নোটিফিকেশন অথবা সবার জন্য পাঠানো নোটিফিকেশন ফিল্টার
       const filtered = allNotifs.filter(n => {
-          const isTargeted = !n.targetUid || String(n.targetUid).trim() === myUID;
-          const isCat = currentFilter === 'all' || (n.category || 'system').toLowerCase() === currentFilter;
-          return isTargeted && isCat;
+          const notifCat = (n.category || 'system').toLowerCase();
+          const target = String(n.targetUid || '').trim();
+
+          // ১. ব্যাক্তিগত নোটিফিকেশন চেক (Earnings / Tasks / Referral)
+          const isMyPersonal = target !== '' && target === myUID;
+
+          // ২. গ্লোবাল নোটিফিকেশন চেক (System - নতুন টাস্ক বা এডমিন ঘোষণা)
+          const isGlobalSystem = (!n.targetUid || target === 'all');
+
+          // ৩. একাউন্ট খোলার আগের সিস্টেম নোটিশ ফিল্টার
+          let isTimeValid = true;
+          if (isGlobalSystem && userSignupTime > 0 && n.createdAt) {
+              const notifTime = n.createdAt.toMillis ? n.createdAt.toMillis() : new Date(n.createdAt).getTime();
+              // যদি নোটিফিকেশনটি একাউন্ট খোলার আগের হয়, তাহলে দেখাবে না
+              if (notifTime < userSignupTime) {
+                  isTimeValid = false;
+              }
+          }
+
+          // ইউজারের জন্য প্রযোজ্য কিনা
+          const isAllowedForMe = isMyPersonal || (isGlobalSystem && isTimeValid);
+          const isMatchingTab = currentFilter === 'all' || notifCat === currentFilter;
+
+          return isAllowedForMe && isMatchingTab;
       });
 
       badgeCount.textContent = filtered.length;
@@ -372,7 +188,7 @@
                 <div class="card-desc">${n.message || ''}</div>
                 <div class="card-time"><i class="fa-regular fa-clock"></i> ${n.time || 'Just now'}</div>
               </div>
-              <i class="fa-solid fa-chevron-right card-arrow"></i>
+              <i class="fa-solid fa-chevron-right" style="color:#94a3b8; font-size:11px;"></i>
               ${isUnread ? '<div class="unread-dot"></div>' : ''}
             </div>
           `;
@@ -380,7 +196,6 @@
       }
     }
 
-    // নোটিফিকেশনে ক্লিক করলে রিড হিসেবে মার্ক হবে এবং সরাসরি History পেজে চলে যাবে
     function handleNotificationClick(notifId, url) {
         const readIds = getReadIds();
         if (!readIds.includes(notifId)) {
@@ -390,7 +205,6 @@
         window.location.href = url;
     }
 
-    // ফিল্টার বাটনের ক্লিক হ্যান্ডলার
     filterButtons.forEach(btn => {
       btn.addEventListener('click', () => {
         filterButtons.forEach(b => b.classList.remove('active'));
@@ -400,17 +214,25 @@
       });
     });
 
-    // Firestore থেকে নোটিফিকেশন রিয়েলটাইম লোড
-    db.collection("notifications").orderBy("createdAt", "desc").limit(35).onSnapshot(snapshot => {
-      allNotifs = [];
-      snapshot.forEach(doc => {
-        allNotifs.push({ id: doc.id, ...doc.data() });
+    // ইউজারের একাউন্ট ক্রিয়েশন টাইম ও নোটিফিকেশন সিঙ্ক
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        db.collection("users").doc(user.uid).get().then(doc => {
+          if (doc.exists && doc.data().createdAt) {
+            userSignupTime = doc.data().createdAt.toMillis ? doc.data().createdAt.toMillis() : new Date(doc.data().createdAt).getTime();
+          }
+          renderNotifications();
+        });
+      }
+
+      db.collection("notifications").orderBy("createdAt", "desc").limit(40).onSnapshot(snapshot => {
+        allNotifs = [];
+        snapshot.forEach(doc => {
+          allNotifs.push({ id: doc.id, ...doc.data() });
+        });
+        renderNotifications();
       });
-      renderNotifications();
-    }, err => {
-      renderNotifications();
     });
   </script>
-
 </body>
 </html>
