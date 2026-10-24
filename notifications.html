@@ -68,6 +68,7 @@
       color: #0284c7;
       cursor: pointer;
       margin-right: 2px;
+      transition: transform 0.15s;
     }
     .back-btn:active { transform: scale(0.92); }
 
@@ -148,13 +149,15 @@
       background: #ffffff;
       border: 1px solid #e2e8f0;
       border-radius: 16px;
-      padding: 12px 14px;
+      padding: 13px 14px;
       display: flex;
       align-items: center;
       gap: 12px;
       cursor: pointer;
       transition: all 0.2s ease;
     }
+    .notif-card:active { transform: scale(0.98); }
+    .notif-card:hover { border-color: #bae6fd; }
 
     .notif-card.unread {
       background: #f0f9ff;
@@ -162,15 +165,16 @@
     }
 
     .icon-box {
-      width: 42px;
-      height: 42px;
+      width: 44px;
+      height: 44px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 16px;
+      font-size: 17px;
       flex-shrink: 0;
       color: #ffffff;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
     }
 
     .card-content { flex: 1; min-width: 0; }
@@ -220,6 +224,12 @@
       font-weight: 600;
     }
 
+    .card-arrow {
+      color: #94a3b8;
+      font-size: 12px;
+      margin-left: 4px;
+    }
+
     .unread-dot {
       position: absolute;
       top: 12px;
@@ -263,19 +273,19 @@
         <h1>Notifications</h1>
         <span class="badge-count" id="badgeCount">0</span>
       </div>
-      <p class="subtitle">Stay updated with your earnings, tasks and more!</p>
+      <p class="subtitle">Stay updated with your earnings, tasks and deposits!</p>
     </div>
 
     <!-- ক্যাটাগরি ফিল্টার -->
     <div class="filters">
       <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="system"><i class="fa-solid fa-gear"></i> System</button>
       <button class="filter-btn" data-filter="earnings"><i class="fa-solid fa-wallet"></i> Earnings</button>
       <button class="filter-btn" data-filter="tasks"><i class="fa-solid fa-square-check"></i> Tasks</button>
       <button class="filter-btn" data-filter="referral"><i class="fa-solid fa-user-group"></i> Referral</button>
-      <button class="filter-btn" data-filter="system"><i class="fa-solid fa-gear"></i> System</button>
     </div>
 
-    <!-- নোটিফিকেশন কার্ড লিস্ট (Firebase থেকে আসবে) -->
+    <!-- নোটিফিকেশন কার্ড লিস্ট -->
     <div class="notification-list" id="notificationList"></div>
 
     <!-- খালি মেসেজ -->
@@ -324,7 +334,17 @@
 
     function renderNotifications() {
       const readIds = getReadIds();
-      const filtered = allNotifs.filter(n => currentFilter === 'all' || (n.category || 'system').toLowerCase() === currentFilter);
+      
+      // ড্যাশবোর্ডের ক্যাশ থেকে ৬ ডিজিটের ইউআইডি নেওয়া
+      const cachedUser = JSON.parse(localStorage.getItem('microtask_cached_user')) || {};
+      const myUID = String(cachedUser.uid || '').trim();
+
+      // ইউজারের নির্দিষ্ট নোটিফিকেশন অথবা সবার জন্য পাঠানো নোটিফিকেশন ফিল্টার
+      const filtered = allNotifs.filter(n => {
+          const isTargeted = !n.targetUid || String(n.targetUid).trim() === myUID;
+          const isCat = currentFilter === 'all' || (n.category || 'system').toLowerCase() === currentFilter;
+          return isTargeted && isCat;
+      });
 
       badgeCount.textContent = filtered.length;
 
@@ -337,9 +357,10 @@
           const cat = (n.category || 'system').toLowerCase();
           const meta = getCategoryMeta(cat);
           const isUnread = !readIds.includes(n.id);
+          const targetUrl = n.actionUrl || 'history.html';
 
           return `
-            <div class="notif-card ${isUnread ? 'unread' : ''}" data-category="${cat}">
+            <div class="notif-card ${isUnread ? 'unread' : ''}" data-category="${cat}" onclick="handleNotificationClick('${n.id}', '${targetUrl}')">
               <div class="icon-box ${meta.bg}">
                 <i class="fa-solid ${meta.icon}"></i>
               </div>
@@ -351,15 +372,22 @@
                 <div class="card-desc">${n.message || ''}</div>
                 <div class="card-time"><i class="fa-regular fa-clock"></i> ${n.time || 'Just now'}</div>
               </div>
+              <i class="fa-solid fa-chevron-right card-arrow"></i>
               ${isUnread ? '<div class="unread-dot"></div>' : ''}
             </div>
           `;
         }).join('');
       }
+    }
 
-      // একবার এই পেজে ঢুকলে সবগুলো নোটিফিকেশন পড়া (Read) হয়ে যাবে
-      const allIds = allNotifs.map(n => n.id);
-      localStorage.setItem('read_notif_ids', JSON.stringify(allIds));
+    // নোটিফিকেশনে ক্লিক করলে রিড হিসেবে মার্ক হবে এবং সরাসরি History পেজে চলে যাবে
+    function handleNotificationClick(notifId, url) {
+        const readIds = getReadIds();
+        if (!readIds.includes(notifId)) {
+            readIds.push(notifId);
+            localStorage.setItem('read_notif_ids', JSON.stringify(readIds));
+        }
+        window.location.href = url;
     }
 
     // ফিল্টার বাটনের ক্লিক হ্যান্ডলার
@@ -373,7 +401,7 @@
     });
 
     // Firestore থেকে নোটিফিকেশন রিয়েলটাইম লোড
-    db.collection("notifications").orderBy("createdAt", "desc").limit(30).onSnapshot(snapshot => {
+    db.collection("notifications").orderBy("createdAt", "desc").limit(35).onSnapshot(snapshot => {
       allNotifs = [];
       snapshot.forEach(doc => {
         allNotifs.push({ id: doc.id, ...doc.data() });
