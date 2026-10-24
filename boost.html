@@ -1,0 +1,1201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Boost & Social Feed — MicroTask</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            aqua: {
+              50: '#f0f9f8',
+              100: '#d9f2ee',
+              200: '#b8e5df',
+              300: '#8dd2c9',
+              400: '#4ebfb3',
+              500: '#14b8a6',
+              600: '#0d9488',
+              700: '#0f766e',
+              bg: '#edf7f6',
+              card: '#ffffff',
+              cardTint: '#f5faf9',
+              border: '#cee7e3',
+              divider: '#d8edea',
+              textPrimary: '#0f2f2d',
+              textSecondary: '#4d726f',
+              inputBg: '#e6f3f1',
+              hoverMint: '#ddf0ed'
+            }
+          },
+          fontFamily: {
+            sans: ['-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #edf7f6;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+  </style>
+</head>
+<body class="text-aqua-textPrimary flex justify-center min-h-screen">
+
+  <!-- Mobile Viewport Container -->
+  <div class="w-full max-w-md bg-aqua-bg min-h-screen flex flex-col relative pb-8 shadow-xl border-x border-aqua-border">
+    
+    <!-- ================= 1. NAVIGATION BAR (WITH BACK BUTTON) ================= -->
+    <nav id="user-nav" class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-aqua-border flex items-center shadow-sm px-2">
+      <!-- Back to Dashboard -->
+      <button onclick="window.location.href='index.html'" title="Back to Dashboard" class="p-2.5 text-aqua-600 hover:text-aqua-700 transition">
+        <i data-lucide="arrow-left" class="w-5 h-5"></i>
+      </button>
+
+      <!-- Feed -->
+      <button onclick="switchTab('home')" id="tab-btn-home" title="Home Feed" class="flex-1 py-3 flex justify-center border-b-2 border-aqua-600 text-aqua-600 transition">
+        <i data-lucide="home" class="w-5 h-5"></i>
+      </button>
+
+      <!-- Create Post -->
+      <button onclick="openCreateModal()" id="tab-btn-plus" title="Create Story" class="flex-1 py-3 flex justify-center border-b-2 border-transparent text-aqua-textSecondary hover:text-aqua-textPrimary transition">
+        <i data-lucide="plus-circle" class="w-5 h-5"></i>
+      </button>
+
+      <!-- Search by UID -->
+      <button onclick="switchTab('search')" id="tab-btn-search" title="Search User" class="flex-1 py-3 flex justify-center border-b-2 border-transparent text-aqua-textSecondary hover:text-aqua-textPrimary transition">
+        <i data-lucide="search" class="w-5 h-5"></i>
+      </button>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="flex-1">
+
+      <!-- ================= 2. HOME FEED SCREEN ================= -->
+      <section id="view-home" class="space-y-2 py-1.5">
+        
+        <!-- Slim "What's on your mind?" Bar -->
+        <div class="bg-white px-3 py-2 border-y border-aqua-border shadow-xs">
+          <div class="flex items-center space-x-2">
+            <img id="creator-avatar" src="" alt="avatar" class="w-8 h-8 rounded-full object-cover border border-aqua-300">
+            <div onclick="openCreateModal()" class="flex-1 bg-aqua-inputBg hover:bg-aqua-hoverMint cursor-pointer rounded-full px-3.5 py-1.5 text-xs text-aqua-textSecondary transition border border-aqua-border/60 truncate">
+              What's on your mind? (100–3,000+ words)
+            </div>
+          </div>
+          <div class="border-t border-aqua-divider mt-1.5 pt-1.5 flex items-center justify-between text-[11px] font-semibold text-aqua-textSecondary px-1">
+            <div class="flex items-center space-x-1 text-teal-600">
+              <i data-lucide="target" class="w-3.5 h-3.5"></i>
+              <span>Word Missions</span>
+            </div>
+            <div class="flex items-center space-x-1 text-emerald-600">
+              <i data-lucide="badge-dollar-sign" class="w-3.5 h-3.5"></i>
+              <span id="rate-display-feed">$0.05 / Like</span>
+            </div>
+            <div class="flex items-center space-x-1 text-cyan-600">
+              <i data-lucide="globe" class="w-3.5 h-3.5"></i>
+              <span>Public Feed</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dynamic Posts List -->
+        <div id="feed-container" class="space-y-2"></div>
+
+      </section>
+
+      <!-- ================= 3. SEARCH BY UID SCREEN ================= -->
+      <section id="view-search" class="hidden py-3 px-3 space-y-3">
+        <div class="bg-white p-3.5 rounded-xl border border-aqua-border shadow-sm">
+          <label class="block text-xs font-bold uppercase tracking-wider text-aqua-textSecondary mb-1.5">
+            Search User by Profile UID
+          </label>
+          <div class="flex space-x-2">
+            <div class="relative flex-1">
+              <i data-lucide="user-search" class="w-4 h-4 text-aqua-textSecondary absolute left-3 top-3"></i>
+              <input 
+                type="text" 
+                id="uid-search-input" 
+                placeholder="Enter UID (e.g. usr_sarah, usr_alex)..." 
+                class="w-full bg-aqua-inputBg text-xs text-aqua-textPrimary pl-9 pr-3 py-2.5 rounded-lg border border-aqua-border focus:outline-none focus:border-aqua-600"
+                onkeydown="if(event.key === 'Enter') searchUserByUID()"
+              />
+            </div>
+            <button onclick="searchUserByUID()" class="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white px-4 py-2 rounded-lg text-xs font-semibold transition shadow-sm">
+              Search
+            </button>
+          </div>
+
+          <div class="flex items-center space-x-1.5 mt-2.5 text-[11px] text-aqua-textSecondary">
+            <span class="font-medium">Suggestions:</span>
+            <span onclick="quickSearch('usr_sarah')" class="cursor-pointer text-teal-700 hover:underline bg-teal-50 border border-teal-200 px-1.5 py-0.5 rounded font-mono">usr_sarah</span>
+            <span onclick="quickSearch('usr_alex')" class="cursor-pointer text-teal-700 hover:underline bg-teal-50 border border-teal-200 px-1.5 py-0.5 rounded font-mono">usr_alex</span>
+            <span onclick="quickSearch('usr_david')" class="cursor-pointer text-teal-700 hover:underline bg-teal-50 border border-teal-200 px-1.5 py-0.5 rounded font-mono">usr_david</span>
+          </div>
+        </div>
+
+        <div id="search-profile-result" class="space-y-3"></div>
+
+        <!-- Discreet link to Admin Portal -->
+        <div class="text-center pt-2">
+          <button onclick="openAdminPortal()" class="text-[10px] text-aqua-textSecondary/50 hover:text-teal-700 underline transition">
+            Access System Admin Portal
+          </button>
+        </div>
+      </section>
+
+      <!-- ================= 4. SEPARATE ISOLATED ADMIN CONTROL PORTAL ================= -->
+      <section id="view-admin" class="hidden py-3 px-3 space-y-3">
+        <!-- Admin Header -->
+        <div class="bg-white rounded-2xl p-4 border border-teal-300 shadow-sm relative overflow-hidden">
+          <div class="flex items-center justify-between pb-3 border-b border-aqua-divider">
+            <div class="flex items-center space-x-2">
+              <div class="w-8 h-8 rounded-lg bg-teal-600 text-white flex items-center justify-center">
+                <i data-lucide="shield" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <h3 class="font-black text-sm text-aqua-textPrimary">Dedicated Admin Room</h3>
+                <span class="text-[10px] text-teal-700 font-bold uppercase">System Customizer</span>
+              </div>
+            </div>
+            <!-- Back to App -->
+            <button onclick="closeAdminPortal()" class="text-xs font-bold text-teal-700 bg-teal-50 hover:bg-teal-100 border border-teal-200 px-3 py-1.5 rounded-lg flex items-center space-x-1">
+              <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+              <span>Exit Admin</span>
+            </button>
+          </div>
+
+          <!-- Dynamic Like Price Form -->
+          <div class="mt-3.5 bg-gradient-to-r from-teal-50 to-cyan-50 p-3.5 rounded-xl border border-teal-200 space-y-2.5">
+            <div class="flex items-center justify-between">
+              <label class="font-extrabold text-xs text-teal-900 flex items-center space-x-1.5">
+                <i data-lucide="sliders" class="w-4 h-4 text-teal-700"></i>
+                <span>Set Like Earning Rate ($ USD):</span>
+              </label>
+              <span id="admin-rate-badge" class="font-mono font-bold text-xs bg-white text-teal-800 px-2 py-0.5 rounded border border-teal-300">
+                $0.05
+              </span>
+            </div>
+            <p class="text-[10px] text-teal-800/80 leading-relaxed">
+              লাইক প্রতি কত সেন্ট আয় হবে তা এখান থেকে কাস্টমাইজ করুন। এটি বাড়ালে বা কমালে সমস্ত পোস্টের আয় সাথে সাথে আপডেট হয়ে যাবে।
+            </p>
+            <div class="flex space-x-2">
+              <div class="relative flex-1">
+                <span class="absolute left-3 top-2 font-bold text-xs text-teal-700">$</span>
+                <input 
+                  type="number" 
+                  step="0.005" 
+                  min="0.001" 
+                  max="1.00" 
+                  id="admin-like-rate-input" 
+                  value="0.05" 
+                  class="w-full bg-white text-xs font-bold text-aqua-textPrimary pl-7 pr-3 py-2 rounded-lg border border-teal-300 focus:outline-none focus:border-teal-600"
+                />
+              </div>
+              <button onclick="saveAdminLikeRate()" class="bg-teal-700 hover:bg-teal-800 text-white font-bold px-4 py-2 rounded-lg text-xs transition shadow-xs">
+                Update Rate
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section: Boost Queue -->
+        <div id="adm-sec-boosts" class="space-y-2.5"></div>
+      </section>
+
+    </main>
+
+    <!-- ================= CREATE POST MODAL ================= -->
+    <div id="modal-create" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-[2px] hidden items-center justify-center p-3">
+      <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden border border-aqua-border max-h-[95vh] flex flex-col">
+        <div class="px-4 py-3 bg-aqua-cardTint border-b border-aqua-border flex items-center justify-between relative">
+          <h3 class="text-base font-bold text-center w-full text-aqua-textPrimary">Create Story & Publish</h3>
+          <button onclick="closeCreateModal()" class="absolute right-3 w-8 h-8 rounded-full bg-aqua-inputBg hover:bg-aqua-hoverMint flex items-center justify-center text-aqua-textSecondary">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <div class="px-4 py-2.5 flex items-center space-x-2.5 border-b border-aqua-border/50 bg-aqua-cardTint/30">
+          <img id="modal-user-avatar" src="" class="w-9 h-9 rounded-full object-cover border border-aqua-border">
+          <div>
+            <span id="modal-user-name" class="font-bold text-xs text-aqua-textPrimary block"></span>
+            <span class="text-[10px] text-aqua-textSecondary font-mono" id="modal-user-uid"></span>
+          </div>
+        </div>
+
+        <div class="p-3.5 flex-1 overflow-y-auto">
+          <div class="border-2 border-aqua-border/80 focus-within:border-teal-600 rounded-xl bg-aqua-cardTint/40 p-2.5 transition shadow-inner">
+            <textarea 
+              id="create-post-input" 
+              rows="9"
+              oninput="handleMissionsCounter(this)"
+              placeholder="Write your article, story or reflections here...&#10;&#10;Complete word missions to unlock higher promotion tiers!"
+              class="w-full text-sm text-aqua-textPrimary placeholder-aqua-textSecondary/60 focus:outline-none resize-none leading-relaxed bg-transparent min-h-[200px]"
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="px-3.5 py-2.5 bg-aqua-cardTint border-t border-aqua-divider space-y-1.5">
+          <div class="flex items-center justify-between text-[11px]">
+            <span class="font-bold text-aqua-textPrimary flex items-center space-x-1">
+              <i data-lucide="flag" class="w-3.5 h-3.5 text-teal-600"></i>
+              <span>Word Milestones</span>
+            </span>
+            <span id="live-word-count" class="font-mono font-bold text-teal-800 bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
+              0 words
+            </span>
+          </div>
+
+          <div class="grid grid-cols-5 gap-1 text-[10px]">
+            <div id="m-100" class="mission-pill p-1 rounded-md border border-gray-200 bg-gray-50 text-gray-400 flex flex-col items-center justify-center transition">
+              <span class="mission-icon font-mono font-bold">100w</span>
+              <span class="text-[8px] opacity-75">300Tk Boost</span>
+            </div>
+            <div id="m-500" class="mission-pill p-1 rounded-md border border-gray-200 bg-gray-50 text-gray-400 flex flex-col items-center justify-center transition">
+              <span class="mission-icon font-mono font-bold">500w</span>
+              <span class="text-[8px] opacity-75">500Tk Boost</span>
+            </div>
+            <div id="m-1000" class="mission-pill p-1 rounded-md border border-gray-200 bg-gray-50 text-gray-400 flex flex-col items-center justify-center transition">
+              <span class="mission-icon font-mono font-bold">1000w</span>
+              <span class="text-[8px] opacity-75">1k Tk Boost</span>
+            </div>
+            <div id="m-2000" class="mission-pill p-1 rounded-md border border-gray-200 bg-gray-50 text-gray-400 flex flex-col items-center justify-center transition">
+              <span class="mission-icon font-mono font-bold">2000w</span>
+              <span class="text-[8px] opacity-75">1.5k Tk Boost</span>
+            </div>
+            <div id="m-3000" class="mission-pill p-1 rounded-md border border-gray-200 bg-gray-50 text-gray-400 flex flex-col items-center justify-center transition">
+              <span class="mission-icon font-mono font-bold">3000w</span>
+              <span class="text-[8px] opacity-75">2k Tk Boost</span>
+            </div>
+          </div>
+
+          <p id="mission-status-msg" class="text-[10px] text-rose-500 font-medium pt-0.5">
+            ⚠️ Write at least 100 words to complete 1st mission and enable posting.
+          </p>
+        </div>
+
+        <div class="p-3 bg-white border-t border-aqua-border">
+          <button 
+            id="btn-post-submit"
+            onclick="publishPost()" 
+            disabled 
+            class="w-full bg-gradient-to-r from-teal-600 to-cyan-600 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold py-2.5 rounded-xl text-xs transition shadow-sm"
+          >
+            Reach 100 words to Post
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= USER BOOST MODAL ================= -->
+    <div id="modal-boost" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-[2px] hidden items-center justify-center p-3">
+      <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden border border-aqua-border">
+        <div class="px-4 py-3 bg-aqua-cardTint border-b border-aqua-border flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <i data-lucide="rocket" class="w-5 h-5 text-teal-600"></i>
+            <h3 class="text-base font-bold text-aqua-textPrimary">Boost Campaign</h3>
+          </div>
+          <button onclick="closeBoostModal()" class="w-8 h-8 rounded-full bg-aqua-inputBg hover:bg-aqua-hoverMint flex items-center justify-center text-aqua-textSecondary">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <div class="p-4 space-y-3.5 text-xs">
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <label class="block font-bold text-aqua-textPrimary">Select Promotion Package (BDT)</label>
+              <span id="boost-tier-badge" class="text-[10px] bg-teal-50 text-teal-800 font-semibold px-2 py-0.5 rounded border border-teal-200"></span>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2" id="package-selector-grid">
+              <button type="button" id="pkg-100" onclick="selectPackage(100)" class="pkg-btn p-2 rounded-lg border border-teal-600 bg-teal-50 text-teal-700 font-bold text-xs" data-val="100">100 Tk</button>
+              <button type="button" id="pkg-300" onclick="selectPackage(300)" class="pkg-btn p-2 rounded-lg border border-aqua-border bg-aqua-inputBg text-aqua-textSecondary font-semibold text-xs" data-val="300">300 Tk</button>
+              <button type="button" id="pkg-500" onclick="selectPackage(500)" class="pkg-btn p-2 rounded-lg border border-aqua-border bg-aqua-inputBg text-aqua-textSecondary font-semibold text-xs" data-val="500">500 Tk</button>
+              <button type="button" id="pkg-1000" onclick="selectPackage(1000)" class="pkg-btn p-2 rounded-lg border border-aqua-border bg-aqua-inputBg text-aqua-textSecondary font-semibold text-xs" data-val="1000">1,000 Tk</button>
+              <button type="button" id="pkg-1500" onclick="selectPackage(1500)" class="pkg-btn p-2 rounded-lg border border-aqua-border bg-aqua-inputBg text-aqua-textSecondary font-semibold text-xs" data-val="1500">1,500 Tk</button>
+              <button type="button" id="pkg-2000" onclick="selectPackage(2000)" class="pkg-btn p-2 rounded-lg border border-aqua-border bg-aqua-inputBg text-aqua-textSecondary font-semibold text-xs" data-val="2000">2,000 Tk</button>
+            </div>
+          </div>
+
+          <div id="boost-rule-notice" class="bg-teal-50/80 border border-teal-200 rounded-xl p-2.5 text-xs space-y-1 text-teal-900">
+            <div class="flex items-center space-x-1.5 font-bold">
+              <i data-lucide="sparkles" class="w-3.5 h-3.5 text-teal-600"></i>
+              <span>Promotion Tiers Active</span>
+            </div>
+            <p id="boost-rule-text" class="text-[11px] text-teal-800 leading-relaxed"></p>
+          </div>
+        </div>
+
+        <div class="p-4 border-t border-aqua-border bg-aqua-cardTint">
+          <button onclick="submitBoostRequest()" class="w-full bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white font-bold py-2 rounded-xl text-xs transition shadow-sm">
+            Submit Boost Request
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= DELETE CONFIRMATION ACTION SHEET ================= -->
+    <div id="modal-delete-sheet" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-[2px] hidden items-end justify-center">
+      <div class="bg-white rounded-t-2xl w-full max-w-md p-4 space-y-3 animate-in slide-in-from-bottom duration-150 border-t border-aqua-border">
+        <div class="w-10 h-1 bg-aqua-border rounded-full mx-auto mb-2"></div>
+        <h4 class="font-bold text-sm text-aqua-textPrimary text-center">Post Options</h4>
+        
+        <button onclick="executePostDeletion()" class="w-full bg-rose-50 hover:bg-rose-100 text-rose-600 font-semibold py-2.5 rounded-xl text-xs flex items-center justify-center space-x-2 transition border border-rose-200">
+          <i data-lucide="trash-2" class="w-4 h-4"></i>
+          <span>Delete This Post Permanently</span>
+        </button>
+
+        <button onclick="closeDeleteSheet()" class="w-full bg-aqua-inputBg hover:bg-aqua-hoverMint text-aqua-textPrimary font-semibold py-2.5 rounded-xl text-xs transition border border-aqua-border">
+          Cancel
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- JavaScript Implementation -->
+  <script>
+    let appSettings = {
+      likeRate: 0.05
+    };
+
+    const usersDatabase = {
+      "usr_david": {
+        uid: "usr_david",
+        name: "David Miller",
+        username: "@david_miller",
+        avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+        bio: "Writer & philosophical thinker. Exploring resilience through written experiences.",
+        isVerified: true
+      },
+      "usr_sarah": {
+        uid: "usr_sarah",
+        name: "Sarah Jenkins",
+        username: "@sarah_j",
+        avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80",
+        bio: "Motivational storyteller and history researcher. Daily reflections on success.",
+        isVerified: true
+      },
+      "usr_alex": {
+        uid: "usr_alex",
+        name: "Alex Morgan",
+        username: "@alex_m",
+        avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
+        bio: "Mindfulness practitioner and avid reader. Finding peace in text literature.",
+        isVerified: false
+      }
+    };
+
+    const currentUser = usersDatabase["usr_david"];
+
+    let posts = [];
+    let selectedBoostPackage = 100;
+    let targetBoostPostId = null;
+    let targetDeletePostId = null;
+
+    function countWords(str) {
+      if (!str) return 0;
+      const matches = str.trim().match(/\S+/g);
+      return matches ? matches.length : 0;
+    }
+
+    function timeAgo(dateString) {
+      const diff = Math.floor((new Date() - new Date(dateString)) / 1000);
+      if (diff < 60) return "Just now";
+      if (diff < 3600) return `${Math.floor(diff / 60)}m`;
+      if (diff < 86400) return `${Math.floor(diff / 3600)}h`;
+      return `${Math.floor(diff / 86400)}d`;
+    }
+
+    function getRemainingTime(targetTimestamp) {
+      const totalSecs = Math.max(0, Math.floor((targetTimestamp - Date.now()) / 1000));
+      const days = Math.floor(totalSecs / (3600 * 24));
+      const hours = Math.floor((totalSecs % (3600 * 24)) / 3600);
+      const minutes = Math.floor((totalSecs % 3600) / 60);
+      const seconds = totalSecs % 60;
+      return { totalSecs, days, hours, minutes, seconds };
+    }
+
+    function togglePostExpand(postId) {
+      const post = posts.find(p => p.id === postId);
+      if (!post) return;
+      post.isExpanded = !post.isExpanded;
+      renderFeed();
+    }
+
+    function buildPostCardHTML(post) {
+      const isLiked = post.likedBy.includes(currentUser.uid);
+      const isOwnPost = post.userId === currentUser.uid;
+      const earnedValue = (post.likesCount * appSettings.likeRate).toFixed(2);
+      const wordCount = countWords(post.content);
+
+      if (post.boostStatus === 'active' && post.boostExpiresAt && post.boostExpiresAt <= Date.now()) {
+        post.boostStatus = 'none';
+        post.boostExpiresAt = null;
+      }
+
+      const wordsArr = post.content.trim().split(/\s+/);
+      const isLong = wordsArr.length > 55;
+      let postBodyContent = '';
+
+      if (isLong) {
+        if (!post.isExpanded) {
+          const truncated = wordsArr.slice(0, 55).join(' ');
+          postBodyContent = `${truncated}... <span onclick="togglePostExpand('${post.id}')" class="text-teal-700 font-bold text-[11px] hover:underline cursor-pointer ml-0.5 inline">See more</span>`;
+        } else {
+          postBodyContent = `${post.content.trim()} <span onclick="togglePostExpand('${post.id}')" class="text-teal-700 font-bold text-[11px] hover:underline cursor-pointer ml-1 inline">See less</span>`;
+        }
+      } else {
+        postBodyContent = post.content.trim();
+      }
+
+      const safeAdIframe = `<!DOCTYPE html><html><head><meta charset='UTF-8'><style>body{margin:0;padding:0;display:flex;justify-content:center;align-items:center;background:transparent;overflow:hidden;}</style></head><body><script>atOptions={'key':'e5856b81f21b2cd3b23286d438c9fbc3','format':'iframe','height':50,'width':320,'params':{}};<` + `/script><script src='https://bicea.org/22/e5856b81f21b2cd3b23286d438c9fbc3'><` + `/script></body></html>`.replace(/"/g, '&quot;');
+
+      return `
+        <article class="bg-white border-y border-aqua-border shadow-xs relative">
+          
+          <div class="px-3 pt-2 pb-1 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+              <img src="${post.avatar}" alt="${post.authorName}" class="w-8 h-8 rounded-full object-cover border border-aqua-200">
+              <div>
+                <div class="flex items-center space-x-1">
+                  <span class="font-bold text-xs text-aqua-textPrimary cursor-pointer hover:underline" onclick="quickSearch('${post.userId}')">${post.authorName}</span>
+                  ${post.isVerified ? `<i data-lucide="check-circle-2" class="w-3 h-3 text-teal-600 fill-teal-600 text-white inline"></i>` : ''}
+                </div>
+                <div class="flex items-center text-[10px] text-aqua-textSecondary space-x-1">
+                  <span class="font-mono text-teal-700 bg-teal-50 px-1 rounded">[${post.userId}]</span>
+                  <span>•</span>
+                  <span>${timeAgo(post.createdAt)}</span>
+                  <span>•</span>
+                  <span class="text-teal-800 font-semibold">${wordCount}w</span>
+                  <span>•</span>
+                  <i data-lucide="globe" class="w-2.5 h-2.5 text-aqua-textSecondary"></i>
+                </div>
+              </div>
+            </div>
+
+            <button onclick="promptDeleteSheet('${post.id}')" title="Post Options" class="w-7 h-7 rounded-full hover:bg-aqua-hoverMint flex items-center justify-center text-aqua-textSecondary transition">
+              <i data-lucide="more-horizontal" class="w-4 h-4"></i>
+            </button>
+          </div>
+
+          <div class="px-3 pt-0.5 pb-1.5 text-xs text-aqua-textPrimary leading-relaxed whitespace-pre-line font-normal">
+            ${postBodyContent}
+          </div>
+
+          <div class="px-3 py-1 flex items-center justify-between text-[11px] text-aqua-textSecondary border-t border-aqua-divider bg-aqua-cardTint/40">
+            <div class="flex items-center space-x-1">
+              <span class="w-3.5 h-3.5 rounded-full bg-teal-600 flex items-center justify-center shadow-xs">
+                <i data-lucide="thumbs-up" class="w-2 h-2 text-white fill-white"></i>
+              </span>
+              <span class="font-medium text-aqua-textPrimary">${post.likesCount}</span>
+              <span class="text-teal-700 font-semibold">• $${earnedValue}</span>
+            </div>
+            <div class="text-aqua-textSecondary">
+              <span>${post.comments.length} comments</span>
+            </div>
+          </div>
+
+          <div class="px-1 py-0.5 grid ${post.boostStatus === 'none' ? 'grid-cols-4' : 'grid-cols-3'} gap-1 text-xs font-semibold text-aqua-textSecondary border-t border-aqua-divider">
+            <button 
+              onclick="toggleLike('${post.id}')" 
+              class="flex items-center justify-center space-x-1 py-1.5 rounded-md hover:bg-aqua-hoverMint transition ${isLiked ? 'text-teal-700 font-bold bg-teal-50' : ''}"
+            >
+              <i data-lucide="thumbs-up" class="w-3.5 h-3.5 ${isLiked ? 'fill-teal-600 text-teal-600' : ''}"></i>
+              <span>Like</span>
+            </button>
+
+            <button 
+              onclick="toggleComments('${post.id}')" 
+              class="flex items-center justify-center space-x-1 py-1.5 rounded-md hover:bg-aqua-hoverMint transition"
+            >
+              <i data-lucide="message-square" class="w-3.5 h-3.5"></i>
+              <span>Comment</span>
+            </button>
+
+            <button 
+              onclick="handleShare()" 
+              class="flex items-center justify-center space-x-1 py-1.5 rounded-md hover:bg-aqua-hoverMint transition"
+            >
+              <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
+              <span>Share</span>
+            </button>
+
+            ${post.boostStatus === 'none' ? `
+              <button 
+                onclick="openBoostModal('${post.id}')" 
+                class="flex items-center justify-center space-x-1 py-1.5 rounded-md hover:bg-aqua-hoverMint text-teal-700 transition"
+              >
+                <i data-lucide="rocket" class="w-3.5 h-3.5 text-teal-600"></i>
+                <span>Boost</span>
+              </button>
+            ` : ''}
+          </div>
+
+          ${post.boostStatus === 'active' ? `
+            <div class="px-3 py-1 bg-gradient-to-r from-teal-50 to-cyan-50 border-t border-teal-200 flex items-center justify-between text-[10px] text-teal-900">
+              <div class="flex items-center space-x-1 font-medium">
+                <i data-lucide="timer" class="w-3 h-3 text-teal-600 animate-pulse"></i>
+                <span id="countdown-${post.id}" class="font-mono font-bold tracking-tight">Calculating...</span>
+              </div>
+              <span class="text-[9px] bg-teal-100 text-teal-800 px-1 rounded font-bold uppercase">
+                ${post.boostPackage} • Active
+              </span>
+            </div>
+          ` : post.boostStatus === 'pending' ? `
+            <div class="px-3 py-1 bg-cyan-50/80 border-t border-cyan-200 flex items-center justify-between text-[10px] text-cyan-900">
+              <div class="flex items-center space-x-1 font-medium">
+                <i data-lucide="clock" class="w-3 h-3 text-cyan-700"></i>
+                <span>Boost Pending Verification (${post.boostPackage})</span>
+              </div>
+              <span class="text-[9px] bg-cyan-200/80 text-cyan-900 px-1 rounded font-bold">Reviewing</span>
+            </div>
+          ` : ''}
+
+          <div id="comment-box-${post.id}" class="hidden p-2.5 bg-aqua-bg/80 border-t border-aqua-border space-y-2">
+            <div class="space-y-2 max-h-52 overflow-y-auto pr-1">
+              ${post.comments.length === 0 ? `<p class="text-xs text-aqua-textSecondary text-center py-1">No comments yet. Write the first comment!</p>` : ''}
+              ${post.comments.map(c => `
+                <div class="flex space-x-2 text-xs items-start">
+                  <img src="${c.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80'}" alt="${c.name}" class="w-6 h-6 rounded-full object-cover border border-aqua-200 mt-0.5">
+                  <div class="flex-1">
+                    <div class="bg-white border border-aqua-border rounded-xl px-2.5 py-1.5 inline-block max-w-[92%] shadow-xs">
+                      <span class="font-bold text-aqua-textPrimary block cursor-pointer hover:underline text-[10px] leading-tight">${c.name}</span>
+                      <p class="text-aqua-textPrimary mt-0.5 text-xs leading-normal">${c.text}</p>
+                    </div>
+                    <div class="flex items-center space-x-2.5 text-[9px] text-aqua-textSecondary mt-0.5 ml-1.5 font-semibold">
+                      <span class="hover:underline cursor-pointer">Like</span>
+                      <span class="hover:underline cursor-pointer">Reply</span>
+                      <span>${c.time}</span>
+                    </div>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+
+            <div class="flex items-center space-x-2 pt-1 border-t border-aqua-border">
+              <img src="${currentUser.avatar}" alt="My Avatar" class="w-6 h-6 rounded-full object-cover border border-aqua-300">
+              
+              ${isOwnPost ? `
+                <div class="flex-1 bg-aqua-inputBg/60 border border-aqua-border rounded-full px-3 py-1 text-[11px] text-aqua-textSecondary italic">
+                  Commenting on your own post is disabled.
+                </div>
+              ` : `
+                <input 
+                  type="text" 
+                  id="input-comment-${post.id}" 
+                  placeholder="Write a comment..." 
+                  class="flex-1 bg-white border border-aqua-border rounded-full px-3 py-1 text-xs focus:outline-none focus:border-teal-600 placeholder-aqua-textSecondary/50"
+                  onkeydown="if(event.key === 'Enter') postComment('${post.id}')"
+                />
+                <button onclick="postComment('${post.id}')" class="text-teal-600 hover:text-teal-700 p-0.5">
+                  <i data-lucide="send" class="w-3.5 h-3.5"></i>
+                </button>
+              `}
+            </div>
+          </div>
+
+          <div class="px-2 py-1 bg-aqua-cardTint border-t border-aqua-border flex flex-col items-center justify-center">
+            <span class="text-[8px] uppercase tracking-wider text-aqua-textSecondary/60 font-semibold mb-0.5">Sponsored Advertisement</span>
+            <div class="w-[320px] h-[50px] bg-white border border-aqua-border/80 rounded flex items-center justify-center overflow-hidden shadow-xs">
+              <iframe 
+                srcdoc="${safeAdIframe}" 
+                width="320" 
+                height="50" 
+                style="border:none; overflow:hidden; width:320px; height:50px;" 
+                scrolling="no">
+              </iframe>
+            </div>
+          </div>
+
+        </article>
+      `;
+    }
+
+    function renderFeed() {
+      const container = document.getElementById('feed-container');
+
+      document.getElementById('rate-display-feed').innerText = `$${appSettings.likeRate.toFixed(2)} / Like`;
+
+      if (posts.length === 0) {
+        container.innerHTML = `
+          <div class="bg-white rounded-2xl p-6 text-center border border-aqua-border shadow-xs mx-2 my-3">
+            <div class="w-10 h-10 rounded-full bg-teal-50 text-teal-600 flex items-center justify-center mx-auto mb-2 border border-teal-200">
+              <i data-lucide="feather" class="w-5 h-5"></i>
+            </div>
+            <h3 class="font-bold text-xs text-aqua-textPrimary">No Posts Yet</h3>
+            <p class="text-[11px] text-aqua-textSecondary mt-0.5 leading-relaxed">
+              Feed is empty! Tap <strong>"What's on your mind?"</strong> above to publish the very first post!
+            </p>
+          </div>
+        `;
+      } else {
+        container.innerHTML = posts.map(buildPostCardHTML).join('');
+      }
+
+      renderAdminQueue();
+      lucide.createIcons();
+      updateAllCountdowns();
+    }
+
+    function saveAdminLikeRate() {
+      const inputVal = parseFloat(document.getElementById('admin-like-rate-input').value);
+      if (isNaN(inputVal) || inputVal <= 0) {
+        alert("Please enter a valid rate greater than 0.");
+        return;
+      }
+
+      appSettings.likeRate = inputVal;
+      document.getElementById('admin-rate-badge').innerText = `$${inputVal.toFixed(2)}`;
+      alert(`Success! Like earning rate customized to $${inputVal.toFixed(2)} per like.`);
+      renderFeed();
+    }
+
+    function renderAdminQueue() {
+      const boostContainer = document.getElementById('adm-sec-boosts');
+      const pendingBoosts = posts.filter(p => p.boostStatus === 'pending');
+
+      if (pendingBoosts.length === 0) {
+        boostContainer.innerHTML = `<div class="bg-white p-4 rounded-xl text-center text-xs text-gray-400">No pending boost campaigns.</div>`;
+      } else {
+        boostContainer.innerHTML = pendingBoosts.map(p => `
+          <div class="bg-white border border-aqua-border rounded-xl p-3 shadow-xs space-y-2 text-xs">
+            <div class="flex justify-between items-center border-b border-aqua-divider pb-1.5">
+              <span class="font-bold text-aqua-textPrimary">${p.authorName} <span class="font-mono text-[10px] text-teal-700">[${p.userId}]</span></span>
+              <span class="bg-teal-50 text-teal-800 font-bold px-2 py-0.5 rounded text-[10px]">${p.boostPackage}</span>
+            </div>
+            <p class="text-[11px] text-aqua-textSecondary italic line-clamp-2">"${p.content}"</p>
+            <div class="bg-aqua-inputBg p-2 rounded-lg grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-[10px] font-bold">Duration (Days):</label>
+                <select id="adm-days-${p.id}" class="w-full bg-white border border-aqua-border rounded p-1 text-xs">
+                  <option value="1">1 Day</option>
+                  <option value="2">2 Days</option>
+                  <option value="3" selected>3 Days</option>
+                  <option value="7">7 Days</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold">Auto-Likes:</label>
+                <input type="number" id="adm-likes-${p.id}" value="20" class="w-full bg-white border border-aqua-border rounded p-1 text-xs">
+              </div>
+            </div>
+            <div class="flex space-x-2 pt-1">
+              <button onclick="approveBoost('${p.id}')" class="flex-1 bg-teal-700 hover:bg-teal-800 text-white font-bold py-1.5 rounded-lg text-xs">Approve Boost</button>
+              <button onclick="rejectBoost('${p.id}')" class="bg-rose-50 text-rose-600 px-3 py-1.5 rounded-lg text-xs font-semibold">Reject</button>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+
+    function openAdminPortal() {
+      document.getElementById('user-nav').classList.add('hidden');
+      document.getElementById('view-home').classList.add('hidden');
+      document.getElementById('view-search').classList.add('hidden');
+
+      document.getElementById('view-admin').classList.remove('hidden');
+      document.getElementById('admin-like-rate-input').value = appSettings.likeRate;
+      document.getElementById('admin-rate-badge').innerText = `$${appSettings.likeRate.toFixed(2)}`;
+      renderAdminQueue();
+      lucide.createIcons();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function closeAdminPortal() {
+      document.getElementById('user-nav').classList.remove('hidden');
+      document.getElementById('view-admin').classList.add('hidden');
+      switchTab('home');
+    }
+
+    const mockCommentBank = [
+      "Very insightful post!",
+      "Completely agree with this perspective.",
+      "Inspiring thoughts. Well written!",
+      "Great wisdom shared here.",
+      "Such a valuable reminder for all of us.",
+      "Spot on! Thanks for posting."
+    ];
+
+    setInterval(() => {
+      let changed = false;
+      posts.forEach(post => {
+        if (post.boostStatus === 'active') {
+          if (post.autoLikesQueue > 0 && Math.random() > 0.4) {
+            post.likesCount += 1;
+            post.autoLikesQueue -= 1;
+            changed = true;
+          }
+          if (post.autoCommentsQueue > 0 && Math.random() > 0.7) {
+            const users = Object.values(usersDatabase);
+            const randomUser = users[Math.floor(Math.random() * users.length)];
+            const randomText = mockCommentBank[Math.floor(Math.random() * mockCommentBank.length)];
+            post.comments.push({
+              id: "c_auto_" + Date.now(),
+              name: randomUser.name,
+              avatar: randomUser.avatar,
+              text: randomText,
+              time: "Just now"
+            });
+            post.autoCommentsQueue -= 1;
+            changed = true;
+          }
+        }
+      });
+      if (changed) {
+        renderFeed();
+      }
+    }, 4000);
+
+    function updateAllCountdowns() {
+      posts.forEach(post => {
+        if (post.boostStatus === 'active' && post.boostExpiresAt) {
+          const el = document.getElementById(`countdown-${post.id}`);
+          if (el) {
+            const time = getRemainingTime(post.boostExpiresAt);
+            if (time.totalSecs <= 0) {
+              post.boostStatus = 'none';
+              renderFeed();
+            } else {
+              const d = String(time.days).padStart(2, '0');
+              const h = String(time.hours).padStart(2, '0');
+              const m = String(time.minutes).padStart(2, '0');
+              const s = String(time.seconds).padStart(2, '0');
+              el.innerText = `${d}d : ${h}h : ${m}m : ${s}s`;
+            }
+          }
+        }
+      });
+    }
+    setInterval(updateAllCountdowns, 1000);
+
+    function toggleLike(postId) {
+      const post = posts.find(p => p.id === postId);
+      if (!post) return;
+
+      if (post.userId === currentUser.uid) {
+        alert("Action not allowed: You cannot like your own post.");
+        return;
+      }
+
+      const alreadyLiked = post.likedBy.includes(currentUser.uid);
+
+      if (alreadyLiked) {
+        post.likedBy = post.likedBy.filter(uid => uid !== currentUser.uid);
+        post.likesCount--;
+      } else {
+        post.likedBy.push(currentUser.uid);
+        post.likesCount++;
+      }
+
+      renderFeed();
+      const searchBox = document.getElementById('search-profile-result');
+      if (!searchBox.classList.contains('hidden') && searchBox.innerHTML !== "") {
+        searchUserByUID(false);
+      }
+    }
+
+    function toggleComments(postId) {
+      const box = document.getElementById(`comment-box-${postId}`);
+      if (box) box.classList.toggle('hidden');
+    }
+
+    function postComment(postId) {
+      const post = posts.find(p => p.id === postId);
+      if (!post) return;
+
+      if (post.userId === currentUser.uid) {
+        alert("Action not allowed: You cannot comment on your own post.");
+        return;
+      }
+
+      const input = document.getElementById(`input-comment-${postId}`);
+      const text = input ? input.value.trim() : "";
+      if (!text) return;
+
+      post.comments.push({
+        id: "c_" + Date.now(),
+        name: currentUser.name,
+        avatar: currentUser.avatar,
+        text: text,
+        time: "Just now"
+      });
+      
+      input.value = "";
+      renderFeed();
+      const searchBox = document.getElementById('search-profile-result');
+      if (!searchBox.classList.contains('hidden') && searchBox.innerHTML !== "") {
+        searchUserByUID(false);
+      }
+    }
+
+    function promptDeleteSheet(postId) {
+      targetDeletePostId = postId;
+      document.getElementById('modal-delete-sheet').classList.remove('hidden');
+      document.getElementById('modal-delete-sheet').classList.add('flex');
+    }
+
+    function closeDeleteSheet() {
+      targetDeletePostId = null;
+      document.getElementById('modal-delete-sheet').classList.add('hidden');
+      document.getElementById('modal-delete-sheet').classList.remove('flex');
+    }
+
+    function executePostDeletion() {
+      if (targetDeletePostId) {
+        posts = posts.filter(p => p.id !== targetDeletePostId);
+        closeDeleteSheet();
+        renderFeed();
+        const searchBox = document.getElementById('search-profile-result');
+        if (!searchBox.classList.contains('hidden') && searchBox.innerHTML !== "") {
+          searchUserByUID(false);
+        }
+      }
+    }
+
+    function quickSearch(uid) {
+      document.getElementById('uid-search-input').value = uid;
+      switchTab('search');
+      searchUserByUID();
+    }
+
+    function searchUserByUID(shouldScroll = true) {
+      const input = document.getElementById('uid-search-input');
+      const uid = input.value.trim().toLowerCase();
+      const container = document.getElementById('search-profile-result');
+
+      if (!uid) {
+        container.innerHTML = `<div class="bg-white p-4 rounded-xl text-center text-xs text-aqua-textSecondary border border-aqua-border">Please enter a valid User UID.</div>`;
+        return;
+      }
+
+      const user = usersDatabase[uid];
+      if (!user) {
+        container.innerHTML = `
+          <div class="bg-white p-6 rounded-xl text-center border border-aqua-border text-xs text-aqua-textSecondary">
+            <i data-lucide="user-x" class="w-8 h-8 text-teal-600/50 mx-auto mb-2"></i>
+            <p class="font-bold text-aqua-textPrimary">No user found with UID: "${uid}"</p>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      const userPosts = posts.filter(p => p.userId === user.uid);
+
+      container.innerHTML = `
+        <div class="bg-white rounded-xl border border-aqua-border shadow-xs overflow-hidden">
+          <div class="h-16 bg-gradient-to-r from-teal-600 to-cyan-600"></div>
+          <div class="px-4 pb-4 relative flex flex-col items-center -mt-8 text-center">
+            <img src="${user.avatar}" alt="${user.name}" class="w-16 h-16 rounded-full border-2 border-white object-cover shadow mb-1.5">
+            <h3 class="font-bold text-base text-aqua-textPrimary flex items-center space-x-1">
+              <span>${user.name}</span>
+              ${user.isVerified ? `<i data-lucide="check-circle-2" class="w-4 h-4 text-teal-600 fill-teal-600 text-white"></i>` : ''}
+            </h3>
+            <span class="text-xs font-mono text-teal-700 bg-teal-50 border border-teal-200 px-2 py-0.5 rounded-full font-bold">UID: ${user.uid}</span>
+            <p class="text-xs text-aqua-textSecondary mt-1.5 max-w-xs leading-relaxed">${user.bio}</p>
+          </div>
+        </div>
+
+        <div class="text-xs font-bold uppercase tracking-wider text-aqua-textSecondary pt-1 px-1">
+          Posts by ${user.name} (${userPosts.length})
+        </div>
+
+        <div class="space-y-2">
+          ${userPosts.length === 0 ? `
+            <div class="bg-white p-6 rounded-xl text-center text-xs text-aqua-textSecondary border border-aqua-border">
+              This user hasn't published any posts yet.
+            </div>
+          ` : userPosts.map(buildPostCardHTML).join('')}
+        </div>
+      `;
+
+      lucide.createIcons();
+      updateAllCountdowns();
+      if (shouldScroll) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    function openCreateModal() {
+      document.getElementById('modal-create').classList.remove('hidden');
+      document.getElementById('modal-create').classList.add('flex');
+    }
+
+    function closeCreateModal() {
+      document.getElementById('modal-create').classList.add('hidden');
+      document.getElementById('modal-create').classList.remove('flex');
+      document.getElementById('create-post-input').value = "";
+      handleMissionsCounter(document.getElementById('create-post-input'));
+    }
+
+    function updateMissionBadge(id, reached, labelText) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const iconSpan = el.querySelector('.mission-icon');
+
+      if (reached) {
+        el.className = "mission-pill p-1 rounded-md border border-teal-500 bg-teal-50 text-teal-700 font-bold flex flex-col items-center justify-center transition shadow-2xs";
+        iconSpan.innerHTML = `✓ ${labelText}`;
+      } else {
+        el.className = "mission-pill p-1 rounded-md border border-gray-200 bg-gray-50 text-gray-400 flex flex-col items-center justify-center transition";
+        iconSpan.innerHTML = labelText;
+      }
+    }
+
+    function handleMissionsCounter(el) {
+      const words = countWords(el.value);
+      const liveCounter = document.getElementById('live-word-count');
+      const submitBtn = document.getElementById('btn-post-submit');
+      const statusMsg = document.getElementById('mission-status-msg');
+
+      liveCounter.innerText = `${words} words`;
+
+      const m100 = words >= 100;
+      const m500 = words >= 500;
+      const m1000 = words >= 1000;
+      const m2000 = words >= 2000;
+      const m3000 = words >= 3000;
+
+      updateMissionBadge('m-100', m100, '100w');
+      updateMissionBadge('m-500', m500, '500w');
+      updateMissionBadge('m-1000', m1000, '1000w');
+      updateMissionBadge('m-2000', m2000, '2000w');
+      updateMissionBadge('m-3000', m3000, '3000w');
+
+      if (words < 100) {
+        const remaining = 100 - words;
+        statusMsg.innerHTML = `⚠️ Need <strong>${remaining} more words</strong> to hit 1st milestone and unlock posting.`;
+        statusMsg.className = "text-[10px] text-rose-500 font-medium pt-0.5";
+        submitBtn.disabled = true;
+        submitBtn.innerText = `Need ${remaining} more words to Post`;
+      } else {
+        submitBtn.disabled = false;
+
+        if (words >= 3000) {
+          statusMsg.innerHTML = `🎉 <strong>All Missions Completed!</strong> Top Tier 2,000 Tk Boost unlocked!`;
+          statusMsg.className = "text-[10px] text-emerald-600 font-bold pt-0.5";
+          submitBtn.innerText = `Publish Story (${words} Words • Max Tier)`;
+        } else if (words >= 2000) {
+          statusMsg.innerHTML = `🌟 <strong>Mission 4 Cleared!</strong> 1,500 Tk Boost unlocked. (${3000 - words}w to unlock 2,000 Tk Boost)`;
+          statusMsg.className = "text-[10px] text-teal-700 font-bold pt-0.5";
+          submitBtn.innerText = `Publish Story (${words} Words)`;
+        } else if (words >= 1000) {
+          statusMsg.innerHTML = `✨ <strong>Mission 3 Cleared!</strong> 1,000 Tk Boost unlocked. (${2000 - words}w to unlock 1,500 Tk Boost)`;
+          statusMsg.className = "text-[10px] text-teal-700 font-bold pt-0.5";
+          submitBtn.innerText = `Publish Story (${words} Words)`;
+        } else if (words >= 500) {
+          statusMsg.innerHTML = `🚀 <strong>Mission 2 Cleared!</strong> 500 Tk Boost unlocked. (${1000 - words}w to unlock 1,000 Tk Boost)`;
+          statusMsg.className = "text-[10px] text-teal-700 font-bold pt-0.5";
+          submitBtn.innerText = `Publish Story (${words} Words)`;
+        } else {
+          statusMsg.innerHTML = `👍 <strong>Mission 1 Cleared!</strong> Eligible to post & 100-300 Tk Boost. (${500 - words}w for 500 Tk Boost)`;
+          statusMsg.className = "text-[10px] text-teal-700 font-medium pt-0.5";
+          submitBtn.innerText = `Publish Story (${words} Words)`;
+        }
+      }
+    }
+
+    function publishPost() {
+      const content = document.getElementById('create-post-input').value.trim();
+      const words = countWords(content);
+
+      if (words < 100) {
+        alert("Post must contain at least 100 words to fulfill the first mission.");
+        return;
+      }
+
+      const newPost = {
+        id: "post_" + Date.now(),
+        userId: currentUser.uid,
+        authorName: currentUser.name,
+        username: currentUser.username,
+        avatar: currentUser.avatar,
+        isVerified: currentUser.isVerified,
+        createdAt: new Date().toISOString(),
+        content: content,
+        likesCount: 0,
+        likedBy: [],
+        boostStatus: "none",
+        boostPackage: null,
+        boostExpiresAt: null,
+        autoLikesQueue: 0,
+        autoCommentsQueue: 0,
+        isExpanded: false,
+        comments: []
+      };
+
+      posts.unshift(newPost);
+      closeCreateModal();
+      switchTab('home');
+      renderFeed();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function openBoostModal(postId) {
+      targetBoostPostId = postId;
+      const post = posts.find(p => p.id === postId);
+      if (!post) return;
+
+      const words = countWords(post.content);
+      const badge = document.getElementById('boost-tier-badge');
+      const ruleText = document.getElementById('boost-rule-text');
+
+      const allPackages = [100, 300, 500, 1000, 1500, 2000];
+      let maxAllowed = 300;
+
+      if (words >= 3000) {
+        maxAllowed = 2000;
+        badge.innerText = `Tier: ${words}w (Max 2,000 Tk)`;
+        ruleText.innerHTML = `Your post completed the <strong>3,000+ words mission</strong>. All promotion packages up to <strong>2,000 Tk</strong> are fully unlocked!`;
+      } else if (words >= 2000) {
+        maxAllowed = 1500;
+        badge.innerText = `Tier: ${words}w (Max 1,500 Tk)`;
+        ruleText.innerHTML = `Your post reached <strong>${words} words</strong>. Packages up to <strong>1,500 Tk</strong> are available.`;
+      } else if (words >= 1000) {
+        maxAllowed = 1000;
+        badge.innerText = `Tier: ${words}w (Max 1,000 Tk)`;
+        ruleText.innerHTML = `Your post reached <strong>${words} words</strong>. Packages up to <strong>1,000 Tk</strong> are available.`;
+      } else if (words >= 500) {
+        maxAllowed = 500;
+        badge.innerText = `Tier: ${words}w (Max 500 Tk)`;
+        ruleText.innerHTML = `Your post reached <strong>${words} words</strong>. Packages up to <strong>500 Tk</strong> are available.`;
+      } else {
+        maxAllowed = 300;
+        badge.innerText = `Tier: ${words}w (100–300 Tk Only)`;
+        ruleText.innerHTML = `Posts between <strong>100 and 499 words</strong> can be boosted with <strong>100 Tk and 300 Tk packages only</strong>.`;
+      }
+
+      allPackages.forEach(amt => {
+        const btn = document.getElementById(`pkg-${amt}`);
+        if (!btn) return;
+
+        if (amt <= maxAllowed) {
+          btn.disabled = false;
+          btn.className = "pkg-btn p-2 rounded-lg border border-aqua-border bg-aqua-inputBg text-aqua-textSecondary font-semibold text-xs";
+        } else {
+          btn.disabled = true;
+          btn.className = "pkg-btn p-2 rounded-lg border border-gray-200 bg-gray-100 text-gray-400 font-semibold text-xs cursor-not-allowed opacity-50";
+        }
+      });
+
+      selectPackage(100);
+      document.getElementById('modal-boost').classList.remove('hidden');
+      document.getElementById('modal-boost').classList.add('flex');
+    }
+
+    function closeBoostModal() {
+      targetBoostPostId = null;
+      document.getElementById('modal-boost').classList.add('hidden');
+      document.getElementById('modal-boost').classList.remove('flex');
+    }
+
+    function selectPackage(amount) {
+      selectedBoostPackage = amount;
+
+      document.querySelectorAll('.pkg-btn').forEach(btn => {
+        if (!btn.disabled) {
+          if (parseInt(btn.getAttribute('data-val')) === amount) {
+            btn.className = "pkg-btn p-2 rounded-lg border border-teal-600 bg-teal-50 text-teal-700 font-bold text-xs";
+          } else {
+            btn.className = "pkg-btn p-2 rounded-lg border border-aqua-border bg-aqua-inputBg text-aqua-textSecondary font-semibold text-xs";
+          }
+        }
+      });
+    }
+
+    function submitBoostRequest() {
+      const post = posts.find(p => p.id === targetBoostPostId);
+      if (!post) return;
+
+      post.boostStatus = "pending";
+      post.boostPackage = `${selectedBoostPackage} Tk`;
+
+      alert(`Boost Request Submitted!\nPackage: ${selectedBoostPackage} Tk\nYour campaign has been submitted for verification.`);
+      
+      closeBoostModal();
+      renderFeed();
+    }
+
+    function approveBoost(postId) {
+      const post = posts.find(p => p.id === postId);
+      if (!post) return;
+
+      const days = parseInt(document.getElementById(`adm-days-${postId}`).value);
+      const targetLikes = parseInt(document.getElementById(`adm-likes-${postId}`).value) || 0;
+
+      post.boostStatus = 'active';
+      post.boostExpiresAt = Date.now() + (days * 24 * 60 * 60 * 1000);
+      post.boostPackage = `${post.boostPackage} (${days}d)`;
+      post.autoLikesQueue = targetLikes;
+      post.autoCommentsQueue = 3;
+
+      alert(`Campaign Approved for ${days} Days! Live timer started.`);
+      renderFeed();
+    }
+
+    function rejectBoost(postId) {
+      const post = posts.find(p => p.id === postId);
+      if (!post) return;
+      post.boostStatus = 'none';
+      post.boostPackage = null;
+      renderFeed();
+    }
+
+    // 18. User Tab Switcher (Home & Search Only - Wallet Removed)
+    function switchTab(tab) {
+      const homeView = document.getElementById('view-home');
+      const searchView = document.getElementById('view-search');
+
+      const tabBtnHome = document.getElementById('tab-btn-home');
+      const tabBtnSearch = document.getElementById('tab-btn-search');
+
+      homeView.classList.add('hidden');
+      searchView.classList.add('hidden');
+
+      tabBtnHome.className = "flex-1 py-3 flex justify-center border-b-2 border-transparent text-aqua-textSecondary hover:text-aqua-textPrimary transition";
+      tabBtnSearch.className = "flex-1 py-3 flex justify-center border-b-2 border-transparent text-aqua-textSecondary hover:text-aqua-textPrimary transition";
+
+      if (tab === 'home') {
+        homeView.classList.remove('hidden');
+        tabBtnHome.className = "flex-1 py-3 flex justify-center border-b-2 border-aqua-600 text-aqua-600 transition";
+      } else if (tab === 'search') {
+        searchView.classList.remove('hidden');
+        tabBtnSearch.className = "flex-1 py-3 flex justify-center border-b-2 border-aqua-600 text-aqua-600 transition";
+      }
+      lucide.createIcons();
+    }
+
+    function handleShare() {
+      if (navigator.share) {
+        navigator.share({ title: 'Social Feed Post', text: 'Check out this thought-provoking post!' });
+      } else {
+        alert("Post link copied to clipboard!");
+      }
+    }
+
+    window.onload = () => {
+      document.getElementById('creator-avatar').src = currentUser.avatar;
+      document.getElementById('modal-user-avatar').src = currentUser.avatar;
+      document.getElementById('modal-user-name').innerText = currentUser.name;
+      document.getElementById('modal-user-uid').innerText = `UID: ${currentUser.uid}`;
+      renderFeed();
+    };
+  </script>
+
+  <!-- ================= ADSTERRA SCRIPTS ================= -->
+  <script data-cfasync="false" src="https://afders.org/1/a160858c84473a1c2302ae4e0160b4f3"></script>
+  <script data-cfasync="false" src="https://bicea.org/14/c8f82646ee575e90bdbcb48a1b89fd2f"></script>
+
+</body>
+</html>
