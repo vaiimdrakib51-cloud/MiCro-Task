@@ -193,7 +193,7 @@
             box-shadow: 0 4px 10px rgba(2, 132, 199, 0.25);
         }
 
-        /* 3D Balance Card with New Wallet Icon */
+        /* 3D Balance Card */
         .balance-card {
             background: linear-gradient(135deg, #0284c7 0%, #0d9488 55%, #059669 100%);
             border-radius: 20px;
@@ -209,7 +209,6 @@
         .balance-top-row { display: flex; justify-content: space-between; align-items: center; width: 100%; }
         .balance-left-content { display: flex; align-items: center; gap: 10px; }
         
-        /* নতুন ওয়ালেট আইকন কন্টেইনার */
         .wallet-circle-3d {
             width: 46px;
             height: 46px;
@@ -222,7 +221,7 @@
             border: 1.5px solid rgba(255, 255, 255, 0.45);
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
             flex-shrink: 0;
-            padding: 4px; /* পারফেক্ট ফিটিং এর জন্য */
+            padding: 4px;
             overflow: hidden;
         }
         .wallet-circle-3d img {
@@ -347,7 +346,6 @@
         .video-icon.fb { background: #1877f2; }
         .video-icon.ig { background: linear-gradient(45deg, #f09433, #dc2743, #bc1888); }
         
-        /* নতুন Boost আইকন স্টাইল */
         .video-icon.boost-box { 
             background: linear-gradient(135deg, #f59e0b, #d97706); 
             padding: 4px;
@@ -380,7 +378,7 @@
         .promo-dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255, 255, 255, 0.5); }
         .promo-dot.active { width: 14px; border-radius: 4px; background: #00d2ff; }
 
-        /* PROPORTIONAL BOTTOM NAVIGATION */
+        /* BOTTOM NAVIGATION */
         .bottom-nav {
             position: fixed; 
             bottom: 0; 
@@ -456,17 +454,49 @@
         .nav-link.refer-tab { color: #059669; }
         .nav-link.refer-tab .nav-icon-wrap { color: #10b981; background: #ecfdf5; }
 
-        /* 50 BDT Modal */
-        .verify-modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(6px); z-index: 2100; display: none; align-items: center; justify-content: center; padding: 18px; }
+        /* ================= 50 BDT PREMIUM MODERN VERIFICATION MODAL ================= */
+        .verify-modal-overlay { 
+            position: fixed; inset: 0; background: rgba(5, 11, 24, 0.85); 
+            backdrop-filter: blur(8px); z-index: 2100; display: none; align-items: center; justify-content: center; padding: 18px; 
+        }
         .verify-modal-overlay.active { display: flex; }
-        .verify-modal-card { background: #ffffff; border-radius: 24px; width: 100%; max-width: 320px; padding: 20px 16px; text-align: center; position: relative; animation: sheetUp 0.25s ease; box-shadow: 0 20px 45px rgba(0,0,0,0.25); }
-        .verify-close-btn { position: absolute; top: 12px; right: 14px; background: #f1f5f9; border: none; width: 26px; height: 26px; border-radius: 50%; font-size: 14px; color: #64748b; cursor: pointer; }
-        .verify-badge-large { width: 54px; height: 54px; border-radius: 50%; background: linear-gradient(135deg, #f59e0b, #d97706); color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 10px; }
-        .verify-modal-card h3 { font-size: 16px; font-weight: 850; color: #0f172a; margin-bottom: 4px; }
-        .verify-fee-pill { display: inline-block; background: #fef3c7; border: 1px solid #fde68a; color: #b45309; font-size: 11px; font-weight: 800; padding: 2px 10px; border-radius: 16px; margin-bottom: 8px; }
-        .verify-modal-card p { font-size: 11px; color: #64748b; line-height: 1.4; margin-bottom: 16px; }
-        .btn-verify-now { width: 100%; padding: 11px; border-radius: 14px; border: none; background: linear-gradient(135deg, #10b981, #059669); color: #ffffff; font-size: 13px; font-weight: 800; cursor: pointer; margin-bottom: 6px; }
-        .btn-verify-later { width: 100%; padding: 8px; border-radius: 12px; border: 1px solid #cbd5e1; background: transparent; color: #64748b; font-size: 11px; font-weight: 700; cursor: pointer; }
+        .verify-modal-card { 
+            background: linear-gradient(165deg, #0e1e3e 0%, #081226 100%); 
+            border: 1.5px solid #00d2ff; border-radius: 26px; width: 100%; max-width: 330px; 
+            padding: 24px 20px 20px; text-align: center; position: relative; 
+            box-shadow: 0 20px 50px rgba(0, 180, 255, 0.25); animation: sheetUp 0.25s ease; color: #fff;
+        }
+        .verify-close-btn { 
+            position: absolute; top: 14px; right: 16px; background: rgba(255,255,255,0.08); 
+            border: none; width: 28px; height: 28px; border-radius: 50%; font-size: 14px; color: #94a3b8; cursor: pointer; 
+        }
+        .verify-badge-large { 
+            width: 62px; height: 62px; border-radius: 50%; background: linear-gradient(135deg, #00d2ff, #0066ff); 
+            color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 26px; margin: 0 auto 12px; 
+            box-shadow: 0 0 25px rgba(0, 150, 255, 0.5); border: 2px solid rgba(255,255,255,0.4);
+        }
+        .verify-modal-card h3 { font-size: 17px; font-weight: 850; color: #ffffff; margin-bottom: 4px; }
+        .verify-fee-pill { 
+            display: inline-block; background: rgba(0, 230, 118, 0.15); border: 1px solid #00e676; 
+            color: #00e676; font-size: 11px; font-weight: 800; padding: 3px 12px; border-radius: 20px; margin-bottom: 12px; 
+        }
+        .verify-benefits-list {
+            background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px; padding: 10px 12px; margin-bottom: 16px; text-align: left;
+        }
+        .verify-benefits-list div { font-size: 11px; color: #cbd5e1; margin-bottom: 6px; display: flex; align-items: center; gap: 7px; }
+        .verify-benefits-list div:last-child { margin-bottom: 0; }
+        .verify-benefits-list div i { color: #38bdf8; font-size: 11px; }
+        .btn-verify-now { 
+            width: 100%; padding: 12px; border-radius: 14px; border: none; 
+            background: linear-gradient(135deg, #00d2ff 0%, #0066ff 100%); color: #ffffff; font-size: 13.5px; 
+            font-weight: 800; cursor: pointer; box-shadow: 0 6px 18px rgba(0, 102, 255, 0.4); transition: transform 0.15s; 
+        }
+        .btn-verify-now:active { transform: scale(0.97); }
+        .btn-verify-later { 
+            width: 100%; padding: 10px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.15); 
+            background: transparent; color: #94a3b8; font-size: 11.5px; font-weight: 700; cursor: pointer; margin-top: 6px; 
+        }
 
         /* Logout Modal */
         .logout-modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(5px); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 20px; }
@@ -510,8 +540,8 @@
                 </div>
                 <p class="auth-legal">
                     By signing up, you agree to our 
-                    <a href="#" onclick="showToast('শর্তাবলী ডেমো','info');return false">Terms of Service</a> and 
-                    <a href="#" onclick="showToast('গোপনীয়তা নীতি ডেমো','info');return false">Privacy Policy</a>.
+                    <a href="#" onclick="showToast('Terms of Service','info');return false">Terms of Service</a> and 
+                    <a href="#" onclick="showToast('Privacy Policy','info');return false">Privacy Policy</a>.
                 </p>
             </main>
 
@@ -657,11 +687,10 @@
                     </div>
                 </div>
 
-                <!-- 3D Balance Card (নতুন ওয়ালেট আইকনযুক্ত) -->
+                <!-- 3D Balance Card -->
                 <div class="balance-card">
                     <div class="balance-top-row">
                         <div class="balance-left-content">
-                            <!-- আপনার দেওয়া নতুন সুন্দর ৩ডি ওয়ালেট আইকন -->
                             <div class="wallet-circle-3d">
                                 <img src="https://i.ibb.co.com/CpmVs7PB/wallet.png" alt="Wallet">
                             </div>
@@ -730,7 +759,7 @@
                     </div>
                 </div>
 
-                <!-- 3D Task Card 1: Videos (TikTok এর জায়গায় Boost যুক্ত) -->
+                <!-- 3D Task Card 1: Videos -->
                 <div class="task-card-3d">
                     <div class="task-row-header">
                         <div class="task-left-meta">
@@ -765,7 +794,6 @@
                             <small>+ Earn</small>
                         </div>
                         
-                        <!-- টিকটকের বদলে নতুন Boost অপশন -->
                         <div class="video-card-3d" onclick="handleBoostClick()">
                             <div class="video-icon boost-box">
                                 <img src="https://i.ibb.co.com/S71wYZrD/capital-gain.png" alt="Boost">
@@ -822,7 +850,7 @@
 
             </div>
 
-            <!-- PROPORTIONAL BOTTOM NAVIGATION -->
+            <!-- BOTTOM NAVIGATION -->
             <nav class="bottom-nav">
                 <div class="nav-link home-tab active" onclick="window.location.href='index.html'">
                     <div class="nav-icon-wrap"><i class="fa-solid fa-house-chimney"></i></div>
@@ -855,19 +883,25 @@
 
     </div>
 
-    <!-- 50 BDT Modal -->
+    <!-- ================= 50 BDT PREMIUM MODERN VERIFICATION MODAL ================= -->
     <div class="verify-modal-overlay" id="verificationModal">
         <div class="verify-modal-card">
             <button type="button" class="verify-close-btn" onclick="closeVerifyModal()">✕</button>
             <div class="verify-badge-large"><i class="fa-solid fa-shield-halved"></i></div>
             <h3>Account Verification</h3>
-            <span class="verify-fee-pill">ফি মাত্র: ৫০ টাকা</span>
-            <p>আপনার অ্যাকাউন্টটি নিরাপদ রাখতে এবং টাস্ক পূরণ ও উইথড্র অপশন আনলক করতে ৫০ টাকা দিয়ে অ্যাকাউন্ট ভেরিফাই সম্পন্ন করুন।</p>
+            <span class="verify-fee-pill">Fee: ৳50 BDT (~$0.42 USD)</span>
+            
+            <div class="verify-benefits-list">
+                <div><i class="fa-solid fa-circle-check"></i> Unlock all Video & Typing Tasks</div>
+                <div><i class="fa-solid fa-circle-check"></i> Enable instant Cash Withdrawals</div>
+                <div><i class="fa-solid fa-circle-check"></i> ৳50 will be charged from Main Balance</div>
+            </div>
+
             <div style="display:flex; flex-direction:column; gap:6px;">
-                <button type="button" class="btn-verify-now" onclick="processAccountVerification()">
-                    <i class="fa-solid fa-circle-check"></i> এখনই ভেরিফাই করুন (৫০৳)
+                <button type="button" class="btn-verify-now" id="btnVerifySubmit" onclick="processAccountVerification()">
+                    <i class="fa-solid fa-lock-open"></i> Pay ৳50 & Verify Now
                 </button>
-                <button type="button" class="btn-verify-later" onclick="closeVerifyModal()">পরে করব</button>
+                <button type="button" class="btn-verify-later" onclick="closeVerifyModal()">Maybe Later</button>
             </div>
         </div>
     </div>
@@ -940,7 +974,6 @@
                 document.getElementById("totalEarnText").textContent = `$ ${totalEarn.toFixed(2)}`;
             }
 
-            // রেফারেল লিঙ্ক থেকে আসলে অটো-ফিল কোড
             const urlParams = new URLSearchParams(window.location.search);
             const refParam = urlParams.get('ref');
             if (refParam) {
@@ -1010,7 +1043,7 @@
 
         function openVerifyModal() {
             if (isUserVerified()) {
-                showToast("অ্যাকাউন্ট ভেরিফাইড!", "success");
+                showToast("Your account is already Verified!", "success");
                 return;
             }
             document.getElementById('verificationModal').classList.add('active');
@@ -1020,12 +1053,12 @@
 
         function handleSecureNav(destinationUrl) {
             if (!isUserVerified()) {
-                showToast("টাস্ক ও উইথড্র করতে আগে ৫০৳ দিয়ে ভেরিফাই করুন!", "error");
+                showToast("Verify account with 50 BDT to unlock this feature!", "error");
                 openVerifyModal();
                 return;
             }
             if (destinationUrl === 'typing') {
-                showToast("টাস্ক লোড হচ্ছে...", "info");
+                showToast("Loading typing tasks...", "info");
             } else {
                 window.location.href = destinationUrl;
             }
@@ -1033,28 +1066,59 @@
 
         function handleBoostClick() {
             if (!isUserVerified()) {
-                showToast("বুস্ট অপশন পেতে আগে ৫০৳ দিয়ে ভেরিফাই করুন!", "error");
+                showToast("Verify account with 50 BDT to access Boost!", "error");
                 openVerifyModal();
                 return;
             }
-            showToast("বুস্ট ফিচার খুব শীঘ্রই লাইভ হচ্ছে!", "info");
+            showToast("Boost feature is going live soon!", "info");
         }
 
+        // ================= মেইন ব্যালেন্স থেকে ৫০ টাকা ($0.42) কেটে ভেরিফাই করা =================
         function processAccountVerification() {
             const user = auth.currentUser;
-            if (!user) return;
-            db.collection("users").doc(user.uid).update({ isVerified: true })
-            .then(() => {
+            if (!user) {
+                showToast("Please sign in first!", "error");
+                return;
+            }
+
+            const feeBDT = 50;
+            const feeUSD = parseFloat((feeBDT / 120).toFixed(4)); // $0.4167
+            const currentBal = currentUserDoc ? (currentUserDoc.balanceUSD || 0) : 0;
+
+            // ব্যালেন্স ৫০ টাকার কম থাকলে রিজেক্ট করবে
+            if (currentBal < feeUSD) {
+                showToast("Insufficient Balance! Need at least ৳50 (~$0.42).", "error");
+                setTimeout(() => {
+                    closeVerifyModal();
+                    window.location.href = "deposit.html";
+                }, 1500);
+                return;
+            }
+
+            const btn = document.getElementById('btnVerifySubmit');
+            btn.disabled = true;
+            btn.innerText = "Processing...";
+
+            // ব্যালেন্স কর্তন এবং একাউন্ট ভেরিফাই
+            db.collection("users").doc(user.uid).update({
+                balanceUSD: firebase.firestore.FieldValue.increment(-feeUSD),
+                isVerified: true
+            }).then(() => {
                 closeVerifyModal();
-                showToast("অ্যাকাউন্ট ভেরিফাইড!", "success");
-            }).catch(err => showToast("ত্রুটি হয়েছে!", "error"));
+                showToast("Account Verified! ৳50 ($0.42) deducted.", "success");
+            }).catch(err => {
+                showToast("Verification failed: " + err.message, "error");
+            }).finally(() => {
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fa-solid fa-lock-open"></i> Pay ৳50 & Verify Now`;
+            });
         }
 
         function copyUID() {
             const uidText = document.getElementById('uidText').innerText.replace(/[^0-9]/g, '').trim();
-            if (!uidText || uidText === "000000") { showToast("প্রথমে লগইন করুন!", "error"); return; }
+            if (!uidText || uidText === "000000") { showToast("Please log in first!", "error"); return; }
             if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(uidText).then(() => showToast("UID কপি হয়েছে: " + uidText, "success")).catch(() => fallbackCopy(uidText));
+                navigator.clipboard.writeText(uidText).then(() => showToast("UID copied: " + uidText, "success")).catch(() => fallbackCopy(uidText));
             } else { fallbackCopy(uidText); }
         }
 
@@ -1066,7 +1130,7 @@
             document.body.appendChild(textarea);
             textarea.focus();
             textarea.select();
-            try { document.execCommand('copy'); showToast("UID কপি হয়েছে: " + text, "success"); } catch (err) { showToast("কপি ব্যর্থ!", "error"); }
+            try { document.execCommand('copy'); showToast("UID copied: " + text, "success"); } catch (err) { showToast("Failed to copy!", "error"); }
             document.body.removeChild(textarea);
         }
 
@@ -1097,7 +1161,7 @@
 
         function handleTelegramTaskClick() {
             if (!isUserVerified()) {
-                showToast("টাস্ক বোনাস পেতে আগে ৫০৳ দিয়ে ভেরিফাই করুন!", "error");
+                showToast("Verify account with 50 BDT to claim task bonus!", "error");
                 openVerifyModal();
                 return;
             }
@@ -1109,7 +1173,7 @@
             setTimeout(() => {
                 addEarningToUser(0.10);
                 db.collection("users").doc(user.uid).update({ telegramClaimed: true }).then(() => {
-                    showToast("$0.10 বোনাস যোগ হয়েছে!", "success");
+                    showToast("$0.10 Telegram bonus added!", "success");
                 });
             }, 1500);
         }
@@ -1123,7 +1187,7 @@
                 localStorage.removeItem('microtask_cached_user');
                 document.getElementById('mainDashboard').style.display = 'none';
                 document.getElementById('authScreen').style.display = 'flex';
-                showToast('লগআউট সম্পন্ন।', 'info');
+                showToast('Logged out successfully.', 'info');
             });
         }
 
@@ -1149,7 +1213,6 @@
             });
         }
 
-        // রেজিস্ট্রেশন হ্যান্ডলার (রেফার কোড সিঙ্কসহ)
         function handleInvezoRegister(e) {
             e.preventDefault();
             const name = document.getElementById('regName').value.trim();
@@ -1189,7 +1252,6 @@
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     };
 
-                    // রেফার কোড থাকলে রেফারার ইউজারের রেফারেল কাউন্ট বাড়ানো
                     if (referCode) {
                         db.collection("users").where("uid", "==", referCode).get().then(snap => {
                             if (!snap.empty) {
@@ -1258,11 +1320,11 @@
                     };
                     localStorage.setItem('microtask_cached_user', JSON.stringify(userPayload));
                     userRef.set(userPayload).then(() => {
-                        showToast("লগইন সফল!", "success");
+                        showToast("Login successful!", "success");
                         closeSheet();
                     });
                 } else {
-                    showToast("লগইন সফল!", "success");
+                    showToast("Login successful!", "success");
                     closeSheet();
                 }
             });
@@ -1271,26 +1333,22 @@
         function handleSocialAuth(provider) {
             if (provider === 'Google') {
                 const googleProvider = new firebase.auth.GoogleAuthProvider();
-                showToast("গুগল সংযোগ হচ্ছে...", "info");
+                showToast("Connecting Google...", "info");
                 
                 auth.signInWithPopup(googleProvider)
                     .then(result => {
                         handleUserFirestoreSync(result.user, 'Google User');
                     })
                     .catch(error => {
-                        console.warn("Popup blocked or failed, trying redirect: ", error);
+                        console.warn("Popup error: ", error);
                         if (error.code === 'auth/popup-blocked' || error.code === 'auth/operation-not-supported-in-this-environment') {
                             auth.signInWithRedirect(googleProvider);
-                        } else if (error.code === 'auth/unauthorized-domain') {
-                            showToast("ফায়ারবেসে ডোমেন পারমিশন দিতে হবে!", "error");
-                        } else if (error.code === 'auth/popup-closed-by-user') {
-                            showToast("লগইন বাতিল", "info");
                         } else {
-                            showToast("লগইন ব্যর্থ!", "error");
+                            showToast("Login failed!", "error");
                         }
                     });
             } else if (provider === 'Facebook') {
-                showToast("ফেসবুক সাইন-ইন শীঘ্রই আসছে!", "info");
+                showToast("Facebook sign-in coming soon!", "info");
             }
         }
 
@@ -1298,7 +1356,7 @@
             e.preventDefault();
             const email = document.getElementById('forgotIdentity').value.trim();
             auth.sendPasswordResetEmail(email)
-                .then(() => { showToast('রিসেট লিঙ্ক পাঠানো হয়েছে!', 'success'); showView('login'); })
+                .then(() => { showToast('Reset instructions sent!', 'success'); showView('login'); })
                 .catch(err => showToast(err.message, 'error'));
         }
 
