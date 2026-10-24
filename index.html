@@ -358,7 +358,7 @@
         .video-card-3d span { font-size: 11px; color: #0f172a; font-weight: 800; margin-top: 2px; }
         .video-card-3d small { font-size: 9.5px; color: #059669; font-weight: 850; }
 
-        /* PROMO BANNER (Proportionally Scaled to 155px) */
+        /* PROMO BANNER (Scaled to 155px) */
         .promo-banner-container { 
             position: relative; 
             width: 100%; 
@@ -376,7 +376,7 @@
         .promo-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255, 255, 255, 0.5); }
         .promo-dot.active { width: 16px; border-radius: 5px; background: #00d2ff; }
 
-        /* BOTTOM NAVIGATION (Native Proportions) */
+        /* BOTTOM NAVIGATION */
         .bottom-nav {
             position: fixed; 
             bottom: 0; 
@@ -756,7 +756,7 @@
                     </div>
                 </div>
 
-                <!-- 3D Task Card 1: Videos -->
+                <!-- 3D Task Card 1: Videos (YouTube ও Boost সম্পূর্ণ ফিক্সড) -->
                 <div class="task-card-3d">
                     <div class="task-row-header">
                         <div class="task-left-meta">
@@ -775,23 +775,29 @@
                     </div>
 
                     <div class="video-grid">
-                        <div class="video-card-3d" onclick="handleSecureNav('youtube-tasks.html')">
+                        <!-- YouTube: GitHub ফাইলের সাথে মিলিয়ে youtube-task.html দেওয়া হয়েছে -->
+                        <div class="video-card-3d" onclick="handleSecureNav('youtube-task.html')">
                             <div class="video-icon yt"><i class="fa-brands fa-youtube"></i></div>
                             <span>YouTube</span>
                             <small>+ Earn</small>
                         </div>
+                        
+                        <!-- Facebook -->
                         <div class="video-card-3d" onclick="handleSecureNav('facebook-tasks.html')">
                             <div class="video-icon fb"><i class="fa-brands fa-facebook-f"></i></div>
                             <span>Facebook</span>
                             <small>+ Earn</small>
                         </div>
+                        
+                        <!-- Instagram -->
                         <div class="video-card-3d" onclick="handleSecureNav('instagram-tasks.html')">
                             <div class="video-icon ig"><i class="fa-brands fa-instagram"></i></div>
                             <span>Instagram</span>
                             <small>+ Earn</small>
                         </div>
                         
-                        <div class="video-card-3d" onclick="handleBoostClick()">
+                        <!-- Boost: সরাসরি boost.html পেজে নিয়ে যাবে -->
+                        <div class="video-card-3d" onclick="handleSecureNav('boost.html')">
                             <div class="video-icon boost-box">
                                 <img src="https://i.ibb.co.com/S71wYZrD/capital-gain.png" alt="Boost">
                             </div>
@@ -1048,6 +1054,7 @@
 
         function closeVerifyModal() { document.getElementById('verificationModal').classList.remove('active'); }
 
+        // সিকিউর নেভিগেশন (ভেরিফাইড হলে ইউটিউব, ফেসবুক, ইনস্টাগ্রাম, বুস্ট সব ওপেন হবে)
         function handleSecureNav(destinationUrl) {
             if (!isUserVerified()) {
                 showToast("Verify account with 50 BDT to unlock this feature!", "error");
@@ -1062,12 +1069,7 @@
         }
 
         function handleBoostClick() {
-            if (!isUserVerified()) {
-                showToast("Verify account with 50 BDT to access Boost!", "error");
-                openVerifyModal();
-                return;
-            }
-            showToast("Boost feature is going live soon!", "info");
+            handleSecureNav('boost.html');
         }
 
         // ================= মেইন ব্যালেন্স থেকে ৫০ টাকা ($0.42) কেটে ভেরিফাই করা =================
@@ -1430,7 +1432,7 @@
             }
         }
 
-        // নোটিফিকেশন কাউন্ট (ব্যক্তিগত ফিল্টারিং সহ)
+        // নোটিফিকেশন কাউন্ট
         function initNotificationBadge() {
             db.collection("notifications").onSnapshot(snapshot => {
                 const readIds = JSON.parse(localStorage.getItem('read_notif_ids') || '[]');
