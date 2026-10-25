@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 
-  <!-- Firebase SDK (Live Task & Admin Sync) -->
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -36,7 +36,7 @@
     .notice-bar { background: rgba(0, 85, 255, 0.15); border: 1px dashed #0088ff; border-radius: 12px; padding: 8px 12px; font-size: 10.5px; color: #a3ccff; display: flex; align-items: center; gap: 8px; }
     .notice-bar i { color: #00d2ff; }
     
-    /* Dynamic Task List */
+    /* Task List */
     .task-list { display: flex; flex-direction: column; gap: 10px; flex: 1; }
     .task-card { background: linear-gradient(180deg, #071e45 0%, #020e24 100%); border: 1.5px solid #0066ff; border-radius: 16px; padding: 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px; cursor: pointer; transition: 0.2s; }
     .task-card:hover { transform: translateY(-2px); border-color: #3895ff; }
@@ -48,19 +48,19 @@
     
     .task-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2.5px; }
     .task-name { color: #ffffff; font-size: 12px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .task-reward { display: flex; align-items: center; gap: 4px; }
-    .mini-coin { width: 12px; height: 12px; background: radial-gradient(circle at 35% 35%, #ffe600, #ff9900 80%); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; color: #633900; font-weight: 900; font-size: 7px; }
-    .reward-coins { color: #ffcc00; font-size: 10.5px; font-weight: 700; }
+    
+    /* সরাসরি ডলার ($ USD) ডিসপ্লে */
+    .task-reward { display: flex; align-items: center; gap: 5px; }
+    .mini-usd-tag { background: linear-gradient(135deg, #10b981, #059669); color: #ffffff; font-size: 9px; font-weight: 900; padding: 1px 6px; border-radius: 6px; }
+    .reward-amount { color: #34d399; font-size: 11.5px; font-weight: 850; }
     
     .task-tags { display: flex; gap: 3.5px; margin-top: 1px; }
     .tag { background: rgba(0, 114, 255, 0.2); border: 0.5px solid #0077ff; color: #8cc3ff; font-size: 8px; padding: 1.5px 4.5px; border-radius: 4px; font-weight: 600; display: inline-flex; align-items: center; gap: 2.5px; }
     .tag.completed { background: rgba(0, 230, 118, 0.15) !important; border-color: #00e676 !important; color: #69f0ae !important; }
-    .tag.completed i { color: #00e676; font-size: 7.5px; }
     
     .btn-3d { background: linear-gradient(180deg, #00c6ff 0%, #0072ff 100%); border: 1px solid #75d4ff; color: white; font-size: 11px; font-weight: 700; padding: 6px 11px; border-radius: 14px; display: flex; align-items: center; gap: 4px; cursor: pointer; white-space: nowrap; }
     .btn-pending { background: linear-gradient(180deg, #ffb300 0%, #e67e00 100%); border: 1px solid #ffe082; color: #fff; font-size: 9.5px; font-weight: 700; padding: 5px 8px; border-radius: 12px; display: flex; align-items: center; gap: 3px; white-space: nowrap; }
     
-    /* Empty State */
     .empty-tasks { text-align: center; padding: 40px 10px; color: #7faaf0; font-size: 12px; display: none; }
     .empty-tasks i { font-size: 32px; color: #3b82f6; margin-bottom: 8px; display: block; }
 
@@ -69,35 +69,41 @@
     .modal-box { width: 100%; max-width: 390px; background: radial-gradient(circle at 50% 0%, #0d3170 0%, #04122d 70%, #010714 100%); border: 1.5px solid #0088ff; border-radius: 22px; padding: 18px 16px; box-shadow: 0 0 25px rgba(0, 136, 255, 0.4); display: flex; flex-direction: column; gap: 12px; position: relative; }
     .close-btn { position: absolute; top: 15px; right: 16px; color: #85b8ff; font-size: 18px; cursor: pointer; }
     .modal-title { color: #fff; font-size: 15px; font-weight: 700; }
+    
     .step-box { background: rgba(0, 20, 50, 0.6); border: 1px solid #0055c4; border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 6px; }
     .step-header { color: #55b3ff; font-size: 10.5px; font-weight: 700; display: flex; align-items: center; gap: 5px; }
-    .video-link-btn { display: flex; align-items: center; justify-content: center; gap: 6px; background: linear-gradient(180deg, #1877f2 0%, #0d54b3 100%); color: white; text-decoration: none; padding: 9px; border-radius: 10px; font-size: 11.5px; font-weight: 700; border: 1px solid #5aa7ff; }
     
+    /* সরাসরি অ্যাপ ওপেন করার বাটন */
+    .video-link-btn { display: flex; align-items: center; justify-content: center; gap: 7px; background: linear-gradient(180deg, #1877f2 0%, #0d54b3 100%); color: white; text-decoration: none; padding: 10px; border-radius: 12px; font-size: 12px; font-weight: 800; border: 1px solid #5aa7ff; cursor: pointer; box-shadow: 0 4px 12px rgba(24, 119, 242, 0.35); }
+    .video-link-btn:active { transform: scale(0.97); }
+    
+    /* গ্যালারি ফাইল আপলোড স্লট */
     .upload-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 4px; }
     .upload-slot { border: 1.5px dashed #0088ff; background: rgba(0, 40, 100, 0.25); border-radius: 10px; height: 82px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; position: relative; overflow: hidden; }
     .upload-slot i { font-size: 18px; color: #00a2ff; margin-bottom: 3px; }
     .upload-slot span { color: #a4cdff; font-size: 9.5px; font-weight: 600; text-align: center; }
     .slot-preview { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: none; }
+    
     .submit-btn { background: linear-gradient(180deg, #00d2ff 0%, #0066eb 100%); border: 1px solid #8be5ff; color: white; font-size: 13px; font-weight: 700; padding: 10px; border-radius: 18px; cursor: pointer; width: 100%; text-align: center; }
+    .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
   </style>
 </head>
 <body>
   <div class="app-screen">
     <div class="header">
-      <!-- ড্যাশবোর্ডে ফিরে যাওয়ার বাটন -->
       <div class="back-btn" onclick="window.location.href='index.html'" title="Back to Dashboard">
         <i class="fa-solid fa-arrow-left"></i>
       </div>
       <div class="logo-3d"><i class="fa-brands fa-facebook-f"></i></div>
-      <div class="header-title"><h2>Facebook Tasks</h2><p>Watch • Like • Submit 3 Proofs</p></div>
+      <div class="header-title"><h2>Facebook Tasks</h2><p>Watch in App • Like • Earn USD ($)</p></div>
     </div>
     
     <div class="notice-bar">
       <i class="fa-solid fa-circle-info"></i>
-      <span>Upload 3 screenshots (Like, Follow, Comment) to submit.</span>
+      <span>Upload 3 screenshots from gallery to submit for Admin review.</span>
     </div>
     
-    <!-- ফায়ারবেস থেকে লাইভ টাস্ক লোড হবে -->
+    <!-- ফায়ারবেস থেকে লাইভ টাস্ক লোড -->
     <div class="task-list" id="taskListContainer">
       <div class="empty-tasks" id="emptyTasksMsg">
         <i class="fa-solid fa-clipboard-check"></i>
@@ -111,27 +117,37 @@
     <div class="modal-box">
       <i class="fa-solid fa-xmark close-btn" onclick="closeModal()"></i>
       <h3 class="modal-title" id="m-title">Complete Task & Submit</h3>
+      
       <div class="step-box">
-        <div class="step-header"><i class="fa-solid fa-1"></i> Step 1: Watch Video on Facebook</div>
-        <a href="#" id="m-link" target="_blank" class="video-link-btn"><i class="fa-brands fa-facebook"></i> Open Facebook Video</a>
+        <div class="step-header"><i class="fa-solid fa-1"></i> Step 1: Open Video in Facebook App</div>
+        <!-- সরাসরি ফোনে ইনস্টল থাকা ফেসবুক অ্যাপ ওপেন হবে -->
+        <button type="button" id="m-app-btn" class="video-link-btn" onclick="openTargetFacebookApp()">
+          <i class="fa-brands fa-facebook"></i> Open in Facebook App
+        </button>
       </div>
+
       <div class="step-box">
-        <div class="step-header"><i class="fa-solid fa-2"></i> Step 2: Upload 3 Proof Screenshots</div>
+        <div class="step-header"><i class="fa-solid fa-2"></i> Step 2: Upload 3 Screenshots from Gallery</div>
         <div class="upload-grid">
           <div class="upload-slot" onclick="triggerInput('file-1')"><i class="fa-solid fa-thumbs-up"></i><span>1. Like</span><img id="prev-1" class="slot-preview"></div>
+          <!-- গ্যালারি পারমিশন নিশ্চিত করতে accept="image/*" ব্যবহার করা হয়েছে -->
           <input type="file" id="file-1" accept="image/*" style="display:none;" onchange="previewSlot(1, event)">
+          
           <div class="upload-slot" onclick="triggerInput('file-2')"><i class="fa-solid fa-user-plus"></i><span>2. Follow</span><img id="prev-2" class="slot-preview"></div>
           <input type="file" id="file-2" accept="image/*" style="display:none;" onchange="previewSlot(2, event)">
+          
           <div class="upload-slot" onclick="triggerInput('file-3')"><i class="fa-solid fa-comment-dots"></i><span>3. Comment</span><img id="prev-3" class="slot-preview"></div>
           <input type="file" id="file-3" accept="image/*" style="display:none;" onchange="previewSlot(3, event)">
         </div>
       </div>
-      <button class="submit-btn" id="submitBtn" onclick="submitProof()"><i class="fa-solid fa-circle-check"></i> Submit for Review</button>
+
+      <button class="submit-btn" id="submitBtn" onclick="submitProof()">
+        <i class="fa-solid fa-circle-check"></i> Submit for Admin Review
+      </button>
     </div>
   </div>
 
   <script>
-    // ফায়ারবেস কনফিগ
     const firebaseConfig = {
       apiKey: "AIzaSyBrG81DRVjx040QhiT68yyRErGXjuCPdS4",
       authDomain: "micro-task-2906d.firebaseapp.com",
@@ -147,31 +163,30 @@
     const db = firebase.firestore();
 
     let activeTaskId = null;
+    let activeTaskUrl = '';
+    let activeRewardUSD = 0.20;
     let pendingTasks = new Set(JSON.parse(localStorage.getItem('fb_pending_tasks') || '[]'));
 
-    // ডিফল্ট ডেমো টাস্ক (যদি এডমিন ডাটাবেসে এখনও টাস্ক না দেয়)
+    // ডিফল্ট ডেমো টাস্ক (কয়েনের বদলে সরাসরি ডলার ডিসপ্লে)
     const DEFAULT_FB_TASKS = [
-      { id: 'fb-1', title: 'Viral Facebook Reel #1', coins: 25, duration: '1:45', url: 'https://facebook.com' },
-      { id: 'fb-2', title: 'Tech Review Episode #2', coins: 20, duration: '2:10', url: 'https://facebook.com' }
+      { id: 'fb-1', title: 'Viral Facebook Reel #1', rewardUSD: 0.25, duration: '1:45', url: 'https://facebook.com' },
+      { id: 'fb-2', title: 'Tech Review Episode #2', rewardUSD: 0.20, duration: '2:10', url: 'https://facebook.com' }
     ];
 
-    // ফায়ারবেস থেকে লাইভ টাস্ক লোড
     function listenToLiveTasks() {
       db.collection("tasks").where("platform", "==", "facebook").onSnapshot(snapshot => {
         const container = document.getElementById('taskListContainer');
         const emptyMsg = document.getElementById('emptyTasksMsg');
-
-        // পুরোনো কার্ড রিমুভ
         container.querySelectorAll('.task-card').forEach(c => c.remove());
 
         if (snapshot.empty) {
-          // এডমিন ডাটাবেসে কোনো টাস্ক না থাকলে ডিফল্ট ডেমো টাস্ক দেখাবে
           renderTasksArray(DEFAULT_FB_TASKS);
         } else {
           emptyMsg.style.display = 'none';
           snapshot.forEach(doc => {
             const data = doc.data();
-            renderSingleTaskCard(doc.id, data.title, data.coins, data.duration || '1:30', data.url || 'https://facebook.com');
+            const reward = data.rewardUSD || (data.coins ? (data.coins / 100) : 0.20);
+            renderSingleTaskCard(doc.id, data.title, reward, data.duration || '1:30', data.url || 'https://facebook.com');
           });
         }
       }, err => {
@@ -180,19 +195,17 @@
     }
 
     function renderTasksArray(array) {
-      array.forEach(t => {
-        renderSingleTaskCard(t.id, t.title, t.coins, t.duration, t.url);
-      });
+      array.forEach(t => renderSingleTaskCard(t.id, t.title, t.rewardUSD || 0.20, t.duration, t.url));
     }
 
-    function renderSingleTaskCard(id, title, coins, duration, url) {
+    function renderSingleTaskCard(id, title, rewardUSD, duration, url) {
       const container = document.getElementById('taskListContainer');
       const isPending = pendingTasks.has(id);
 
       const card = document.createElement('div');
       card.className = `task-card ${isPending ? 'is-pending' : ''}`;
       card.id = id;
-      card.onclick = () => handleCardClick(id, title, coins, url);
+      card.onclick = () => handleCardClick(id, title, rewardUSD, url);
 
       card.innerHTML = `
         <div class="task-thumb">
@@ -202,8 +215,8 @@
         <div class="task-info">
           <span class="task-name">${title}</span>
           <div class="task-reward">
-            <span class="mini-coin">$</span>
-            <span class="reward-coins">+${coins} Coins</span>
+            <span class="mini-usd-tag">USD</span>
+            <span class="reward-amount">+$${parseFloat(rewardUSD).toFixed(2)}</span>
           </div>
           <div class="task-tags">
             <span class="tag ${isPending ? 'completed' : ''}">${isPending ? '<i class="fa-solid fa-check"></i> ' : ''}Like</span>
@@ -221,11 +234,14 @@
       container.appendChild(card);
     }
 
-    function handleCardClick(id, title, coins, url) {
-      if(pendingTasks.has(id)) { alert("This task is currently Pending review!"); return; }
+    function handleCardClick(id, title, rewardUSD, url) {
+      if(pendingTasks.has(id)) { alert("This task is currently Pending Admin review!"); return; }
       activeTaskId = id;
-      document.getElementById('m-title').innerText = title + " (+" + coins + " Coins)";
-      document.getElementById('m-link').href = url;
+      activeTaskUrl = url;
+      activeRewardUSD = parseFloat(rewardUSD) || 0.20;
+
+      document.getElementById('m-title').innerText = `${title} (+$${activeRewardUSD.toFixed(2)})`;
+      
       for(let i=1; i<=3; i++){ 
         document.getElementById('file-'+i).value=""; 
         document.getElementById('prev-'+i).style.display="none"; 
@@ -233,14 +249,36 @@
       document.getElementById('taskModal').style.display = "flex";
     }
 
+    // ================= সরাসরি ফোনে থাকা ফেসবুক অ্যাপ ওপেন করার ডিপ লিংক =================
+    function openTargetFacebookApp() {
+      if (!activeTaskUrl) return;
+
+      const isAndroid = /android/i.test(navigator.userAgent);
+      const cleanUrl = activeTaskUrl.replace(/^https?:\/\//, '');
+
+      if (isAndroid) {
+        // অ্যান্ড্রয়েড ফোনে ফেসবুকের অফিসিয়াল অ্যাপ চালু করবে
+        window.location.href = `intent://${cleanUrl}#Intent;package=com.facebook.katana;scheme=https;end`;
+      } else {
+        // আইফোন বা অন্য ডিভাইসে অ্যাপ স্কিম
+        window.location.href = `fb://facewebmodal/f?href=${encodeURIComponent(activeTaskUrl)}`;
+      }
+
+      // ফোনে ফেসবুক অ্যাপ না থাকলে ব্রাউজারে ব্যাকআপ হিসেবে ওপেন হবে
+      setTimeout(() => {
+        window.open(activeTaskUrl, '_blank');
+      }, 1500);
+    }
+
+    // গ্যালারি থেকে ছবি সিলেক্টের ট্রিগার
     function triggerInput(id){ document.getElementById(id).click(); }
     
     function previewSlot(num, e){
-      if(e.target.files[0]){
+      if(e.target.files && e.target.files[0]){
         let r = new FileReader();
         r.onload = function(ev){ 
-          document.getElementById('prev-'+num).src=ev.target.result; 
-          document.getElementById('prev-'+num).style.display="block"; 
+          document.getElementById('prev-'+num).src = ev.target.result; 
+          document.getElementById('prev-'+num).style.display = "block"; 
         };
         r.readAsDataURL(e.target.files[0]);
       }
@@ -248,15 +286,15 @@
 
     function closeModal(){ document.getElementById('taskModal').style.display="none"; }
 
-    // ইউজার সাবমিট করলে পেন্ডিং হবে এবং ফায়ারবেসে সাবমিশন সেভ হবে
+    // প্রুফ সাবমিশন (ড্যাশবোর্ডের ৬ সংখ্যার UID দিয়ে সেভ হবে এবং পেন্ডিং থাকবে)
     function submitProof(){
       if(!document.getElementById('file-1').files.length || !document.getElementById('file-2').files.length || !document.getElementById('file-3').files.length){
-        alert("Please upload all 3 screenshots!"); return;
+        alert("Please upload all 3 screenshots from your gallery!"); return;
       }
 
       const btn = document.getElementById('submitBtn');
       btn.disabled = true;
-      btn.innerText = "Submitting...";
+      btn.innerText = "Submitting to Admin...";
       
       pendingTasks.add(activeTaskId);
       localStorage.setItem('fb_pending_tasks', JSON.stringify([...pendingTasks]));
@@ -265,25 +303,27 @@
       if(card) {
         card.classList.add('is-pending');
         card.querySelector('.action-btn-area').innerHTML = '<div class="btn-pending"><i class="fa-solid fa-clock"></i> Pending</div>';
-        card.querySelectorAll('.task-tags .tag').forEach(tag => {
-          tag.classList.add('completed');
-          tag.innerHTML = `<i class="fa-solid fa-check"></i> ${tag.innerText.trim().replace(/^.*?\s/, '')}`;
-        });
       }
 
-      // ফায়ারবেসে টাস্ক সাবমিশন রেকর্ড সেভ (এডমিন চেক করার জন্য)
-      const user = auth.currentUser;
+      const cachedUser = JSON.parse(localStorage.getItem('microtask_cached_user')) || {};
+      const userUID = String(cachedUser.uid || '000000').trim(); // ড্যাশবোর্ডের ৬ সংখ্যার UID (যেমন: 798686)
+
+      // ফায়ারবেসে সাবমিশন সেভ (সরাসরি ডলারে রিওয়ার্ড রেকর্ড হবে)
       db.collection("task_submissions").add({
         taskId: activeTaskId,
         platform: "facebook",
-        uid: user ? user.uid : "guest",
+        uid: userUID, // ৬ ডিজিট ইউআইডি
+        rewardUSD: activeRewardUSD,
         status: "pending",
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
+        alert("Proof submitted successfully! It is now Pending review in the Admin Panel.");
+        closeModal();
+      }).catch(err => {
+        alert("Submission error: " + err.message);
       }).finally(() => {
         btn.disabled = false;
-        btn.innerText = "Submit for Review";
-        alert("Submitted successfully! Task is Pending review.");
-        closeModal();
+        btn.innerText = "Submit for Admin Review";
       });
     }
 
