@@ -14,49 +14,278 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
-    body { background-color: #f0f9ff; color: #0f172a; min-height: 100vh; display: flex; justify-content: center; padding: 12px 10px 30px; }
-    .app-container { width: 100%; max-width: 480px; background: #ffffff; border-radius: 24px; padding: 18px 15px; box-shadow: 0 8px 30px rgba(2, 132, 199, 0.08); border: 1.5px solid #d4ebf8; min-height: 90vh; display: flex; flex-direction: column; }
-    
-    .header { margin-bottom: 16px; }
-    .title-row { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
-    .back-btn { width: 36px; height: 36px; border-radius: 50%; background: #f1f5f9; border: none; display: flex; align-items: center; justify-content: center; font-size: 16px; color: #0284c7; cursor: pointer; margin-right: 2px; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: #f0f9ff;
+      color: #0f172a;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 12px 10px 30px;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 480px;
+      background: #ffffff;
+      border-radius: 24px;
+      padding: 18px 15px;
+      box-shadow: 0 8px 30px rgba(2, 132, 199, 0.08);
+      border: 1.5px solid #d4ebf8;
+      min-height: 90vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* হেডার */
+    .header {
+      margin-bottom: 16px;
+    }
+
+    .title-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 4px;
+    }
+
+    .back-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #f1f5f9;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      color: #0284c7;
+      cursor: pointer;
+      margin-right: 2px;
+      transition: transform 0.15s;
+    }
     .back-btn:active { transform: scale(0.92); }
-    .title-row .bell-icon { font-size: 22px; color: #f59e0b; }
-    .title-row h1 { font-size: 20px; font-weight: 850; color: #0f172a; }
-    .badge-count { background-color: #ef4444; color: #ffffff; font-size: 11px; font-weight: 800; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
-    .subtitle { color: #64748b; font-size: 12px; margin-left: 48px; }
 
-    .filters { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 12px; scrollbar-width: none; }
+    .title-row .bell-icon {
+      font-size: 22px;
+      color: #f59e0b;
+    }
+
+    .title-row h1 {
+      font-size: 20px;
+      font-weight: 850;
+      color: #0f172a;
+    }
+
+    .badge-count {
+      background-color: #ef4444;
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 800;
+      min-width: 22px;
+      height: 22px;
+      padding: 0 6px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .subtitle {
+      color: #64748b;
+      font-size: 12px;
+      margin-left: 48px;
+    }
+
+    /* ফিল্টার বাটনস */
+    .filters {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 12px;
+      scrollbar-width: none;
+    }
     .filters::-webkit-scrollbar { display: none; }
-    .filter-btn { background: #f8fafc; color: #475569; border: 1px solid #e2e8f0; padding: 7px 13px; border-radius: 50px; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 5px; cursor: pointer; white-space: nowrap; transition: all 0.2s ease; }
-    .filter-btn.active { background: #0284c7; color: #ffffff; border-color: #0284c7; box-shadow: 0 4px 10px rgba(2, 132, 199, 0.25); }
 
-    .notification-list { display: flex; flex-direction: column; gap: 10px; flex: 1; }
-    .notif-card { position: relative; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 13px 14px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all 0.2s ease; }
-    .notif-card:active { transform: scale(0.98); }
-    .notif-card.unread { background: #f0f9ff; border-color: #bae6fd; }
+    .filter-btn {
+      background: #f8fafc;
+      color: #475569;
+      border: 1px solid #e2e8f0;
+      padding: 7px 13px;
+      border-radius: 50px;
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
 
-    .icon-box { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; color: #ffffff; }
+    .filter-btn.active {
+      background: #0284c7;
+      color: #ffffff;
+      border-color: #0284c7;
+      box-shadow: 0 4px 10px rgba(2, 132, 199, 0.25);
+    }
+
+    /* নোটিফিকেশন কার্ড লিস্ট */
+    .notification-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1;
+    }
+
+    .notif-card {
+      position: relative;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 13px 14px;
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .notif-card:active { transform: scale(0.99); }
+    .notif-card:hover { border-color: #bae6fd; }
+
+    .notif-card.unread {
+      background: #f0f9ff;
+      border-color: #bae6fd;
+    }
+
+    .icon-box {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+      flex-shrink: 0;
+      color: #ffffff;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    }
+
     .card-content { flex: 1; min-width: 0; }
-    .card-header-line { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; }
-    .card-title { font-size: 13.5px; font-weight: 800; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .tag { font-size: 9.5px; font-weight: 800; padding: 2px 7px; border-radius: 6px; text-transform: capitalize; }
+
+    .card-header-line {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 3px;
+    }
+
+    .card-title {
+      font-size: 13.5px;
+      font-weight: 800;
+      color: #0f172a;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .tag {
+      font-size: 9.5px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 6px;
+      text-transform: capitalize;
+    }
+
     .tag-earnings { background: #dcfce7; color: #15803d; }
     .tag-tasks { background: #e0f2fe; color: #0369a1; }
     .tag-referral { background: #f3e8ff; color: #7e22ce; }
     .tag-system { background: #ffedd5; color: #c2410c; }
 
-    .card-desc { font-size: 11.5px; color: #475569; line-height: 1.4; margin-bottom: 4px; }
-    .card-time { font-size: 10px; color: #94a3b8; display: flex; align-items: center; gap: 4px; font-weight: 600; }
-    .unread-dot { position: absolute; top: 12px; right: 12px; width: 8px; height: 8px; background-color: #ef4444; border-radius: 50%; }
+    .card-desc {
+      font-size: 11.5px;
+      color: #475569;
+      line-height: 1.4;
+      margin-bottom: 4px;
+    }
+
+    .card-time {
+      font-size: 10px;
+      color: #0284c7;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-weight: 700;
+    }
+
+    .card-actions-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: auto;
+    }
+
+    /* ডিলিট বাটন */
+    .notif-del-btn {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      color: #ef4444;
+      width: 30px;
+      height: 30px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+    .notif-del-btn:hover {
+      background: #ef4444;
+      color: #ffffff;
+    }
+    .notif-del-btn:active {
+      transform: scale(0.88);
+    }
+
+    .card-arrow {
+      color: #94a3b8;
+      font-size: 11px;
+    }
+
+    .unread-dot {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 7px;
+      height: 7px;
+      background-color: #ef4444;
+      border-radius: 50%;
+    }
 
     .bg-green { background: linear-gradient(135deg, #10b981, #059669); }
     .bg-blue { background: linear-gradient(135deg, #0284c7, #0369a1); }
     .bg-purple { background: linear-gradient(135deg, #a855f7, #7c3aed); }
     .bg-orange { background: linear-gradient(135deg, #f97316, #ea580c); }
 
-    .empty-msg { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; padding: 60px 10px; color: #94a3b8; text-align: center; }
+    .empty-msg {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      padding: 60px 10px;
+      color: #94a3b8;
+      text-align: center;
+    }
     .empty-msg i { font-size: 38px; margin-bottom: 10px; color: #cbd5e1; }
     .empty-msg p { font-size: 13.5px; font-weight: 600; }
   </style>
@@ -64,6 +293,8 @@
 <body>
 
   <div class="app-container">
+    
+    <!-- হেডার -->
     <div class="header">
       <div class="title-row">
         <button type="button" class="back-btn" onclick="window.location.href='index.html'" title="Back to Dashboard">
@@ -73,24 +304,27 @@
         <h1>Notifications</h1>
         <span class="badge-count" id="badgeCount">0</span>
       </div>
-      <p class="subtitle">Personal earnings, tasks & system updates</p>
+      <p class="subtitle">System, Tasks, Referral & Earnings updates</p>
     </div>
 
     <!-- ক্যাটাগরি ফিল্টার -->
     <div class="filters">
       <button class="filter-btn active" data-filter="all">All</button>
-      <button class="filter-btn" data-filter="earnings"><i class="fa-solid fa-wallet"></i> Earnings</button>
+      <button class="filter-btn" data-filter="system"><i class="fa-solid fa-headset"></i> System</button>
       <button class="filter-btn" data-filter="tasks"><i class="fa-solid fa-square-check"></i> Tasks</button>
       <button class="filter-btn" data-filter="referral"><i class="fa-solid fa-user-group"></i> Referral</button>
-      <button class="filter-btn" data-filter="system"><i class="fa-solid fa-gear"></i> System</button>
+      <button class="filter-btn" data-filter="earnings"><i class="fa-solid fa-wallet"></i> Earnings</button>
     </div>
 
+    <!-- নোটিফিকেশন লিস্ট -->
     <div class="notification-list" id="notificationList"></div>
 
+    <!-- খালি নোটিফিকেশন মেসেজ -->
     <div class="empty-msg" id="emptyMsg">
       <i class="fa-regular fa-bell-slash"></i>
       <p>No notifications found</p>
     </div>
+
   </div>
 
   <script>
@@ -115,10 +349,49 @@
 
     let allNotifs = [];
     let currentFilter = 'all';
-    let userSignupTime = 0; // একাউন্ট তৈরির সময়
+    let userSignupTime = 0;
 
     function getReadIds() {
       try { return JSON.parse(localStorage.getItem('read_notif_ids') || '[]'); } catch(e) { return []; }
+    }
+
+    function getDeletedIds() {
+      try { return JSON.parse(localStorage.getItem('deleted_notif_ids') || '[]'); } catch(e) { return []; }
+    }
+
+    // লাইভ টাইম-অ্যাগো ফরম্যাট (৬০ সেকেন্ড পর্যন্ত Just now, পরে 1m ago, 2h ago ইত্যাদি)
+    function formatTimeAgo(createdAt) {
+      if (!createdAt) return 'Just now';
+
+      let millis = 0;
+      if (createdAt.toMillis) {
+        millis = createdAt.toMillis();
+      } else if (createdAt.seconds) {
+        millis = createdAt.seconds * 1000;
+      } else {
+        millis = new Date(createdAt).getTime();
+      }
+
+      if (isNaN(millis) || millis <= 0) return 'Just now';
+
+      const now = Date.now();
+      const diffSec = Math.floor((now - millis) / 1000);
+
+      if (diffSec < 60) {
+        return 'Just now';
+      } else if (diffSec < 3600) {
+        const mins = Math.floor(diffSec / 60);
+        return `${mins}m ago`;
+      } else if (diffSec < 86400) {
+        const hours = Math.floor(diffSec / 3600);
+        return `${hours}h ago`;
+      } else {
+        const days = Math.floor(diffSec / 86400);
+        if (days === 1) return 'Yesterday';
+        if (days < 7) return `${days}d ago`;
+        const d = new Date(millis);
+        return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+      }
     }
 
     function getCategoryMeta(cat) {
@@ -126,37 +399,39 @@
         case 'earnings': return { icon: 'fa-wallet', bg: 'bg-green', tagClass: 'tag-earnings', text: 'Earnings' };
         case 'tasks': return { icon: 'fa-square-check', bg: 'bg-blue', tagClass: 'tag-tasks', text: 'Tasks' };
         case 'referral': return { icon: 'fa-user-group', bg: 'bg-purple', tagClass: 'tag-referral', text: 'Referral' };
-        default: return { icon: 'fa-gear', bg: 'bg-orange', tagClass: 'tag-system', text: 'System' };
+        default: return { icon: 'fa-headset', bg: 'bg-orange', tagClass: 'tag-system', text: 'System' };
       }
     }
 
     function renderNotifications() {
       const readIds = getReadIds();
+      const deletedIds = getDeletedIds();
+      
       const cachedUser = JSON.parse(localStorage.getItem('microtask_cached_user')) || {};
       const myUID = String(cachedUser.uid || '').trim();
 
       const filtered = allNotifs.filter(n => {
+          if (deletedIds.includes(n.id)) return false;
+
           const notifCat = (n.category || 'system').toLowerCase();
           const target = String(n.targetUid || '').trim();
 
-          // ১. ব্যাক্তিগত নোটিফিকেশন চেক (Earnings / Tasks / Referral)
-          const isMyPersonal = target !== '' && target === myUID;
+          // ১. ব্যাক্তিগত নোটিফিকেশন চেক (ডিপোজিট/উইথড্র, টাস্ক এপ্রুভাল, কাস্টমার সাপোর্ট মেসেজ)
+          const isPersonal = target !== '' && (target === myUID || (auth.currentUser && target === auth.currentUser.uid));
 
-          // ২. গ্লোবাল নোটিফিকেশন চেক (System - নতুন টাস্ক বা এডমিন ঘোষণা)
+          // ২. গ্লোবাল নোটিফিকেশন চেক (সিস্টেমের সবার জন্য সাধারণ ঘোষণা)
           const isGlobalSystem = (!n.targetUid || target === 'all');
 
-          // ৩. একাউন্ট খোলার আগের সিস্টেম নোটিশ ফিল্টার
+          // ৩. একাউন্ট খোলার আগের সিস্টেম নোটিশ বাদ দেওয়া
           let isTimeValid = true;
           if (isGlobalSystem && userSignupTime > 0 && n.createdAt) {
               const notifTime = n.createdAt.toMillis ? n.createdAt.toMillis() : new Date(n.createdAt).getTime();
-              // যদি নোটিফিকেশনটি একাউন্ট খোলার আগের হয়, তাহলে দেখাবে না
               if (notifTime < userSignupTime) {
                   isTimeValid = false;
               }
           }
 
-          // ইউজারের জন্য প্রযোজ্য কিনা
-          const isAllowedForMe = isMyPersonal || (isGlobalSystem && isTimeValid);
+          const isAllowedForMe = isPersonal || (isGlobalSystem && isTimeValid);
           const isMatchingTab = currentFilter === 'all' || notifCat === currentFilter;
 
           return isAllowedForMe && isMatchingTab;
@@ -173,10 +448,11 @@
           const cat = (n.category || 'system').toLowerCase();
           const meta = getCategoryMeta(cat);
           const isUnread = !readIds.includes(n.id);
-          const targetUrl = n.actionUrl || 'history.html';
+          const targetUrl = n.actionUrl || '';
+          const timeText = formatTimeAgo(n.createdAt);
 
           return `
-            <div class="notif-card ${isUnread ? 'unread' : ''}" data-category="${cat}" onclick="handleNotificationClick('${n.id}', '${targetUrl}')">
+            <div class="notif-card ${isUnread ? 'unread' : ''}" data-category="${cat}" onclick="handleNotificationClick('${n.id}', '${targetUrl}', '${cat}')">
               <div class="icon-box ${meta.bg}">
                 <i class="fa-solid ${meta.icon}"></i>
               </div>
@@ -186,9 +462,15 @@
                   <span class="tag ${meta.tagClass}">${meta.text}</span>
                 </div>
                 <div class="card-desc">${n.message || ''}</div>
-                <div class="card-time"><i class="fa-regular fa-clock"></i> ${n.time || 'Just now'}</div>
+                <div class="card-time"><i class="fa-regular fa-clock"></i> ${timeText}</div>
               </div>
-              <i class="fa-solid fa-chevron-right" style="color:#94a3b8; font-size:11px;"></i>
+              <div class="card-actions-right">
+                <!-- ডিলিট বাটন -->
+                <button type="button" class="notif-del-btn" onclick="deleteNotification(event, '${n.id}', '${n.targetUid || ''}')" title="Delete">
+                  <i class="fa-regular fa-trash-can"></i>
+                </button>
+                <i class="fa-solid fa-chevron-right card-arrow"></i>
+              </div>
               ${isUnread ? '<div class="unread-dot"></div>' : ''}
             </div>
           `;
@@ -196,13 +478,45 @@
       }
     }
 
-    function handleNotificationClick(notifId, url) {
+    // ================= স্মার্ট রিডাইরেক্ট ফাংশন =================
+    function handleNotificationClick(notifId, url, category) {
         const readIds = getReadIds();
         if (!readIds.includes(notifId)) {
             readIds.push(notifId);
             localStorage.setItem('read_notif_ids', JSON.stringify(readIds));
         }
-        window.location.href = url;
+
+        // ক্যাটাগরি ও নোটিফিকেশন অনুযায়ী সঠিক পেজে নিয়ে যাওয়া
+        if (url && url !== '') {
+            window.location.href = url;
+        } else if (category === 'earnings' || category === 'tasks') {
+            window.location.href = 'history.html'; // ডিপোজিট, উইথড্র ও টাস্ক হিস্ট্রি
+        } else if (category === 'referral') {
+            window.location.href = 'refer.html';   // রেফারেল হিস্ট্রি/পেজ
+        } else if (category === 'system') {
+            window.location.href = 'support.html'; // কাস্টমার কেয়ার/সাপোর্ট পেজ
+        } else {
+            window.location.href = 'history.html';
+        }
+    }
+
+    // ================= নোটিফিকেশন ডিলিট =================
+    function deleteNotification(event, notifId, targetUid) {
+      event.stopPropagation();
+      
+      const deletedIds = getDeletedIds();
+      if (!deletedIds.includes(notifId)) {
+        deletedIds.push(notifId);
+        localStorage.setItem('deleted_notif_ids', JSON.stringify(deletedIds));
+      }
+
+      const cachedUser = JSON.parse(localStorage.getItem('microtask_cached_user')) || {};
+      const myUID = String(cachedUser.uid || '').trim();
+      if (targetUid && (targetUid === myUID || (auth.currentUser && targetUid === auth.currentUser.uid))) {
+        db.collection("notifications").doc(notifId).delete().catch(() => {});
+      }
+
+      renderNotifications();
     }
 
     filterButtons.forEach(btn => {
@@ -214,7 +528,12 @@
       });
     });
 
-    // ইউজারের একাউন্ট ক্রিয়েশন টাইম ও নোটিফিকেশন সিঙ্ক
+    setInterval(() => {
+      if (allNotifs.length > 0) {
+        renderNotifications();
+      }
+    }, 30000);
+
     auth.onAuthStateChanged(user => {
       if (user) {
         db.collection("users").doc(user.uid).get().then(doc => {
@@ -225,7 +544,7 @@
         });
       }
 
-      db.collection("notifications").orderBy("createdAt", "desc").limit(40).onSnapshot(snapshot => {
+      db.collection("notifications").orderBy("createdAt", "desc").limit(50).onSnapshot(snapshot => {
         allNotifs = [];
         snapshot.forEach(doc => {
           allNotifs.push({ id: doc.id, ...doc.data() });
@@ -234,5 +553,6 @@
       });
     });
   </script>
+
 </body>
 </html>
