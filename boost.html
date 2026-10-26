@@ -10,6 +10,11 @@
   <!-- Lucide Icons CDN -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
+  <!-- Firebase SDK (Compat Version) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
   <script>
     tailwind.config = {
       theme: {
@@ -56,7 +61,7 @@
   <!-- Mobile Viewport Container -->
   <div class="w-full max-w-md bg-aqua-bg min-h-screen flex flex-col relative pb-8 shadow-xl border-x border-aqua-border">
     
-    <!-- ================= 1. NAVIGATION BAR (WITH BACK BUTTON) ================= -->
+    <!-- ================= 1. NAVIGATION BAR ================= -->
     <nav id="user-nav" class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-aqua-border flex items-center shadow-sm px-2">
       <!-- Back to Dashboard -->
       <button onclick="window.location.href='index.html'" title="Back to Dashboard" class="p-2.5 text-aqua-600 hover:text-aqua-700 transition">
@@ -88,7 +93,7 @@
         <!-- Slim "What's on your mind?" Bar -->
         <div class="bg-white px-3 py-2 border-y border-aqua-border shadow-xs">
           <div class="flex items-center space-x-2">
-            <img id="creator-avatar" src="" alt="avatar" class="w-8 h-8 rounded-full object-cover border border-aqua-300">
+            <img id="creator-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150" alt="avatar" class="w-8 h-8 rounded-full object-cover border border-aqua-300">
             <div onclick="openCreateModal()" class="flex-1 bg-aqua-inputBg hover:bg-aqua-hoverMint cursor-pointer rounded-full px-3.5 py-1.5 text-xs text-aqua-textSecondary transition border border-aqua-border/60 truncate">
               What's on your mind? (100–3,000+ words)
             </div>
@@ -110,7 +115,12 @@
         </div>
 
         <!-- Dynamic Posts List -->
-        <div id="feed-container" class="space-y-2"></div>
+        <div id="feed-container" class="space-y-2">
+          <div class="p-8 text-center text-xs text-aqua-textSecondary">
+            <i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto mb-2 text-teal-600"></i>
+            Loading posts...
+          </div>
+        </div>
 
       </section>
 
@@ -118,7 +128,7 @@
       <section id="view-search" class="hidden py-3 px-3 space-y-3">
         <div class="bg-white p-3.5 rounded-xl border border-aqua-border shadow-sm">
           <label class="block text-xs font-bold uppercase tracking-wider text-aqua-textSecondary mb-1.5">
-            Search User by Profile UID
+            Search User by 6-Digit UID
           </label>
           <div class="flex space-x-2">
             <div class="relative flex-1">
@@ -126,8 +136,8 @@
               <input 
                 type="text" 
                 id="uid-search-input" 
-                placeholder="Enter UID (e.g. usr_sarah, usr_alex)..." 
-                class="w-full bg-aqua-inputBg text-xs text-aqua-textPrimary pl-9 pr-3 py-2.5 rounded-lg border border-aqua-border focus:outline-none focus:border-aqua-600"
+                placeholder="Enter 6-digit UID (e.g. 455115)..." 
+                class="w-full bg-aqua-inputBg text-xs text-aqua-textPrimary pl-9 pr-3 py-2.5 rounded-lg border border-aqua-border focus:outline-none focus:border-aqua-600 font-mono"
                 onkeydown="if(event.key === 'Enter') searchUserByUID()"
               />
             </div>
@@ -135,82 +145,9 @@
               Search
             </button>
           </div>
-
-          <div class="flex items-center space-x-1.5 mt-2.5 text-[11px] text-aqua-textSecondary">
-            <span class="font-medium">Suggestions:</span>
-            <span onclick="quickSearch('usr_sarah')" class="cursor-pointer text-teal-700 hover:underline bg-teal-50 border border-teal-200 px-1.5 py-0.5 rounded font-mono">usr_sarah</span>
-            <span onclick="quickSearch('usr_alex')" class="cursor-pointer text-teal-700 hover:underline bg-teal-50 border border-teal-200 px-1.5 py-0.5 rounded font-mono">usr_alex</span>
-            <span onclick="quickSearch('usr_david')" class="cursor-pointer text-teal-700 hover:underline bg-teal-50 border border-teal-200 px-1.5 py-0.5 rounded font-mono">usr_david</span>
-          </div>
         </div>
 
         <div id="search-profile-result" class="space-y-3"></div>
-
-        <!-- Discreet link to Admin Portal -->
-        <div class="text-center pt-2">
-          <button onclick="openAdminPortal()" class="text-[10px] text-aqua-textSecondary/50 hover:text-teal-700 underline transition">
-            Access System Admin Portal
-          </button>
-        </div>
-      </section>
-
-      <!-- ================= 4. SEPARATE ISOLATED ADMIN CONTROL PORTAL ================= -->
-      <section id="view-admin" class="hidden py-3 px-3 space-y-3">
-        <!-- Admin Header -->
-        <div class="bg-white rounded-2xl p-4 border border-teal-300 shadow-sm relative overflow-hidden">
-          <div class="flex items-center justify-between pb-3 border-b border-aqua-divider">
-            <div class="flex items-center space-x-2">
-              <div class="w-8 h-8 rounded-lg bg-teal-600 text-white flex items-center justify-center">
-                <i data-lucide="shield" class="w-4 h-4"></i>
-              </div>
-              <div>
-                <h3 class="font-black text-sm text-aqua-textPrimary">Dedicated Admin Room</h3>
-                <span class="text-[10px] text-teal-700 font-bold uppercase">System Customizer</span>
-              </div>
-            </div>
-            <!-- Back to App -->
-            <button onclick="closeAdminPortal()" class="text-xs font-bold text-teal-700 bg-teal-50 hover:bg-teal-100 border border-teal-200 px-3 py-1.5 rounded-lg flex items-center space-x-1">
-              <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
-              <span>Exit Admin</span>
-            </button>
-          </div>
-
-          <!-- Dynamic Like Price Form -->
-          <div class="mt-3.5 bg-gradient-to-r from-teal-50 to-cyan-50 p-3.5 rounded-xl border border-teal-200 space-y-2.5">
-            <div class="flex items-center justify-between">
-              <label class="font-extrabold text-xs text-teal-900 flex items-center space-x-1.5">
-                <i data-lucide="sliders" class="w-4 h-4 text-teal-700"></i>
-                <span>Set Like Earning Rate ($ USD):</span>
-              </label>
-              <span id="admin-rate-badge" class="font-mono font-bold text-xs bg-white text-teal-800 px-2 py-0.5 rounded border border-teal-300">
-                $0.05
-              </span>
-            </div>
-            <p class="text-[10px] text-teal-800/80 leading-relaxed">
-              লাইক প্রতি কত সেন্ট আয় হবে তা এখান থেকে কাস্টমাইজ করুন। এটি বাড়ালে বা কমালে সমস্ত পোস্টের আয় সাথে সাথে আপডেট হয়ে যাবে।
-            </p>
-            <div class="flex space-x-2">
-              <div class="relative flex-1">
-                <span class="absolute left-3 top-2 font-bold text-xs text-teal-700">$</span>
-                <input 
-                  type="number" 
-                  step="0.005" 
-                  min="0.001" 
-                  max="1.00" 
-                  id="admin-like-rate-input" 
-                  value="0.05" 
-                  class="w-full bg-white text-xs font-bold text-aqua-textPrimary pl-7 pr-3 py-2 rounded-lg border border-teal-300 focus:outline-none focus:border-teal-600"
-                />
-              </div>
-              <button onclick="saveAdminLikeRate()" class="bg-teal-700 hover:bg-teal-800 text-white font-bold px-4 py-2 rounded-lg text-xs transition shadow-xs">
-                Update Rate
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Section: Boost Queue -->
-        <div id="adm-sec-boosts" class="space-y-2.5"></div>
       </section>
 
     </main>
@@ -240,7 +177,7 @@
               rows="9"
               oninput="handleMissionsCounter(this)"
               placeholder="Write your article, story or reflections here...&#10;&#10;Complete word missions to unlock higher promotion tiers!"
-              class="w-full text-sm text-aqua-textPrimary placeholder-aqua-textSecondary/60 focus:outline-none resize-none leading-relaxed bg-transparent min-h-[200px]"
+              class="w-full text-sm text-aqua-textPrimary placeholder-aqua-textSecondary/60 focus:outline-none resize-none leading-relaxed bg-transparent min-h-[190px]"
             ></textarea>
           </div>
         </div>
@@ -337,7 +274,7 @@
         </div>
 
         <div class="p-4 border-t border-aqua-border bg-aqua-cardTint">
-          <button onclick="submitBoostRequest()" class="w-full bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white font-bold py-2 rounded-xl text-xs transition shadow-sm">
+          <button id="btnSubmitBoostReq" onclick="submitBoostRequest()" class="w-full bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-sm">
             Submit Boost Request
           </button>
         </div>
@@ -346,7 +283,7 @@
 
     <!-- ================= DELETE CONFIRMATION ACTION SHEET ================= -->
     <div id="modal-delete-sheet" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-[2px] hidden items-end justify-center">
-      <div class="bg-white rounded-t-2xl w-full max-w-md p-4 space-y-3 animate-in slide-in-from-bottom duration-150 border-t border-aqua-border">
+      <div class="bg-white rounded-t-2xl w-full max-w-md p-4 space-y-3 border-t border-aqua-border">
         <div class="w-10 h-1 bg-aqua-border rounded-full mx-auto mb-2"></div>
         <h4 class="font-bold text-sm text-aqua-textPrimary text-center">Post Options</h4>
         
@@ -365,38 +302,48 @@
 
   <!-- JavaScript Implementation -->
   <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBrG81DRVjx040QhiT68yyRErGXjuCPdS4",
+      authDomain: "micro-task-2906d.firebaseapp.com",
+      projectId: "micro-task-2906d",
+      storageBucket: "micro-task-2906d.firebasestorage.app",
+      messagingSenderId: "642332420854",
+      appId: "1:642332420854:web:67115930992e7685b49ad7",
+      measurementId: "G-N76WH82XYJ"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
     let appSettings = {
       likeRate: 0.05
     };
 
-    const usersDatabase = {
-      "usr_david": {
-        uid: "usr_david",
-        name: "David Miller",
-        username: "@david_miller",
-        avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-        bio: "Writer & philosophical thinker. Exploring resilience through written experiences.",
-        isVerified: true
-      },
-      "usr_sarah": {
-        uid: "usr_sarah",
-        name: "Sarah Jenkins",
-        username: "@sarah_j",
-        avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80",
-        bio: "Motivational storyteller and history researcher. Daily reflections on success.",
-        isVerified: true
-      },
-      "usr_alex": {
-        uid: "usr_alex",
-        name: "Alex Morgan",
-        username: "@alex_m",
-        avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
-        bio: "Mindfulness practitioner and avid reader. Finding peace in text literature.",
-        isVerified: false
-      }
+    // ড্যাশবোর্ডের আসল লগইন করা ইউজার রিড
+    let currentUser = {
+      uid: "000000",
+      name: "User",
+      username: "@user",
+      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+      bio: "MicroTask Member",
+      isVerified: false
     };
 
-    const currentUser = usersDatabase["usr_david"];
+    function loadActiveUserSession() {
+      const cached = JSON.parse(localStorage.getItem('microtask_cached_user'));
+      if (cached && cached.uid) {
+        currentUser.uid = String(cached.uid).trim();
+        currentUser.name = cached.name || 'User';
+        currentUser.username = '@' + (cached.name ? cached.name.toLowerCase().replace(/\s+/g, '_') : 'user');
+        currentUser.isVerified = cached.isVerified === true;
+      }
+
+      document.getElementById('creator-avatar').src = currentUser.avatar;
+      document.getElementById('modal-user-avatar').src = currentUser.avatar;
+      document.getElementById('modal-user-name').innerText = currentUser.name;
+      document.getElementById('modal-user-uid').innerText = `UID: ${currentUser.uid}`;
+    }
 
     let posts = [];
     let selectedBoostPackage = 100;
@@ -409,8 +356,13 @@
       return matches ? matches.length : 0;
     }
 
-    function timeAgo(dateString) {
-      const diff = Math.floor((new Date() - new Date(dateString)) / 1000);
+    function timeAgo(dateInput) {
+      if (!dateInput) return "Just now";
+      let d = dateInput;
+      if (dateInput.toDate) d = dateInput.toDate();
+      else if (typeof dateInput === 'string' || typeof dateInput === 'number') d = new Date(dateInput);
+
+      const diff = Math.floor((new Date() - d) / 1000);
       if (diff < 60) return "Just now";
       if (diff < 3600) return `${Math.floor(diff / 60)}m`;
       if (diff < 86400) return `${Math.floor(diff / 3600)}h`;
@@ -434,9 +386,9 @@
     }
 
     function buildPostCardHTML(post) {
-      const isLiked = post.likedBy.includes(currentUser.uid);
-      const isOwnPost = post.userId === currentUser.uid;
-      const earnedValue = (post.likesCount * appSettings.likeRate).toFixed(2);
+      const isLiked = Array.isArray(post.likedBy) && post.likedBy.includes(currentUser.uid);
+      const isOwnPost = String(post.userId) === String(currentUser.uid);
+      const earnedValue = ((post.likesCount || 0) * appSettings.likeRate).toFixed(2);
       const wordCount = countWords(post.content);
 
       if (post.boostStatus === 'active' && post.boostExpiresAt && post.boostExpiresAt <= Date.now()) {
@@ -444,7 +396,7 @@
         post.boostExpiresAt = null;
       }
 
-      const wordsArr = post.content.trim().split(/\s+/);
+      const wordsArr = (post.content || '').trim().split(/\s+/);
       const isLong = wordsArr.length > 55;
       let postBodyContent = '';
 
@@ -456,7 +408,7 @@
           postBodyContent = `${post.content.trim()} <span onclick="togglePostExpand('${post.id}')" class="text-teal-700 font-bold text-[11px] hover:underline cursor-pointer ml-1 inline">See less</span>`;
         }
       } else {
-        postBodyContent = post.content.trim();
+        postBodyContent = (post.content || '').trim();
       }
 
       const safeAdIframe = `<!DOCTYPE html><html><head><meta charset='UTF-8'><style>body{margin:0;padding:0;display:flex;justify-content:center;align-items:center;background:transparent;overflow:hidden;}</style></head><body><script>atOptions={'key':'e5856b81f21b2cd3b23286d438c9fbc3','format':'iframe','height':50,'width':320,'params':{}};<` + `/script><script src='https://bicea.org/22/e5856b81f21b2cd3b23286d438c9fbc3'><` + `/script></body></html>`.replace(/"/g, '&quot;');
@@ -466,14 +418,14 @@
           
           <div class="px-3 pt-2 pb-1 flex items-center justify-between">
             <div class="flex items-center space-x-2">
-              <img src="${post.avatar}" alt="${post.authorName}" class="w-8 h-8 rounded-full object-cover border border-aqua-200">
+              <img src="${post.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'}" alt="${post.authorName}" class="w-8 h-8 rounded-full object-cover border border-aqua-200">
               <div>
                 <div class="flex items-center space-x-1">
                   <span class="font-bold text-xs text-aqua-textPrimary cursor-pointer hover:underline" onclick="quickSearch('${post.userId}')">${post.authorName}</span>
                   ${post.isVerified ? `<i data-lucide="check-circle-2" class="w-3 h-3 text-teal-600 fill-teal-600 text-white inline"></i>` : ''}
                 </div>
                 <div class="flex items-center text-[10px] text-aqua-textSecondary space-x-1">
-                  <span class="font-mono text-teal-700 bg-teal-50 px-1 rounded">[${post.userId}]</span>
+                  <span class="font-mono text-teal-700 bg-teal-50 px-1 rounded font-bold">[#${post.userId}]</span>
                   <span>•</span>
                   <span>${timeAgo(post.createdAt)}</span>
                   <span>•</span>
@@ -484,9 +436,11 @@
               </div>
             </div>
 
+            ${isOwnPost ? `
             <button onclick="promptDeleteSheet('${post.id}')" title="Post Options" class="w-7 h-7 rounded-full hover:bg-aqua-hoverMint flex items-center justify-center text-aqua-textSecondary transition">
               <i data-lucide="more-horizontal" class="w-4 h-4"></i>
             </button>
+            ` : ''}
           </div>
 
           <div class="px-3 pt-0.5 pb-1.5 text-xs text-aqua-textPrimary leading-relaxed whitespace-pre-line font-normal">
@@ -498,11 +452,11 @@
               <span class="w-3.5 h-3.5 rounded-full bg-teal-600 flex items-center justify-center shadow-xs">
                 <i data-lucide="thumbs-up" class="w-2 h-2 text-white fill-white"></i>
               </span>
-              <span class="font-medium text-aqua-textPrimary">${post.likesCount}</span>
+              <span class="font-medium text-aqua-textPrimary">${post.likesCount || 0}</span>
               <span class="text-teal-700 font-semibold">• $${earnedValue}</span>
             </div>
             <div class="text-aqua-textSecondary">
-              <span>${post.comments.length} comments</span>
+              <span>${(post.comments || []).length} comments</span>
             </div>
           </div>
 
@@ -549,14 +503,14 @@
                 <span id="countdown-${post.id}" class="font-mono font-bold tracking-tight">Calculating...</span>
               </div>
               <span class="text-[9px] bg-teal-100 text-teal-800 px-1 rounded font-bold uppercase">
-                ${post.boostPackage} • Active
+                ${post.boostPackage || 'Boosted'} • Active
               </span>
             </div>
           ` : post.boostStatus === 'pending' ? `
             <div class="px-3 py-1 bg-cyan-50/80 border-t border-cyan-200 flex items-center justify-between text-[10px] text-cyan-900">
               <div class="flex items-center space-x-1 font-medium">
                 <i data-lucide="clock" class="w-3 h-3 text-cyan-700"></i>
-                <span>Boost Pending Verification (${post.boostPackage})</span>
+                <span>Boost Pending Admin Verification (${post.boostPackage || ''})</span>
               </div>
               <span class="text-[9px] bg-cyan-200/80 text-cyan-900 px-1 rounded font-bold">Reviewing</span>
             </div>
@@ -564,8 +518,8 @@
 
           <div id="comment-box-${post.id}" class="hidden p-2.5 bg-aqua-bg/80 border-t border-aqua-border space-y-2">
             <div class="space-y-2 max-h-52 overflow-y-auto pr-1">
-              ${post.comments.length === 0 ? `<p class="text-xs text-aqua-textSecondary text-center py-1">No comments yet. Write the first comment!</p>` : ''}
-              ${post.comments.map(c => `
+              ${(post.comments || []).length === 0 ? `<p class="text-xs text-aqua-textSecondary text-center py-1">No comments yet. Write the first comment!</p>` : ''}
+              ${(post.comments || []).map(c => `
                 <div class="flex space-x-2 text-xs items-start">
                   <img src="${c.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80'}" alt="${c.name}" class="w-6 h-6 rounded-full object-cover border border-aqua-200 mt-0.5">
                   <div class="flex-1">
@@ -574,9 +528,7 @@
                       <p class="text-aqua-textPrimary mt-0.5 text-xs leading-normal">${c.text}</p>
                     </div>
                     <div class="flex items-center space-x-2.5 text-[9px] text-aqua-textSecondary mt-0.5 ml-1.5 font-semibold">
-                      <span class="hover:underline cursor-pointer">Like</span>
-                      <span class="hover:underline cursor-pointer">Reply</span>
-                      <span>${c.time}</span>
+                      <span>${c.time || 'Just now'}</span>
                     </div>
                   </div>
                 </div>
@@ -586,22 +538,16 @@
             <div class="flex items-center space-x-2 pt-1 border-t border-aqua-border">
               <img src="${currentUser.avatar}" alt="My Avatar" class="w-6 h-6 rounded-full object-cover border border-aqua-300">
               
-              ${isOwnPost ? `
-                <div class="flex-1 bg-aqua-inputBg/60 border border-aqua-border rounded-full px-3 py-1 text-[11px] text-aqua-textSecondary italic">
-                  Commenting on your own post is disabled.
-                </div>
-              ` : `
-                <input 
-                  type="text" 
-                  id="input-comment-${post.id}" 
-                  placeholder="Write a comment..." 
-                  class="flex-1 bg-white border border-aqua-border rounded-full px-3 py-1 text-xs focus:outline-none focus:border-teal-600 placeholder-aqua-textSecondary/50"
-                  onkeydown="if(event.key === 'Enter') postComment('${post.id}')"
-                />
-                <button onclick="postComment('${post.id}')" class="text-teal-600 hover:text-teal-700 p-0.5">
-                  <i data-lucide="send" class="w-3.5 h-3.5"></i>
-                </button>
-              `}
+              <input 
+                type="text" 
+                id="input-comment-${post.id}" 
+                placeholder="Write a comment..." 
+                class="flex-1 bg-white border border-aqua-border rounded-full px-3 py-1 text-xs focus:outline-none focus:border-teal-600 placeholder-aqua-textSecondary/50"
+                onkeydown="if(event.key === 'Enter') postComment('${post.id}')"
+              />
+              <button onclick="postComment('${post.id}')" class="text-teal-600 hover:text-teal-700 p-0.5">
+                <i data-lucide="send" class="w-3.5 h-3.5"></i>
+              </button>
             </div>
           </div>
 
@@ -624,6 +570,7 @@
 
     function renderFeed() {
       const container = document.getElementById('feed-container');
+      if (!container) return;
 
       document.getElementById('rate-display-feed').innerText = `$${appSettings.likeRate.toFixed(2)} / Like`;
 
@@ -643,81 +590,28 @@
         container.innerHTML = posts.map(buildPostCardHTML).join('');
       }
 
-      renderAdminQueue();
       lucide.createIcons();
       updateAllCountdowns();
     }
 
-    function saveAdminLikeRate() {
-      const inputVal = parseFloat(document.getElementById('admin-like-rate-input').value);
-      if (isNaN(inputVal) || inputVal <= 0) {
-        alert("Please enter a valid rate greater than 0.");
-        return;
-      }
-
-      appSettings.likeRate = inputVal;
-      document.getElementById('admin-rate-badge').innerText = `$${inputVal.toFixed(2)}`;
-      alert(`Success! Like earning rate customized to $${inputVal.toFixed(2)} per like.`);
-      renderFeed();
+    // ================= ফায়ারবেস থেকে লাইভ পোস্ট লোড =================
+    function initFirebasePostsListener() {
+      db.collection("posts").orderBy("createdAt", "desc").limit(40).onSnapshot(snapshot => {
+        posts = [];
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          posts.push({
+            id: doc.id,
+            ...data
+          });
+        });
+        renderFeed();
+      }, err => {
+        console.error("Firestore posts load error:", err);
+      });
     }
 
-    function renderAdminQueue() {
-      const boostContainer = document.getElementById('adm-sec-boosts');
-      const pendingBoosts = posts.filter(p => p.boostStatus === 'pending');
-
-      if (pendingBoosts.length === 0) {
-        boostContainer.innerHTML = `<div class="bg-white p-4 rounded-xl text-center text-xs text-gray-400">No pending boost campaigns.</div>`;
-      } else {
-        boostContainer.innerHTML = pendingBoosts.map(p => `
-          <div class="bg-white border border-aqua-border rounded-xl p-3 shadow-xs space-y-2 text-xs">
-            <div class="flex justify-between items-center border-b border-aqua-divider pb-1.5">
-              <span class="font-bold text-aqua-textPrimary">${p.authorName} <span class="font-mono text-[10px] text-teal-700">[${p.userId}]</span></span>
-              <span class="bg-teal-50 text-teal-800 font-bold px-2 py-0.5 rounded text-[10px]">${p.boostPackage}</span>
-            </div>
-            <p class="text-[11px] text-aqua-textSecondary italic line-clamp-2">"${p.content}"</p>
-            <div class="bg-aqua-inputBg p-2 rounded-lg grid grid-cols-2 gap-2">
-              <div>
-                <label class="block text-[10px] font-bold">Duration (Days):</label>
-                <select id="adm-days-${p.id}" class="w-full bg-white border border-aqua-border rounded p-1 text-xs">
-                  <option value="1">1 Day</option>
-                  <option value="2">2 Days</option>
-                  <option value="3" selected>3 Days</option>
-                  <option value="7">7 Days</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-[10px] font-bold">Auto-Likes:</label>
-                <input type="number" id="adm-likes-${p.id}" value="20" class="w-full bg-white border border-aqua-border rounded p-1 text-xs">
-              </div>
-            </div>
-            <div class="flex space-x-2 pt-1">
-              <button onclick="approveBoost('${p.id}')" class="flex-1 bg-teal-700 hover:bg-teal-800 text-white font-bold py-1.5 rounded-lg text-xs">Approve Boost</button>
-              <button onclick="rejectBoost('${p.id}')" class="bg-rose-50 text-rose-600 px-3 py-1.5 rounded-lg text-xs font-semibold">Reject</button>
-            </div>
-          </div>
-        `).join('');
-      }
-    }
-
-    function openAdminPortal() {
-      document.getElementById('user-nav').classList.add('hidden');
-      document.getElementById('view-home').classList.add('hidden');
-      document.getElementById('view-search').classList.add('hidden');
-
-      document.getElementById('view-admin').classList.remove('hidden');
-      document.getElementById('admin-like-rate-input').value = appSettings.likeRate;
-      document.getElementById('admin-rate-badge').innerText = `$${appSettings.likeRate.toFixed(2)}`;
-      renderAdminQueue();
-      lucide.createIcons();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function closeAdminPortal() {
-      document.getElementById('user-nav').classList.remove('hidden');
-      document.getElementById('view-admin').classList.add('hidden');
-      switchTab('home');
-    }
-
+    // ================= সময়ের সাথে সাথে বুস্ট লাইক ও কমেন্ট বৃদ্ধি =================
     const mockCommentBank = [
       "Very insightful post!",
       "Completely agree with this perspective.",
@@ -728,34 +622,40 @@
     ];
 
     setInterval(() => {
-      let changed = false;
       posts.forEach(post => {
-        if (post.boostStatus === 'active') {
+        if (post.boostStatus === 'active' && post.boostExpiresAt > Date.now()) {
+          // টার্গেট লাইক কিউ থেকে ধীরে ধীরে লাইক যোগ
           if (post.autoLikesQueue > 0 && Math.random() > 0.4) {
-            post.likesCount += 1;
+            post.likesCount = (post.likesCount || 0) + 1;
             post.autoLikesQueue -= 1;
-            changed = true;
+            db.collection("posts").doc(post.id).update({
+              likesCount: firebase.firestore.FieldValue.increment(1),
+              autoLikesQueue: firebase.firestore.FieldValue.increment(-1)
+            }).catch(() => {});
           }
+
+          // মাঝে মাঝে অটো কমেন্ট যোগ
           if (post.autoCommentsQueue > 0 && Math.random() > 0.7) {
-            const users = Object.values(usersDatabase);
-            const randomUser = users[Math.floor(Math.random() * users.length)];
             const randomText = mockCommentBank[Math.floor(Math.random() * mockCommentBank.length)];
-            post.comments.push({
+            const autoComment = {
               id: "c_auto_" + Date.now(),
-              name: randomUser.name,
-              avatar: randomUser.avatar,
+              name: "MicroTask Member",
+              avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80",
               text: randomText,
               time: "Just now"
-            });
+            };
+            post.comments = post.comments || [];
+            post.comments.push(autoComment);
             post.autoCommentsQueue -= 1;
-            changed = true;
+
+            db.collection("posts").doc(post.id).update({
+              comments: firebase.firestore.FieldValue.arrayUnion(autoComment),
+              autoCommentsQueue: firebase.firestore.FieldValue.increment(-1)
+            }).catch(() => {});
           }
         }
       });
-      if (changed) {
-        renderFeed();
-      }
-    }, 4000);
+    }, 4500);
 
     function updateAllCountdowns() {
       posts.forEach(post => {
@@ -765,6 +665,7 @@
             const time = getRemainingTime(post.boostExpiresAt);
             if (time.totalSecs <= 0) {
               post.boostStatus = 'none';
+              db.collection("posts").doc(post.id).update({ boostStatus: 'none' }).catch(() => {});
               renderFeed();
             } else {
               const d = String(time.days).padStart(2, '0');
@@ -783,26 +684,31 @@
       const post = posts.find(p => p.id === postId);
       if (!post) return;
 
-      if (post.userId === currentUser.uid) {
+      if (String(post.userId) === String(currentUser.uid)) {
         alert("Action not allowed: You cannot like your own post.");
         return;
       }
 
+      post.likedBy = post.likedBy || [];
       const alreadyLiked = post.likedBy.includes(currentUser.uid);
 
       if (alreadyLiked) {
         post.likedBy = post.likedBy.filter(uid => uid !== currentUser.uid);
-        post.likesCount--;
+        post.likesCount = Math.max(0, (post.likesCount || 1) - 1);
+        db.collection("posts").doc(postId).update({
+          likedBy: firebase.firestore.FieldValue.arrayRemove(currentUser.uid),
+          likesCount: firebase.firestore.FieldValue.increment(-1)
+        });
       } else {
         post.likedBy.push(currentUser.uid);
-        post.likesCount++;
+        post.likesCount = (post.likesCount || 0) + 1;
+        db.collection("posts").doc(postId).update({
+          likedBy: firebase.firestore.FieldValue.arrayUnion(currentUser.uid),
+          likesCount: firebase.firestore.FieldValue.increment(1)
+        });
       }
 
       renderFeed();
-      const searchBox = document.getElementById('search-profile-result');
-      if (!searchBox.classList.contains('hidden') && searchBox.innerHTML !== "") {
-        searchUserByUID(false);
-      }
     }
 
     function toggleComments(postId) {
@@ -811,32 +717,23 @@
     }
 
     function postComment(postId) {
-      const post = posts.find(p => p.id === postId);
-      if (!post) return;
-
-      if (post.userId === currentUser.uid) {
-        alert("Action not allowed: You cannot comment on your own post.");
-        return;
-      }
-
       const input = document.getElementById(`input-comment-${postId}`);
       const text = input ? input.value.trim() : "";
       if (!text) return;
 
-      post.comments.push({
+      const newComment = {
         id: "c_" + Date.now(),
         name: currentUser.name,
         avatar: currentUser.avatar,
         text: text,
         time: "Just now"
-      });
-      
-      input.value = "";
-      renderFeed();
-      const searchBox = document.getElementById('search-profile-result');
-      if (!searchBox.classList.contains('hidden') && searchBox.innerHTML !== "") {
-        searchUserByUID(false);
-      }
+      };
+
+      db.collection("posts").doc(postId).update({
+        comments: firebase.firestore.FieldValue.arrayUnion(newComment)
+      }).then(() => {
+        input.value = "";
+      }).catch(err => alert("Error posting comment: " + err.message));
     }
 
     function promptDeleteSheet(postId) {
@@ -853,13 +750,9 @@
 
     function executePostDeletion() {
       if (targetDeletePostId) {
-        posts = posts.filter(p => p.id !== targetDeletePostId);
-        closeDeleteSheet();
-        renderFeed();
-        const searchBox = document.getElementById('search-profile-result');
-        if (!searchBox.classList.contains('hidden') && searchBox.innerHTML !== "") {
-          searchUserByUID(false);
-        }
+        db.collection("posts").doc(targetDeletePostId).delete().then(() => {
+          closeDeleteSheet();
+        }).catch(err => alert("Error deleting post: " + err.message));
       }
     }
 
@@ -869,62 +762,55 @@
       searchUserByUID();
     }
 
-    function searchUserByUID(shouldScroll = true) {
+    function searchUserByUID() {
       const input = document.getElementById('uid-search-input');
       const uid = input.value.trim().toLowerCase();
       const container = document.getElementById('search-profile-result');
 
       if (!uid) {
-        container.innerHTML = `<div class="bg-white p-4 rounded-xl text-center text-xs text-aqua-textSecondary border border-aqua-border">Please enter a valid User UID.</div>`;
+        container.innerHTML = `<div class="bg-white p-4 rounded-xl text-center text-xs text-aqua-textSecondary border border-aqua-border">Please enter a valid 6-digit User UID.</div>`;
         return;
       }
 
-      const user = usersDatabase[uid];
-      if (!user) {
+      const userPosts = posts.filter(p => String(p.userId) === String(uid));
+
+      if (userPosts.length === 0) {
         container.innerHTML = `
           <div class="bg-white p-6 rounded-xl text-center border border-aqua-border text-xs text-aqua-textSecondary">
             <i data-lucide="user-x" class="w-8 h-8 text-teal-600/50 mx-auto mb-2"></i>
-            <p class="font-bold text-aqua-textPrimary">No user found with UID: "${uid}"</p>
+            <p class="font-bold text-aqua-textPrimary">No posts found with UID: "#${uid}"</p>
           </div>
         `;
         lucide.createIcons();
         return;
       }
 
-      const userPosts = posts.filter(p => p.userId === user.uid);
+      const firstAuthor = userPosts[0];
 
       container.innerHTML = `
         <div class="bg-white rounded-xl border border-aqua-border shadow-xs overflow-hidden">
           <div class="h-16 bg-gradient-to-r from-teal-600 to-cyan-600"></div>
           <div class="px-4 pb-4 relative flex flex-col items-center -mt-8 text-center">
-            <img src="${user.avatar}" alt="${user.name}" class="w-16 h-16 rounded-full border-2 border-white object-cover shadow mb-1.5">
+            <img src="${firstAuthor.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'}" alt="${firstAuthor.authorName}" class="w-16 h-16 rounded-full border-2 border-white object-cover shadow mb-1.5">
             <h3 class="font-bold text-base text-aqua-textPrimary flex items-center space-x-1">
-              <span>${user.name}</span>
-              ${user.isVerified ? `<i data-lucide="check-circle-2" class="w-4 h-4 text-teal-600 fill-teal-600 text-white"></i>` : ''}
+              <span>${firstAuthor.authorName}</span>
+              ${firstAuthor.isVerified ? `<i data-lucide="check-circle-2" class="w-4 h-4 text-teal-600 fill-teal-600 text-white"></i>` : ''}
             </h3>
-            <span class="text-xs font-mono text-teal-700 bg-teal-50 border border-teal-200 px-2 py-0.5 rounded-full font-bold">UID: ${user.uid}</span>
-            <p class="text-xs text-aqua-textSecondary mt-1.5 max-w-xs leading-relaxed">${user.bio}</p>
+            <span class="text-xs font-mono text-teal-700 bg-teal-50 border border-teal-200 px-2 py-0.5 rounded-full font-bold">UID: #${uid}</span>
           </div>
         </div>
 
         <div class="text-xs font-bold uppercase tracking-wider text-aqua-textSecondary pt-1 px-1">
-          Posts by ${user.name} (${userPosts.length})
+          Posts by ${firstAuthor.authorName} (${userPosts.length})
         </div>
 
         <div class="space-y-2">
-          ${userPosts.length === 0 ? `
-            <div class="bg-white p-6 rounded-xl text-center text-xs text-aqua-textSecondary border border-aqua-border">
-              This user hasn't published any posts yet.
-            </div>
-          ` : userPosts.map(buildPostCardHTML).join('')}
+          ${userPosts.map(buildPostCardHTML).join('')}
         </div>
       `;
 
       lucide.createIcons();
       updateAllCountdowns();
-      if (shouldScroll) {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
     }
 
     function openCreateModal() {
@@ -987,25 +873,26 @@
           statusMsg.className = "text-[10px] text-emerald-600 font-bold pt-0.5";
           submitBtn.innerText = `Publish Story (${words} Words • Max Tier)`;
         } else if (words >= 2000) {
-          statusMsg.innerHTML = `🌟 <strong>Mission 4 Cleared!</strong> 1,500 Tk Boost unlocked. (${3000 - words}w to unlock 2,000 Tk Boost)`;
+          statusMsg.innerHTML = `🌟 <strong>Mission 4 Cleared!</strong> 1,500 Tk Boost unlocked.`;
           statusMsg.className = "text-[10px] text-teal-700 font-bold pt-0.5";
           submitBtn.innerText = `Publish Story (${words} Words)`;
         } else if (words >= 1000) {
-          statusMsg.innerHTML = `✨ <strong>Mission 3 Cleared!</strong> 1,000 Tk Boost unlocked. (${2000 - words}w to unlock 1,500 Tk Boost)`;
+          statusMsg.innerHTML = `✨ <strong>Mission 3 Cleared!</strong> 1,000 Tk Boost unlocked.`;
           statusMsg.className = "text-[10px] text-teal-700 font-bold pt-0.5";
           submitBtn.innerText = `Publish Story (${words} Words)`;
         } else if (words >= 500) {
-          statusMsg.innerHTML = `🚀 <strong>Mission 2 Cleared!</strong> 500 Tk Boost unlocked. (${1000 - words}w to unlock 1,000 Tk Boost)`;
+          statusMsg.innerHTML = `🚀 <strong>Mission 2 Cleared!</strong> 500 Tk Boost unlocked.`;
           statusMsg.className = "text-[10px] text-teal-700 font-bold pt-0.5";
           submitBtn.innerText = `Publish Story (${words} Words)`;
         } else {
-          statusMsg.innerHTML = `👍 <strong>Mission 1 Cleared!</strong> Eligible to post & 100-300 Tk Boost. (${500 - words}w for 500 Tk Boost)`;
+          statusMsg.innerHTML = `👍 <strong>Mission 1 Cleared!</strong> Eligible to post & 100-300 Tk Boost.`;
           statusMsg.className = "text-[10px] text-teal-700 font-medium pt-0.5";
           submitBtn.innerText = `Publish Story (${words} Words)`;
         }
       }
     }
 
+    // ================= ফায়ারবেসে পোস্ট পাবলিশ করা =================
     function publishPost() {
       const content = document.getElementById('create-post-input').value.trim();
       const words = countWords(content);
@@ -1015,14 +902,17 @@
         return;
       }
 
-      const newPost = {
-        id: "post_" + Date.now(),
+      const submitBtn = document.getElementById('btn-post-submit');
+      submitBtn.disabled = true;
+      submitBtn.innerText = "Publishing...";
+
+      const newPostPayload = {
         userId: currentUser.uid,
         authorName: currentUser.name,
         username: currentUser.username,
         avatar: currentUser.avatar,
         isVerified: currentUser.isVerified,
-        createdAt: new Date().toISOString(),
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         content: content,
         likesCount: 0,
         likedBy: [],
@@ -1031,15 +921,19 @@
         boostExpiresAt: null,
         autoLikesQueue: 0,
         autoCommentsQueue: 0,
-        isExpanded: false,
         comments: []
       };
 
-      posts.unshift(newPost);
-      closeCreateModal();
-      switchTab('home');
-      renderFeed();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      db.collection("posts").add(newPostPayload).then(() => {
+        closeCreateModal();
+        switchTab('home');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }).catch(err => {
+        alert("Error publishing: " + err.message);
+      }).finally(() => {
+        submitBtn.disabled = false;
+        submitBtn.innerText = "Reach 100 words to Post";
+      });
     }
 
     function openBoostModal(postId) {
@@ -1114,45 +1008,41 @@
       });
     }
 
+    // ================= ফায়ারবেসে বুস্ট ক্যাম্পেইন রিকোয়েস্ট পাঠানো =================
     function submitBoostRequest() {
       const post = posts.find(p => p.id === targetBoostPostId);
       if (!post) return;
 
-      post.boostStatus = "pending";
-      post.boostPackage = `${selectedBoostPackage} Tk`;
+      const btn = document.getElementById('btnSubmitBoostReq');
+      btn.disabled = true;
+      btn.innerText = "Submitting to Admin...";
 
-      alert(`Boost Request Submitted!\nPackage: ${selectedBoostPackage} Tk\nYour campaign has been submitted for verification.`);
-      
-      closeBoostModal();
-      renderFeed();
+      // ১. পোস্টে পেন্ডিং বুস্ট স্ট্যাটাস মার্ক করা
+      db.collection("posts").doc(post.id).update({
+        boostStatus: "pending",
+        boostPackage: `${selectedBoostPackage} Tk`
+      });
+
+      // ২. অ্যাডমিন প্যানেলে রিকোয়েস্ট কালেকশনে পাঠানো
+      db.collection("boost_requests").add({
+        postId: post.id,
+        content: post.content,
+        authorName: currentUser.name,
+        userId: currentUser.uid,
+        boostPackage: `${selectedBoostPackage} Tk`,
+        status: "pending",
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
+        alert(`Boost Request Submitted!\nPackage: ${selectedBoostPackage} Tk\nক্যাম্পেইনটি অ্যাডমিন প্যানেলে ভেরিফিকেশনের জন্য পাঠানো হয়েছে।`);
+        closeBoostModal();
+      }).catch(err => {
+        alert("Error submitting boost: " + err.message);
+      }).finally(() => {
+        btn.disabled = false;
+        btn.innerText = "Submit Boost Request";
+      });
     }
 
-    function approveBoost(postId) {
-      const post = posts.find(p => p.id === postId);
-      if (!post) return;
-
-      const days = parseInt(document.getElementById(`adm-days-${postId}`).value);
-      const targetLikes = parseInt(document.getElementById(`adm-likes-${postId}`).value) || 0;
-
-      post.boostStatus = 'active';
-      post.boostExpiresAt = Date.now() + (days * 24 * 60 * 60 * 1000);
-      post.boostPackage = `${post.boostPackage} (${days}d)`;
-      post.autoLikesQueue = targetLikes;
-      post.autoCommentsQueue = 3;
-
-      alert(`Campaign Approved for ${days} Days! Live timer started.`);
-      renderFeed();
-    }
-
-    function rejectBoost(postId) {
-      const post = posts.find(p => p.id === postId);
-      if (!post) return;
-      post.boostStatus = 'none';
-      post.boostPackage = null;
-      renderFeed();
-    }
-
-    // 18. User Tab Switcher (Home & Search Only - Wallet Removed)
     function switchTab(tab) {
       const homeView = document.getElementById('view-home');
       const searchView = document.getElementById('view-search');
@@ -1178,18 +1068,15 @@
 
     function handleShare() {
       if (navigator.share) {
-        navigator.share({ title: 'Social Feed Post', text: 'Check out this thought-provoking post!' });
+        navigator.share({ title: 'MicroTask Story', text: 'Check out this thought-provoking post on MicroTask!' });
       } else {
         alert("Post link copied to clipboard!");
       }
     }
 
     window.onload = () => {
-      document.getElementById('creator-avatar').src = currentUser.avatar;
-      document.getElementById('modal-user-avatar').src = currentUser.avatar;
-      document.getElementById('modal-user-name').innerText = currentUser.name;
-      document.getElementById('modal-user-uid').innerText = `UID: ${currentUser.uid}`;
-      renderFeed();
+      loadActiveUserSession();
+      initFirebasePostsListener();
     };
   </script>
 
