@@ -49,6 +49,33 @@
             position: relative;
         }
 
+        /* পুল-টু-রিফ্রেশ ইন্ডিকেটর */
+        .pull-refresh-indicator {
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-60px);
+            background: #ffffff;
+            border: 1.5px solid #0284c7;
+            color: #0284c7;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 11.5px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 6px 20px rgba(2, 132, 199, 0.25);
+            z-index: 5000;
+            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .pull-refresh-indicator.visible {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
         .phone {
             width: 100%;
             max-width: 460px;
@@ -170,7 +197,7 @@
             min-width: 18px; 
             height: 18px; 
             border-radius: 50%; 
-            display: flex; 
+            display: none; /* ডিফল্টভাবে লুকানো */
             align-items: center; 
             justify-content: center; 
             border: 2px solid #ffffff; 
@@ -452,7 +479,7 @@
         .nav-link.refer-tab { color: #059669; }
         .nav-link.refer-tab .nav-icon-wrap { color: #10b981; background: #ecfdf5; }
 
-        /* ================= 50 BDT PREMIUM MODERN VERIFICATION MODAL ================= */
+        /* 50 BDT VERIFICATION MODAL */
         .verify-modal-overlay { 
             position: fixed; inset: 0; background: rgba(5, 11, 24, 0.85); 
             backdrop-filter: blur(8px); z-index: 2100; display: none; align-items: center; justify-content: center; padding: 18px; 
@@ -516,6 +543,12 @@
     </style>
 </head>
 <body>
+
+    <!-- পুল-টু-রিফ্রেশ ইন্ডিকেটর -->
+    <div class="pull-refresh-indicator" id="pullRefreshIndicator">
+        <i class="fa-solid fa-arrows-rotate fa-spin"></i>
+        <span>রিফ্রেশ করা হচ্ছে...</span>
+    </div>
 
     <div class="phone">
 
@@ -756,7 +789,7 @@
                     </div>
                 </div>
 
-                <!-- 3D Task Card 1: Videos (YouTube ও Boost সম্পূর্ণ ফিক্সড) -->
+                <!-- 3D Task Card 1: Videos -->
                 <div class="task-card-3d">
                     <div class="task-row-header">
                         <div class="task-left-meta">
@@ -775,28 +808,24 @@
                     </div>
 
                     <div class="video-grid">
-                        <!-- YouTube: GitHub ফাইলের সাথে মিলিয়ে youtube-task.html দেওয়া হয়েছে -->
                         <div class="video-card-3d" onclick="handleSecureNav('youtube-tasks.html')">
                             <div class="video-icon yt"><i class="fa-brands fa-youtube"></i></div>
                             <span>YouTube</span>
                             <small>+ Earn</small>
                         </div>
                         
-                        <!-- Facebook -->
                         <div class="video-card-3d" onclick="handleSecureNav('facebook-tasks.html')">
                             <div class="video-icon fb"><i class="fa-brands fa-facebook-f"></i></div>
                             <span>Facebook</span>
                             <small>+ Earn</small>
                         </div>
                         
-                        <!-- Instagram -->
                         <div class="video-card-3d" onclick="handleSecureNav('instagram-tasks.html')">
                             <div class="video-icon ig"><i class="fa-brands fa-instagram"></i></div>
                             <span>Instagram</span>
                             <small>+ Earn</small>
                         </div>
                         
-                        <!-- Boost: সরাসরি boost.html পেজে নিয়ে যাবে -->
                         <div class="video-card-3d" onclick="handleSecureNav('boost.html')">
                             <div class="video-icon boost-box">
                                 <img src="https://i.ibb.co.com/S71wYZrD/capital-gain.png" alt="Boost">
@@ -826,7 +855,7 @@
                     </div>
                 </div>
 
-                <!-- 3D Task Card 3: Telegram Bonus -->
+                <!-- 3D Task Card 3: Telegram Bonus (ক্র্যাশ-মুক্ত লিঙ্ক ফিক্সড) -->
                 <div class="task-card-3d" id="taskTelegramBox" onclick="handleTelegramTaskClick()" style="cursor:pointer;">
                     <div class="task-row-header">
                         <div class="task-left-meta">
@@ -845,7 +874,7 @@
                     </div>
                 </div>
 
-                <!-- Promo Banner (Scaled to 155px) -->
+                <!-- Promo Banner -->
                 <div class="promo-banner-container">
                     <div class="promo-slider-track" id="promoSliderTrack"></div>
                     <div class="promo-dots" id="promoDots"></div>
@@ -886,7 +915,7 @@
 
     </div>
 
-    <!-- ================= 50 BDT PREMIUM MODERN VERIFICATION MODAL ================= -->
+    <!-- 50 BDT VERIFICATION MODAL -->
     <div class="verify-modal-overlay" id="verificationModal">
         <div class="verify-modal-card">
             <button type="button" class="verify-close-btn" onclick="closeVerifyModal()">✕</button>
@@ -920,6 +949,22 @@
                 <button type="button" class="btn-confirm-logout" onclick="confirmLogout()">লগআউট</button>
             </div>
         </div>
+    </div>
+
+    <!-- গ্যালারি ও নোটিফিকেশন পারমিশন মডাল -->
+    <div id="permissionModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:3000; align-items:center; justify-content:center; padding:16px;">
+      <div style="background:#ffffff; border-radius:24px; padding:24px 20px; max-width:320px; text-align:center; box-shadow:0 10px 30px rgba(0,0,0,0.3); animation:sheetUp 0.25s ease;">
+        <div style="width:58px; height:58px; border-radius:50%; background:#e0f2fe; color:#0284c7; display:flex; align-items:center; justify-content:center; font-size:24px; margin:0 auto 12px;">
+          <i class="fa-solid fa-camera-rotate"></i>
+        </div>
+        <h3 style="font-size:16px; font-weight:850; color:#0f172a; margin-bottom:6px;">অনুমতি প্রয়োজন</h3>
+        <p style="font-size:11.5px; color:#475569; line-height:1.45; margin-bottom:16px;">
+          ভিডিও টাস্ক প্রুফ দিতে ফোনের গ্যালারি থেকে স্ক্রিনশট নেওয়া এবং আয়ের আপডেট পেতে নোটিফিকেশন অনুমোদন নিশ্চিত করুন।
+        </p>
+        <button type="button" onclick="grantPermissions()" style="width:100%; padding:12px; background:linear-gradient(135deg, #0284c7, #10b981); color:#fff; border:none; border-radius:14px; font-weight:800; font-size:13px; cursor:pointer; box-shadow:0 4px 12px rgba(2, 132, 199, 0.3);">
+          <i class="fa-solid fa-check"></i> অনুমোদন দিন (Allow All)
+        </button>
+      </div>
     </div>
 
     <!-- Toast Alert Box -->
@@ -957,15 +1002,26 @@
             return `${year}-${month}-${day}`;
         }
 
-        // ইনস্ট্যান্ট সেশন রিস্টোর
+        // ================= ১. ইনস্ট্যান্ট সেশন ও ফ্লিকার-মুক্ত ভেরিফিকেশন লোড =================
         (function restoreSessionInstantly() {
             const cachedUser = JSON.parse(localStorage.getItem('microtask_cached_user'));
             if (cachedUser && cachedUser.uid) {
+                currentUserDoc = cachedUser;
                 document.getElementById('authScreen').style.display = 'none';
                 document.getElementById('mainDashboard').style.display = 'block';
                 document.getElementById('dashboardUserName').innerText = cachedUser.name || 'User';
                 document.getElementById('uidText').innerText = `UID: ${cachedUser.uid || '000000'}`;
                 
+                // ভেরিফিকেশন স্ট্যাটাস সাথে সাথে সেট (ফ্লিকার হবে না)
+                if (cachedUser.isVerified === true) {
+                    const wrapper = document.getElementById('verifyPillWrapper');
+                    const badgeIcon = document.getElementById('verifyBadgeIcon');
+                    const badgeText = document.getElementById('verifyBadgeText');
+                    if (wrapper) wrapper.className = "verify-badge-pill verified";
+                    if (badgeIcon) badgeIcon.innerHTML = `<i class="fa-solid fa-shield-halved"></i>`;
+                    if (badgeText) badgeText.textContent = "Verified";
+                }
+
                 const balUSD = cachedUser.balanceUSD || 0;
                 document.getElementById("balanceAmount").textContent = `$ ${balUSD.toFixed(2)}`;
                 document.getElementById("bdtAmount").textContent = `≈ ${(balUSD * 120).toFixed(2)} BDT`;
@@ -1027,7 +1083,9 @@
             updateBalanceDisplay();
         }
 
-        function isUserVerified() { return currentUserDoc && currentUserDoc.isVerified === true; }
+        function isUserVerified() { 
+            return (currentUserDoc && currentUserDoc.isVerified === true); 
+        }
 
         function updateVerificationUI() {
             const wrapper = document.getElementById('verifyPillWrapper');
@@ -1052,9 +1110,10 @@
             document.getElementById('verificationModal').classList.add('active');
         }
 
-        function closeVerifyModal() { document.getElementById('verificationModal').classList.remove('active'); }
+        function closeVerifyModal() { 
+            document.getElementById('verificationModal').classList.remove('active'); 
+        }
 
-        // সিকিউর নেভিগেশন (ভেরিফাইড হলে ইউটিউব, ফেসবুক, ইনস্টাগ্রাম, বুস্ট সব ওপেন হবে)
         function handleSecureNav(destinationUrl) {
             if (!isUserVerified()) {
                 showToast("Verify account with 50 BDT to unlock this feature!", "error");
@@ -1068,11 +1127,7 @@
             }
         }
 
-        function handleBoostClick() {
-            handleSecureNav('boost.html');
-        }
-
-        // ================= মেইন ব্যালেন্স থেকে ৫০ টাকা ($0.42) কেটে ভেরিফাই করা =================
+        // ৫০ টাকা ভেরিফিকেশন প্রসেস
         function processAccountVerification() {
             const user = auth.currentUser;
             if (!user) {
@@ -1081,7 +1136,7 @@
             }
 
             const feeBDT = 50;
-            const feeUSD = parseFloat((feeBDT / 120).toFixed(4)); // $0.4167
+            const feeUSD = parseFloat((feeBDT / 120).toFixed(4));
             const currentBal = currentUserDoc ? (currentUserDoc.balanceUSD || 0) : 0;
 
             if (currentBal < feeUSD) {
@@ -1101,6 +1156,12 @@
                 balanceUSD: firebase.firestore.FieldValue.increment(-feeUSD),
                 isVerified: true
             }).then(() => {
+                if (currentUserDoc) currentUserDoc.isVerified = true;
+                const cached = JSON.parse(localStorage.getItem('microtask_cached_user')) || {};
+                cached.isVerified = true;
+                localStorage.setItem('microtask_cached_user', JSON.stringify(cached));
+
+                updateVerificationUI();
                 closeVerifyModal();
                 showToast("Account Verified! ৳50 ($0.42) deducted.", "success");
             }).catch(err => {
@@ -1156,6 +1217,7 @@
             });
         }
 
+        // ================= ২. নিরাপদ টেলিগ্রাম ওপেনার (ক্র্যাশ-মুক্ত লিঙ্ক) =================
         function handleTelegramTaskClick() {
             if (!isUserVerified()) {
                 showToast("Verify account with 50 BDT to claim task bonus!", "error");
@@ -1164,9 +1226,13 @@
             }
             const user = auth.currentUser;
             if (!user) return;
-            if (currentUserDoc && currentUserDoc.telegramClaimed) { window.open('https://t.me/OnlineBD77R', '_blank'); return; }
 
-            window.open('https://t.me/OnlineBD77R', '_blank');
+            const tgUrl = 'https://t.me/OnlineBD77R';
+            const win = window.open(tgUrl, '_blank');
+            if (!win) window.location.href = tgUrl;
+
+            if (currentUserDoc && currentUserDoc.telegramClaimed) return;
+
             setTimeout(() => {
                 addEarningToUser(0.10);
                 db.collection("users").doc(user.uid).update({ telegramClaimed: true }).then(() => {
@@ -1267,7 +1333,10 @@
                 .then(() => {
                     msgEl.textContent = 'Account created successfully!';
                     msgEl.className = 'message show';
-                    setTimeout(() => { closeSheet(); }, 600);
+                    setTimeout(() => { 
+                        closeSheet(); 
+                        checkUserPermissionPrompt();
+                    }, 600);
                 })
                 .catch(err => {
                     msgEl.textContent = err.message;
@@ -1288,7 +1357,10 @@
             btn.innerText = "Signing in...";
 
             auth.signInWithEmailAndPassword(email, password)
-                .then(() => { closeSheet(); })
+                .then(() => { 
+                    closeSheet(); 
+                    setTimeout(checkUserPermissionPrompt, 1200);
+                })
                 .catch(err => {
                     msgEl.textContent = err.message;
                     msgEl.className = 'message show error';
@@ -1319,10 +1391,12 @@
                     userRef.set(userPayload).then(() => {
                         showToast("Login successful!", "success");
                         closeSheet();
+                        setTimeout(checkUserPermissionPrompt, 1200);
                     });
                 } else {
                     showToast("Login successful!", "success");
                     closeSheet();
+                    setTimeout(checkUserPermissionPrompt, 1200);
                 }
             });
         }
@@ -1337,7 +1411,6 @@
                         handleUserFirestoreSync(result.user, 'Google User');
                     })
                     .catch(error => {
-                        console.warn("Popup error: ", error);
                         if (error.code === 'auth/popup-blocked' || error.code === 'auth/operation-not-supported-in-this-environment') {
                             auth.signInWithRedirect(googleProvider);
                         } else {
@@ -1406,7 +1479,7 @@
                     if (loadedBanners.length > 0) promoBanners = loadedBanners;
                 }
                 renderDynamicBanners();
-            }, err => renderDynamicBanners());
+            }, () => renderDynamicBanners());
         }
 
         function renderDynamicBanners() {
@@ -1432,15 +1505,21 @@
             }
         }
 
-        // নোটিফিকেশন কাউন্ট
+        // ================= ৩. নোটিফিকেশন কাউন্টার ফিক্স (আগে থেকে ৬ দেখানো স্থায়ী সমাধান) =================
         function initNotificationBadge() {
+            const badge = document.getElementById('notifBadgeCount');
+            badge.innerText = '0';
+            badge.style.display = 'none';
+
             db.collection("notifications").onSnapshot(snapshot => {
                 const readIds = JSON.parse(localStorage.getItem('read_notif_ids') || '[]');
+                const deletedIds = JSON.parse(localStorage.getItem('deleted_notif_ids') || '[]');
                 const cachedUser = JSON.parse(localStorage.getItem('microtask_cached_user')) || {};
                 const myUID = String(cachedUser.uid || '').trim();
                 let unreadCount = 0;
 
                 snapshot.forEach(doc => {
+                    if (deletedIds.includes(doc.id)) return;
                     const n = doc.data();
                     const target = String(n.targetUid || '').trim();
                     const isForMe = target === myUID || target === 'all' || target === '';
@@ -1450,18 +1529,69 @@
                     }
                 });
 
-                const badge = document.getElementById('notifBadgeCount');
                 if (unreadCount > 0) {
                     badge.innerText = unreadCount > 9 ? '9+' : unreadCount;
                     badge.style.display = 'flex';
                 } else {
+                    badge.innerText = '0';
                     badge.style.display = 'none';
                 }
             });
         }
 
+        // ================= ৪. মোবাইল পুল-টু-রিফ্রেশ (Pull to Refresh) লজিক =================
+        let touchStartY = 0;
+        let touchDiffY = 0;
+        const refreshIndicator = document.getElementById('pullRefreshIndicator');
+
+        window.addEventListener('touchstart', (e) => {
+            if (window.scrollY === 0) {
+                touchStartY = e.touches[0].clientY;
+            }
+        }, { passive: true });
+
+        window.addEventListener('touchmove', (e) => {
+            if (window.scrollY === 0 && touchStartY > 0) {
+                touchDiffY = e.touches[0].clientY - touchStartY;
+                if (touchDiffY > 70) {
+                    refreshIndicator.classList.add('visible');
+                }
+            }
+        }, { passive: true });
+
+        window.addEventListener('touchend', () => {
+            if (touchDiffY > 70) {
+                refreshIndicator.classList.add('visible');
+                showToast("তথ্য রিফ্রেশ হচ্ছে...", "info");
+                setTimeout(() => {
+                    window.location.reload();
+                }, 600);
+            } else {
+                refreshIndicator.classList.remove('visible');
+            }
+            touchStartY = 0;
+            touchDiffY = 0;
+        });
+
+        // ================= ৫. গ্যালারি ও নোটিফিকেশন পারমিশন লজিক =================
+        function checkUserPermissionPrompt() {
+            if (!localStorage.getItem('microtask_permissions_granted')) {
+                document.getElementById('permissionModal').style.display = 'flex';
+            }
+        }
+
+        function grantPermissions() {
+            if ("Notification" in window && Notification.permission !== "granted") {
+                Notification.requestPermission();
+            }
+            localStorage.setItem('microtask_permissions_granted', 'true');
+            document.getElementById('permissionModal').style.display = 'none';
+            showToast("অনুমোদন সফল হয়েছে!", "success");
+        }
+
         initBannerSlider();
         initNotificationBadge();
+        setTimeout(checkUserPermissionPrompt, 1500);
     </script>
 </body>
 </html>
