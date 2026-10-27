@@ -58,10 +58,9 @@
 </head>
 <body class="text-aqua-textPrimary flex justify-center min-h-screen">
 
-  <!-- Mobile Viewport Container -->
   <div class="w-full max-w-md bg-aqua-bg min-h-screen flex flex-col relative pb-8 shadow-xl border-x border-aqua-border">
     
-    <!-- ================= 1. NAVIGATION BAR ================= -->
+    <!-- 1. NAVIGATION BAR WITH BACK BUTTON -->
     <nav id="user-nav" class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-aqua-border flex items-center shadow-sm px-2">
       <!-- Back to Dashboard -->
       <button onclick="window.location.href='index.html'" title="Back to Dashboard" class="p-2.5 text-aqua-600 hover:text-aqua-700 transition">
@@ -87,10 +86,8 @@
     <!-- Main Content Area -->
     <main class="flex-1">
 
-      <!-- ================= 2. HOME FEED SCREEN ================= -->
+      <!-- 2. HOME FEED SCREEN -->
       <section id="view-home" class="space-y-2 py-1.5">
-        
-        <!-- Slim "What's on your mind?" Bar -->
         <div class="bg-white px-3 py-2 border-y border-aqua-border shadow-xs">
           <div class="flex items-center space-x-2">
             <img id="creator-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150" alt="avatar" class="w-8 h-8 rounded-full object-cover border border-aqua-300">
@@ -114,17 +111,15 @@
           </div>
         </div>
 
-        <!-- Dynamic Posts List -->
         <div id="feed-container" class="space-y-2">
           <div class="p-8 text-center text-xs text-aqua-textSecondary">
             <i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto mb-2 text-teal-600"></i>
             Loading posts...
           </div>
         </div>
-
       </section>
 
-      <!-- ================= 3. SEARCH BY UID SCREEN ================= -->
+      <!-- 3. SEARCH BY UID SCREEN -->
       <section id="view-search" class="hidden py-3 px-3 space-y-3">
         <div class="bg-white p-3.5 rounded-xl border border-aqua-border shadow-sm">
           <label class="block text-xs font-bold uppercase tracking-wider text-aqua-textSecondary mb-1.5">
@@ -136,7 +131,7 @@
               <input 
                 type="text" 
                 id="uid-search-input" 
-                placeholder="Enter 6-digit UID (e.g. 455115)..." 
+                placeholder="Enter 6-digit UID (e.g. 118603)..." 
                 class="w-full bg-aqua-inputBg text-xs text-aqua-textPrimary pl-9 pr-3 py-2.5 rounded-lg border border-aqua-border focus:outline-none focus:border-aqua-600 font-mono"
                 onkeydown="if(event.key === 'Enter') searchUserByUID()"
               />
@@ -152,7 +147,7 @@
 
     </main>
 
-    <!-- ================= CREATE POST MODAL ================= -->
+    <!-- CREATE POST MODAL -->
     <div id="modal-create" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-[2px] hidden items-center justify-center p-3">
       <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden border border-aqua-border max-h-[95vh] flex flex-col">
         <div class="px-4 py-3 bg-aqua-cardTint border-b border-aqua-border flex items-center justify-between relative">
@@ -234,7 +229,7 @@
       </div>
     </div>
 
-    <!-- ================= USER BOOST MODAL ================= -->
+    <!-- USER BOOST MODAL -->
     <div id="modal-boost" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-[2px] hidden items-center justify-center p-3">
       <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden border border-aqua-border">
         <div class="px-4 py-3 bg-aqua-cardTint border-b border-aqua-border flex items-center justify-between">
@@ -281,7 +276,7 @@
       </div>
     </div>
 
-    <!-- ================= DELETE CONFIRMATION ACTION SHEET ================= -->
+    <!-- DELETE CONFIRMATION -->
     <div id="modal-delete-sheet" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-[2px] hidden items-end justify-center">
       <div class="bg-white rounded-t-2xl w-full max-w-md p-4 space-y-3 border-t border-aqua-border">
         <div class="w-10 h-1 bg-aqua-border rounded-full mx-auto mb-2"></div>
@@ -300,7 +295,6 @@
 
   </div>
 
-  <!-- JavaScript Implementation -->
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyBrG81DRVjx040QhiT68yyRErGXjuCPdS4",
@@ -316,17 +310,13 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    let appSettings = {
-      likeRate: 0.05
-    };
+    let appSettings = { likeRate: 0.05 };
 
-    // ড্যাশবোর্ডের আসল লগইন করা ইউজার রিড
     let currentUser = {
       uid: "000000",
       name: "User",
       username: "@user",
       avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-      bio: "MicroTask Member",
       isVerified: false
     };
 
@@ -338,11 +328,10 @@
         currentUser.username = '@' + (cached.name ? cached.name.toLowerCase().replace(/\s+/g, '_') : 'user');
         currentUser.isVerified = cached.isVerified === true;
       }
-
       document.getElementById('creator-avatar').src = currentUser.avatar;
       document.getElementById('modal-user-avatar').src = currentUser.avatar;
       document.getElementById('modal-user-name').innerText = currentUser.name;
-      document.getElementById('modal-user-uid').innerText = `UID: ${currentUser.uid}`;
+      document.getElementById('modal-user-uid').innerText = `UID: #${currentUser.uid}`;
     }
 
     let posts = [];
@@ -369,6 +358,13 @@
       return `${Math.floor(diff / 86400)}d`;
     }
 
+    function formatNumber(num) {
+      if (!num) return '0';
+      if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+      if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+      return num;
+    }
+
     function getRemainingTime(targetTimestamp) {
       const totalSecs = Math.max(0, Math.floor((targetTimestamp - Date.now()) / 1000));
       const days = Math.floor(totalSecs / (3600 * 24));
@@ -390,6 +386,7 @@
       const isOwnPost = String(post.userId) === String(currentUser.uid);
       const earnedValue = ((post.likesCount || 0) * appSettings.likeRate).toFixed(2);
       const wordCount = countWords(post.content);
+      const viewsDisplay = formatNumber(post.viewsCount || 1);
 
       if (post.boostStatus === 'active' && post.boostExpiresAt && post.boostExpiresAt <= Date.now()) {
         post.boostStatus = 'none';
@@ -447,15 +444,24 @@
             ${postBodyContent}
           </div>
 
-          <div class="px-3 py-1 flex items-center justify-between text-[11px] text-aqua-textSecondary border-t border-aqua-divider bg-aqua-cardTint/40">
-            <div class="flex items-center space-x-1">
-              <span class="w-3.5 h-3.5 rounded-full bg-teal-600 flex items-center justify-center shadow-xs">
-                <i data-lucide="thumbs-up" class="w-2 h-2 text-white fill-white"></i>
-              </span>
-              <span class="font-medium text-aqua-textPrimary">${post.likesCount || 0}</span>
-              <span class="text-teal-700 font-semibold">• $${earnedValue}</span>
+          <!-- ফেইসবুক স্টাইল ভিউ কাউন্টার ও লাইক স্ট্যাটাস -->
+          <div class="px-3 py-1.5 flex items-center justify-between text-[11px] text-aqua-textSecondary border-t border-aqua-divider bg-aqua-cardTint/40">
+            <div class="flex items-center space-x-2">
+              <div class="flex items-center space-x-1">
+                <span class="w-3.5 h-3.5 rounded-full bg-teal-600 flex items-center justify-center shadow-xs">
+                  <i data-lucide="thumbs-up" class="w-2 h-2 text-white fill-white"></i>
+                </span>
+                <span class="font-bold text-aqua-textPrimary">${post.likesCount || 0}</span>
+                <span class="text-teal-700 font-semibold text-[10px]">• $${earnedValue}</span>
+              </div>
             </div>
-            <div class="text-aqua-textSecondary">
+
+            <!-- ভিউজ ও কমেন্টস সংখ্যা -->
+            <div class="flex items-center space-x-3 text-aqua-textSecondary font-medium text-[11px]">
+              <span class="flex items-center space-x-1 text-teal-800">
+                <i data-lucide="eye" class="w-3.5 h-3.5 text-teal-600"></i>
+                <strong class="font-bold">${viewsDisplay}</strong> views
+              </span>
               <span>${(post.comments || []).length} comments</span>
             </div>
           </div>
@@ -510,7 +516,7 @@
             <div class="px-3 py-1 bg-cyan-50/80 border-t border-cyan-200 flex items-center justify-between text-[10px] text-cyan-900">
               <div class="flex items-center space-x-1 font-medium">
                 <i data-lucide="clock" class="w-3 h-3 text-cyan-700"></i>
-                <span>Boost Pending Admin Verification (${post.boostPackage || ''})</span>
+                <span>Boost Pending Admin Approval (${post.boostPackage || ''})</span>
               </div>
               <span class="text-[9px] bg-cyan-200/80 text-cyan-900 px-1 rounded font-bold">Reviewing</span>
             </div>
@@ -524,7 +530,7 @@
                   <img src="${c.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80'}" alt="${c.name}" class="w-6 h-6 rounded-full object-cover border border-aqua-200 mt-0.5">
                   <div class="flex-1">
                     <div class="bg-white border border-aqua-border rounded-xl px-2.5 py-1.5 inline-block max-w-[92%] shadow-xs">
-                      <span class="font-bold text-aqua-textPrimary block cursor-pointer hover:underline text-[10px] leading-tight">${c.name}</span>
+                      <span class="font-bold text-aqua-textPrimary block text-[10px] leading-tight">${c.name}</span>
                       <p class="text-aqua-textPrimary mt-0.5 text-xs leading-normal">${c.text}</p>
                     </div>
                     <div class="flex items-center space-x-2.5 text-[9px] text-aqua-textSecondary mt-0.5 ml-1.5 font-semibold">
@@ -594,16 +600,12 @@
       updateAllCountdowns();
     }
 
-    // ================= ফায়ারবেস থেকে লাইভ পোস্ট লোড =================
     function initFirebasePostsListener() {
       db.collection("posts").orderBy("createdAt", "desc").limit(40).onSnapshot(snapshot => {
         posts = [];
         snapshot.forEach(doc => {
           const data = doc.data();
-          posts.push({
-            id: doc.id,
-            ...data
-          });
+          posts.push({ id: doc.id, ...data });
         });
         renderFeed();
       }, err => {
@@ -611,51 +613,83 @@
       });
     }
 
-    // ================= সময়ের সাথে সাথে বুস্ট লাইক ও কমেন্ট বৃদ্ধি =================
-    const mockCommentBank = [
-      "Very insightful post!",
-      "Completely agree with this perspective.",
-      "Inspiring thoughts. Well written!",
-      "Great wisdom shared here.",
-      "Such a valuable reminder for all of us.",
-      "Spot on! Thanks for posting."
+    // ইউনিক প্রোফাইল ও কমেন্ট ব্যাংক (একটি আইডি থেকে একবারই কমেন্ট আসবে)
+    const UNIQUE_PROFILES_POOL = [
+      { id: "u_1", name: "Tanvir Hasan", avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80", text: "অসাধারণ তথ্যবহুল একটি লেখা, ধন্যবাদ!" },
+      { id: "u_2", name: "Nusrat Jahan", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80", text: "খুব সুন্দর পয়েন্ট তুলে ধরেছেন।" },
+      { id: "u_3", name: "Shakib Al Hasan", avatar: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=100&auto=format&fit=crop&q=80", text: "একদম সহমত আপনার বক্তব্যের সাথে।" },
+      { id: "u_4", name: "Mehedi Hasan", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80", text: "পরবর্তী লেখার অপেক্ষায় রইলাম!" },
+      { id: "u_5", name: "Ayesha Akter", avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&auto=format&fit=crop&q=80", text: "এমন চিন্তাভাবনা সত্যিই অনুপ্রেরণাদায়ক।" },
+      { id: "u_6", name: "Farhan Ahmed", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&auto=format&fit=crop&q=80", text: "পোস্টটি পড়ে অনেক কিছু জানতে পারলাম।" },
+      { id: "u_7", name: "Sadia Rahman", avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&auto=format&fit=crop&q=80", text: "চমৎকার ও অনুপ্রেরণাদায়ক উপস্থাপনা!" },
+      { id: "u_8", name: "Rifat Islam", avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&auto=format&fit=crop&q=80", text: "সত্যিই দারুণ একটি বিশ্লেষণ!" },
+      { id: "u_9", name: "Jannatul Ferdous", avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&auto=format&fit=crop&q=80", text: "খুব নিখুঁত ও সুন্দর লেখা।" },
+      { id: "u_10", name: "Kamrul Hasan", avatar: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=100&auto=format&fit=crop&q=80", text: "অসাধারণ ভাবনা, শুভকামনা আপনার জন্য।" },
+      { id: "u_11", name: "Sumaiya Islam", avatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=100&auto=format&fit=crop&q=80", text: "অনেক ভালো লাগলো পোস্টটি।" },
+      { id: "u_12", name: "Arif Chowdhury", avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&auto=format&fit=crop&q=80", text: "একদম সময়োপযোগী আলোচনা।" }
     ];
 
+    // লাইভ বুস্টিং লুপ (স্বয়ংক্রিয় ভিউজ, লাইক ও ইউনিক কমেন্ট বৃদ্ধি)
     setInterval(() => {
       posts.forEach(post => {
         if (post.boostStatus === 'active' && post.boostExpiresAt > Date.now()) {
-          // টার্গেট লাইক কিউ থেকে ধীরে ধীরে লাইক যোগ
-          if (post.autoLikesQueue > 0 && Math.random() > 0.4) {
-            post.likesCount = (post.likesCount || 0) + 1;
-            post.autoLikesQueue -= 1;
-            db.collection("posts").doc(post.id).update({
-              likesCount: firebase.firestore.FieldValue.increment(1),
-              autoLikesQueue: firebase.firestore.FieldValue.increment(-1)
-            }).catch(() => {});
+          let updateData = {};
+          let shouldUpdate = false;
+
+          // ১. ফেসবুকের মতো সময়ের সাথে ভিউ বৃদ্ধি
+          if ((post.autoViewsQueue || 0) > 0) {
+            const addViews = Math.min(post.autoViewsQueue, Math.floor(Math.random() * 4) + 2);
+            post.viewsCount = (post.viewsCount || 0) + addViews;
+            post.autoViewsQueue -= addViews;
+            updateData.viewsCount = firebase.firestore.FieldValue.increment(addViews);
+            updateData.autoViewsQueue = firebase.firestore.FieldValue.increment(-addViews);
+            shouldUpdate = true;
           }
 
-          // মাঝে মাঝে অটো কমেন্ট যোগ
-          if (post.autoCommentsQueue > 0 && Math.random() > 0.7) {
-            const randomText = mockCommentBank[Math.floor(Math.random() * mockCommentBank.length)];
-            const autoComment = {
-              id: "c_auto_" + Date.now(),
-              name: "MicroTask Member",
-              avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80",
-              text: randomText,
-              time: "Just now"
-            };
-            post.comments = post.comments || [];
-            post.comments.push(autoComment);
-            post.autoCommentsQueue -= 1;
+          // ২. লাইক বৃদ্ধি
+          if ((post.autoLikesQueue || 0) > 0 && Math.random() > 0.45) {
+            post.likesCount = (post.likesCount || 0) + 1;
+            post.autoLikesQueue -= 1;
+            updateData.likesCount = firebase.firestore.FieldValue.increment(1);
+            updateData.autoLikesQueue = firebase.firestore.FieldValue.increment(-1);
+            shouldUpdate = true;
+          }
 
-            db.collection("posts").doc(post.id).update({
-              comments: firebase.firestore.FieldValue.arrayUnion(autoComment),
-              autoCommentsQueue: firebase.firestore.FieldValue.increment(-1)
-            }).catch(() => {});
+          // ৩. ইউনিক কমেন্ট বৃদ্ধি (এক প্রোফাইল একবারই কমেন্ট করবে)
+          if ((post.autoCommentsQueue || 0) > 0 && Math.random() > 0.65) {
+            post.usedCommenters = post.usedCommenters || [];
+            const availableProfiles = UNIQUE_PROFILES_POOL.filter(p => !post.usedCommenters.includes(p.id));
+
+            if (availableProfiles.length > 0) {
+              const selectedUser = availableProfiles[Math.floor(Math.random() * availableProfiles.length)];
+              
+              const newComment = {
+                id: "c_auto_" + Date.now(),
+                commenterId: selectedUser.id,
+                name: selectedUser.name,
+                avatar: selectedUser.avatar,
+                text: selectedUser.text,
+                time: "Just now"
+              };
+
+              post.comments = post.comments || [];
+              post.comments.push(newComment);
+              post.usedCommenters.push(selectedUser.id);
+              post.autoCommentsQueue -= 1;
+
+              updateData.comments = firebase.firestore.FieldValue.arrayUnion(newComment);
+              updateData.usedCommenters = firebase.firestore.FieldValue.arrayUnion(selectedUser.id);
+              updateData.autoCommentsQueue = firebase.firestore.FieldValue.increment(-1);
+              shouldUpdate = true;
+            }
+          }
+
+          if (shouldUpdate) {
+            db.collection("posts").doc(post.id).update(updateData).catch(() => {});
           }
         }
       });
-    }, 4500);
+    }, 4000);
 
     function updateAllCountdowns() {
       posts.forEach(post => {
@@ -723,6 +757,7 @@
 
       const newComment = {
         id: "c_" + Date.now(),
+        commenterId: currentUser.uid,
         name: currentUser.name,
         avatar: currentUser.avatar,
         text: text,
@@ -867,7 +902,6 @@
         submitBtn.innerText = `Need ${remaining} more words to Post`;
       } else {
         submitBtn.disabled = false;
-
         if (words >= 3000) {
           statusMsg.innerHTML = `🎉 <strong>All Missions Completed!</strong> Top Tier 2,000 Tk Boost unlocked!`;
           statusMsg.className = "text-[10px] text-emerald-600 font-bold pt-0.5";
@@ -892,7 +926,6 @@
       }
     }
 
-    // ================= ফায়ারবেসে পোস্ট পাবলিশ করা =================
     function publishPost() {
       const content = document.getElementById('create-post-input').value.trim();
       const words = countWords(content);
@@ -916,11 +949,14 @@
         content: content,
         likesCount: 0,
         likedBy: [],
+        viewsCount: 1,
         boostStatus: "none",
         boostPackage: null,
         boostExpiresAt: null,
         autoLikesQueue: 0,
         autoCommentsQueue: 0,
+        autoViewsQueue: 0,
+        usedCommenters: [],
         comments: []
       };
 
@@ -973,7 +1009,6 @@
       allPackages.forEach(amt => {
         const btn = document.getElementById(`pkg-${amt}`);
         if (!btn) return;
-
         if (amt <= maxAllowed) {
           btn.disabled = false;
           btn.className = "pkg-btn p-2 rounded-lg border border-aqua-border bg-aqua-inputBg text-aqua-textSecondary font-semibold text-xs";
@@ -1008,7 +1043,6 @@
       });
     }
 
-    // ================= ফায়ারবেসে বুস্ট ক্যাম্পেইন রিকোয়েস্ট পাঠানো =================
     function submitBoostRequest() {
       const post = posts.find(p => p.id === targetBoostPostId);
       if (!post) return;
@@ -1017,13 +1051,11 @@
       btn.disabled = true;
       btn.innerText = "Submitting to Admin...";
 
-      // ১. পোস্টে পেন্ডিং বুস্ট স্ট্যাটাস মার্ক করা
       db.collection("posts").doc(post.id).update({
         boostStatus: "pending",
         boostPackage: `${selectedBoostPackage} Tk`
       });
 
-      // ২. অ্যাডমিন প্যানেলে রিকোয়েস্ট কালেকশনে পাঠানো
       db.collection("boost_requests").add({
         postId: post.id,
         content: post.content,
@@ -1033,7 +1065,7 @@
         status: "pending",
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       }).then(() => {
-        alert(`Boost Request Submitted!\nPackage: ${selectedBoostPackage} Tk\nক্যাম্পেইনটি অ্যাডমিন প্যানেলে ভেরিফিকেশনের জন্য পাঠানো হয়েছে।`);
+        alert(`Boost Request Submitted!\nPackage: ${selectedBoostPackage} Tk\nক্যাম্পেইনটি অ্যাডমিন প্যানেলে অনুমোদনের জন্য পাঠানো হয়েছে।`);
         closeBoostModal();
       }).catch(err => {
         alert("Error submitting boost: " + err.message);
@@ -1080,7 +1112,7 @@
     };
   </script>
 
-  <!-- ================= ADSTERRA SCRIPTS ================= -->
+  <!-- ADSTERRA SCRIPTS -->
   <script data-cfasync="false" src="https://afders.org/1/a160858c84473a1c2302ae4e0160b4f3"></script>
   <script data-cfasync="false" src="https://bicea.org/14/c8f82646ee575e90bdbcb48a1b89fd2f"></script>
 
