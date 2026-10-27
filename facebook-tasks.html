@@ -55,9 +55,8 @@
     .step-box { background: rgba(0, 20, 50, 0.6); border: 1px solid #0055c4; border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 6px; }
     .step-header { color: #55b3ff; font-size: 10.5px; font-weight: 700; }
     
-    .video-link-btn { display: flex; align-items: center; justify-content: center; gap: 7px; background: linear-gradient(180deg, #1877f2 0%, #0d54b3 100%); color: white; padding: 10px; border-radius: 12px; font-size: 12px; font-weight: 800; border: 1px solid #5aa7ff; cursor: pointer; }
+    .video-link-btn { display: flex; align-items: center; justify-content: center; gap: 7px; background: linear-gradient(180deg, #1877f2 0%, #0d54b3 100%); color: white; padding: 11px; border-radius: 12px; font-size: 12.5px; font-weight: 800; border: 1px solid #5aa7ff; cursor: pointer; }
     
-    /* নিরাপদ গ্যালারি স্লট (ক্লিক করলেই সরাসরি গ্যালারি খুলবে) */
     .upload-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 4px; }
     .upload-slot { border: 1.5px dashed #0088ff; background: rgba(0, 40, 100, 0.25); border-radius: 10px; height: 82px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; position: relative; overflow: hidden; }
     .upload-slot i { font-size: 18px; color: #00a2ff; margin-bottom: 3px; }
@@ -65,7 +64,7 @@
     .slot-preview { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: none; z-index: 5; }
     .slot-native-input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 10; }
     
-    .submit-btn { background: linear-gradient(180deg, #00d2ff 0%, #0066eb 100%); border: 1px solid #8be5ff; color: white; font-size: 13px; font-weight: 700; padding: 10px; border-radius: 18px; cursor: pointer; width: 100%; text-align: center; }
+    .submit-btn { background: linear-gradient(180deg, #00d2ff 0%, #0066eb 100%); border: 1px solid #8be5ff; color: white; font-size: 13px; font-weight: 700; padding: 11px; border-radius: 18px; cursor: pointer; width: 100%; text-align: center; }
     .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
   </style>
 </head>
@@ -93,10 +92,9 @@
       <h3 class="modal-title" id="m-title">Complete Task & Submit</h3>
       
       <div class="step-box">
-        <div class="step-header"><i class="fa-solid fa-1"></i> Step 1: Open Video in Facebook</div>
-        <!-- ১০০% ক্র্যাশ-মুক্ত লিঙ্ক ওপেন বাটন -->
-        <button type="button" class="video-link-btn" onclick="openTargetFacebookSafe()">
-          <i class="fa-brands fa-facebook"></i> Open Facebook Link
+        <div class="step-header"><i class="fa-solid fa-1"></i> Step 1: Open Video in Facebook App</div>
+        <button type="button" class="video-link-btn" onclick="openTargetNativeApp()">
+          <i class="fa-brands fa-facebook"></i> Open in Facebook App
         </button>
       </div>
 
@@ -146,8 +144,8 @@
     let pendingTasks = new Set(JSON.parse(localStorage.getItem('fb_pending_tasks') || '[]'));
 
     const DEFAULT_FB_TASKS = [
-      { id: 'fb-1', title: 'Viral Facebook Reel #1', rewardUSD: 0.25, duration: '1:45', url: 'https://facebook.com' },
-      { id: 'fb-2', title: 'Tech Review Episode #2', rewardUSD: 0.20, duration: '2:10', url: 'https://facebook.com' }
+      { id: 'fb-1', title: 'Viral Facebook Reel #1', rewardUSD: 0.25, duration: '1:45', url: 'https://www.facebook.com' },
+      { id: 'fb-2', title: 'Tech Review Video #2', rewardUSD: 0.20, duration: '2:10', url: 'https://www.facebook.com' }
     ];
 
     function listenToLiveTasks() {
@@ -160,7 +158,7 @@
           snapshot.forEach(doc => {
             const data = doc.data();
             const reward = data.rewardUSD || (data.coins ? (data.coins / 100) : 0.20);
-            renderSingleTaskCard(doc.id, data.title, reward, data.duration || '1:30', data.url || 'https://facebook.com');
+            renderSingleTaskCard(doc.id, data.title, reward, data.duration || '1:30', data.url || 'https://www.facebook.com');
           });
         }
       }, () => {
@@ -207,7 +205,7 @@
     function handleCardClick(id, title, rewardUSD, url) {
       if(pendingTasks.has(id)) { alert("This task is currently Pending Admin review!"); return; }
       activeTaskId = id;
-      activeTaskUrl = url || 'https://facebook.com';
+      activeTaskUrl = url || 'https://www.facebook.com';
       activeRewardUSD = parseFloat(rewardUSD) || 0.20;
 
       document.getElementById('m-title').innerText = `${title} (+$${activeRewardUSD.toFixed(2)})`;
@@ -218,15 +216,20 @@
       document.getElementById('taskModal').style.display = "flex";
     }
 
-    // ================= ১০০% ক্র্যাশ-মুক্ত ফেসবুক ওপেনার =================
-    // intent:// বাদ দিয়ে ইউনিভার্সাল লিঙ্কিং করা হয়েছে, যা ফেসবুক অ্যাপ অথবা ব্রাউজারে নিরাপদভাবে ওপেন হবে
-    function openTargetFacebookSafe() {
+    // ================= সরাসরি ফোনে থাকা ফেসবুক অ্যাপ ওপেন করার নিরাপদ মেকানিজম =================
+    function openTargetNativeApp() {
       if (!activeTaskUrl) return;
-      const targetUrl = activeTaskUrl.startsWith('http') ? activeTaskUrl : `https://${activeTaskUrl}`;
-      const win = window.open(targetUrl, '_blank');
-      if (!win) {
-        window.location.href = targetUrl;
-      }
+      let target = activeTaskUrl.trim();
+      if (!/^https?:\/\//i.test(target)) target = 'https://' + target;
+
+      // ভার্চুয়াল অ্যাঙ্কর ডিসপ্যাচ: এটি ফোনকে স্বয়ংক্রিয়ভাবে নেটিভ ফেসবুক অ্যাপে রিডাইরেক্ট করে
+      const a = document.createElement('a');
+      a.href = target;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
     }
 
     function previewSlot(num, e){
