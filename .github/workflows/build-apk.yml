@@ -67,7 +67,7 @@ jobs:
           }
           EOF
 
-          # App build.gradle (OneSignal যুক্ত করা হলো)
+          # App build.gradle (OneSignal + AndroidX Core)
           cat << 'EOF' > app/build.gradle
           plugins {
               id 'com.android.application'
@@ -81,8 +81,8 @@ jobs:
                   applicationId "com.microtask.app"
                   minSdk 21
                   targetSdk 34
-                  versionCode 1
-                  versionName "1.0"
+                  versionCode 2
+                  versionName "1.1"
               }
 
               buildTypes {
@@ -99,6 +99,7 @@ jobs:
           dependencies {
               implementation 'androidx.appcompat:appcompat:1.6.1'
               implementation 'com.google.android.material:material:1.11.0'
+              implementation 'androidx.core:core:1.12.0'
               implementation 'com.onesignal:OneSignal:[5.1.0, 5.99.99]'
           }
           EOF
@@ -119,15 +120,25 @@ jobs:
           </resources>
           EOF
 
-          # AndroidManifest.xml
+          # AndroidManifest.xml (সকল প্রয়োজনীয় পারমিশন ও ব্যাকগ্রাউন্ড সার্ভিস যুক্ত)
           cat << 'EOF' > app/src/main/AndroidManifest.xml
           <?xml version="1.0" encoding="utf-8"?>
           <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+              <!-- ইন্টারনেট ও নেটওয়ার্ক পারমিশন -->
               <uses-permission android:name="android.permission.INTERNET" />
               <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+              
+              <!-- পুশ নোটিফিকেশন পারমিশন (Android 13+) -->
               <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+              <uses-permission android:name="android.permission.VIBRATE" />
+              <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+              <!-- গ্যালারি থেকে ছবি সিলেক্ট করার পারমিশন -->
+              <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+              <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
 
               <application
+                  android:name=".MyApplication"
                   android:allowBackup="true"
                   android:icon="@mipmap/ic_launcher"
                   android:label="@string/app_name"
@@ -148,33 +159,73 @@ jobs:
           </manifest>
           EOF
 
-          # MainActivity.java (OneSignal App ID সেট করা হলো)
+          # MyApplication.java (অ্যাপ বন্ধ থাকলেও ব্যাকগ্রাউন্ড নোটিফিকেশন চালু রাখবে)
+          cat << 'EOF' > app/src/main/java/com/microtask/app/MyApplication.java
+          package com.microtask.app;
+
+          import android.app.Application;
+          import com.onesignal.OneSignal;
+          import com.onesignal.debug.LogLevel;
+
+          public class MyApplication extends Application {
+              private static final String ONESIGNAL_APP_ID = "e94dc542-7d17-4dd3-a20e-c1925cce7749";
+
+              @Override
+              public void onCreate() {
+                  super.onCreate();
+                  // ব্যাকগ্রাউন্ডে নোটিফিকেশন রিসিভ করার জন্য অ্যাপ্লিকেশন লেভেলে ইনিট
+                  OneSignal.getDebug().setLogLevel(LogLevel.VERBOSE);
+                  OneSignal.initWithContext(this, ONESIGNAL_APP_ID);
+              }
+          }
+          EOF
+
+          # MainActivity.java (পারমিশন রিকোয়েস্ট + গ্যালারি ফাইল পিকার + এক্সটার্নাল অ্যাপ রিডাইরেক্ট)
           cat << 'EOF' > app/src/main/java/com/microtask/app/MainActivity.java
           package com.microtask.app;
 
+          import android.Manifest;
           import android.annotation.SuppressLint;
+          import android.content.ActivityNotFoundException;
+          import android.content.Intent;
+          import android.content.pm.PackageManager;
+          import android.net.Uri;
+          import android.os.Build;
           import android.os.Bundle;
+          import android.webkit.ValueCallback;
+          import android.webkit.WebChromeClient;
+          import android.webkit.WebResourceRequest;
           import android.webkit.WebSettings;
           import android.webkit.WebView;
           import android.webkit.WebViewClient;
-          import androidx.appcompat.app.AppCompatActivity;
+          import android.widget.Toast;
 
-          import com.onesignal.OneSignal;
+          import androidx.annotation.NonNull;
+          import androidx.appcompat.app.AppCompatActivity;
+          import androidx.core.app.ActivityCompat;
+          import androidx.core.content.ContextCompat;
+
           import com.onesignal.Continue;
-          import com.onesignal.debug.LogLevel;
+          import com.onesignal.OneSignal;
+
+          import java.util.ArrayList;
+          import java.util.List;
 
           public class MainActivity extends AppCompatActivity {
-              private static final String ONESIGNAL_APP_ID = "e94dc542-7d17-4dd3-a20e-c1925cce7749";
               private WebView myWebView;
+              private ValueCallback<Uri[]> mFilePathCallback;
+              private static final int FILE_CHOOSER_REQUEST_CODE = 1001;
+              private static final int PERMISSION_REQUEST_CODE = 2001;
 
               @SuppressLint("SetJavaScriptEnabled")
               @Override
               protected void onCreate(Bundle savedInstanceState) {
                   super.onCreate(savedInstanceState);
 
-                  // Initialize OneSignal
-                  OneSignal.getDebug().setLogLevel(LogLevel.VERBOSE);
-                  OneSignal.initWithContext(this, ONESIGNAL_APP_ID);
+                  // ১. অ্যাপে ঢোকার সাথে সাথে নোটিফিকেশন এবং গ্যালারির পারমিশন পপআপ
+                  requestAppPermissions();
+
+                  // OneSignal ইন-অ্যাপ প্রম্পট
                   OneSignal.getNotifications().requestPermission(true, Continue.none());
 
                   myWebView = new WebView(this);
@@ -185,9 +236,134 @@ jobs:
                   webSettings.setDomStorageEnabled(true);
                   webSettings.setDatabaseEnabled(true);
                   webSettings.setAllowFileAccess(true);
+                  webSettings.setAllowContentAccess(true);
+                  webSettings.setUseWideViewPort(true);
+                  webSettings.setLoadWithOverviewMode(true);
 
-                  myWebView.setWebViewClient(new WebViewClient());
+                  // ২. বাহ্যিক লিংক হ্যান্ডলিং (ইউটিউব, টেলিগ্রাম, ফেসবুক সরাসরি তাদের অ্যাপে খুলবে)
+                  myWebView.setWebViewClient(new WebViewClient() {
+                      @Override
+                      public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                          return handleExternalUrls(request.getUrl().toString());
+                      }
+
+                      @SuppressWarnings("deprecation")
+                      @Override
+                      public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                          return handleExternalUrls(url);
+                      }
+                  });
+
+                  // ৩. গ্যালারি থেকে স্ক্রিনশট সিলেক্ট করার জন্য WebChromeClient
+                  myWebView.setWebChromeClient(new WebChromeClient() {
+                      @Override
+                      public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
+                          if (mFilePathCallback != null) {
+                              mFilePathCallback.onReceiveValue(null);
+                          }
+                          mFilePathCallback = filePathCallback;
+
+                          Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                          intent.addCategory(Intent.CATEGORY_OPENABLE);
+                          intent.setType("image/*");
+                          intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, false);
+
+                          try {
+                              startActivityForResult(Intent.createChooser(intent, "Select Screenshot"), FILE_CHOOSER_REQUEST_CODE);
+                          } catch (ActivityNotFoundException e) {
+                              mFilePathCallback = null;
+                              Toast.makeText(MainActivity.this, "No file manager found", Toast.LENGTH_SHORT).show();
+                              return false;
+                          }
+                          return true;
+                      }
+                  });
+
                   myWebView.loadUrl("https://vaiimdrakib51-cloud.github.io/MiCro-Task/");
+              }
+
+              // অ্যাপ খোলার সাথে সাথে পারমিশন চাওয়া
+              private void requestAppPermissions() {
+                  List<String> list = new ArrayList<>();
+
+                  // পুশ নোটিফিকেশন পারমিশন (Android 13+)
+                  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                      if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                          list.add(Manifest.permission.POST_NOTIFICATIONS);
+                      }
+                      if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED) {
+                          list.add(Manifest.permission.READ_MEDIA_IMAGES);
+                      }
+                  } else {
+                      if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                          list.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+                      }
+                  }
+
+                  if (!list.isEmpty()) {
+                      ActivityCompat.requestPermissions(this, list.toArray(new String[0]), PERMISSION_REQUEST_CODE);
+                  }
+              }
+
+              // লিংক হ্যান্ডলার: নিজস্ব ওয়েবসাইট ছাড়া বাইরের যেকোনো অ্যাপে রিডাইরেক্ট করবে
+              private boolean handleExternalUrls(String url) {
+                  if (url == null) return false;
+
+                  // অ্যাপের নিজস্ব ওয়েবসাইট হলে ভেতরেই থাকবে
+                  if (url.startsWith("https://vaiimdrakib51-cloud.github.io/MiCro-Task/")) {
+                      return false;
+                  }
+
+                  try {
+                      // intent:// বা সরাসরি t.me, whatsapp, youtube, facebook লিংক
+                      Intent intent;
+                      if (url.startsWith("intent:")) {
+                          intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME);
+                          if (intent != null) {
+                              startActivity(intent);
+                              return true;
+                          }
+                      } else {
+                          intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                          startActivity(intent);
+                          return true;
+                      }
+                  } catch (Exception e) {
+                      try {
+                          // অ্যাপ ইনস্টল না থাকলে সাধারণ ব্রাউজারে খুলবে
+                          Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                          startActivity(browserIntent);
+                          return true;
+                      } catch (Exception ex) {
+                          Toast.makeText(this, "Cannot open this link", Toast.LENGTH_SHORT).show();
+                      }
+                  }
+                  return true;
+              }
+
+              // গ্যালারি থেকে ছবি সিলেক্ট হওয়ার পর রিটার্ন রেজাল্ট হ্যান্ডলিং
+              @Override
+              protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+                  super.onActivityResult(requestCode, resultCode, data);
+
+                  if (requestCode == FILE_CHOOSER_REQUEST_CODE) {
+                      if (mFilePathCallback == null) return;
+
+                      Uri[] results = null;
+                      if (resultCode == RESULT_OK && data != null) {
+                          if (data.getData() != null) {
+                              results = new Uri[]{ data.getData() };
+                          } else if (data.getClipData() != null) {
+                              int count = data.getClipData().getItemCount();
+                              results = new Uri[count];
+                              for (int i = 0; i < count; i++) {
+                                  results[i] = data.getClipData().getItemAt(i).getUri();
+                              }
+                          }
+                      }
+                      mFilePathCallback.onReceiveValue(results);
+                      mFilePathCallback = null;
+                  }
               }
 
               @Override
