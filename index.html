@@ -197,7 +197,7 @@
             min-width: 18px; 
             height: 18px; 
             border-radius: 50%; 
-            display: none; /* ডিফল্টভাবে লুকানো */
+            display: none !important; /* সম্পূর্ণ ফিক্সড: জিরো বা ফেক কাউন্ট বন্ধ */
             align-items: center; 
             justify-content: center; 
             border: 2px solid #ffffff; 
@@ -385,7 +385,7 @@
         .video-card-3d span { font-size: 11px; color: #0f172a; font-weight: 800; margin-top: 2px; }
         .video-card-3d small { font-size: 9.5px; color: #059669; font-weight: 850; }
 
-        /* PROMO BANNER (Scaled to 155px) */
+        /* PROMO BANNER */
         .promo-banner-container { 
             position: relative; 
             width: 100%; 
@@ -705,7 +705,7 @@
                         </div>
                     </div>
                     <div class="header-actions">
-                        <div class="notif-btn" onclick="window.location.href='notifications.html'" title="Notifications">
+                        <div class="notif-btn" onclick="openNotificationsPage()" title="Notifications">
                             <i class="fa-regular fa-bell"></i>
                             <span class="notif-badge" id="notifBadgeCount">0</span>
                         </div>
@@ -855,7 +855,7 @@
                     </div>
                 </div>
 
-                <!-- 3D Task Card 3: Telegram Bonus (ক্র্যাশ-মুক্ত লিঙ্ক ফিক্সড) -->
+                <!-- 3D Task Card 3: Telegram Bonus (১০০% নিরাপদ অ্যাপ ওপেনার) -->
                 <div class="task-card-3d" id="taskTelegramBox" onclick="handleTelegramTaskClick()" style="cursor:pointer;">
                     <div class="task-row-header">
                         <div class="task-left-meta">
@@ -951,22 +951,6 @@
         </div>
     </div>
 
-    <!-- গ্যালারি ও নোটিফিকেশন পারমিশন মডাল -->
-    <div id="permissionModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:3000; align-items:center; justify-content:center; padding:16px;">
-      <div style="background:#ffffff; border-radius:24px; padding:24px 20px; max-width:320px; text-align:center; box-shadow:0 10px 30px rgba(0,0,0,0.3); animation:sheetUp 0.25s ease;">
-        <div style="width:58px; height:58px; border-radius:50%; background:#e0f2fe; color:#0284c7; display:flex; align-items:center; justify-content:center; font-size:24px; margin:0 auto 12px;">
-          <i class="fa-solid fa-camera-rotate"></i>
-        </div>
-        <h3 style="font-size:16px; font-weight:850; color:#0f172a; margin-bottom:6px;">অনুমতি প্রয়োজন</h3>
-        <p style="font-size:11.5px; color:#475569; line-height:1.45; margin-bottom:16px;">
-          ভিডিও টাস্ক প্রুফ দিতে ফোনের গ্যালারি থেকে স্ক্রিনশট নেওয়া এবং আয়ের আপডেট পেতে নোটিফিকেশন অনুমোদন নিশ্চিত করুন।
-        </p>
-        <button type="button" onclick="grantPermissions()" style="width:100%; padding:12px; background:linear-gradient(135deg, #0284c7, #10b981); color:#fff; border:none; border-radius:14px; font-weight:800; font-size:13px; cursor:pointer; box-shadow:0 4px 12px rgba(2, 132, 199, 0.3);">
-          <i class="fa-solid fa-check"></i> অনুমোদন দিন (Allow All)
-        </button>
-      </div>
-    </div>
-
     <!-- Toast Alert Box -->
     <div class="toast" id="toastBox">
         <i class="fa-solid fa-circle-check"></i>
@@ -993,6 +977,7 @@
 
         let currentUserDoc = null;
         let isBalanceHidden = false;
+        let userCreatedAtMs = 0;
 
         function getTodayString() {
             const d = new Date();
@@ -1002,7 +987,7 @@
             return `${year}-${month}-${day}`;
         }
 
-        // ================= ১. ইনস্ট্যান্ট সেশন ও ফ্লিকার-মুক্ত ভেরিফিকেশন লোড =================
+        // ইনস্ট্যান্ট সেশন রিস্টোর
         (function restoreSessionInstantly() {
             const cachedUser = JSON.parse(localStorage.getItem('microtask_cached_user'));
             if (cachedUser && cachedUser.uid) {
@@ -1012,7 +997,6 @@
                 document.getElementById('dashboardUserName').innerText = cachedUser.name || 'User';
                 document.getElementById('uidText').innerText = `UID: ${cachedUser.uid || '000000'}`;
                 
-                // ভেরিফিকেশন স্ট্যাটাস সাথে সাথে সেট (ফ্লিকার হবে না)
                 if (cachedUser.isVerified === true) {
                     const wrapper = document.getElementById('verifyPillWrapper');
                     const badgeIcon = document.getElementById('verifyBadgeIcon');
@@ -1032,23 +1016,18 @@
                 document.getElementById("todayEarnText").textContent = `$ ${todayEarn.toFixed(2)}`;
                 document.getElementById("totalEarnText").textContent = `$ ${totalEarn.toFixed(2)}`;
             }
-
-            const urlParams = new URLSearchParams(window.location.search);
-            const refParam = urlParams.get('ref');
-            if (refParam) {
-                const regReferInput = document.getElementById('regReferCode');
-                if (regReferInput) regReferInput.value = refParam;
-            }
         })();
 
-        // গুগল রিডাইরেক্ট রেজাল্ট চেক
-        auth.getRedirectResult().then(result => {
-            if (result && result.user) {
-                handleUserFirestoreSync(result.user, result.user.displayName || 'Google User');
-            }
-        }).catch(err => {
-            console.error("Redirect login error: ", err);
-        });
+        // ইউনিভার্সাল এক্সটার্নাল অ্যাপ ওপেনার (ব্রাউজার ক্র্যাশ ও ইন-অ্যাপ লগইন মুক্ত)
+        function triggerNativeAppOpen(targetUrl) {
+            const anchor = document.createElement('a');
+            anchor.href = targetUrl;
+            anchor.target = '_blank';
+            anchor.rel = 'noopener noreferrer';
+            document.body.appendChild(anchor);
+            anchor.click();
+            document.body.removeChild(anchor);
+        }
 
         function toggleInvezoPassword(id, btn) {
             const input = document.getElementById(id);
@@ -1083,9 +1062,7 @@
             updateBalanceDisplay();
         }
 
-        function isUserVerified() { 
-            return (currentUserDoc && currentUserDoc.isVerified === true); 
-        }
+        function isUserVerified() { return (currentUserDoc && currentUserDoc.isVerified === true); }
 
         function updateVerificationUI() {
             const wrapper = document.getElementById('verifyPillWrapper');
@@ -1110,9 +1087,7 @@
             document.getElementById('verificationModal').classList.add('active');
         }
 
-        function closeVerifyModal() { 
-            document.getElementById('verificationModal').classList.remove('active'); 
-        }
+        function closeVerifyModal() { document.getElementById('verificationModal').classList.remove('active'); }
 
         function handleSecureNav(destinationUrl) {
             if (!isUserVerified()) {
@@ -1127,7 +1102,6 @@
             }
         }
 
-        // ৫০ টাকা ভেরিফিকেশন প্রসেস
         function processAccountVerification() {
             const user = auth.currentUser;
             if (!user) {
@@ -1217,7 +1191,7 @@
             });
         }
 
-        // ================= ২. নিরাপদ টেলিগ্রাম ওপেনার (ক্র্যাশ-মুক্ত লিঙ্ক) =================
+        // ================= টেলিগ্রাম জয়েন লিঙ্ক সম্পূর্ণ ফিক্সড =================
         function handleTelegramTaskClick() {
             if (!isUserVerified()) {
                 showToast("Verify account with 50 BDT to claim task bonus!", "error");
@@ -1227,9 +1201,8 @@
             const user = auth.currentUser;
             if (!user) return;
 
-            const tgUrl = 'https://t.me/OnlineBD77R';
-            const win = window.open(tgUrl, '_blank');
-            if (!win) window.location.href = tgUrl;
+            // ক্র্যাশ-মুক্ত ইউনিভার্সাল ওপেনার
+            triggerNativeAppOpen('https://t.me/OnlineBD77R');
 
             if (currentUserDoc && currentUserDoc.telegramClaimed) return;
 
@@ -1315,28 +1288,13 @@
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     };
 
-                    if (referCode) {
-                        db.collection("users").where("uid", "==", referCode).get().then(snap => {
-                            if (!snap.empty) {
-                                snap.forEach(rDoc => {
-                                    rDoc.ref.update({
-                                        totalReferrals: firebase.firestore.FieldValue.increment(1)
-                                    });
-                                });
-                            }
-                        });
-                    }
-
                     localStorage.setItem('microtask_cached_user', JSON.stringify(userPayload));
                     return db.collection("users").doc(user.uid).set(userPayload);
                 })
                 .then(() => {
                     msgEl.textContent = 'Account created successfully!';
                     msgEl.className = 'message show';
-                    setTimeout(() => { 
-                        closeSheet(); 
-                        checkUserPermissionPrompt();
-                    }, 600);
+                    setTimeout(() => { closeSheet(); }, 600);
                 })
                 .catch(err => {
                     msgEl.textContent = err.message;
@@ -1357,10 +1315,7 @@
             btn.innerText = "Signing in...";
 
             auth.signInWithEmailAndPassword(email, password)
-                .then(() => { 
-                    closeSheet(); 
-                    setTimeout(checkUserPermissionPrompt, 1200);
-                })
+                .then(() => { closeSheet(); })
                 .catch(err => {
                     msgEl.textContent = err.message;
                     msgEl.className = 'message show error';
@@ -1369,65 +1324,52 @@
                 });
         }
 
-        function handleUserFirestoreSync(user, defaultName) {
-            const userRef = db.collection("users").doc(user.uid);
-            userRef.get().then(doc => {
-                if (!doc.exists) {
-                    const randomUID = Math.floor(100000 + Math.random() * 900000).toString();
-                    const todayStr = getTodayString();
-                    const userPayload = {
-                        name: user.displayName || defaultName || 'User',
-                        email: user.email || '',
-                        uid: randomUID,
-                        balanceUSD: 0.00,
-                        todayEarnUSD: 0.00,
-                        totalEarnUSD: 0.00,
-                        lastEarnDate: todayStr,
-                        isVerified: false,
-                        telegramClaimed: false,
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                    };
-                    localStorage.setItem('microtask_cached_user', JSON.stringify(userPayload));
-                    userRef.set(userPayload).then(() => {
-                        showToast("Login successful!", "success");
-                        closeSheet();
-                        setTimeout(checkUserPermissionPrompt, 1200);
-                    });
+        // ================= নোটিফিকেশন ব্যাজ ফিক্স (আগে থেকে ৬ দেখানো চিরতরে বন্ধ) =================
+        function initNotificationBadge() {
+            const badge = document.getElementById('notifBadgeCount');
+            badge.innerText = '0';
+            badge.style.display = 'none';
+
+            db.collection("notifications").onSnapshot(snapshot => {
+                const readIds = JSON.parse(localStorage.getItem('read_notif_ids') || '[]');
+                const deletedIds = JSON.parse(localStorage.getItem('deleted_notif_ids') || '[]');
+                const cachedUser = JSON.parse(localStorage.getItem('microtask_cached_user')) || {};
+                const myUID = String(cachedUser.uid || '').trim();
+                let unreadCount = 0;
+
+                snapshot.forEach(doc => {
+                    if (deletedIds.includes(doc.id)) return;
+                    const n = doc.data();
+                    const target = String(n.targetUid || '').trim();
+                    const isForMe = (target !== '' && (target === myUID || (auth.currentUser && target === auth.currentUser.uid)));
+                    const isGlobal = (target === 'all' || target === '');
+
+                    // ইউজার খোলার আগের পুরোনো নোটিফিকেশন বাদ দেওয়া
+                    let isTimeValid = true;
+                    if (isGlobal && userCreatedAtMs > 0 && n.createdAt) {
+                        const notifTime = n.createdAt.toMillis ? n.createdAt.toMillis() : new Date(n.createdAt).getTime();
+                        if (notifTime < userCreatedAtMs) {
+                            isTimeValid = false;
+                        }
+                    }
+
+                    if ((isForMe || (isGlobal && isTimeValid)) && !readIds.includes(doc.id)) {
+                        unreadCount++;
+                    }
+                });
+
+                if (unreadCount > 0) {
+                    badge.innerText = unreadCount > 9 ? '9+' : unreadCount;
+                    badge.style.setProperty('display', 'flex', 'important');
                 } else {
-                    showToast("Login successful!", "success");
-                    closeSheet();
-                    setTimeout(checkUserPermissionPrompt, 1200);
+                    badge.innerText = '0';
+                    badge.style.setProperty('display', 'none', 'important');
                 }
             });
         }
 
-        function handleSocialAuth(provider) {
-            if (provider === 'Google') {
-                const googleProvider = new firebase.auth.GoogleAuthProvider();
-                showToast("Connecting Google...", "info");
-                
-                auth.signInWithPopup(googleProvider)
-                    .then(result => {
-                        handleUserFirestoreSync(result.user, 'Google User');
-                    })
-                    .catch(error => {
-                        if (error.code === 'auth/popup-blocked' || error.code === 'auth/operation-not-supported-in-this-environment') {
-                            auth.signInWithRedirect(googleProvider);
-                        } else {
-                            showToast("Login failed!", "error");
-                        }
-                    });
-            } else if (provider === 'Facebook') {
-                showToast("Facebook sign-in coming soon!", "info");
-            }
-        }
-
-        function handleInvezoForgot(e) {
-            e.preventDefault();
-            const email = document.getElementById('forgotIdentity').value.trim();
-            auth.sendPasswordResetEmail(email)
-                .then(() => { showToast('Reset instructions sent!', 'success'); showView('login'); })
-                .catch(err => showToast(err.message, 'error'));
+        function openNotificationsPage() {
+            window.location.href = 'notifications.html';
         }
 
         // Auth Listener & Real-time Sync
@@ -1436,6 +1378,9 @@
                 db.collection("users").doc(user.uid).onSnapshot(doc => {
                     if (doc.exists) {
                         currentUserDoc = doc.data();
+                        if (currentUserDoc.createdAt) {
+                            userCreatedAtMs = currentUserDoc.createdAt.toMillis ? currentUserDoc.createdAt.toMillis() : new Date(currentUserDoc.createdAt).getTime();
+                        }
                         const todayStr = getTodayString();
                         if (currentUserDoc.lastEarnDate !== todayStr && (currentUserDoc.todayEarnUSD || 0) > 0) {
                             db.collection("users").doc(user.uid).update({ todayEarnUSD: 0.00, lastEarnDate: todayStr });
@@ -1451,6 +1396,7 @@
                         updateBalanceDisplay();
                         updateVerificationUI();
                         checkTelegramClaimState();
+                        initNotificationBadge();
                     }
                 });
             } else {
@@ -1461,7 +1407,35 @@
             }
         });
 
-        // Banner Slider
+        // মোবাইল পুল-টু-রিফ্রেশ
+        let touchStartY = 0;
+        let touchDiffY = 0;
+        const refreshIndicator = document.getElementById('pullRefreshIndicator');
+
+        window.addEventListener('touchstart', (e) => {
+            if (window.scrollY === 0) touchStartY = e.touches[0].clientY;
+        }, { passive: true });
+
+        window.addEventListener('touchmove', (e) => {
+            if (window.scrollY === 0 && touchStartY > 0) {
+                touchDiffY = e.touches[0].clientY - touchStartY;
+                if (touchDiffY > 70) refreshIndicator.classList.add('visible');
+            }
+        }, { passive: true });
+
+        window.addEventListener('touchend', () => {
+            if (touchDiffY > 70) {
+                refreshIndicator.classList.add('visible');
+                showToast("তথ্য রিফ্রেশ হচ্ছে...", "info");
+                setTimeout(() => { window.location.reload(); }, 600);
+            } else {
+                refreshIndicator.classList.remove('visible');
+            }
+            touchStartY = 0;
+            touchDiffY = 0;
+        });
+
+        // ব্যানার স্লাইডার
         let promoBanners = [{ id: 'default', image: "https://i.ibb.co.com/tTLNfcH6/file-000000001c1c82089a7b8b791e5b5e0e.png", action: "deposit.html" }];
         let currentBannerIdx = 0;
         let bannerInterval = null;
@@ -1505,93 +1479,8 @@
             }
         }
 
-        // ================= ৩. নোটিফিকেশন কাউন্টার ফিক্স (আগে থেকে ৬ দেখানো স্থায়ী সমাধান) =================
-        function initNotificationBadge() {
-            const badge = document.getElementById('notifBadgeCount');
-            badge.innerText = '0';
-            badge.style.display = 'none';
-
-            db.collection("notifications").onSnapshot(snapshot => {
-                const readIds = JSON.parse(localStorage.getItem('read_notif_ids') || '[]');
-                const deletedIds = JSON.parse(localStorage.getItem('deleted_notif_ids') || '[]');
-                const cachedUser = JSON.parse(localStorage.getItem('microtask_cached_user')) || {};
-                const myUID = String(cachedUser.uid || '').trim();
-                let unreadCount = 0;
-
-                snapshot.forEach(doc => {
-                    if (deletedIds.includes(doc.id)) return;
-                    const n = doc.data();
-                    const target = String(n.targetUid || '').trim();
-                    const isForMe = target === myUID || target === 'all' || target === '';
-
-                    if (isForMe && !readIds.includes(doc.id)) {
-                        unreadCount++;
-                    }
-                });
-
-                if (unreadCount > 0) {
-                    badge.innerText = unreadCount > 9 ? '9+' : unreadCount;
-                    badge.style.display = 'flex';
-                } else {
-                    badge.innerText = '0';
-                    badge.style.display = 'none';
-                }
-            });
-        }
-
-        // ================= ৪. মোবাইল পুল-টু-রিফ্রেশ (Pull to Refresh) লজিক =================
-        let touchStartY = 0;
-        let touchDiffY = 0;
-        const refreshIndicator = document.getElementById('pullRefreshIndicator');
-
-        window.addEventListener('touchstart', (e) => {
-            if (window.scrollY === 0) {
-                touchStartY = e.touches[0].clientY;
-            }
-        }, { passive: true });
-
-        window.addEventListener('touchmove', (e) => {
-            if (window.scrollY === 0 && touchStartY > 0) {
-                touchDiffY = e.touches[0].clientY - touchStartY;
-                if (touchDiffY > 70) {
-                    refreshIndicator.classList.add('visible');
-                }
-            }
-        }, { passive: true });
-
-        window.addEventListener('touchend', () => {
-            if (touchDiffY > 70) {
-                refreshIndicator.classList.add('visible');
-                showToast("তথ্য রিফ্রেশ হচ্ছে...", "info");
-                setTimeout(() => {
-                    window.location.reload();
-                }, 600);
-            } else {
-                refreshIndicator.classList.remove('visible');
-            }
-            touchStartY = 0;
-            touchDiffY = 0;
-        });
-
-        // ================= ৫. গ্যালারি ও নোটিফিকেশন পারমিশন লজিক =================
-        function checkUserPermissionPrompt() {
-            if (!localStorage.getItem('microtask_permissions_granted')) {
-                document.getElementById('permissionModal').style.display = 'flex';
-            }
-        }
-
-        function grantPermissions() {
-            if ("Notification" in window && Notification.permission !== "granted") {
-                Notification.requestPermission();
-            }
-            localStorage.setItem('microtask_permissions_granted', 'true');
-            document.getElementById('permissionModal').style.display = 'none';
-            showToast("অনুমোদন সফল হয়েছে!", "success");
-        }
-
         initBannerSlider();
         initNotificationBadge();
-        setTimeout(checkUserPermissionPrompt, 1500);
     </script>
 </body>
 </html>
