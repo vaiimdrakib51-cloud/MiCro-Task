@@ -5,9 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Boost & Social Feed — MicroTask</title>
   
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons CDN -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
+  <!-- Firebase SDK (Compat Version) -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -18,12 +21,27 @@
         extend: {
           colors: {
             aqua: {
-              50: '#f0f9f8', 100: '#d9f2ee', 200: '#b8e5df', 300: '#8dd2c9',
-              400: '#4ebfb3', 500: '#14b8a6', 600: '#0d9488', 700: '#0f766e',
-              bg: '#edf7f6', card: '#ffffff', cardTint: '#f5faf9', border: '#cee7e3',
-              divider: '#d8edea', textPrimary: '#0f2f2d', textSecondary: '#4d726f',
-              inputBg: '#e6f3f1', hoverMint: '#ddf0ed'
+              50: '#f0f9f8',
+              100: '#d9f2ee',
+              200: '#b8e5df',
+              300: '#8dd2c9',
+              400: '#4ebfb3',
+              500: '#14b8a6',
+              600: '#0d9488',
+              700: '#0f766e',
+              bg: '#edf7f6',
+              card: '#ffffff',
+              cardTint: '#f5faf9',
+              border: '#cee7e3',
+              divider: '#d8edea',
+              textPrimary: '#0f2f2d',
+              textSecondary: '#4d726f',
+              inputBg: '#e6f3f1',
+              hoverMint: '#ddf0ed'
             }
+          },
+          fontFamily: {
+            sans: ['-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
           }
         }
       }
@@ -31,37 +49,48 @@
   </script>
 
   <style>
-    body { background-color: #edf7f6; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+    body {
+      background-color: #edf7f6;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
   </style>
 </head>
 <body class="text-aqua-textPrimary flex justify-center min-h-screen">
 
+  <!-- Mobile Viewport Container -->
   <div class="w-full max-w-md bg-aqua-bg min-h-screen flex flex-col relative pb-8 shadow-xl border-x border-aqua-border">
     
-    <!-- NAVIGATION BAR -->
+    <!-- ================= 1. NAVIGATION BAR ================= -->
     <nav id="user-nav" class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-aqua-border flex items-center shadow-sm px-2">
+      <!-- Back to Dashboard -->
       <button onclick="window.location.href='index.html'" title="Back to Dashboard" class="p-2.5 text-aqua-600 hover:text-aqua-700 transition">
         <i data-lucide="arrow-left" class="w-5 h-5"></i>
       </button>
 
+      <!-- Feed -->
       <button onclick="switchTab('home')" id="tab-btn-home" title="Home Feed" class="flex-1 py-3 flex justify-center border-b-2 border-aqua-600 text-aqua-600 transition">
         <i data-lucide="home" class="w-5 h-5"></i>
       </button>
 
+      <!-- Create Post -->
       <button onclick="openCreateModal()" id="tab-btn-plus" title="Create Story" class="flex-1 py-3 flex justify-center border-b-2 border-transparent text-aqua-textSecondary hover:text-aqua-textPrimary transition">
         <i data-lucide="plus-circle" class="w-5 h-5"></i>
       </button>
 
+      <!-- Search by UID -->
       <button onclick="switchTab('search')" id="tab-btn-search" title="Search User" class="flex-1 py-3 flex justify-center border-b-2 border-transparent text-aqua-textSecondary hover:text-aqua-textPrimary transition">
         <i data-lucide="search" class="w-5 h-5"></i>
       </button>
     </nav>
 
-    <!-- Main Content -->
+    <!-- Main Content Area -->
     <main class="flex-1">
 
-      <!-- HOME FEED -->
+      <!-- ================= 2. HOME FEED SCREEN ================= -->
       <section id="view-home" class="space-y-2 py-1.5">
+        
+        <!-- Slim "What's on your mind?" Bar -->
         <div class="bg-white px-3 py-2 border-y border-aqua-border shadow-xs">
           <div class="flex items-center space-x-2">
             <img id="creator-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150" alt="avatar" class="w-8 h-8 rounded-full object-cover border border-aqua-300">
@@ -80,15 +109,22 @@
             </div>
             <div class="flex items-center space-x-1 text-cyan-600">
               <i data-lucide="globe" class="w-3.5 h-3.5"></i>
-              <span>Live Social Feed</span>
+              <span>Public Feed</span>
             </div>
           </div>
         </div>
 
-        <div id="feed-container" class="space-y-2"></div>
+        <!-- Dynamic Posts List -->
+        <div id="feed-container" class="space-y-2">
+          <div class="p-8 text-center text-xs text-aqua-textSecondary">
+            <i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto mb-2 text-teal-600"></i>
+            Loading posts...
+          </div>
+        </div>
+
       </section>
 
-      <!-- SEARCH VIEW -->
+      <!-- ================= 3. SEARCH BY UID SCREEN ================= -->
       <section id="view-search" class="hidden py-3 px-3 space-y-3">
         <div class="bg-white p-3.5 rounded-xl border border-aqua-border shadow-sm">
           <label class="block text-xs font-bold uppercase tracking-wider text-aqua-textSecondary mb-1.5">
@@ -100,27 +136,28 @@
               <input 
                 type="text" 
                 id="uid-search-input" 
-                placeholder="Enter 6-digit UID (e.g. 300011)..." 
+                placeholder="Enter 6-digit UID (e.g. 455115)..." 
                 class="w-full bg-aqua-inputBg text-xs text-aqua-textPrimary pl-9 pr-3 py-2.5 rounded-lg border border-aqua-border focus:outline-none focus:border-aqua-600 font-mono"
                 onkeydown="if(event.key === 'Enter') searchUserByUID()"
               />
             </div>
-            <button onclick="searchUserByUID()" class="bg-gradient-to-r from-teal-600 to-cyan-600 text-white px-4 py-2 rounded-lg text-xs font-semibold shadow-sm">
+            <button onclick="searchUserByUID()" class="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white px-4 py-2 rounded-lg text-xs font-semibold transition shadow-sm">
               Search
             </button>
           </div>
         </div>
+
         <div id="search-profile-result" class="space-y-3"></div>
       </section>
 
     </main>
 
-    <!-- CREATE POST MODAL -->
+    <!-- ================= CREATE POST MODAL ================= -->
     <div id="modal-create" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-[2px] hidden items-center justify-center p-3">
       <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden border border-aqua-border max-h-[95vh] flex flex-col">
         <div class="px-4 py-3 bg-aqua-cardTint border-b border-aqua-border flex items-center justify-between relative">
           <h3 class="text-base font-bold text-center w-full text-aqua-textPrimary">Create Story & Publish</h3>
-          <button onclick="closeCreateModal()" class="absolute right-3 w-8 h-8 rounded-full bg-aqua-inputBg flex items-center justify-center text-aqua-textSecondary">
+          <button onclick="closeCreateModal()" class="absolute right-3 w-8 h-8 rounded-full bg-aqua-inputBg hover:bg-aqua-hoverMint flex items-center justify-center text-aqua-textSecondary">
             <i data-lucide="x" class="w-5 h-5"></i>
           </button>
         </div>
@@ -134,13 +171,13 @@
         </div>
 
         <div class="p-3.5 flex-1 overflow-y-auto">
-          <div class="border-2 border-aqua-border/80 focus-within:border-teal-600 rounded-xl bg-aqua-cardTint/40 p-2.5 shadow-inner">
+          <div class="border-2 border-aqua-border/80 focus-within:border-teal-600 rounded-xl bg-aqua-cardTint/40 p-2.5 transition shadow-inner">
             <textarea 
               id="create-post-input" 
-              rows="8"
+              rows="9"
               oninput="handleMissionsCounter(this)"
               placeholder="Write your article, story or reflections here...&#10;&#10;Complete word missions to unlock higher promotion tiers!"
-              class="w-full text-sm text-aqua-textPrimary placeholder-aqua-textSecondary/60 focus:outline-none resize-none leading-relaxed bg-transparent min-h-[180px]"
+              class="w-full text-sm text-aqua-textPrimary placeholder-aqua-textSecondary/60 focus:outline-none resize-none leading-relaxed bg-transparent min-h-[190px]"
             ></textarea>
           </div>
         </div>
@@ -197,7 +234,7 @@
       </div>
     </div>
 
-    <!-- BOOST MODAL -->
+    <!-- ================= USER BOOST MODAL ================= -->
     <div id="modal-boost" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-[2px] hidden items-center justify-center p-3">
       <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden border border-aqua-border">
         <div class="px-4 py-3 bg-aqua-cardTint border-b border-aqua-border flex items-center justify-between">
@@ -205,7 +242,7 @@
             <i data-lucide="rocket" class="w-5 h-5 text-teal-600"></i>
             <h3 class="text-base font-bold text-aqua-textPrimary">Boost Campaign</h3>
           </div>
-          <button onclick="closeBoostModal()" class="w-8 h-8 rounded-full bg-aqua-inputBg flex items-center justify-center text-aqua-textSecondary">
+          <button onclick="closeBoostModal()" class="w-8 h-8 rounded-full bg-aqua-inputBg hover:bg-aqua-hoverMint flex items-center justify-center text-aqua-textSecondary">
             <i data-lucide="x" class="w-5 h-5"></i>
           </button>
         </div>
@@ -244,7 +281,7 @@
       </div>
     </div>
 
-    <!-- DELETE ACTION SHEET -->
+    <!-- ================= DELETE CONFIRMATION ACTION SHEET ================= -->
     <div id="modal-delete-sheet" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-[2px] hidden items-end justify-center">
       <div class="bg-white rounded-t-2xl w-full max-w-md p-4 space-y-3 border-t border-aqua-border">
         <div class="w-10 h-1 bg-aqua-border rounded-full mx-auto mb-2"></div>
@@ -255,7 +292,7 @@
           <span>Delete This Post Permanently</span>
         </button>
 
-        <button onclick="closeDeleteSheet()" class="w-full bg-aqua-inputBg text-aqua-textPrimary font-semibold py-2.5 rounded-xl text-xs border border-aqua-border">
+        <button onclick="closeDeleteSheet()" class="w-full bg-aqua-inputBg hover:bg-aqua-hoverMint text-aqua-textPrimary font-semibold py-2.5 rounded-xl text-xs transition border border-aqua-border">
           Cancel
         </button>
       </div>
@@ -263,6 +300,7 @@
 
   </div>
 
+  <!-- JavaScript Implementation -->
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyBrG81DRVjx040QhiT68yyRErGXjuCPdS4",
@@ -275,15 +313,19 @@
     };
 
     firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
     const db = firebase.firestore();
 
-    let appSettings = { likeRate: 0.05 };
+    let appSettings = {
+      likeRate: 0.05
+    };
 
+    // ড্যাশবোর্ডের আসল লগইন করা ইউজার রিড
     let currentUser = {
       uid: "000000",
       name: "User",
       username: "@user",
-      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
+      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
       bio: "MicroTask Member",
       isVerified: false
     };
@@ -307,20 +349,6 @@
     let selectedBoostPackage = 100;
     let targetBoostPostId = null;
     let targetDeletePostId = null;
-
-    // ================= ৫০+ ইউনিক প্রোফাইল ও কমেন্ট রিপোজিটরি (এক প্রোফাইল দুইবার কমেন্ট করবে না) =================
-    const UNIQUE_COMMENTERS = [
-      { name: "Tanvir Hasan", avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=80", text: "অসাধারণ লেখা! পড়ে অনেক ভালো লাগলো।" },
-      { name: "Nusrat Jahan", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80", text: "খুব সুন্দর পয়েন্ট তুলে ধরেছেন, ধন্যবাদ।" },
-      { name: "Arif Chowdhury", avatar: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=80", text: "সবার জন্য অনেক শিক্ষণীয় একটি পোস্ট।" },
-      { name: "Sumaiya Akter", avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80", text: "১০০% সহমত আপনার বক্তব্যের সাথে!" },
-      { name: "Mahmudul Haque", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80", text: "Great thoughts. Keep writing such inspiring articles." },
-      { name: "Farhana Islam", avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=80", text: "এত সুন্দর করে গুছিয়ে লিখেছেন যা প্রশংসনীয়।" },
-      { name: "Rakibul Islam", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80", text: "বর্তমান সময়ের অন্যতম সেরা ও সময়োপযোগী লেখা।" },
-      { name: "Sabina Yasmin", avatar: "https://images.unsplash.com/photo-1554151228-14d9def656e4?w=80", text: "আমার টাইমলাইনে শেয়ার করলাম, সবার পড়া উচিত।" },
-      { name: "Shakil Ahmed", avatar: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=80", text: "Spot on! Completely agreed with this perspective." },
-      { name: "Tasnim Rahman", avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=80", text: "ধন্যবাদ ভাইয়া এমন চমৎকার গল্প শেয়ার করার জন্য।" }
-    ];
 
     function countWords(str) {
       if (!str) return 0;
@@ -357,47 +385,10 @@
       renderFeed();
     }
 
-    // ================= অফলাইন ও ব্যাকগ্রাউন্ড বুস্ট প্রগ্রেস ক্যালকুলেশন =================
-    function calculateLiveBoostMetrics(post) {
-      if (post.boostStatus === 'active' && post.boostApprovedAt && post.boostExpiresAt) {
-        const approvedAtMs = post.boostApprovedAt.toMillis ? post.boostApprovedAt.toMillis() : new Date(post.boostApprovedAt).getTime();
-        const durationTotalMs = post.boostExpiresAt - approvedAtMs;
-        const elapsedMs = Math.max(0, Date.now() - approvedAtMs);
-        const progressRatio = Math.min(1, elapsedMs / (durationTotalMs || 1));
-
-        const targetLikes = post.targetLikes || 40;
-        const targetViews = post.targetViews || (targetLikes * 12);
-        
-        post.calculatedLikes = (post.initialLikes || 0) + Math.floor(progressRatio * targetLikes);
-        post.calculatedViews = (post.initialViews || 20) + Math.floor(progressRatio * targetViews);
-
-        // সময়ের অনুপাত অনুযায়ী ইউনিক কমেন্ট স্বয়ংক্রিয় অ্যাড হওয়া
-        const targetCommentsCount = Math.min(UNIQUE_COMMENTERS.length, Math.floor(progressRatio * (post.targetComments || 8)));
-        post.comments = post.comments || [];
-        for (let i = 0; i < targetCommentsCount; i++) {
-          const u = UNIQUE_COMMENTERS[i];
-          if (!post.comments.some(c => c.name === u.name)) {
-            post.comments.push({
-              id: "auto_" + i,
-              name: u.name,
-              avatar: u.avatar,
-              text: u.text,
-              time: "Recent"
-            });
-          }
-        }
-      } else {
-        post.calculatedLikes = post.likesCount || 0;
-        post.calculatedViews = post.viewsCount || 15;
-      }
-    }
-
     function buildPostCardHTML(post) {
-      calculateLiveBoostMetrics(post);
-
       const isLiked = Array.isArray(post.likedBy) && post.likedBy.includes(currentUser.uid);
       const isOwnPost = String(post.userId) === String(currentUser.uid);
-      const earnedValue = (post.calculatedLikes * appSettings.likeRate).toFixed(2);
+      const earnedValue = ((post.likesCount || 0) * appSettings.likeRate).toFixed(2);
       const wordCount = countWords(post.content);
 
       if (post.boostStatus === 'active' && post.boostExpiresAt && post.boostExpiresAt <= Date.now()) {
@@ -420,6 +411,8 @@
         postBodyContent = (post.content || '').trim();
       }
 
+      const safeAdIframe = `<!DOCTYPE html><html><head><meta charset='UTF-8'><style>body{margin:0;padding:0;display:flex;justify-content:center;align-items:center;background:transparent;overflow:hidden;}</style></head><body><script>atOptions={'key':'e5856b81f21b2cd3b23286d438c9fbc3','format':'iframe','height':50,'width':320,'params':{}};<` + `/script><script src='https://bicea.org/22/e5856b81f21b2cd3b23286d438c9fbc3'><` + `/script></body></html>`.replace(/"/g, '&quot;');
+
       return `
         <article class="bg-white border-y border-aqua-border shadow-xs relative">
           
@@ -437,12 +430,14 @@
                   <span>${timeAgo(post.createdAt)}</span>
                   <span>•</span>
                   <span class="text-teal-800 font-semibold">${wordCount}w</span>
+                  <span>•</span>
+                  <i data-lucide="globe" class="w-2.5 h-2.5 text-aqua-textSecondary"></i>
                 </div>
               </div>
             </div>
 
             ${isOwnPost ? `
-            <button onclick="promptDeleteSheet('${post.id}')" title="Post Options" class="w-7 h-7 rounded-full hover:bg-aqua-hoverMint flex items-center justify-center text-aqua-textSecondary">
+            <button onclick="promptDeleteSheet('${post.id}')" title="Post Options" class="w-7 h-7 rounded-full hover:bg-aqua-hoverMint flex items-center justify-center text-aqua-textSecondary transition">
               <i data-lucide="more-horizontal" class="w-4 h-4"></i>
             </button>
             ` : ''}
@@ -452,48 +447,49 @@
             ${postBodyContent}
           </div>
 
-          <!-- লাইক, ভিউজ এবং কমেন্ট কাউন্টার বার -->
           <div class="px-3 py-1 flex items-center justify-between text-[11px] text-aqua-textSecondary border-t border-aqua-divider bg-aqua-cardTint/40">
-            <div class="flex items-center space-x-3">
-              <div class="flex items-center space-x-1">
-                <span class="w-3.5 h-3.5 rounded-full bg-teal-600 flex items-center justify-center shadow-xs">
-                  <i data-lucide="thumbs-up" class="w-2 h-2 text-white fill-white"></i>
-                </span>
-                <span class="font-medium text-aqua-textPrimary">${post.calculatedLikes}</span>
-                <span class="text-teal-700 font-semibold">• $${earnedValue}</span>
-              </div>
-
-              <!-- ভিউজ কাউন্টার (Views Counter) -->
-              <div class="flex items-center space-x-1 text-cyan-700">
-                <i data-lucide="eye" class="w-3 h-3 text-cyan-600"></i>
-                <span class="font-bold text-[10px]">${post.calculatedViews} views</span>
-              </div>
+            <div class="flex items-center space-x-1">
+              <span class="w-3.5 h-3.5 rounded-full bg-teal-600 flex items-center justify-center shadow-xs">
+                <i data-lucide="thumbs-up" class="w-2 h-2 text-white fill-white"></i>
+              </span>
+              <span class="font-medium text-aqua-textPrimary">${post.likesCount || 0}</span>
+              <span class="text-teal-700 font-semibold">• $${earnedValue}</span>
             </div>
-
-            <div class="text-aqua-textSecondary font-semibold">
+            <div class="text-aqua-textSecondary">
               <span>${(post.comments || []).length} comments</span>
             </div>
           </div>
 
-          <!-- অ্যাকশন বাটনস -->
           <div class="px-1 py-0.5 grid ${post.boostStatus === 'none' ? 'grid-cols-4' : 'grid-cols-3'} gap-1 text-xs font-semibold text-aqua-textSecondary border-t border-aqua-divider">
-            <button onclick="toggleLike('${post.id}')" class="flex items-center justify-center space-x-1 py-1.5 rounded-md hover:bg-aqua-hoverMint transition ${isLiked ? 'text-teal-700 font-bold bg-teal-50' : ''}">
+            <button 
+              onclick="toggleLike('${post.id}')" 
+              class="flex items-center justify-center space-x-1 py-1.5 rounded-md hover:bg-aqua-hoverMint transition ${isLiked ? 'text-teal-700 font-bold bg-teal-50' : ''}"
+            >
               <i data-lucide="thumbs-up" class="w-3.5 h-3.5 ${isLiked ? 'fill-teal-600 text-teal-600' : ''}"></i>
               <span>Like</span>
             </button>
 
-            <button onclick="toggleComments('${post.id}')" class="flex items-center justify-center space-x-1 py-1.5 rounded-md hover:bg-aqua-hoverMint">
+            <button 
+              onclick="toggleComments('${post.id}')" 
+              class="flex items-center justify-center space-x-1 py-1.5 rounded-md hover:bg-aqua-hoverMint transition"
+            >
               <i data-lucide="message-square" class="w-3.5 h-3.5"></i>
               <span>Comment</span>
             </button>
 
-            <button onclick="handleShare()" class="flex items-center justify-center space-x-1 py-1.5 rounded-md hover:bg-aqua-hoverMint">
+            <button 
+              onclick="handleShare()" 
+              class="flex items-center justify-center space-x-1 py-1.5 rounded-md hover:bg-aqua-hoverMint transition"
+            >
               <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
               <span>Share</span>
             </button>
 
             ${post.boostStatus === 'none' ? `
-              <button onclick="openBoostModal('${post.id}')" class="flex items-center justify-center space-x-1 py-1.5 rounded-md hover:bg-aqua-hoverMint text-teal-700">
+              <button 
+                onclick="openBoostModal('${post.id}')" 
+                class="flex items-center justify-center space-x-1 py-1.5 rounded-md hover:bg-aqua-hoverMint text-teal-700 transition"
+              >
                 <i data-lucide="rocket" class="w-3.5 h-3.5 text-teal-600"></i>
                 <span>Boost</span>
               </button>
@@ -520,7 +516,6 @@
             </div>
           ` : ''}
 
-          <!-- কমেন্টস সেকশন -->
           <div id="comment-box-${post.id}" class="hidden p-2.5 bg-aqua-bg/80 border-t border-aqua-border space-y-2">
             <div class="space-y-2 max-h-52 overflow-y-auto pr-1">
               ${(post.comments || []).length === 0 ? `<p class="text-xs text-aqua-textSecondary text-center py-1">No comments yet. Write the first comment!</p>` : ''}
@@ -529,8 +524,11 @@
                   <img src="${c.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80'}" alt="${c.name}" class="w-6 h-6 rounded-full object-cover border border-aqua-200 mt-0.5">
                   <div class="flex-1">
                     <div class="bg-white border border-aqua-border rounded-xl px-2.5 py-1.5 inline-block max-w-[92%] shadow-xs">
-                      <span class="font-bold text-aqua-textPrimary block text-[10px] leading-tight">${c.name}</span>
+                      <span class="font-bold text-aqua-textPrimary block cursor-pointer hover:underline text-[10px] leading-tight">${c.name}</span>
                       <p class="text-aqua-textPrimary mt-0.5 text-xs leading-normal">${c.text}</p>
+                    </div>
+                    <div class="flex items-center space-x-2.5 text-[9px] text-aqua-textSecondary mt-0.5 ml-1.5 font-semibold">
+                      <span>${c.time || 'Just now'}</span>
                     </div>
                   </div>
                 </div>
@@ -539,16 +537,30 @@
 
             <div class="flex items-center space-x-2 pt-1 border-t border-aqua-border">
               <img src="${currentUser.avatar}" alt="My Avatar" class="w-6 h-6 rounded-full object-cover border border-aqua-300">
+              
               <input 
                 type="text" 
                 id="input-comment-${post.id}" 
                 placeholder="Write a comment..." 
-                class="flex-1 bg-white border border-aqua-border rounded-full px-3 py-1 text-xs focus:outline-none focus:border-teal-600"
+                class="flex-1 bg-white border border-aqua-border rounded-full px-3 py-1 text-xs focus:outline-none focus:border-teal-600 placeholder-aqua-textSecondary/50"
                 onkeydown="if(event.key === 'Enter') postComment('${post.id}')"
               />
               <button onclick="postComment('${post.id}')" class="text-teal-600 hover:text-teal-700 p-0.5">
                 <i data-lucide="send" class="w-3.5 h-3.5"></i>
               </button>
+            </div>
+          </div>
+
+          <div class="px-2 py-1 bg-aqua-cardTint border-t border-aqua-border flex flex-col items-center justify-center">
+            <span class="text-[8px] uppercase tracking-wider text-aqua-textSecondary/60 font-semibold mb-0.5">Sponsored Advertisement</span>
+            <div class="w-[320px] h-[50px] bg-white border border-aqua-border/80 rounded flex items-center justify-center overflow-hidden shadow-xs">
+              <iframe 
+                srcdoc="${safeAdIframe}" 
+                width="320" 
+                height="50" 
+                style="border:none; overflow:hidden; width:320px; height:50px;" 
+                scrolling="no">
+              </iframe>
             </div>
           </div>
 
@@ -569,7 +581,9 @@
               <i data-lucide="feather" class="w-5 h-5"></i>
             </div>
             <h3 class="font-bold text-xs text-aqua-textPrimary">No Posts Yet</h3>
-            <p class="text-[11px] text-aqua-textSecondary mt-0.5">Feed is empty! Be the first to publish a story.</p>
+            <p class="text-[11px] text-aqua-textSecondary mt-0.5 leading-relaxed">
+              Feed is empty! Tap <strong>"What's on your mind?"</strong> above to publish the very first post!
+            </p>
           </div>
         `;
       } else {
@@ -580,15 +594,68 @@
       updateAllCountdowns();
     }
 
+    // ================= ফায়ারবেস থেকে লাইভ পোস্ট লোড =================
     function initFirebasePostsListener() {
-      db.collection("posts").orderBy("createdAt", "desc").limit(35).onSnapshot(snapshot => {
+      db.collection("posts").orderBy("createdAt", "desc").limit(40).onSnapshot(snapshot => {
         posts = [];
         snapshot.forEach(doc => {
-          posts.push({ id: doc.id, ...doc.data() });
+          const data = doc.data();
+          posts.push({
+            id: doc.id,
+            ...data
+          });
         });
         renderFeed();
+      }, err => {
+        console.error("Firestore posts load error:", err);
       });
     }
+
+    // ================= সময়ের সাথে সাথে বুস্ট লাইক ও কমেন্ট বৃদ্ধি =================
+    const mockCommentBank = [
+      "Very insightful post!",
+      "Completely agree with this perspective.",
+      "Inspiring thoughts. Well written!",
+      "Great wisdom shared here.",
+      "Such a valuable reminder for all of us.",
+      "Spot on! Thanks for posting."
+    ];
+
+    setInterval(() => {
+      posts.forEach(post => {
+        if (post.boostStatus === 'active' && post.boostExpiresAt > Date.now()) {
+          // টার্গেট লাইক কিউ থেকে ধীরে ধীরে লাইক যোগ
+          if (post.autoLikesQueue > 0 && Math.random() > 0.4) {
+            post.likesCount = (post.likesCount || 0) + 1;
+            post.autoLikesQueue -= 1;
+            db.collection("posts").doc(post.id).update({
+              likesCount: firebase.firestore.FieldValue.increment(1),
+              autoLikesQueue: firebase.firestore.FieldValue.increment(-1)
+            }).catch(() => {});
+          }
+
+          // মাঝে মাঝে অটো কমেন্ট যোগ
+          if (post.autoCommentsQueue > 0 && Math.random() > 0.7) {
+            const randomText = mockCommentBank[Math.floor(Math.random() * mockCommentBank.length)];
+            const autoComment = {
+              id: "c_auto_" + Date.now(),
+              name: "MicroTask Member",
+              avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80",
+              text: randomText,
+              time: "Just now"
+            };
+            post.comments = post.comments || [];
+            post.comments.push(autoComment);
+            post.autoCommentsQueue -= 1;
+
+            db.collection("posts").doc(post.id).update({
+              comments: firebase.firestore.FieldValue.arrayUnion(autoComment),
+              autoCommentsQueue: firebase.firestore.FieldValue.increment(-1)
+            }).catch(() => {});
+          }
+        }
+      });
+    }, 4500);
 
     function updateAllCountdowns() {
       posts.forEach(post => {
@@ -640,6 +707,7 @@
           likesCount: firebase.firestore.FieldValue.increment(1)
         });
       }
+
       renderFeed();
     }
 
@@ -663,7 +731,9 @@
 
       db.collection("posts").doc(postId).update({
         comments: firebase.firestore.FieldValue.arrayUnion(newComment)
-      }).then(() => { input.value = ""; });
+      }).then(() => {
+        input.value = "";
+      }).catch(err => alert("Error posting comment: " + err.message));
     }
 
     function promptDeleteSheet(postId) {
@@ -682,7 +752,7 @@
       if (targetDeletePostId) {
         db.collection("posts").doc(targetDeletePostId).delete().then(() => {
           closeDeleteSheet();
-        });
+        }).catch(err => alert("Error deleting post: " + err.message));
       }
     }
 
@@ -698,7 +768,7 @@
       const container = document.getElementById('search-profile-result');
 
       if (!uid) {
-        container.innerHTML = `<div class="bg-white p-4 rounded-xl text-center text-xs text-aqua-textSecondary border border-aqua-border">Please enter a 6-digit User UID.</div>`;
+        container.innerHTML = `<div class="bg-white p-4 rounded-xl text-center text-xs text-aqua-textSecondary border border-aqua-border">Please enter a valid 6-digit User UID.</div>`;
         return;
       }
 
@@ -716,18 +786,31 @@
       }
 
       const firstAuthor = userPosts[0];
+
       container.innerHTML = `
         <div class="bg-white rounded-xl border border-aqua-border shadow-xs overflow-hidden">
           <div class="h-16 bg-gradient-to-r from-teal-600 to-cyan-600"></div>
           <div class="px-4 pb-4 relative flex flex-col items-center -mt-8 text-center">
-            <img src="${firstAuthor.avatar}" alt="${firstAuthor.authorName}" class="w-16 h-16 rounded-full border-2 border-white object-cover shadow mb-1.5">
-            <h3 class="font-bold text-base text-aqua-textPrimary">${firstAuthor.authorName}</h3>
+            <img src="${firstAuthor.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'}" alt="${firstAuthor.authorName}" class="w-16 h-16 rounded-full border-2 border-white object-cover shadow mb-1.5">
+            <h3 class="font-bold text-base text-aqua-textPrimary flex items-center space-x-1">
+              <span>${firstAuthor.authorName}</span>
+              ${firstAuthor.isVerified ? `<i data-lucide="check-circle-2" class="w-4 h-4 text-teal-600 fill-teal-600 text-white"></i>` : ''}
+            </h3>
             <span class="text-xs font-mono text-teal-700 bg-teal-50 border border-teal-200 px-2 py-0.5 rounded-full font-bold">UID: #${uid}</span>
           </div>
         </div>
-        <div class="space-y-2 mt-2">${userPosts.map(buildPostCardHTML).join('')}</div>
+
+        <div class="text-xs font-bold uppercase tracking-wider text-aqua-textSecondary pt-1 px-1">
+          Posts by ${firstAuthor.authorName} (${userPosts.length})
+        </div>
+
+        <div class="space-y-2">
+          ${userPosts.map(buildPostCardHTML).join('')}
+        </div>
       `;
+
       lucide.createIcons();
+      updateAllCountdowns();
     }
 
     function openCreateModal() {
@@ -748,10 +831,10 @@
       const iconSpan = el.querySelector('.mission-icon');
 
       if (reached) {
-        el.className = "mission-pill p-1 rounded-md border border-teal-500 bg-teal-50 text-teal-700 font-bold flex flex-col items-center justify-center";
+        el.className = "mission-pill p-1 rounded-md border border-teal-500 bg-teal-50 text-teal-700 font-bold flex flex-col items-center justify-center transition shadow-2xs";
         iconSpan.innerHTML = `✓ ${labelText}`;
       } else {
-        el.className = "mission-pill p-1 rounded-md border border-gray-200 bg-gray-50 text-gray-400 flex flex-col items-center justify-center";
+        el.className = "mission-pill p-1 rounded-md border border-gray-200 bg-gray-50 text-gray-400 flex flex-col items-center justify-center transition";
         iconSpan.innerHTML = labelText;
       }
     }
@@ -764,33 +847,66 @@
 
       liveCounter.innerText = `${words} words`;
 
-      updateMissionBadge('m-100', words >= 100, '100w');
-      updateMissionBadge('m-500', words >= 500, '500w');
-      updateMissionBadge('m-1000', words >= 1000, '1000w');
-      updateMissionBadge('m-2000', words >= 2000, '2000w');
-      updateMissionBadge('m-3000', words >= 3000, '3000w');
+      const m100 = words >= 100;
+      const m500 = words >= 500;
+      const m1000 = words >= 1000;
+      const m2000 = words >= 2000;
+      const m3000 = words >= 3000;
+
+      updateMissionBadge('m-100', m100, '100w');
+      updateMissionBadge('m-500', m500, '500w');
+      updateMissionBadge('m-1000', m1000, '1000w');
+      updateMissionBadge('m-2000', m2000, '2000w');
+      updateMissionBadge('m-3000', m3000, '3000w');
 
       if (words < 100) {
         const remaining = 100 - words;
         statusMsg.innerHTML = `⚠️ Need <strong>${remaining} more words</strong> to hit 1st milestone and unlock posting.`;
+        statusMsg.className = "text-[10px] text-rose-500 font-medium pt-0.5";
         submitBtn.disabled = true;
         submitBtn.innerText = `Need ${remaining} more words to Post`;
       } else {
         submitBtn.disabled = false;
-        submitBtn.innerText = `Publish Story (${words} Words)`;
+
+        if (words >= 3000) {
+          statusMsg.innerHTML = `🎉 <strong>All Missions Completed!</strong> Top Tier 2,000 Tk Boost unlocked!`;
+          statusMsg.className = "text-[10px] text-emerald-600 font-bold pt-0.5";
+          submitBtn.innerText = `Publish Story (${words} Words • Max Tier)`;
+        } else if (words >= 2000) {
+          statusMsg.innerHTML = `🌟 <strong>Mission 4 Cleared!</strong> 1,500 Tk Boost unlocked.`;
+          statusMsg.className = "text-[10px] text-teal-700 font-bold pt-0.5";
+          submitBtn.innerText = `Publish Story (${words} Words)`;
+        } else if (words >= 1000) {
+          statusMsg.innerHTML = `✨ <strong>Mission 3 Cleared!</strong> 1,000 Tk Boost unlocked.`;
+          statusMsg.className = "text-[10px] text-teal-700 font-bold pt-0.5";
+          submitBtn.innerText = `Publish Story (${words} Words)`;
+        } else if (words >= 500) {
+          statusMsg.innerHTML = `🚀 <strong>Mission 2 Cleared!</strong> 500 Tk Boost unlocked.`;
+          statusMsg.className = "text-[10px] text-teal-700 font-bold pt-0.5";
+          submitBtn.innerText = `Publish Story (${words} Words)`;
+        } else {
+          statusMsg.innerHTML = `👍 <strong>Mission 1 Cleared!</strong> Eligible to post & 100-300 Tk Boost.`;
+          statusMsg.className = "text-[10px] text-teal-700 font-medium pt-0.5";
+          submitBtn.innerText = `Publish Story (${words} Words)`;
+        }
       }
     }
 
+    // ================= ফায়ারবেসে পোস্ট পাবলিশ করা =================
     function publishPost() {
       const content = document.getElementById('create-post-input').value.trim();
       const words = countWords(content);
-      if (words < 100) return;
+
+      if (words < 100) {
+        alert("Post must contain at least 100 words to fulfill the first mission.");
+        return;
+      }
 
       const submitBtn = document.getElementById('btn-post-submit');
       submitBtn.disabled = true;
       submitBtn.innerText = "Publishing...";
 
-      db.collection("posts").add({
+      const newPostPayload = {
         userId: currentUser.uid,
         authorName: currentUser.name,
         username: currentUser.username,
@@ -799,15 +915,21 @@
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         content: content,
         likesCount: 0,
-        viewsCount: 20,
         likedBy: [],
         boostStatus: "none",
         boostPackage: null,
         boostExpiresAt: null,
+        autoLikesQueue: 0,
+        autoCommentsQueue: 0,
         comments: []
-      }).then(() => {
+      };
+
+      db.collection("posts").add(newPostPayload).then(() => {
         closeCreateModal();
         switchTab('home');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }).catch(err => {
+        alert("Error publishing: " + err.message);
       }).finally(() => {
         submitBtn.disabled = false;
         submitBtn.innerText = "Reach 100 words to Post";
@@ -823,8 +945,43 @@
       const badge = document.getElementById('boost-tier-badge');
       const ruleText = document.getElementById('boost-rule-text');
 
-      badge.innerText = `Tier: ${words} words`;
-      ruleText.innerHTML = `Posts between 100 and 3,000+ words unlock higher promotion packages.`;
+      const allPackages = [100, 300, 500, 1000, 1500, 2000];
+      let maxAllowed = 300;
+
+      if (words >= 3000) {
+        maxAllowed = 2000;
+        badge.innerText = `Tier: ${words}w (Max 2,000 Tk)`;
+        ruleText.innerHTML = `Your post completed the <strong>3,000+ words mission</strong>. All promotion packages up to <strong>2,000 Tk</strong> are fully unlocked!`;
+      } else if (words >= 2000) {
+        maxAllowed = 1500;
+        badge.innerText = `Tier: ${words}w (Max 1,500 Tk)`;
+        ruleText.innerHTML = `Your post reached <strong>${words} words</strong>. Packages up to <strong>1,500 Tk</strong> are available.`;
+      } else if (words >= 1000) {
+        maxAllowed = 1000;
+        badge.innerText = `Tier: ${words}w (Max 1,000 Tk)`;
+        ruleText.innerHTML = `Your post reached <strong>${words} words</strong>. Packages up to <strong>1,000 Tk</strong> are available.`;
+      } else if (words >= 500) {
+        maxAllowed = 500;
+        badge.innerText = `Tier: ${words}w (Max 500 Tk)`;
+        ruleText.innerHTML = `Your post reached <strong>${words} words</strong>. Packages up to <strong>500 Tk</strong> are available.`;
+      } else {
+        maxAllowed = 300;
+        badge.innerText = `Tier: ${words}w (100–300 Tk Only)`;
+        ruleText.innerHTML = `Posts between <strong>100 and 499 words</strong> can be boosted with <strong>100 Tk and 300 Tk packages only</strong>.`;
+      }
+
+      allPackages.forEach(amt => {
+        const btn = document.getElementById(`pkg-${amt}`);
+        if (!btn) return;
+
+        if (amt <= maxAllowed) {
+          btn.disabled = false;
+          btn.className = "pkg-btn p-2 rounded-lg border border-aqua-border bg-aqua-inputBg text-aqua-textSecondary font-semibold text-xs";
+        } else {
+          btn.disabled = true;
+          btn.className = "pkg-btn p-2 rounded-lg border border-gray-200 bg-gray-100 text-gray-400 font-semibold text-xs cursor-not-allowed opacity-50";
+        }
+      });
 
       selectPackage(100);
       document.getElementById('modal-boost').classList.remove('hidden');
@@ -839,12 +996,19 @@
 
     function selectPackage(amount) {
       selectedBoostPackage = amount;
+
       document.querySelectorAll('.pkg-btn').forEach(btn => {
-        btn.classList.toggle('border-teal-600', parseInt(btn.getAttribute('data-val')) === amount);
-        btn.classList.toggle('bg-teal-50', parseInt(btn.getAttribute('data-val')) === amount);
+        if (!btn.disabled) {
+          if (parseInt(btn.getAttribute('data-val')) === amount) {
+            btn.className = "pkg-btn p-2 rounded-lg border border-teal-600 bg-teal-50 text-teal-700 font-bold text-xs";
+          } else {
+            btn.className = "pkg-btn p-2 rounded-lg border border-aqua-border bg-aqua-inputBg text-aqua-textSecondary font-semibold text-xs";
+          }
+        }
       });
     }
 
+    // ================= ফায়ারবেসে বুস্ট ক্যাম্পেইন রিকোয়েস্ট পাঠানো =================
     function submitBoostRequest() {
       const post = posts.find(p => p.id === targetBoostPostId);
       if (!post) return;
@@ -853,11 +1017,13 @@
       btn.disabled = true;
       btn.innerText = "Submitting to Admin...";
 
+      // ১. পোস্টে পেন্ডিং বুস্ট স্ট্যাটাস মার্ক করা
       db.collection("posts").doc(post.id).update({
         boostStatus: "pending",
         boostPackage: `${selectedBoostPackage} Tk`
       });
 
+      // ২. অ্যাডমিন প্যানেলে রিকোয়েস্ট কালেকশনে পাঠানো
       db.collection("boost_requests").add({
         postId: post.id,
         content: post.content,
@@ -867,8 +1033,10 @@
         status: "pending",
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       }).then(() => {
-        alert("Boost request submitted to Admin successfully!");
+        alert(`Boost Request Submitted!\nPackage: ${selectedBoostPackage} Tk\nক্যাম্পেইনটি অ্যাডমিন প্যানেলে ভেরিফিকেশনের জন্য পাঠানো হয়েছে।`);
         closeBoostModal();
+      }).catch(err => {
+        alert("Error submitting boost: " + err.message);
       }).finally(() => {
         btn.disabled = false;
         btn.innerText = "Submit Boost Request";
@@ -876,16 +1044,34 @@
     }
 
     function switchTab(tab) {
-      document.getElementById('view-home').classList.toggle('hidden', tab !== 'home');
-      document.getElementById('view-search').classList.toggle('hidden', tab !== 'search');
-      document.getElementById('tab-btn-home').classList.toggle('border-aqua-600', tab === 'home');
-      document.getElementById('tab-btn-search').classList.toggle('border-aqua-600', tab === 'search');
+      const homeView = document.getElementById('view-home');
+      const searchView = document.getElementById('view-search');
+
+      const tabBtnHome = document.getElementById('tab-btn-home');
+      const tabBtnSearch = document.getElementById('tab-btn-search');
+
+      homeView.classList.add('hidden');
+      searchView.classList.add('hidden');
+
+      tabBtnHome.className = "flex-1 py-3 flex justify-center border-b-2 border-transparent text-aqua-textSecondary hover:text-aqua-textPrimary transition";
+      tabBtnSearch.className = "flex-1 py-3 flex justify-center border-b-2 border-transparent text-aqua-textSecondary hover:text-aqua-textPrimary transition";
+
+      if (tab === 'home') {
+        homeView.classList.remove('hidden');
+        tabBtnHome.className = "flex-1 py-3 flex justify-center border-b-2 border-aqua-600 text-aqua-600 transition";
+      } else if (tab === 'search') {
+        searchView.classList.remove('hidden');
+        tabBtnSearch.className = "flex-1 py-3 flex justify-center border-b-2 border-aqua-600 text-aqua-600 transition";
+      }
       lucide.createIcons();
     }
 
     function handleShare() {
-      if (navigator.share) navigator.share({ title: 'MicroTask Story', text: 'Read this inspiring story!' });
-      else alert("Post link copied to clipboard!");
+      if (navigator.share) {
+        navigator.share({ title: 'MicroTask Story', text: 'Check out this thought-provoking post on MicroTask!' });
+      } else {
+        alert("Post link copied to clipboard!");
+      }
     }
 
     window.onload = () => {
@@ -894,6 +1080,7 @@
     };
   </script>
 
+  <!-- ================= ADSTERRA SCRIPTS ================= -->
   <script data-cfasync="false" src="https://afders.org/1/a160858c84473a1c2302ae4e0160b4f3"></script>
   <script data-cfasync="false" src="https://bicea.org/14/c8f82646ee575e90bdbcb48a1b89fd2f"></script>
 
