@@ -18,6 +18,7 @@
     
     .header { display: flex; align-items: center; gap: 12px; }
     .back-btn { color: #f7a8c4; font-size: 16px; cursor: pointer; width: 34px; height: 34px; border-radius: 50%; background: rgba(214, 41, 118, 0.15); border: 1px solid rgba(214, 41, 118, 0.35); display: flex; align-items: center; justify-content: center; }
+    .back-btn:active { transform: scale(0.9); }
     .logo-3d { width: 40px; height: 40px; background: linear-gradient(45deg, #f09433, #dc2743, #bc1888); border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 22px; color: white; flex-shrink: 0; }
     .header-title h2 { color: #ffffff; font-size: 16px; font-weight: 700; }
     .header-title p { color: #fa7e1e; font-size: 10px; font-weight: 500; }
@@ -25,8 +26,9 @@
     .notice-bar { background: rgba(214, 41, 118, 0.15); border: 1px dashed #d62976; border-radius: 12px; padding: 8px 12px; font-size: 10.5px; color: #ffd1e1; display: flex; align-items: center; gap: 8px; }
     
     .task-list { display: flex; flex-direction: column; gap: 10px; flex: 1; }
-    .task-card { background: linear-gradient(180deg, #330524 0%, #14020f 100%); border: 1.5px solid #cc2366; border-radius: 16px; padding: 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px; cursor: pointer; }
-    .task-card.is-pending { border-color: #e69500 !important; }
+    .task-card { background: linear-gradient(180deg, #330524 0%, #14020f 100%); border: 1.5px solid #cc2366; border-radius: 16px; padding: 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px; cursor: pointer; transition: 0.2s; }
+    .task-card:hover { transform: translateY(-2px); border-color: #ff5b94; }
+    .task-card.is-pending { border-color: #e69500 !important; cursor: default; }
     
     .task-thumb { width: 66px; height: 52px; border-radius: 10px; background: #4a0d37; border: 1px solid #d62976; position: relative; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .play-circle { width: 20px; height: 20px; background: rgba(220, 39, 67, 0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 8.5px; }
@@ -52,19 +54,16 @@
     .step-box { background: rgba(55, 6, 40, 0.5); border: 1px solid #a61c56; border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 6px; }
     .step-header { color: #ff8cb7; font-size: 10.5px; font-weight: 700; }
     
-    .video-link-btn { display: flex; align-items: center; justify-content: center; gap: 7px; background: linear-gradient(45deg, #f09433, #dc2743, #bc1888); color: white; padding: 10px; border-radius: 12px; font-size: 12px; font-weight: 800; border: none; cursor: pointer; }
+    .video-link-btn { display: flex; align-items: center; justify-content: center; gap: 7px; background: linear-gradient(45deg, #f09433, #dc2743, #bc1888); color: white; padding: 11px; border-radius: 12px; font-size: 12.5px; font-weight: 800; border: none; cursor: pointer; }
     
-    /* ১০০% গ্যারান্টিড গ্যালারি স্লট (ট্যাপ করলেই গ্যালারি খুলবে) */
     .upload-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 4px; }
     .upload-slot { border: 1.5px dashed #d62976; background: rgba(70, 10, 50, 0.3); border-radius: 10px; height: 82px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden; cursor: pointer; }
     .upload-slot i { font-size: 18px; color: #ff5b94; margin-bottom: 3px; }
     .upload-slot span { color: #ffd6e4; font-size: 9.5px; font-weight: 600; text-align: center; }
     .slot-preview { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: none; z-index: 5; }
-    
-    /* স্বচ্ছ ইনপুট যা পুরো স্লটে সরাসরি গ্যালারি ওপেন করে */
     .slot-native-input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 10; }
     
-    .submit-btn { background: linear-gradient(180deg, #ff5b94 0%, #bc1888 100%); border: 1px solid #ffa1c4; color: white; font-size: 13px; font-weight: 700; padding: 10px; border-radius: 18px; cursor: pointer; width: 100%; text-align: center; }
+    .submit-btn { background: linear-gradient(180deg, #ff5b94 0%, #bc1888 100%); border: 1px solid #ffa1c4; color: white; font-size: 13px; font-weight: 700; padding: 11px; border-radius: 18px; cursor: pointer; width: 100%; text-align: center; }
     .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
   </style>
 </head>
@@ -75,51 +74,44 @@
         <i class="fa-solid fa-arrow-left"></i>
       </div>
       <div class="logo-3d"><i class="fa-brands fa-instagram"></i></div>
-      <div class="header-title"><h2>Instagram Tasks</h2><p>Watch Video • Like • Earn USD ($)</p></div>
+      <div class="header-title"><h2>Instagram Tasks</h2><p>Watch Video • Follow • Earn USD ($)</p></div>
     </div>
     
     <div class="notice-bar">
       <i class="fa-solid fa-circle-info"></i>
-      <span>Tap slots to pick screenshots from your phone gallery.</span>
+      <span>Tap slots to select screenshots directly from your gallery.</span>
     </div>
     
     <div class="task-list" id="taskListContainer"></div>
   </div>
 
-  <!-- প্রুফ সাবমিট মডাল -->
   <div class="modal-overlay" id="taskModal">
     <div class="modal-box">
       <i class="fa-solid fa-xmark close-btn" onclick="closeModal()"></i>
       <h3 class="modal-title" id="m-title">Complete Task & Submit</h3>
       
       <div class="step-box">
-        <div class="step-header"><i class="fa-solid fa-1"></i> Step 1: Open Instagram Video</div>
-        <button type="button" class="video-link-btn" onclick="openTargetVideo()">
-          <i class="fa-brands fa-instagram"></i> Open Video Link
+        <div class="step-header"><i class="fa-solid fa-1"></i> Step 1: Open Instagram Reel</div>
+        <button type="button" class="video-link-btn" onclick="openTargetNativeApp()">
+          <i class="fa-brands fa-instagram"></i> Open in Instagram App
         </button>
       </div>
 
       <div class="step-box">
         <div class="step-header"><i class="fa-solid fa-2"></i> Step 2: Select 3 Screenshots from Gallery</div>
         <div class="upload-grid">
-          <!-- ১. লাইক স্লট -->
           <div class="upload-slot">
-            <i class="fa-solid fa-thumbs-up"></i><span>1. Like</span>
-            <img id="prev-1" class="slot-preview">
+            <i class="fa-solid fa-thumbs-up"></i><span>1. Like</span><img id="prev-1" class="slot-preview">
             <input type="file" id="file-1" accept="image/*" class="slot-native-input" onchange="previewSlot(1, event)">
           </div>
           
-          <!-- ২. ফলো স্লট -->
           <div class="upload-slot">
-            <i class="fa-solid fa-user-plus"></i><span>2. Follow</span>
-            <img id="prev-2" class="slot-preview">
+            <i class="fa-solid fa-user-plus"></i><span>2. Follow</span><img id="prev-2" class="slot-preview">
             <input type="file" id="file-2" accept="image/*" class="slot-native-input" onchange="previewSlot(2, event)">
           </div>
           
-          <!-- ৩. কমেন্ট স্লট -->
           <div class="upload-slot">
-            <i class="fa-solid fa-comment-dots"></i><span>3. Comment</span>
-            <img id="prev-3" class="slot-preview">
+            <i class="fa-solid fa-comment-dots"></i><span>3. Comment</span><img id="prev-3" class="slot-preview">
             <input type="file" id="file-3" accept="image/*" class="slot-native-input" onchange="previewSlot(3, event)">
           </div>
         </div>
@@ -151,25 +143,24 @@
     let pendingTasks = new Set(JSON.parse(localStorage.getItem('ig_pending_tasks') || '[]'));
 
     const DEFAULT_IG_TASKS = [
-      { id: 'ig-1', title: 'Viral Instagram Reel #1', rewardUSD: 0.25, duration: '0:30', url: 'https://instagram.com' },
-      { id: 'ig-2', title: 'Fashion Brand Promo #2', rewardUSD: 0.20, duration: '0:45', url: 'https://instagram.com' }
+      { id: 'ig-1', title: 'Viral Instagram Reel #1', rewardUSD: 0.25, duration: '0:30', url: 'https://www.instagram.com' },
+      { id: 'ig-2', title: 'Fashion Brand Promo #2', rewardUSD: 0.20, duration: '0:45', url: 'https://www.instagram.com' }
     ];
 
     function listenToLiveTasks() {
       db.collection("tasks").where("platform", "==", "instagram").onSnapshot(snapshot => {
         const container = document.getElementById('taskListContainer');
         container.innerHTML = '';
-
         if (snapshot.empty) {
           DEFAULT_IG_TASKS.forEach(t => renderSingleTaskCard(t.id, t.title, t.rewardUSD, t.duration, t.url));
         } else {
           snapshot.forEach(doc => {
             const data = doc.data();
             const reward = data.rewardUSD || (data.coins ? (data.coins / 100) : 0.20);
-            renderSingleTaskCard(doc.id, data.title, reward, data.duration || '0:30', data.url || 'https://instagram.com');
+            renderSingleTaskCard(doc.id, data.title, reward, data.duration || '0:30', data.url || 'https://www.instagram.com');
           });
         }
-      }, err => {
+      }, () => {
         DEFAULT_IG_TASKS.forEach(t => renderSingleTaskCard(t.id, t.title, t.rewardUSD, t.duration, t.url));
       });
     }
@@ -213,11 +204,10 @@
     function handleCardClick(id, title, rewardUSD, url) {
       if(pendingTasks.has(id)) { alert("This task is currently Pending Admin review!"); return; }
       activeTaskId = id;
-      activeTaskUrl = url || 'https://instagram.com';
+      activeTaskUrl = url || 'https://www.instagram.com';
       activeRewardUSD = parseFloat(rewardUSD) || 0.20;
 
       document.getElementById('m-title').innerText = `${title} (+$${activeRewardUSD.toFixed(2)})`;
-      
       for(let i=1; i<=3; i++){ 
         document.getElementById('file-'+i).value = ""; 
         document.getElementById('prev-'+i).style.display = "none"; 
@@ -225,17 +215,20 @@
       document.getElementById('taskModal').style.display = "flex";
     }
 
-    // ১০০% ক্র্যাশ-মুক্ত ইউনিভার্সাল লিঙ্ক ওপেনার
-    function openTargetVideo() {
+    function openTargetNativeApp() {
       if (!activeTaskUrl) return;
-      // স্ট্যান্ডার্ড উইন্ডো ওপেন যা কোনো এরর দেয় না
-      const win = window.open(activeTaskUrl, '_blank');
-      if (!win) {
-        window.location.href = activeTaskUrl;
-      }
+      let target = activeTaskUrl.trim();
+      if (!/^https?:\/\//i.test(target)) target = 'https://' + target;
+
+      const a = document.createElement('a');
+      a.href = target;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
     }
 
-    // গ্যালারি প্রিভিউ হ্যান্ডলার
     function previewSlot(num, e){
       if(e.target.files && e.target.files[0]){
         let r = new FileReader();
@@ -278,7 +271,7 @@
         status: "pending",
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       }).then(() => {
-        alert("Proof submitted successfully! It is now Pending review in the Admin Panel.");
+        alert("Proof submitted successfully! It is now Pending review in Admin Panel.");
         closeModal();
       }).catch(err => {
         alert("Submission error: " + err.message);
