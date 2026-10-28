@@ -104,7 +104,7 @@
       margin-left: 48px;
     }
 
-    /* ফিল্টার বাটনস */
+    /* ফিল্টার বাটনস (সাপোর্ট অপশন সহ) */
     .filters {
       display: flex;
       gap: 8px;
@@ -206,6 +206,7 @@
 
     .tag-earnings { background: #dcfce7; color: #15803d; }
     .tag-tasks { background: #e0f2fe; color: #0369a1; }
+    .tag-support { background: #ccfbf1; color: #0f766e; }
     .tag-referral { background: #f3e8ff; color: #7e22ce; }
     .tag-system { background: #ffedd5; color: #c2410c; }
 
@@ -232,7 +233,6 @@
       margin-left: auto;
     }
 
-    /* ডিলিট বাটন */
     .notif-del-btn {
       background: rgba(239, 68, 68, 0.1);
       border: 1px solid rgba(239, 68, 68, 0.25);
@@ -252,9 +252,6 @@
       background: #ef4444;
       color: #ffffff;
     }
-    .notif-del-btn:active {
-      transform: scale(0.88);
-    }
 
     .card-arrow {
       color: #94a3b8;
@@ -273,6 +270,7 @@
 
     .bg-green { background: linear-gradient(135deg, #10b981, #059669); }
     .bg-blue { background: linear-gradient(135deg, #0284c7, #0369a1); }
+    .bg-teal { background: linear-gradient(135deg, #14b8a6, #0f766e); }
     .bg-purple { background: linear-gradient(135deg, #a855f7, #7c3aed); }
     .bg-orange { background: linear-gradient(135deg, #f97316, #ea580c); }
 
@@ -304,14 +302,15 @@
         <h1>Notifications</h1>
         <span class="badge-count" id="badgeCount">0</span>
       </div>
-      <p class="subtitle">System, Tasks, Referral & Earnings updates</p>
+      <p class="subtitle">System, Tasks, Support, Referral & Earnings updates</p>
     </div>
 
-    <!-- ক্যাটাগরি ফিল্টার -->
+    <!-- ক্যাটাগরি ফিল্টার: কাস্টমার সাপোর্ট আলাদা বাটন সহ -->
     <div class="filters">
       <button class="filter-btn active" data-filter="all">All</button>
-      <button class="filter-btn" data-filter="system"><i class="fa-solid fa-headset"></i> System</button>
+      <button class="filter-btn" data-filter="system"><i class="fa-solid fa-bullhorn"></i> System</button>
       <button class="filter-btn" data-filter="tasks"><i class="fa-solid fa-square-check"></i> Tasks</button>
+      <button class="filter-btn" data-filter="support"><i class="fa-solid fa-headset"></i> Support</button>
       <button class="filter-btn" data-filter="referral"><i class="fa-solid fa-user-group"></i> Referral</button>
       <button class="filter-btn" data-filter="earnings"><i class="fa-solid fa-wallet"></i> Earnings</button>
     </div>
@@ -319,7 +318,7 @@
     <!-- নোটিফিকেশন লিস্ট -->
     <div class="notification-list" id="notificationList"></div>
 
-    <!-- খালি নোটিফিকেশন মেসেজ -->
+    <!-- নোটিফিকেশন খালি থাকলে মেসেজ -->
     <div class="empty-msg" id="emptyMsg">
       <i class="fa-regular fa-bell-slash"></i>
       <p>No notifications found</p>
@@ -359,7 +358,7 @@
       try { return JSON.parse(localStorage.getItem('deleted_notif_ids') || '[]'); } catch(e) { return []; }
     }
 
-    // লাইভ টাইম-অ্যাগো ফরম্যাট (৬০ সেকেন্ড পর্যন্ত Just now, পরে 1m ago, 2h ago ইত্যাদি)
+    // লাইভ টাইম-অ্যাগো ফরম্যাটিং
     function formatTimeAgo(createdAt) {
       if (!createdAt) return 'Just now';
 
@@ -374,32 +373,27 @@
 
       if (isNaN(millis) || millis <= 0) return 'Just now';
 
-      const now = Date.now();
-      const diffSec = Math.floor((now - millis) / 1000);
+      const diffSec = Math.floor((Date.now() - millis) / 1000);
 
-      if (diffSec < 60) {
-        return 'Just now';
-      } else if (diffSec < 3600) {
-        const mins = Math.floor(diffSec / 60);
-        return `${mins}m ago`;
-      } else if (diffSec < 86400) {
-        const hours = Math.floor(diffSec / 3600);
-        return `${hours}h ago`;
-      } else {
-        const days = Math.floor(diffSec / 86400);
-        if (days === 1) return 'Yesterday';
-        if (days < 7) return `${days}d ago`;
-        const d = new Date(millis);
-        return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
-      }
+      if (diffSec < 60) return 'Just now';
+      if (diffSec < 3600) return `${Math.floor(diffSec / 60)}m ago`;
+      if (diffSec < 86400) return `${Math.floor(diffSec / 3600)}h ago`;
+      
+      const days = Math.floor(diffSec / 86400);
+      if (days === 1) return 'Yesterday';
+      if (days < 7) return `${days}d ago`;
+
+      return new Date(millis).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
     }
 
+    // ক্যাটাগরি অনুযায়ী আইকন ও কালার মেটাডাটা
     function getCategoryMeta(cat) {
       switch((cat || '').toLowerCase()) {
         case 'earnings': return { icon: 'fa-wallet', bg: 'bg-green', tagClass: 'tag-earnings', text: 'Earnings' };
         case 'tasks': return { icon: 'fa-square-check', bg: 'bg-blue', tagClass: 'tag-tasks', text: 'Tasks' };
+        case 'support': return { icon: 'fa-headset', bg: 'bg-teal', tagClass: 'tag-support', text: 'Support' };
         case 'referral': return { icon: 'fa-user-group', bg: 'bg-purple', tagClass: 'tag-referral', text: 'Referral' };
-        default: return { icon: 'fa-headset', bg: 'bg-orange', tagClass: 'tag-system', text: 'System' };
+        default: return { icon: 'fa-bullhorn', bg: 'bg-orange', tagClass: 'tag-system', text: 'System' };
       }
     }
 
@@ -416,13 +410,13 @@
           const notifCat = (n.category || 'system').toLowerCase();
           const target = String(n.targetUid || '').trim();
 
-          // ১. ব্যাক্তিগত নোটিফিকেশন চেক (ডিপোজিট/উইথড্র, টাস্ক এপ্রুভাল, কাস্টমার সাপোর্ট মেসেজ)
+          // পার্সোনাল নোটিফিকেশন চেক (ডিপোজিট, উইথড্র, টাস্ক এপ্রুভাল, রেফারেল বোনাস, সাপোর্ট)
           const isPersonal = target !== '' && (target === myUID || (auth.currentUser && target === auth.currentUser.uid));
 
-          // ২. গ্লোবাল নোটিফিকেশন চেক (সিস্টেমের সবার জন্য সাধারণ ঘোষণা)
+          // গ্লোবাল সিস্টেম নোটিশ
           const isGlobalSystem = (!n.targetUid || target === 'all');
 
-          // ৩. একাউন্ট খোলার আগের সিস্টেম নোটিশ বাদ দেওয়া
+          // একাউন্ট খোলার আগের পুরোনো গ্লোবাল নোটিশ বাদ দেওয়া
           let isTimeValid = true;
           if (isGlobalSystem && userSignupTime > 0 && n.createdAt) {
               const notifTime = n.createdAt.toMillis ? n.createdAt.toMillis() : new Date(n.createdAt).getTime();
@@ -465,7 +459,6 @@
                 <div class="card-time"><i class="fa-regular fa-clock"></i> ${timeText}</div>
               </div>
               <div class="card-actions-right">
-                <!-- ডিলিট বাটন -->
                 <button type="button" class="notif-del-btn" onclick="deleteNotification(event, '${n.id}', '${n.targetUid || ''}')" title="Delete">
                   <i class="fa-regular fa-trash-can"></i>
                 </button>
@@ -478,7 +471,7 @@
       }
     }
 
-    // ================= স্মার্ট রিডাইরেক্ট ফাংশন =================
+    // স্মার্ট রিডাইরেক্ট ফাংশন (ট্যাপ করলে সরাসরি সঠিক পেজে নিয়ে যাবে)
     function handleNotificationClick(notifId, url, category) {
         const readIds = getReadIds();
         if (!readIds.includes(notifId)) {
@@ -486,21 +479,22 @@
             localStorage.setItem('read_notif_ids', JSON.stringify(readIds));
         }
 
-        // ক্যাটাগরি ও নোটিফিকেশন অনুযায়ী সঠিক পেজে নিয়ে যাওয়া
         if (url && url !== '') {
             window.location.href = url;
+        } else if (category === 'support') {
+            window.location.href = 'support.html';
         } else if (category === 'earnings' || category === 'tasks') {
-            window.location.href = 'history.html'; // ডিপোজিট, উইথড্র ও টাস্ক হিস্ট্রি
-        } else if (category === 'referral') {
-            window.location.href = 'refer.html';   // রেফারেল হিস্ট্রি/পেজ
-        } else if (category === 'system') {
-            window.location.href = 'support.html'; // কাস্টমার কেয়ার/সাপোর্ট পেজ
-        } else {
             window.location.href = 'history.html';
+        } else if (category === 'referral') {
+            window.location.href = 'refer.html';
+        } else if (category === 'system') {
+            window.location.href = 'index.html';
+        } else {
+            window.location.href = 'index.html';
         }
     }
 
-    // ================= নোটিফিকেশন ডিলিট =================
+    // নোটিফিকেশন ডিলিট
     function deleteNotification(event, notifId, targetUid) {
       event.stopPropagation();
       
@@ -528,12 +522,12 @@
       });
     });
 
+    // প্রতি ৩০ সেকেন্ড পর পর লাইভ টাইম রিফ্রেশ
     setInterval(() => {
-      if (allNotifs.length > 0) {
-        renderNotifications();
-      }
+      if (allNotifs.length > 0) renderNotifications();
     }, 30000);
 
+    // ফায়ারবেস লাইভ সিঙ্ক
     auth.onAuthStateChanged(user => {
       if (user) {
         db.collection("users").doc(user.uid).get().then(doc => {
@@ -544,7 +538,7 @@
         });
       }
 
-      db.collection("notifications").orderBy("createdAt", "desc").limit(50).onSnapshot(snapshot => {
+      db.collection("notifications").orderBy("createdAt", "desc").limit(60).onSnapshot(snapshot => {
         allNotifs = [];
         snapshot.forEach(doc => {
           allNotifs.push({ id: doc.id, ...doc.data() });
