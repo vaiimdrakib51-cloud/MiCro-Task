@@ -31,45 +31,59 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
         
         html { 
-            width: 100%; 
-            min-height: 100%; 
-            background: #f0f9ff; 
-            overflow-x: hidden; 
-            overflow-y: scroll;
-            -webkit-overflow-scrolling: touch;
+            width: 100%; min-height: 100%; background: #f0f9ff; overflow-x: hidden; overflow-y: scroll; -webkit-overflow-scrolling: touch;
         }
 
         body { 
-            width: 100%; 
-            min-height: 100vh; 
-            background: #f0f9ff; 
-            color: #0f172a; 
-            overflow-x: hidden; 
-            overflow-y: visible;
-            position: relative;
+            width: 100%; min-height: 100vh; background: #f0f9ff; color: #0f172a; overflow-x: hidden; position: relative;
+        }
+
+        /* ড্রপ-ডাউন নোটিফিকেশন ব্যানার */
+        .app-push-banner {
+            position: fixed;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-140px);
+            width: 92%;
+            max-width: 410px;
+            background: linear-gradient(135deg, #0284c7 0%, #0d9488 100%);
+            color: #ffffff;
+            padding: 12px 14px;
+            border-radius: 20px;
+            box-shadow: 0 12px 30px rgba(2, 132, 199, 0.45);
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: 1.5px solid rgba(255, 255, 255, 0.4);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+        }
+        .app-push-banner.show {
+            transform: translateX(-50%) translateY(0);
+        }
+        .banner-bell-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 19px;
+            color: #fff;
+            flex-shrink: 0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
         }
 
         /* পুল-টু-রিফ্রেশ ইন্ডিকেটর */
         .pull-refresh-indicator {
-            position: fixed;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%) translateY(-60px);
-            background: #ffffff;
-            border: 1.5px solid #0284c7;
-            color: #0284c7;
-            padding: 8px 16px;
-            border-radius: 30px;
-            font-size: 11.5px;
-            font-weight: 800;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 6px 20px rgba(2, 132, 199, 0.25);
-            z-index: 5000;
+            position: fixed; top: 10px; left: 50%; transform: translateX(-50%) translateY(-60px);
+            background: #ffffff; border: 1.5px solid #0284c7; color: #0284c7; padding: 8px 16px;
+            border-radius: 30px; font-size: 11.5px; font-weight: 800; display: flex; align-items: center; gap: 8px;
+            box-shadow: 0 6px 20px rgba(2, 132, 199, 0.25); z-index: 5000;
             transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s;
-            opacity: 0;
-            pointer-events: none;
+            opacity: 0; pointer-events: none;
         }
         .pull-refresh-indicator.visible {
             transform: translateX(-50%) translateY(0);
@@ -77,26 +91,14 @@
         }
 
         .phone {
-            width: 100%;
-            max-width: 460px;
-            margin: 0 auto;
-            position: relative;
-            background: transparent;
-            min-height: 100vh;
+            width: 100%; max-width: 460px; margin: 0 auto; position: relative; background: transparent; min-height: 100vh;
         }
 
         /* 1. AUTH SCREEN */
         .auth-screen { 
-            background: var(--paper); 
-            color: var(--ink); 
-            min-height: 100vh; 
-            display: flex; 
-            flex-direction: column; 
-            position: relative; 
-            z-index: 10; 
-            padding: 26px 18px 22px; 
+            background: var(--paper); color: var(--ink); min-height: 100vh; display: flex; 
+            flex-direction: column; position: relative; z-index: 10; padding: 26px 18px 22px; 
         }
-        
         .auth-brand { display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 900; font-size: 24px; margin: 6px 0 0; color: #111; }
         .auth-main { padding: 0 16px 20px; display: flex; flex-direction: column; flex: 1; }
         .auth-hero { height: 190px; display: flex; align-items: center; justify-content: center; margin: 8px 0; }
@@ -127,7 +129,6 @@
         .input-wrap { position: relative; }
         .field input { width: 100%; height: 46px; border: 1.5px solid #d4d4d4; border-radius: 999px; background: #fff; padding: 0 44px 0 16px; font-size: 13px; outline: none; color: #111; }
         .field input:focus { border-color: #111; }
-        
         .eye { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); border: 0; width: 32px; height: 32px; background: transparent; display: flex; align-items: center; justify-content: center; color: #64748b; cursor: pointer; font-size: 14px; }
         .row-between { display: flex; justify-content: space-between; align-items: center; font-size: 12px; margin: 10px 4px; }
         .check { display: flex; align-items: center; gap: 6px; color: #555; font-size: 12px; }
@@ -136,49 +137,15 @@
         .message.show { display: block; }
         .message.error { background: #fee2e2; border-color: #fca5a5; color: #991b1b; }
         .close-btn-sheet { position: absolute; right: 16px; top: 16px; background: #eee; border: 0; width: 30px; height: 30px; border-radius: 50%; font-size: 17px; color: #333; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        
-        .social-bottom { text-align: center; margin: 16px 0 2px; color: #888; font-size: 11px; }
-        .social-icons { display: flex; justify-content: center; gap: 14px; margin-top: 10px; }
-        .social-circle { width: 46px; height: 46px; border-radius: 50%; background: #fff; border: 1.5px solid #dedede; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); font-size: 20px; font-weight: 900; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.15s; }
-        .social-circle:active { transform: scale(0.92); }
-        .social-circle.google { color: #4285f4; }
-        .social-circle.facebook { color: #1877f2; font-family: Arial, sans-serif; font-size: 22px; }
 
         /* ================= 2. MAIN DASHBOARD ================= */
-        .main-dashboard {
-            display: none;
-            width: 100%;
-            padding-top: 10px;
-            padding-bottom: 110px;
-        }
-        
-        .app-body { 
-            padding: 0 14px; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 13px;
-            width: 100%;
-            max-width: 460px; 
-            margin: 0 auto;
-        }
+        .main-dashboard { display: none; width: 100%; padding-top: 10px; padding-bottom: 110px; }
+        .app-body { padding: 0 14px; display: flex; flex-direction: column; gap: 13px; width: 100%; max-width: 460px; margin: 0 auto; }
 
         /* Header */
         .header { display: flex; justify-content: space-between; align-items: center; padding: 4px 2px 2px; }
         .brand { display: flex; align-items: center; gap: 10px; }
-        .brand-logo-box {
-            width: 42px;
-            height: 42px;
-            border-radius: 14px;
-            overflow: hidden;
-            background: #ffffff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid #bae6fd;
-            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.18), inset 0 1px 1px #fff;
-            flex-shrink: 0;
-            padding: 2px;
-        }
+        .brand-logo-box { width: 42px; height: 42px; border-radius: 14px; overflow: hidden; background: #ffffff; display: flex; align-items: center; justify-content: center; border: 2px solid #bae6fd; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.18), inset 0 1px 1px #fff; flex-shrink: 0; padding: 2px; }
         .brand-logo-img { width: 100%; height: 100%; object-fit: contain; }
         .brand-title h1 { font-size: 20px; font-weight: 900; color: #0c4a6e; letter-spacing: -0.4px; line-height: 1.1; }
         .brand-title h1 span { color: #0284c7; }
@@ -187,74 +154,23 @@
         .header-actions { display: flex; align-items: center; gap: 14px; }
         .notif-btn { position: relative; color: #0369a1; font-size: 23px; cursor: pointer; padding: 2px; }
         .notif-badge { 
-            position: absolute; 
-            top: -4px; 
-            right: -6px; 
-            background: #ef4444; 
-            color: #fff; 
-            font-size: 9.5px; 
-            font-weight: 900; 
-            min-width: 18px; 
-            height: 18px; 
-            border-radius: 50%; 
-            display: none !important; /* সম্পূর্ণ ফিক্সড: জিরো বা ফেক কাউন্ট বন্ধ */
-            align-items: center; 
-            justify-content: center; 
-            border: 2px solid #ffffff; 
-            padding: 0 2px;
+            position: absolute; top: -4px; right: -6px; background: #ef4444; color: #fff; 
+            font-size: 9.5px; font-weight: 900; min-width: 18px; height: 18px; border-radius: 50%; 
+            display: none !important; align-items: center; justify-content: center; border: 2px solid #ffffff; padding: 0 2px;
         }
         .profile-btn { display: flex; align-items: center; gap: 5px; cursor: pointer; }
-        .profile-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #0284c7, #10b981);
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            border: 2.5px solid #ffffff;
-            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.28);
-        }
+        .profile-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #0284c7, #10b981); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 18px; border: 2.5px solid #ffffff; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.28); }
 
         /* 3D Balance Card */
         .balance-card {
             background: linear-gradient(135deg, #0284c7 0%, #0d9488 55%, #059669 100%);
-            border-radius: 24px;
-            padding: 16px 18px 14px;
-            box-shadow: 0 10px 24px rgba(13, 148, 136, 0.28), inset 0 1px 1px rgba(255, 255, 255, 0.45);
-            border: 1.5px solid rgba(255, 255, 255, 0.4);
-            color: #ffffff;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
+            border-radius: 24px; padding: 16px 18px 14px; box-shadow: 0 10px 24px rgba(13, 148, 136, 0.28), inset 0 1px 1px rgba(255, 255, 255, 0.45);
+            border: 1.5px solid rgba(255, 255, 255, 0.4); color: #ffffff; display: flex; flex-direction: column; gap: 12px;
         }
-
         .balance-top-row { display: flex; justify-content: space-between; align-items: center; width: 100%; }
         .balance-left-content { display: flex; align-items: center; gap: 12px; }
-        
-        .wallet-circle-3d {
-            width: 52px;
-            height: 52px;
-            border-radius: 16px;
-            background: rgba(255, 255, 255, 0.22);
-            backdrop-filter: blur(8px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1.5px solid rgba(255, 255, 255, 0.5);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-            flex-shrink: 0;
-            padding: 5px;
-            overflow: hidden;
-        }
-        .wallet-circle-3d img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.22));
-        }
+        .wallet-circle-3d { width: 52px; height: 52px; border-radius: 16px; background: rgba(255, 255, 255, 0.22); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; border: 1.5px solid rgba(255, 255, 255, 0.5); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12); flex-shrink: 0; padding: 5px; overflow: hidden; }
+        .wallet-circle-3d img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.22)); }
         
         .balance-text-group { display: flex; flex-direction: column; gap: 2px; line-height: 1.2; }
         .balance-label-line { display: flex; align-items: center; gap: 7px; font-size: 11.5px; font-weight: 700; color: #ccfbf1; text-transform: uppercase; letter-spacing: 0.4px; }
@@ -267,15 +183,7 @@
         .uid-chip-3d { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 800; color: #ffffff; background: rgba(0, 0, 0, 0.28); border: 1.2px solid rgba(255, 255, 255, 0.4); padding: 3px 10px; border-radius: 16px; cursor: pointer; }
 
         /* 3-Column Sub Stats Grid */
-        .balance-sub-stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1.1fr;
-            gap: 7px;
-            background: rgba(0, 0, 0, 0.24);
-            border-radius: 14px;
-            padding: 7px;
-            border: 1px solid rgba(255, 255, 255, 0.18);
-        }
+        .balance-sub-stats-grid { display: grid; grid-template-columns: 1fr 1fr 1.1fr; gap: 7px; background: rgba(0, 0, 0, 0.24); border-radius: 14px; padding: 7px; border: 1px solid rgba(255, 255, 255, 0.18); }
         .sub-stat-box { display: flex; align-items: center; gap: 7px; min-width: 0; background: rgba(255, 255, 255, 0.09); border-radius: 10px; padding: 6px 8px; }
         .sub-stat-mini-icon { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 13px; color: #fff; }
         .sub-stat-mini-icon.green-glow { background: #10b981; }
@@ -294,75 +202,33 @@
         .verify-pill-text strong { font-size: 10.5px; font-weight: 850; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         /* Actions Grid */
-        .actions-wide-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            width: 100%;
-        }
-
-        .action-wide-card {
-            border-radius: 20px;
-            padding: 10px 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            cursor: pointer;
-            height: 64px;
-            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
+        .actions-wide-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
+        .action-wide-card { border-radius: 20px; padding: 10px 16px; display: flex; align-items: center; justify-content: center; gap: 12px; cursor: pointer; height: 64px; transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
         .action-wide-card:active { transform: scale(0.96); }
-
-        .action-wide-card.deposit-card {
-            background: linear-gradient(145deg, #ffffff, #ecfdf5);
-            border: 1.5px solid #a7f3d0;
-            box-shadow: 0 4px 16px rgba(16, 185, 129, 0.18), inset 0 1px 1px #ffffff;
-        }
-
-        .action-wide-card.withdraw-card {
-            background: linear-gradient(145deg, #ffffff, #f0f9ff);
-            border: 1.5px solid #bae6fd;
-            box-shadow: 0 4px 16px rgba(2, 132, 199, 0.18), inset 0 1px 1px #ffffff;
-        }
-
-        .action-wide-card img {
-            width: 44px;
-            height: 44px;
-            object-fit: contain;
-            filter: drop-shadow(0 2px 6px rgba(0,0,0,0.14));
-            flex-shrink: 0;
-        }
-
+        .action-wide-card.deposit-card { background: linear-gradient(145deg, #ffffff, #ecfdf5); border: 1.5px solid #a7f3d0; box-shadow: 0 4px 16px rgba(16, 185, 129, 0.18), inset 0 1px 1px #ffffff; }
+        .action-wide-card.withdraw-card { background: linear-gradient(145deg, #ffffff, #f0f9ff); border: 1.5px solid #bae6fd; box-shadow: 0 4px 16px rgba(2, 132, 199, 0.18), inset 0 1px 1px #ffffff; }
+        .action-wide-card img { width: 44px; height: 44px; object-fit: contain; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.14)); flex-shrink: 0; }
         .action-wide-card span { font-size: 16px; font-weight: 850; letter-spacing: -0.2px; }
         .action-wide-card.deposit-card span { color: #047857; }
         .action-wide-card.withdraw-card span { color: #0369a1; }
 
         /* 3D Task Cards */
-        .task-card-3d { 
-            background: var(--card-3d); 
-            border: 1.5px solid var(--card-border); 
-            border-radius: 20px; 
-            padding: 12px 14px; 
-            box-shadow: var(--shadow-3d); 
-        }
+        .task-card-3d { background: var(--card-3d); border: 1.5px solid var(--card-border); border-radius: 20px; padding: 12px 14px; box-shadow: var(--shadow-3d); }
         .task-row-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; }
         .task-left-meta { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; }
         .task-symbol-3d { width: 42px; height: 42px; border-radius: 13px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 17px; flex-shrink: 0; }
         .task-symbol-3d.cyan { background: linear-gradient(135deg, #0284c7, #0d9488); }
         .task-symbol-3d.purple { background: linear-gradient(135deg, #8b5cf6, #6366f1); }
         .task-symbol-3d.telegram-blue { background: linear-gradient(135deg, #0088cc, #0284c7); }
-        
         .task-text { display: flex; flex-direction: column; justify-content: center; min-width: 0; line-height: 1.25; overflow: hidden; }
         .task-text h4 { font-size: 14.5px; font-weight: 850; color: #0c4a6e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .task-text p { font-size: 11px; color: #64748b; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
-        
         .task-pill { display: inline-flex; align-items: center; gap: 5px; padding: 4px 11px; border-radius: 18px; font-size: 11.5px; font-weight: 800; white-space: nowrap; margin-left: auto; cursor: pointer; flex-shrink: 0; }
         .task-pill.green-pill { background: #dcfce7; color: #047857; border: 1px solid #86efac; }
         .task-pill.blue-pill { background: #e0f2fe; color: #0369a1; border: 1px solid #7dd3fc; }
         .task-pill.claimed-pill { background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; }
 
-        /* 4 Cards: YouTube, Facebook, Instagram, Boost */
+        /* Video Grid */
         .video-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 10px; }
         .video-card-3d { background: #ffffff; border: 1.5px solid #cce5f5; border-radius: 16px; padding: 10px 4px 8px; display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; box-shadow: 0 3px 8px rgba(2, 132, 199, 0.06); }
         .video-card-3d:active { transform: scale(0.95); }
@@ -370,32 +236,13 @@
         .video-icon.yt { background: #ff0000; }
         .video-icon.fb { background: #1877f2; }
         .video-icon.ig { background: linear-gradient(45deg, #f09433, #dc2743, #bc1888); }
-        
-        .video-icon.boost-box { 
-            background: linear-gradient(135deg, #f59e0b, #d97706); 
-            padding: 5px;
-            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.35);
-        }
-        .video-icon.boost-box img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-
+        .video-icon.boost-box { background: linear-gradient(135deg, #f59e0b, #d97706); padding: 5px; }
+        .video-icon.boost-box img { width: 100%; height: 100%; object-fit: contain; }
         .video-card-3d span { font-size: 11px; color: #0f172a; font-weight: 800; margin-top: 2px; }
         .video-card-3d small { font-size: 9.5px; color: #059669; font-weight: 850; }
 
-        /* PROMO BANNER */
-        .promo-banner-container { 
-            position: relative; 
-            width: 100%; 
-            height: 155px; 
-            border-radius: 22px; 
-            overflow: hidden; 
-            background: #08192e; 
-            border: 2px solid #bae6fd; 
-            box-shadow: 0 6px 18px rgba(2, 132, 199, 0.18); 
-        }
+        /* Promo Banner */
+        .promo-banner-container { position: relative; width: 100%; height: 155px; border-radius: 22px; overflow: hidden; background: #08192e; border: 2px solid #bae6fd; box-shadow: 0 6px 18px rgba(2, 132, 199, 0.18); }
         .promo-slider-track { display: flex; height: 100%; width: 100%; transition: transform 0.4s ease; }
         .promo-slide { min-width: 100%; height: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .promo-slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -403,127 +250,42 @@
         .promo-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255, 255, 255, 0.5); }
         .promo-dot.active { width: 16px; border-radius: 5px; background: #00d2ff; }
 
-        /* BOTTOM NAVIGATION */
-        .bottom-nav {
-            position: fixed; 
-            bottom: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 72px; 
-            background: rgba(255, 255, 255, 0.98); 
-            backdrop-filter: blur(16px); 
-            border-top: 1.5px solid #d4ebf8; 
-            display: flex; 
-            justify-content: space-around; 
-            align-items: center; 
-            padding: 5px 8px 3px; 
-            z-index: 1000; 
-            box-shadow: 0 -6px 24px rgba(12, 74, 110, 0.1); 
-        }
-
-        .nav-link {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 2px;
-            color: #64748b;
-            text-decoration: none;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            flex: 1;
-        }
-
-        .nav-icon-wrap {
-            width: 46px;
-            height: 34px;
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px; 
-            transition: all 0.2s ease;
-        }
-
+        /* Bottom Nav */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 72px; background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(16px); border-top: 1.5px solid #d4ebf8; display: flex; justify-content: space-around; align-items: center; padding: 5px 8px 3px; z-index: 1000; box-shadow: 0 -6px 24px rgba(12, 74, 110, 0.1); }
+        .nav-link { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: #64748b; text-decoration: none; cursor: pointer; transition: all 0.2s ease; flex: 1; }
+        .nav-icon-wrap { width: 46px; height: 34px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px; transition: all 0.2s ease; }
         .nav-link span { font-size: 11px; font-weight: 800; }
         .nav-link:active .nav-icon-wrap { transform: scale(0.90); }
-
         .nav-link.home-tab.active { color: #0284c7; }
         .nav-link.home-tab.active .nav-icon-wrap { background: #e0f2fe; color: #0284c7; }
-
         .nav-link.lucky-tab { color: #d97706; }
         .nav-link.lucky-tab .nav-icon-wrap { color: #f59e0b; background: #fef3c7; }
-
         .nav-link.center-support { position: relative; top: -16px; flex: 1.1; }
-        .center-bubble-3d {
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background: #ffffff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2.5px solid #0284c7;
-            box-shadow: 0 6px 20px rgba(2, 132, 199, 0.4), inset 0 2px 2px #fff;
-            padding: 3px;
-            overflow: hidden;
-            transition: transform 0.2s;
-        }
+        .center-bubble-3d { width: 56px; height: 56px; border-radius: 50%; background: #ffffff; display: flex; align-items: center; justify-content: center; border: 2.5px solid #0284c7; box-shadow: 0 6px 20px rgba(2, 132, 199, 0.4), inset 0 2px 2px #fff; padding: 3px; overflow: hidden; transition: transform 0.2s; }
         .center-bubble-3d:active { transform: scale(0.90); }
         .center-bubble-img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
         .center-support-text { font-size: 11px; font-weight: 900; color: #0284c7; margin-top: 2px; }
-
         .nav-link.history-tab { color: #0284c7; }
         .nav-link.history-tab .nav-icon-wrap { color: #0284c7; background: #f0f9ff; }
-
         .nav-link.refer-tab { color: #059669; }
         .nav-link.refer-tab .nav-icon-wrap { color: #10b981; background: #ecfdf5; }
 
-        /* 50 BDT VERIFICATION MODAL */
-        .verify-modal-overlay { 
-            position: fixed; inset: 0; background: rgba(5, 11, 24, 0.85); 
-            backdrop-filter: blur(8px); z-index: 2100; display: none; align-items: center; justify-content: center; padding: 18px; 
-        }
+        /* Modals */
+        .verify-modal-overlay { position: fixed; inset: 0; background: rgba(5, 11, 24, 0.85); backdrop-filter: blur(8px); z-index: 2100; display: none; align-items: center; justify-content: center; padding: 18px; }
         .verify-modal-overlay.active { display: flex; }
-        .verify-modal-card { 
-            background: linear-gradient(165deg, #0e1e3e 0%, #081226 100%); 
-            border: 1.5px solid #00d2ff; border-radius: 26px; width: 100%; max-width: 330px; 
-            padding: 24px 20px 20px; text-align: center; position: relative; 
-            box-shadow: 0 20px 50px rgba(0, 180, 255, 0.25); animation: sheetUp 0.25s ease; color: #fff;
-        }
-        .verify-close-btn { 
-            position: absolute; top: 14px; right: 16px; background: rgba(255,255,255,0.08); 
-            border: none; width: 28px; height: 28px; border-radius: 50%; font-size: 14px; color: #94a3b8; cursor: pointer; 
-        }
-        .verify-badge-large { 
-            width: 62px; height: 62px; border-radius: 50%; background: linear-gradient(135deg, #00d2ff, #0066ff); 
-            color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 26px; margin: 0 auto 12px; 
-            box-shadow: 0 0 25px rgba(0, 150, 255, 0.5); border: 2px solid rgba(255,255,255,0.4);
-        }
+        .verify-modal-card { background: linear-gradient(165deg, #0e1e3e 0%, #081226 100%); border: 1.5px solid #00d2ff; border-radius: 26px; width: 100%; max-width: 330px; padding: 24px 20px 20px; text-align: center; position: relative; box-shadow: 0 20px 50px rgba(0, 180, 255, 0.25); color: #fff; }
+        .verify-close-btn { position: absolute; top: 14px; right: 16px; background: rgba(255,255,255,0.08); border: none; width: 28px; height: 28px; border-radius: 50%; font-size: 14px; color: #94a3b8; cursor: pointer; }
+        .verify-badge-large { width: 62px; height: 62px; border-radius: 50%; background: linear-gradient(135deg, #00d2ff, #0066ff); color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 26px; margin: 0 auto 12px; box-shadow: 0 0 25px rgba(0, 150, 255, 0.5); border: 2px solid rgba(255,255,255,0.4); }
         .verify-modal-card h3 { font-size: 17px; font-weight: 850; color: #ffffff; margin-bottom: 4px; }
-        .verify-fee-pill { 
-            display: inline-block; background: rgba(0, 230, 118, 0.15); border: 1px solid #00e676; 
-            color: #00e676; font-size: 11px; font-weight: 800; padding: 3px 12px; border-radius: 20px; margin-bottom: 12px; 
-        }
-        .verify-benefits-list {
-            background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 14px; padding: 10px 12px; margin-bottom: 16px; text-align: left;
-        }
+        .verify-fee-pill { display: inline-block; background: rgba(0, 230, 118, 0.15); border: 1px solid #00e676; color: #00e676; font-size: 11px; font-weight: 800; padding: 3px 12px; border-radius: 20px; margin-bottom: 12px; }
+        .verify-benefits-list { background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 10px 12px; margin-bottom: 16px; text-align: left; }
         .verify-benefits-list div { font-size: 11px; color: #cbd5e1; margin-bottom: 6px; display: flex; align-items: center; gap: 7px; }
         .verify-benefits-list div:last-child { margin-bottom: 0; }
         .verify-benefits-list div i { color: #38bdf8; font-size: 11px; }
-        .btn-verify-now { 
-            width: 100%; padding: 12px; border-radius: 14px; border: none; 
-            background: linear-gradient(135deg, #00d2ff 0%, #0066ff 100%); color: #ffffff; font-size: 13.5px; 
-            font-weight: 800; cursor: pointer; box-shadow: 0 6px 18px rgba(0, 102, 255, 0.4); transition: transform 0.15s; 
-        }
+        .btn-verify-now { width: 100%; padding: 12px; border-radius: 14px; border: none; background: linear-gradient(135deg, #00d2ff 0%, #0066ff 100%); color: #ffffff; font-size: 13.5px; font-weight: 800; cursor: pointer; box-shadow: 0 6px 18px rgba(0, 102, 255, 0.4); transition: transform 0.15s; }
         .btn-verify-now:active { transform: scale(0.97); }
-        .btn-verify-later { 
-            width: 100%; padding: 10px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.15); 
-            background: transparent; color: #94a3b8; font-size: 11.5px; font-weight: 700; cursor: pointer; margin-top: 6px; 
-        }
+        .btn-verify-later { width: 100%; padding: 10px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.15); background: transparent; color: #94a3b8; font-size: 11.5px; font-weight: 700; cursor: pointer; margin-top: 6px; }
 
-        /* Logout Modal */
         .logout-modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(5px); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 20px; }
         .logout-modal-overlay.active { display: flex; }
         .logout-modal-card { background: #ffffff; border-radius: 20px; width: 100%; max-width: 300px; padding: 20px 16px; text-align: center; }
@@ -534,7 +296,6 @@
         .btn-cancel-logout { flex: 1; padding: 9px; border-radius: 12px; border: 1px solid #cbd5e1; background: #f8fafc; font-weight: 700; font-size: 12px; cursor: pointer; }
         .btn-confirm-logout { flex: 1; padding: 9px; border-radius: 12px; border: none; background: #ef4444; color: #fff; font-weight: 700; font-size: 12px; cursor: pointer; }
 
-        /* Toast */
         .toast { position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%) translateY(100px); background: #0f172a; color: #FFF; padding: 10px 18px; border-radius: 25px; font-size: 12px; font-weight: 600; transition: all 0.3s ease; z-index: 2500; opacity: 0; white-space: nowrap; box-shadow: 0 8px 24px rgba(0,0,0,0.28); }
         .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
         .toast.success i { color: #10B981; }
@@ -543,6 +304,15 @@
     </style>
 </head>
 <body>
+
+    <!-- ড্রপ-ডাউন লাইভ নোটিফিকেশন ব্যানার (সাউন্ড সহ) -->
+    <div class="app-push-banner" id="appPushBanner" onclick="window.location.href='notifications.html'">
+        <div class="banner-bell-icon"><i class="fa-solid fa-bell"></i></div>
+        <div style="flex:1; min-width:0;">
+            <h4 id="bannerPushTitle" style="font-size:13px; font-weight:800; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">New Notification</h4>
+            <p id="bannerPushMsg" style="font-size:11px; opacity:0.9; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Check your notifications</p>
+        </div>
+    </div>
 
     <!-- পুল-টু-রিফ্রেশ ইন্ডিকেটর -->
     <div class="pull-refresh-indicator" id="pullRefreshIndicator">
@@ -599,7 +369,7 @@
                                 <label for="regPassword">Password</label>
                                 <div class="input-wrap">
                                     <input id="regPassword" type="password" placeholder="Create a password (6+ characters)" minlength="6" required>
-                                    <button class="eye" type="button" onclick="toggleInvezoPassword('regPassword',this)" title="Toggle password visibility">
+                                    <button class="eye" type="button" onclick="toggleInvezoPassword('regPassword',this)">
                                         <i class="fa-regular fa-eye-slash"></i>
                                     </button>
                                 </div>
@@ -608,32 +378,23 @@
                                 <label for="regConfirm">Confirm password</label>
                                 <div class="input-wrap">
                                     <input id="regConfirm" type="password" placeholder="Enter password again" minlength="6" required>
-                                    <button class="eye" type="button" onclick="toggleInvezoPassword('regConfirm',this)" title="Toggle password visibility">
+                                    <button class="eye" type="button" onclick="toggleInvezoPassword('regConfirm',this)">
                                         <i class="fa-regular fa-eye-slash"></i>
                                     </button>
                                 </div>
                             </div>
-                            
                             <div class="field">
                                 <label for="regReferCode">Referral Code (Optional)</label>
                                 <div class="input-wrap">
                                     <input id="regReferCode" placeholder="Enter Referrer UID (e.g. 118603)" maxlength="10">
                                 </div>
                             </div>
-
                             <div class="row-between">
                                 <label class="check"><input type="checkbox" id="termsAgree" required> I agree to the Terms</label>
                             </div>
                             <div class="message" id="regMessage"></div>
                             <button class="auth-btn primary" id="regSubmitBtn" type="submit" style="margin-top:10px;">Create Account</button>
                         </form>
-                        <div class="social-bottom">
-                            <span>Or continue with</span>
-                            <div class="social-icons">
-                                <button type="button" class="social-circle google" onclick="handleSocialAuth('Google')" title="Sign in with Google">G</button>
-                                <button type="button" class="social-circle facebook" onclick="handleSocialAuth('Facebook')" title="Sign in with Facebook">f</button>
-                            </div>
-                        </div>
                         <p class="switch">Already have an account? <span class="auth-link" onclick="showView('login')">Sign In</span></p>
                     </div>
 
@@ -650,7 +411,7 @@
                                 <label for="loginPassword">Password</label>
                                 <div class="input-wrap">
                                     <input id="loginPassword" type="password" placeholder="Enter your password" required>
-                                    <button class="eye" type="button" onclick="toggleInvezoPassword('loginPassword',this)" title="Toggle password visibility">
+                                    <button class="eye" type="button" onclick="toggleInvezoPassword('loginPassword',this)">
                                         <i class="fa-regular fa-eye-slash"></i>
                                     </button>
                                 </div>
@@ -662,13 +423,6 @@
                             <div class="message" id="loginMessage"></div>
                             <button class="auth-btn primary" id="loginSubmitBtn" type="submit" style="margin-top:10px;">Sign In</button>
                         </form>
-                        <div class="social-bottom">
-                            <span>Or continue with</span>
-                            <div class="social-icons">
-                                <button type="button" class="social-circle google" onclick="handleSocialAuth('Google')" title="Sign in with Google">G</button>
-                                <button type="button" class="social-circle facebook" onclick="handleSocialAuth('Facebook')" title="Sign in with Facebook">f</button>
-                            </div>
-                        </div>
                         <p class="switch">New here? <span class="auth-link" onclick="showView('register')">Create Account</span></p>
                     </div>
 
@@ -681,7 +435,7 @@
                                 <input id="forgotIdentity" type="email" placeholder="name@gmail.com" required>
                             </div>
                             <div class="message" id="forgotMessage"></div>
-                            <button class="auth-btn primary" type="submit" style="margin-top:10px;">Send reset instructions</button>
+                            <button class="auth-btn primary" id="forgotSubmitBtn" type="submit" style="margin-top:10px;">Send reset instructions</button>
                         </form>
                         <p class="switch"><span class="auth-link" onclick="showView('login')">← Back to Sign In</span></p>
                     </div>
@@ -776,14 +530,14 @@
                     </div>
                 </div>
 
-                <!-- Actions Grid (Deposit & Withdraw) -->
+                <!-- Actions Grid -->
                 <div class="actions-wide-grid">
-                    <div class="action-wide-card deposit-card" onclick="window.location.href='deposit.html'" title="Deposit Money">
+                    <div class="action-wide-card deposit-card" onclick="window.location.href='deposit.html'">
                         <img src="https://i.ibb.co.com/kghfWJBN/file-00000000b2dc8211affafc4155f20703.png" alt="Deposit">
                         <span>Deposit</span>
                     </div>
 
-                    <div class="action-wide-card withdraw-card" onclick="handleSecureNav('withdraw.html')" title="Withdraw Money">
+                    <div class="action-wide-card withdraw-card" onclick="handleSecureNav('withdraw.html')">
                         <img src="https://i.ibb.co.com/QvvSGNpK/file-00000000a4f08211972bdbaacfea428b.png" alt="Withdraw">
                         <span>Withdraw</span>
                     </div>
@@ -855,7 +609,7 @@
                     </div>
                 </div>
 
-                <!-- 3D Task Card 3: Telegram Bonus (১০০% নিরাপদ অ্যাপ ওপেনার) -->
+                <!-- 3D Task Card 3: Telegram Bonus -->
                 <div class="task-card-3d" id="taskTelegramBox" onclick="handleTelegramTaskClick()" style="cursor:pointer;">
                     <div class="task-row-header">
                         <div class="task-left-meta">
@@ -978,6 +732,52 @@
         let currentUserDoc = null;
         let isBalanceHidden = false;
         let userCreatedAtMs = 0;
+        let isFirstLoadCheck = true;
+
+        // ================= অডিও সাউন্ড বাজানোর ফাংশন (কোনো বাহ্যিক ফাইল ছাড়াই বাজে) =================
+        function playUserAlertSound() {
+            try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (!AudioCtx) return;
+                const ctx = new AudioCtx();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+
+                osc.type = "sine";
+                // সুন্দর দুই ধাপের রিংটোন (E5 -> B5)
+                osc.frequency.setValueAtTime(659.25, ctx.currentTime);
+                osc.frequency.setValueAtTime(987.77, ctx.currentTime + 0.12);
+
+                gain.gain.setValueAtTime(0.4, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                osc.start();
+                osc.stop(ctx.currentTime + 0.4);
+
+                if (navigator.vibrate) {
+                    navigator.vibrate([150, 80, 150]);
+                }
+            } catch (e) {
+                console.warn("Sound play error:", e);
+            }
+        }
+
+        // ================= ড্রপ-ডাউন ব্যানার দেখানো =================
+        function showBannerNotification(title, message) {
+            const banner = document.getElementById('appPushBanner');
+            document.getElementById('bannerPushTitle').innerText = title || "New Notification";
+            document.getElementById('bannerPushMsg').innerText = message || "";
+            
+            banner.classList.add('show');
+            playUserAlertSound();
+
+            setTimeout(() => {
+                banner.classList.remove('show');
+            }, 4500);
+        }
 
         function getTodayString() {
             const d = new Date();
@@ -987,7 +787,6 @@
             return `${year}-${month}-${day}`;
         }
 
-        // ইনস্ট্যান্ট সেশন রিস্টোর
         (function restoreSessionInstantly() {
             const cachedUser = JSON.parse(localStorage.getItem('microtask_cached_user'));
             if (cachedUser && cachedUser.uid) {
@@ -1018,7 +817,6 @@
             }
         })();
 
-        // ইউনিভার্সাল এক্সটার্নাল অ্যাপ ওপেনার (ব্রাউজার ক্র্যাশ ও ইন-অ্যাপ লগইন মুক্ত)
         function triggerNativeAppOpen(targetUrl) {
             const anchor = document.createElement('a');
             anchor.href = targetUrl;
@@ -1104,10 +902,7 @@
 
         function processAccountVerification() {
             const user = auth.currentUser;
-            if (!user) {
-                showToast("Please sign in first!", "error");
-                return;
-            }
+            if (!user) { showToast("Please sign in first!", "error"); return; }
 
             const feeBDT = 50;
             const feeUSD = parseFloat((feeBDT / 120).toFixed(4));
@@ -1115,10 +910,7 @@
 
             if (currentBal < feeUSD) {
                 showToast("Insufficient Balance! Need at least ৳50 (~$0.42).", "error");
-                setTimeout(() => {
-                    closeVerifyModal();
-                    window.location.href = "deposit.html";
-                }, 1500);
+                setTimeout(() => { closeVerifyModal(); window.location.href = "deposit.html"; }, 1500);
                 return;
             }
 
@@ -1134,7 +926,6 @@
                 const cached = JSON.parse(localStorage.getItem('microtask_cached_user')) || {};
                 cached.isVerified = true;
                 localStorage.setItem('microtask_cached_user', JSON.stringify(cached));
-
                 updateVerificationUI();
                 closeVerifyModal();
                 showToast("Account Verified! ৳50 ($0.42) deducted.", "success");
@@ -1177,7 +968,6 @@
         function addEarningToUser(amountUSD) {
             const user = auth.currentUser;
             if (!user || !currentUserDoc) return;
-
             const todayStr = getTodayString();
             const currentBal = currentUserDoc.balanceUSD || 0;
             const currentTotal = currentUserDoc.totalEarnUSD || 0;
@@ -1191,7 +981,6 @@
             });
         }
 
-        // ================= টেলিগ্রাম জয়েন লিঙ্ক সম্পূর্ণ ফিক্সড =================
         function handleTelegramTaskClick() {
             if (!isUserVerified()) {
                 showToast("Verify account with 50 BDT to claim task bonus!", "error");
@@ -1201,9 +990,7 @@
             const user = auth.currentUser;
             if (!user) return;
 
-            // ক্র্যাশ-মুক্ত ইউনিভার্সাল ওপেনার
             triggerNativeAppOpen('https://t.me/OnlineBD77R');
-
             if (currentUserDoc && currentUserDoc.telegramClaimed) return;
 
             setTimeout(() => {
@@ -1324,11 +1111,34 @@
                 });
         }
 
-        // ================= নোটিফিকেশন ব্যাজ ফিক্স (আগে থেকে ৬ দেখানো চিরতরে বন্ধ) =================
+        function handleInvezoForgot(e) {
+            e.preventDefault();
+            const email = document.getElementById('forgotIdentity').value.trim();
+            const msgEl = document.getElementById('forgotMessage');
+            const btn = document.getElementById('forgotSubmitBtn');
+
+            btn.disabled = true;
+            btn.innerText = "Sending...";
+
+            auth.sendPasswordResetEmail(email)
+                .then(() => {
+                    msgEl.textContent = 'Password reset email sent! Check your inbox.';
+                    msgEl.className = 'message show';
+                    btn.disabled = false;
+                    btn.innerText = "Send reset instructions";
+                })
+                .catch(err => {
+                    msgEl.textContent = err.message;
+                    msgEl.className = 'message show error';
+                    btn.disabled = false;
+                    btn.innerText = "Send reset instructions";
+                });
+        }
+
+        // ================= লাইভ নোটিফিকেশন সিঙ্ক (সাউন্ড + ব্যানার সহ) =================
         function initNotificationBadge() {
             const badge = document.getElementById('notifBadgeCount');
-            badge.innerText = '0';
-            badge.style.display = 'none';
+            setTimeout(() => { isFirstLoadCheck = false; }, 3000);
 
             db.collection("notifications").onSnapshot(snapshot => {
                 const readIds = JSON.parse(localStorage.getItem('read_notif_ids') || '[]');
@@ -1337,6 +1147,19 @@
                 const myUID = String(cachedUser.uid || '').trim();
                 let unreadCount = 0;
 
+                snapshot.docChanges().forEach(change => {
+                    if (change.type === "added" && !isFirstLoadCheck) {
+                        const n = change.doc.data();
+                        const target = String(n.targetUid || '').trim();
+                        const isForMe = (target !== '' && (target === myUID || (auth.currentUser && target === auth.currentUser.uid)));
+                        const isGlobal = (target === 'all' || target === '');
+
+                        if (isForMe || isGlobal) {
+                            showBannerNotification(n.title, n.message);
+                        }
+                    }
+                });
+
                 snapshot.forEach(doc => {
                     if (deletedIds.includes(doc.id)) return;
                     const n = doc.data();
@@ -1344,7 +1167,6 @@
                     const isForMe = (target !== '' && (target === myUID || (auth.currentUser && target === auth.currentUser.uid)));
                     const isGlobal = (target === 'all' || target === '');
 
-                    // ইউজার খোলার আগের পুরোনো নোটিফিকেশন বাদ দেওয়া
                     let isTimeValid = true;
                     if (isGlobal && userCreatedAtMs > 0 && n.createdAt) {
                         const notifTime = n.createdAt.toMillis ? n.createdAt.toMillis() : new Date(n.createdAt).getTime();
@@ -1372,7 +1194,6 @@
             window.location.href = 'notifications.html';
         }
 
-        // Auth Listener & Real-time Sync
         auth.onAuthStateChanged(user => {
             if (user) {
                 db.collection("users").doc(user.uid).onSnapshot(doc => {
@@ -1407,7 +1228,7 @@
             }
         });
 
-        // মোবাইল পুল-টু-রিফ্রেশ
+        // পুল-টু-রিফ্রেশ
         let touchStartY = 0;
         let touchDiffY = 0;
         const refreshIndicator = document.getElementById('pullRefreshIndicator');
