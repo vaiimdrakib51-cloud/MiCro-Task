@@ -197,7 +197,7 @@
             min-width: 18px; 
             height: 18px; 
             border-radius: 50%; 
-            display: none !important; /* সম্পূর্ণ ফিক্সড: জিরো বা ফেক কাউন্ট বন্ধ */
+            display: none; 
             align-items: center; 
             justify-content: center; 
             border: 2px solid #ffffff; 
@@ -855,7 +855,7 @@
                     </div>
                 </div>
 
-                <!-- 3D Task Card 3: Telegram Bonus (১০০% নিরাপদ অ্যাপ ওপেনার) -->
+                <!-- 3D Task Card 3: Telegram Bonus -->
                 <div class="task-card-3d" id="taskTelegramBox" onclick="handleTelegramTaskClick()" style="cursor:pointer;">
                     <div class="task-row-header">
                         <div class="task-left-meta">
@@ -987,6 +987,14 @@
             return `${year}-${month}-${day}`;
         }
 
+        // নাম আংশিক গোপন করার হেল্পার (যেমন: Tanvir Hasan -> Ta****)
+        function maskUserName(name) {
+            if (!name) return "User***";
+            name = name.trim();
+            if (name.length <= 2) return name + "***";
+            return name.slice(0, 2) + "****";
+        }
+
         // ইনস্ট্যান্ট সেশন রিস্টোর
         (function restoreSessionInstantly() {
             const cachedUser = JSON.parse(localStorage.getItem('microtask_cached_user'));
@@ -1018,7 +1026,6 @@
             }
         })();
 
-        // ইউনিভার্সাল এক্সটার্নাল অ্যাপ ওপেনার (ব্রাউজার ক্র্যাশ ও ইন-অ্যাপ লগইন মুক্ত)
         function triggerNativeAppOpen(targetUrl) {
             const anchor = document.createElement('a');
             anchor.href = targetUrl;
@@ -1102,6 +1109,7 @@
             }
         }
 
+        // ================= ২. ভেরিফিকেশন হলে রেফারারকে ৪০ টাকা বোনাস + নোটিফিকেশন =================
         function processAccountVerification() {
             const user = auth.currentUser;
             if (!user) {
@@ -1126,6 +1134,7 @@
             btn.disabled = true;
             btn.innerText = "Processing...";
 
+            // ইউজার থেকে ৫০ টাকা কাটা এবং ভেরিফাই করা
             db.collection("users").doc(user.uid).update({
                 balanceUSD: firebase.firestore.FieldValue.increment(-feeUSD),
                 isVerified: true
@@ -1138,6 +1147,34 @@
                 updateVerificationUI();
                 closeVerifyModal();
                 showToast("Account Verified! ৳50 ($0.42) deducted.", "success");
+
+                // রেফারারকে স্বয়ংক্রিয়ভাবে ৪০ টাকা ($0.33) বোনাস দেওয়া
+                if (currentUserDoc && currentUserDoc.referredBy) {
+                    const refUID = String(currentUserDoc.referredBy).trim();
+                    const bonusUSD = parseFloat((40 / 120).toFixed(4)); // ৪০ টাকা ≈ $0.3333 USD
+                    const maskedUser = maskUserName(currentUserDoc.name || 'Member');
+
+                    db.collection("users").where("uid", "==", refUID).get().then(snap => {
+                        if (!snap.empty) {
+                            const referrerDoc = snap.docs[0];
+                            referrerDoc.ref.update({
+                                balanceUSD: firebase.firestore.FieldValue.increment(bonusUSD),
+                                totalEarnUSD: firebase.firestore.FieldValue.increment(bonusUSD)
+                            });
+
+                            // রেফারারের কাছে নোটিফিকেশন পাঠানো
+                            db.collection("notifications").add({
+                                targetUid: refUID,
+                                category: "referral",
+                                title: "🎉 ৳৪০ রেফারেল বোনাস জমা হয়েছে!",
+                                message: `অভিনন্দন! আপনার রেফারেল ${maskedUser} অ্যাকাউন্ট ভেরিফাই করেছে। আপনার অ্যাকাউন্টে ৳৪০ ($0.33) বোনাস যোগ হয়েছে!`,
+                                actionUrl: "refer.html",
+                                time: "Just now",
+                                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                            });
+                        }
+                    }).catch(e => console.error("Referral bonus error:", e));
+                }
             }).catch(err => {
                 showToast("Verification failed: " + err.message, "error");
             }).finally(() => {
@@ -1191,7 +1228,6 @@
             });
         }
 
-        // ================= টেলিগ্রাম জয়েন লিঙ্ক সম্পূর্ণ ফিক্সড =================
         function handleTelegramTaskClick() {
             if (!isUserVerified()) {
                 showToast("Verify account with 50 BDT to claim task bonus!", "error");
@@ -1201,7 +1237,6 @@
             const user = auth.currentUser;
             if (!user) return;
 
-            // ক্র্যাশ-মুক্ত ইউনিভার্সাল ওপেনার
             triggerNativeAppOpen('https://t.me/OnlineBD77R');
 
             if (currentUserDoc && currentUserDoc.telegramClaimed) return;
@@ -1249,6 +1284,7 @@
             });
         }
 
+        // ================= ১. রেজিস্ট্রেশন সময়ে রেফারারের কাছে নোটিফিকেশন =================
         function handleInvezoRegister(e) {
             e.preventDefault();
             const name = document.getElementById('regName').value.trim();
@@ -1289,6 +1325,21 @@
                     };
 
                     localStorage.setItem('microtask_cached_user', JSON.stringify(userPayload));
+
+                    // রেফারারকে নোটিফিকেশন পাঠানো (নাম আংশিক গোপন রেখে)
+                    if (referCode) {
+                        const hiddenName = maskUserName(name);
+                        db.collection("notifications").add({
+                            targetUid: String(referCode).trim(),
+                            category: "referral",
+                            title: "নতুন সদস্য জয়েন করেছে!",
+                            message: `${hiddenName} আপনার রেফারেল কোড ব্যবহার করে অ্যাকাউন্ট খুলেছে। সে ৫০ টাকায় অ্যাকাউন্ট ভেরিফাই করলে পাবেন ৳৪০ ইনস্ট্যান্ট বোনাস!`,
+                            actionUrl: "refer.html",
+                            time: "Just now",
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    }
+
                     return db.collection("users").doc(user.uid).set(userPayload);
                 })
                 .then(() => {
@@ -1324,7 +1375,28 @@
                 });
         }
 
-        // ================= নোটিফিকেশন ব্যাজ ফিক্স (আগে থেকে ৬ দেখানো চিরতরে বন্ধ) =================
+        function handleInvezoForgot(e) {
+            e.preventDefault();
+            const email = document.getElementById('forgotIdentity').value.trim();
+            const msgEl = document.getElementById('forgotMessage');
+            if (!email) return;
+
+            auth.sendPasswordResetEmail(email)
+                .then(() => {
+                    msgEl.textContent = 'Password reset instructions sent to your email!';
+                    msgEl.className = 'message show';
+                })
+                .catch(err => {
+                    msgEl.textContent = err.message;
+                    msgEl.className = 'message show error';
+                });
+        }
+
+        function handleSocialAuth(provider) {
+            showToast(`${provider} login will be available in next update!`, "info");
+        }
+
+        // নোটিফিকেশন ব্যাজ লাইভ ট্র্যাকিং
         function initNotificationBadge() {
             const badge = document.getElementById('notifBadgeCount');
             badge.innerText = '0';
@@ -1344,13 +1416,10 @@
                     const isForMe = (target !== '' && (target === myUID || (auth.currentUser && target === auth.currentUser.uid)));
                     const isGlobal = (target === 'all' || target === '');
 
-                    // ইউজার খোলার আগের পুরোনো নোটিফিকেশন বাদ দেওয়া
                     let isTimeValid = true;
                     if (isGlobal && userCreatedAtMs > 0 && n.createdAt) {
                         const notifTime = n.createdAt.toMillis ? n.createdAt.toMillis() : new Date(n.createdAt).getTime();
-                        if (notifTime < userCreatedAtMs) {
-                            isTimeValid = false;
-                        }
+                        if (notifTime < userCreatedAtMs) isTimeValid = false;
                     }
 
                     if ((isForMe || (isGlobal && isTimeValid)) && !readIds.includes(doc.id)) {
@@ -1360,10 +1429,10 @@
 
                 if (unreadCount > 0) {
                     badge.innerText = unreadCount > 9 ? '9+' : unreadCount;
-                    badge.style.setProperty('display', 'flex', 'important');
+                    badge.style.display = 'flex';
                 } else {
                     badge.innerText = '0';
-                    badge.style.setProperty('display', 'none', 'important');
+                    badge.style.display = 'none';
                 }
             });
         }
