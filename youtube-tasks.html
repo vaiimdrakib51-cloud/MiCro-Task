@@ -59,7 +59,6 @@
     
     .video-link-btn { display: flex; align-items: center; justify-content: center; gap: 7px; background: linear-gradient(180deg, #ff0000 0%, #b30000 100%); color: white; padding: 11px; border-radius: 12px; font-size: 12.5px; font-weight: 800; border: none; cursor: pointer; }
     
-    /* প্রোফাইল লিংক ইনপুট বক্স */
     .profile-input-box { background: rgba(30, 0, 0, 0.6); border: 1px solid #ff4d4d; border-radius: 10px; padding: 9px 10px; margin-top: 4px; display: flex; flex-direction: column; gap: 4px; }
     .profile-input-box label { font-size: 10.5px; color: #ffcccc; font-weight: 700; }
     .profile-input-box input { background: #120202; border: 1px solid #ff6666; border-radius: 7px; padding: 7px 10px; color: #ffffff; font-size: 11.5px; outline: none; }
@@ -88,7 +87,7 @@
     
     <div class="notice-bar">
       <i class="fa-solid fa-circle-info"></i>
-      <span>Follow Admin task rules. Upload required screenshots & profile link.</span>
+      <span>Upload required proofs as requested by Admin.</span>
     </div>
     
     <div class="task-list" id="taskListContainer"></div>
@@ -100,7 +99,6 @@
       <i class="fa-solid fa-xmark close-btn" onclick="closeModal()"></i>
       <h3 class="modal-title" id="m-title">Complete Task & Submit</h3>
       
-      <!-- Step 1: Open Video in YouTube App -->
       <div class="step-box">
         <div class="step-header"><i class="fa-solid fa-1"></i> Step 1: Open Video in YouTube App</div>
         <button type="button" class="video-link-btn" onclick="openTargetNativeApp()">
@@ -108,18 +106,16 @@
         </button>
       </div>
 
-      <!-- Step 2: Dynamic Requirements from Admin -->
       <div class="step-box">
         <div class="step-header"><i class="fa-solid fa-2"></i> Step 2: Upload Required Proofs</div>
         
-        <!-- ডুপ্লিকেট সাবস্ক্রাইব রোধে ইউটিউব চ্যানেল/প্রোফাইল লিংক -->
+        <!-- শুধুমাত্র Subscribe অন থাকলেই এটি দেখাবে -->
         <div id="profileLinkBox" class="profile-input-box" style="display:none;">
           <label><i class="fa-solid fa-link"></i> আপনার ইউটিউব চ্যানেল / প্রোফাইল লিংক দিন:</label>
           <input type="url" id="userProfileUrl" placeholder="https://youtube.com/@yourchannel">
-          <small>⚠️ এই প্রোফাইল দিয়ে পূর্বে কাজ করা হয়েছে কি না তা স্বয়ংক্রিয়ভাবে যাচাই করা হবে।</small>
+          <small>⚠️ এই চ্যানেল দিয়ে ইতিপূর্বে সাবস্ক্রাইব করা হয়েছে কি না তা যাচাই করা হবে।</small>
         </div>
 
-        <!-- অ্যাডমিন রুলস অনুযায়ী ডায়নামিক স্ক্রিনশট স্লট -->
         <div class="upload-grid" id="dynamicUploadGrid"></div>
       </div>
 
@@ -149,7 +145,6 @@
     let activeRewardUSD = 0.20;
     let activeTaskData = null;
 
-    // অলরেডি সাবমিট করা টাস্কের লিস্ট (যাতে পেন্ডিং না দেখিয়ে সাথে সাথে মুছে যায়)
     let userSubmittedTasks = new Set(JSON.parse(localStorage.getItem('yt_submitted_tasks') || '[]'));
 
     function getUserUID() {
@@ -160,7 +155,6 @@
     function listenToLiveTasks() {
       const myUID = getUserUID();
 
-      // ইউজারের সাবমিট করা কাজগুলো টেনে আনা
       db.collection("task_submissions").where("uid", "==", myUID).get().then(snap => {
         snap.forEach(doc => {
           if (doc.data().taskId) userSubmittedTasks.add(doc.data().taskId);
@@ -171,12 +165,10 @@
       db.collection("tasks").where("platform", "==", "youtube").onSnapshot(snapshot => {
         const container = document.getElementById('taskListContainer');
         container.innerHTML = '';
-
         let visibleCount = 0;
 
         snapshot.forEach(doc => {
           const tId = doc.id;
-          // কাজ সাবমিট করা হয়ে গেলে তা আর এই পেজে দেখাবে না (মুছে যাবে)
           if (userSubmittedTasks.has(tId)) return;
 
           const data = doc.data();
@@ -196,7 +188,6 @@
       });
     }
 
-    // অ্যাডমিন রুলস অনুযায়ী কার্ড রেন্ডার (Subscribe এবং Follow উভয় ফিল্ড চেক ফিক্সড)
     function renderSingleTaskCard(id, title, rewardUSD, duration, url, taskData) {
       const container = document.getElementById('taskListContainer');
 
@@ -235,7 +226,6 @@
       container.appendChild(card);
     }
 
-    // মডাল হ্যান্ডলার ও ইনপুট স্লট তৈরি
     function handleCardClick(id, title, rewardUSD, url, taskData) {
       activeTaskId = id;
       activeTaskUrl = url || 'https://www.youtube.com';
@@ -250,7 +240,7 @@
 
       const isSubReq = (activeTaskData.requiresSubscribe === true || activeTaskData.requiresFollow === true);
 
-      // সাবস্ক্রাইব করতে বললে ইউটিউব চ্যানেল/প্রোফাইল লিংক ইনপুট দেখাবে
+      // শুধুমাত্র Subscribe অন থাকলেই চ্যানেল লিংক চাইবে
       if (isSubReq) {
         profileLinkBox.style.display = 'flex';
         document.getElementById('userProfileUrl').value = '';
@@ -258,19 +248,15 @@
         profileLinkBox.style.display = 'none';
       }
 
-      // অ্যাডমিন যা যা চাইবে শুধুই সেই স্লট শো করবে
       let slotIndex = 1;
-
       if (activeTaskData.requiresLike !== false) {
         uploadGrid.innerHTML += createUploadSlotHTML(slotIndex, 'Like Screenshot', 'fa-thumbs-up');
         slotIndex++;
       }
-
       if (isSubReq) {
         uploadGrid.innerHTML += createUploadSlotHTML(slotIndex, 'Subscribe Screenshot', 'fa-bell');
         slotIndex++;
       }
-
       if (activeTaskData.requiresComment === true) {
         uploadGrid.innerHTML += createUploadSlotHTML(slotIndex, 'Comment Screenshot', 'fa-comment-dots');
         slotIndex++;
@@ -290,7 +276,6 @@
       `;
     }
 
-    // ফোনে ইনস্টল থাকা ইউটিউব অ্যাপে ওপেন করার মেকানিজম
     function openTargetNativeApp() {
       if (!activeTaskUrl) return;
       let target = activeTaskUrl.trim();
@@ -318,21 +303,39 @@
 
     function closeModal(){ document.getElementById('taskModal').style.display="none"; }
 
-    function readFileAsBase64(file) {
+    // ================= অটোমেটিক ইমেজ কম্প্রেসার (1MB সাইজ লিমিট সমাধান) =================
+    function compressImageToBase64(file, maxWidth = 650, quality = 0.65) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = error => reject(error);
         reader.readAsDataURL(file);
+        reader.onload = event => {
+          const img = new Image();
+          img.src = event.target.result;
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let width = img.width;
+            let height = img.height;
+            if (width > maxWidth) {
+              height = Math.round((height * maxWidth) / width);
+              width = maxWidth;
+            }
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            const compressed = canvas.toDataURL('image/jpeg', quality);
+            resolve(compressed);
+          };
+          img.onerror = () => resolve(event.target.result);
+        };
+        reader.onerror = error => reject(error);
       });
     }
 
-    // ================= সাবমিশন: আসল ছবিগুলো Base64 এ কনভার্ট হয়ে অ্যাডমিনে যাবে =================
     async function submitProof() {
       const btn = document.getElementById('submitBtn');
       const inputs = document.querySelectorAll('.slot-native-input');
 
-      // সব কয়টি স্ক্রিনশট সিলেক্ট করা হয়েছে কি না চেক
       for (let input of inputs) {
         if (!input.files || input.files.length === 0) {
           alert("অ্যাডমিনের চাওয়া সব কয়টি স্ক্রিনশট সিলেক্ট করুন!");
@@ -343,10 +346,8 @@
       let profileUrl = '';
       const isSubReq = (activeTaskData.requiresSubscribe === true || activeTaskData.requiresFollow === true);
 
-      // সাবস্ক্রাইব টাস্ক হলে চ্যানেল লিংক ডুপ্লিকেট চেক
       if (isSubReq) {
         profileUrl = document.getElementById('userProfileUrl').value.trim().toLowerCase().replace(/\/+$/, "");
-
         if (!profileUrl) {
           alert("অনুগ্রহ করে আপনার ইউটিউব চ্যানেল / প্রোফাইল লিংকটি প্রবেশ করান!");
           return;
@@ -362,7 +363,7 @@
             .get();
 
           if (!duplicateCheck.empty) {
-            alert("⚠️ এই ইউটিউব আইডি দিয়ে ইতিপূর্বে এই টাস্কটি সম্পন্ন করা হয়েছে! একই প্রোফাইল একাধিকবার ব্যবহার করা সম্পূর্ণ নিষিদ্ধ।");
+            alert("⚠️ এই ইউটিউব আইডি দিয়ে ইতিপূর্বে এই টাস্কটি সম্পন্ন করা হয়েছে! একই প্রোফাইল একাধিকবার ব্যবহার করা যাবে না।");
             btn.disabled = false;
             btn.innerText = "Submit for Review";
             return;
@@ -371,15 +372,15 @@
       }
 
       btn.disabled = true;
-      btn.innerText = "ছবি প্রসেসিং হচ্ছে...";
+      btn.innerText = "ছবি কম্প্রেস করা হচ্ছে...";
 
       try {
-        // ছবিগুলো Base64 এ রূপান্তর করে proofs অ্যারে তৈরি (অ্যাডমিন প্যানেল প্রিভিউয়ের জন্য)
         const screenshotBase64List = [];
         for (let input of inputs) {
           const file = input.files[0];
-          const base64Data = await readFileAsBase64(file);
-          screenshotBase64List.push(base64Data);
+          // ইমেজ অটোমেটিক রিসাইজ ও কম্প্রেস (সাইজ ১ মেগাবাইটের অনেক নিচে থাকবে)
+          const compressedData = await compressImageToBase64(file);
+          screenshotBase64List.push(compressedData);
         }
 
         btn.innerText = "Submitting to Admin...";
@@ -390,17 +391,15 @@
           platform: "youtube",
           uid: userUID,
           profileUrl: profileUrl || null,
-          proofs: screenshotBase64List, // আসল স্ক্রিনশট ছবিগুলো অ্যাডমিনে পাঠানো হলো
+          proofs: screenshotBase64List,
           rewardUSD: activeRewardUSD,
           status: "pending",
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
 
-        // ১. কাজ সাবমিট হওয়া মাত্রই ইউজারের লোকাল লিস্টে যোগ
         userSubmittedTasks.add(activeTaskId);
         localStorage.setItem('yt_submitted_tasks', JSON.stringify([...userSubmittedTasks]));
 
-        // ২. কার্ডটি সাথে সাথে স্ক্রিন থেকে চিরতরে মুছে ফেলা (আর পেন্ডিং দেখাবে না)
         const cardElem = document.getElementById(`card-${activeTaskId}`);
         if (cardElem) cardElem.remove();
 
@@ -417,7 +416,7 @@
         alert("টাস্কটি সফলভাবে জমা দেওয়া হয়েছে! স্ক্রিনশট সহ অ্যাডমিন প্যানেলে পাঠানো হয়েছে।");
         closeModal();
       } catch (err) {
-        alert("ত্রুটি: " + err.message);
+        alert("ত্রুটি: " + (err.message || "ছবি আপলোডে সমস্যা"));
       } finally {
         btn.disabled = false;
         btn.innerText = "Submit for Review";
