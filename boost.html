@@ -482,7 +482,7 @@
             </div>
           </div>
 
-          <div class="px-1 py-0.5 grid ${post.boostStatus === 'none' ? 'grid-cols-4' : 'grid-cols-3'} gap-1 text-xs font-semibold text-aqua-textSecondary border-t border-aqua-divider">
+          <div class="px-1 py-0.5 grid ${isOwnPost && post.boostStatus === 'none' ? 'grid-cols-4' : 'grid-cols-3'} gap-1 text-xs font-semibold text-aqua-textSecondary border-t border-aqua-divider">
             <button 
               onclick="toggleLike('${post.id}')" 
               class="flex items-center justify-center space-x-1 py-1.5 rounded-md hover:bg-aqua-hoverMint transition ${isLiked ? 'text-teal-700 font-bold bg-teal-50' : ''}"
@@ -507,7 +507,8 @@
               <span>Share</span>
             </button>
 
-            ${post.boostStatus === 'none' ? `
+            <!-- ১. শুধুমাত্র নিজের পোস্টেই Boost বাটন আসবে, অন্যের পোস্টে আসবে না -->
+            ${isOwnPost && post.boostStatus === 'none' ? `
               <button 
                 onclick="openBoostModal('${post.id}')" 
                 class="flex items-center justify-center space-x-1 py-1.5 rounded-md hover:bg-aqua-hoverMint text-teal-700 transition"
@@ -518,11 +519,14 @@
             ` : ''}
           </div>
 
+          <!-- ২. বুস্টের বাকি সময়ের কাউন্টডাউন টাইমার শুধুই পোস্টের মালিক দেখতে পারবে -->
           ${post.boostStatus === 'active' ? `
             <div class="px-3 py-1 bg-gradient-to-r from-teal-50 to-cyan-50 border-t border-teal-200 flex items-center justify-between text-[10px] text-teal-900">
               <div class="flex items-center space-x-1 font-medium">
                 <i data-lucide="timer" class="w-3 h-3 text-teal-600 animate-pulse"></i>
-                <span id="countdown-${post.id}" class="font-mono font-bold tracking-tight">Calculating...</span>
+                <span id="countdown-${post.id}" class="font-mono font-bold tracking-tight">
+                  ${isOwnPost ? 'Calculating...' : 'Active Promotion'}
+                </span>
               </div>
               <span class="text-[9px] bg-teal-100 text-teal-800 px-1 rounded font-bold uppercase">
                 ${post.boostPackage || 'Boosted'} • Active
@@ -687,7 +691,6 @@
       { id: "u_6", name: "Farhan Ahmed", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&auto=format&fit=crop&q=80", text: "পোস্টটি পড়ে অনেক কিছু জানতে পারলাম।" }
     ];
 
-    // লাইভ বুস্টিং লুপ
     setInterval(() => {
       posts.forEach(post => {
         if (post.boostStatus === 'active' && post.boostExpiresAt > Date.now()) {
@@ -749,17 +752,23 @@
     function updateAllCountdowns() {
       posts.forEach(post => {
         if (post.boostStatus === 'active' && post.boostExpiresAt) {
+          const isOwn = String(post.userId) === String(currentUser.uid);
           const el = document.getElementById(`countdown-${post.id}`);
           if (el) {
             const time = getRemainingTime(post.boostExpiresAt);
             if (time.totalSecs <= 0) {
               handleBoostExpirationAndSettle(post);
             } else {
-              const d = String(time.days).padStart(2, '0');
-              const h = String(time.hours).padStart(2, '0');
-              const m = String(time.minutes).padStart(2, '0');
-              const s = String(time.seconds).padStart(2, '0');
-              el.innerText = `${d}d : ${h}h : ${m}m : ${s}s`;
+              // শুধুমাত্র পোস্টের মালিক বিস্তারিত সময় দেখতে পাবে
+              if (isOwn) {
+                const d = String(time.days).padStart(2, '0');
+                const h = String(time.hours).padStart(2, '0');
+                const m = String(time.minutes).padStart(2, '0');
+                const s = String(time.seconds).padStart(2, '0');
+                el.innerText = `${d}d : ${h}h : ${m}m : ${s}s`;
+              } else {
+                el.innerText = `Active Promotion`;
+              }
             }
           }
         }
@@ -767,6 +776,7 @@
     }
     setInterval(updateAllCountdowns, 1000);
 
+    // ৩. লাইক ফাংশন ফিক্সড (হোম ও সার্চ উভয় ট্যাবে তাৎক্ষণিক কাজ করবে)
     function toggleLike(postId) {
       const post = posts.find(p => p.id === postId);
       if (!post) return;
@@ -795,7 +805,11 @@
         });
       }
 
+      // হোম ও সার্চ উভয় ট্যাবেই সাথে সাথে ভিউ আপডেট হবে
       renderFeed();
+      if (!document.getElementById('view-search').classList.contains('hidden')) {
+        searchUserByUID();
+      }
     }
 
     function toggleComments(postId) {
