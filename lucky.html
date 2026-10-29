@@ -9,6 +9,11 @@
   <!-- FontAwesome 6 Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
+  <!-- Firebase SDK (Compat Version) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
   <style>
     * {
       margin: 0;
@@ -35,12 +40,12 @@
       gap: 14px;
     }
 
-    /* 0. Top Navigation Header with 3D Back Button */
+    /* 0. Top Navigation Header */
     .top-nav-bar {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 2px 4px 6px;
+      gap: 14px;
+      padding: 4px 4px 8px;
     }
 
     .back-btn-top {
@@ -62,7 +67,7 @@
 
     .top-nav-bar h2 {
       color: #ffffff;
-      font-size: 18px;
+      font-size: 19px;
       font-weight: 800;
       letter-spacing: -0.3px;
     }
@@ -83,8 +88,14 @@
     .draw-header {
       display: flex;
       align-items: center;
-      gap: 12px;
+      justify-content: space-between;
       margin-bottom: 12px;
+    }
+
+    .draw-header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
     .live-badge {
@@ -112,12 +123,21 @@
       font-weight: 700;
     }
 
+    .sales-tag {
+      font-size: 10.5px;
+      font-weight: 800;
+      padding: 3px 9px;
+      border-radius: 6px;
+    }
+    .sales-tag.open { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981; }
+    .sales-tag.closed { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; }
+
     .schedule {
       display: flex;
       align-items: center;
       gap: 8px;
       color: #f1f5f9;
-      font-size: 13.5px;
+      font-size: 13px;
       font-weight: 600;
       margin-bottom: 16px;
     }
@@ -169,7 +189,7 @@
       width: 100%;
       background: linear-gradient(180deg, #facc15 0%, #eab308 50%, #ca8a04 100%);
       color: #000000;
-      font-size: 16px;
+      font-size: 15.5px;
       font-weight: 800;
       padding: 12px;
       border: none;
@@ -180,14 +200,21 @@
       gap: 8px;
       cursor: pointer;
       box-shadow: 0 4px 15px rgba(234, 179, 8, 0.4);
-      transition: transform 0.2s;
+      transition: transform 0.2s, background 0.3s;
     }
 
     .btn-join:active {
       transform: scale(0.98);
     }
 
-    /* 2. Middle Card: Winners */
+    .btn-join.disabled-btn {
+      background: #334155;
+      color: #94a3b8;
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+
+    /* 2. Winners Card */
     .winners-card {
       border: 1.5px solid #6366f1;
       box-shadow: 0 0 15px rgba(99, 102, 241, 0.25);
@@ -208,6 +235,18 @@
       flex-direction: column;
       gap: 12px;
       margin-bottom: 16px;
+      min-height: 80px;
+    }
+
+    .no-winner-msg {
+      text-align: center;
+      color: #94a3b8;
+      font-size: 12px;
+      padding: 22px 10px;
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 12px;
+      border: 1px dashed rgba(255, 255, 255, 0.1);
+      line-height: 1.5;
     }
 
     .winner-row {
@@ -235,26 +274,21 @@
       font-weight: 700;
       color: #fff;
     }
-
     .rank-1 { background: #eab308; color: #000; box-shadow: 0 0 8px #eab308; }
     .rank-2 { background: #93c5fd; color: #000; }
     .rank-3 { background: #f97316; }
-    .rank-4 { background: #60a5fa; }
-    .rank-5 { background: #38bdf8; }
 
-    .avatar {
+    .avatar-icon {
       width: 36px;
       height: 36px;
       border-radius: 50%;
-      border: 2px solid transparent;
-      object-fit: cover;
+      background: #1e293b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #facc15;
+      font-size: 14px;
     }
-
-    .border-gold { border-color: #eab308; }
-    .border-silver { border-color: #cbd5e1; }
-    .border-bronze { border-color: #ea580c; }
-    .border-blue { border-color: #3b82f6; }
-    .border-teal { border-color: #06b6d4; }
 
     .user-info .name {
       display: block;
@@ -267,13 +301,6 @@
       color: #facc15;
       font-size: 11px;
       font-weight: 600;
-    }
-
-    .badge-icon {
-      font-size: 24px;
-      display: flex;
-      align-items: center;
-      gap: 4px;
     }
 
     .btn-view-all {
@@ -329,7 +356,7 @@
       margin-top: 4px;
     }
 
-    /* ================= Modal Styling ================= */
+    /* Modal Styling */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -337,7 +364,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(2, 6, 23, 0.85);
+      background: rgba(2, 6, 23, 0.88);
       backdrop-filter: blur(8px);
       z-index: 1000;
       justify-content: center;
@@ -355,7 +382,7 @@
       box-shadow: 0 0 30px rgba(99, 102, 241, 0.4);
       border-radius: 20px;
       width: 100%;
-      max-width: 360px;
+      max-width: 370px;
       overflow: hidden;
       animation: modalFade 0.25s ease-out;
     }
@@ -389,7 +416,6 @@
     }
     .btn-close:hover { color: #fff; }
 
-    /* Modal Tabs */
     .modal-tabs {
       display: flex;
       background: #04081e;
@@ -418,7 +444,7 @@
 
     .modal-body {
       padding: 16px;
-      max-height: 400px;
+      max-height: 420px;
       overflow-y: auto;
     }
 
@@ -429,7 +455,6 @@
       display: block;
     }
 
-    /* Form Styling */
     .form-group {
       margin-bottom: 10px;
       text-align: left;
@@ -458,16 +483,25 @@
       border-color: #6366f1;
     }
 
-    .ticket-price-info {
-      color: #94a3b8;
-      font-size: 12px;
-      margin-bottom: 10px;
+    .ticket-price-box {
+      background: rgba(250, 204, 21, 0.1);
+      border: 1px dashed #facc15;
+      border-radius: 12px;
+      padding: 10px;
       text-align: center;
+      margin-bottom: 12px;
     }
 
-    .ticket-price-info strong {
-      color: #38bdf8;
-      font-size: 14px;
+    .ticket-price-box p {
+      color: #94a3b8;
+      font-size: 11px;
+    }
+
+    .ticket-price-box strong {
+      color: #facc15;
+      font-size: 16px;
+      display: block;
+      margin-top: 2px;
     }
 
     .btn-confirm-buy {
@@ -476,44 +510,144 @@
       color: #fff;
       font-weight: 700;
       border: none;
-      padding: 10px;
+      padding: 11px;
       border-radius: 20px;
       font-size: 13.5px;
       cursor: pointer;
       box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
       margin-top: 8px;
+      transition: transform 0.15s;
+    }
+    .btn-confirm-buy:active { transform: scale(0.97); }
+
+    .btn-confirm-buy:disabled {
+      background: #475569;
+      box-shadow: none;
+      cursor: not-allowed;
     }
 
-    /* Prize List */
-    .prize-list {
+    /* Prize Banner Slider */
+    .prize-slider-container {
+      position: relative;
+      width: 100%;
+      height: 235px;
+      border-radius: 18px;
+      overflow: hidden;
+      background: #070e28;
+      border: 1.5px solid #6366f1;
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.3);
+      margin-bottom: 12px;
+    }
+
+    .prize-slider-track {
+      display: flex;
+      height: 100%;
+      width: 100%;
+      transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .prize-slide {
+      min-width: 100%;
+      height: 100%;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #030718;
+    }
+
+    .prize-slide img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .prize-slide-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(180deg, transparent 0%, rgba(3, 7, 24, 0.94) 100%);
+      padding: 20px 14px 12px;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 3px;
+      text-align: left;
     }
 
-    .prize-item {
-      display: flex;
-      justify-content: space-between;
+    .prize-badge-rank {
+      display: inline-flex;
       align-items: center;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      padding: 8px 12px;
-      border-radius: 10px;
+      gap: 5px;
+      background: linear-gradient(90deg, #facc15, #ca8a04);
+      color: #000;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 2px 10px;
+      border-radius: 14px;
+      width: fit-content;
     }
 
-    .prize-item .rank-title {
-      color: #e2e8f0;
-      font-size: 12.5px;
-      font-weight: 600;
+    .prize-slide-title {
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.25;
     }
 
-    .prize-item .prize-val {
-      color: #facc15;
-      font-size: 13px;
+    .prize-slide-value {
+      color: #38bdf8;
+      font-size: 12px;
       font-weight: 700;
     }
 
-    /* My Tickets History */
+    .slider-nav-btn {
+      position: absolute;
+      top: 45%;
+      transform: translateY(-50%);
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      cursor: pointer;
+      z-index: 5;
+    }
+    .slider-nav-btn.prev { left: 8px; }
+    .slider-nav-btn.next { right: 8px; }
+
+    .prize-slider-dots {
+      position: absolute;
+      bottom: 6px;
+      right: 12px;
+      display: flex;
+      gap: 5px;
+      z-index: 6;
+      background: rgba(0,0,0,0.5);
+      padding: 3px 7px;
+      border-radius: 12px;
+    }
+
+    .prize-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.4);
+      transition: all 0.25s;
+    }
+    .prize-dot.active {
+      width: 16px;
+      border-radius: 8px;
+      background: #facc15;
+    }
+
+    /* Ticket Card */
     .ticket-card {
       background: rgba(255, 255, 255, 0.04);
       border: 1px dashed #6366f1;
@@ -557,6 +691,31 @@
       text-align: center;
       padding: 30px 0;
     }
+
+    /* Toast */
+    .toast-box {
+      position: fixed;
+      bottom: 25px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #0f172a;
+      color: #fff;
+      padding: 11px 22px;
+      border-radius: 30px;
+      font-size: 12.5px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 9999;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    }
+    .toast-box.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
   </style>
 </head>
 <body>
@@ -574,16 +733,19 @@
     <!-- 1. Next Draw Card -->
     <div class="card draw-card">
       <div class="draw-header">
-        <span class="live-badge">LIVE <span>((•))</span></span>
-        <span class="draw-title">Next Draw</span>
+        <div class="draw-header-left">
+          <span class="live-badge">LIVE <span>((•))</span></span>
+          <span class="draw-title">Mega Lucky Draw</span>
+        </div>
+        <span class="sales-tag open" id="salesStatusBadge">Open</span>
       </div>
 
       <div class="schedule">
         <span class="calendar-icon">📅</span>
-        <span>Sunday, <strong>10:00 PM</strong> (BD Time)</span>
+        <span id="targetDrawDateText">Draw Date: <strong>Loading schedule...</strong></span>
       </div>
 
-      <!-- Real-Time Countdown Grid -->
+      <!-- Real-Time Countdown Grid (Admin Configured) -->
       <div class="countdown-grid">
         <div class="count-box">
           <span class="num" id="days">00</span>
@@ -603,87 +765,27 @@
         </div>
       </div>
 
-      <!-- Join Button -->
-      <button class="btn-join" onclick="openModal('buyTab')">
-        🎟️ Join Now
+      <!-- Join Button (Controlled by Admin) -->
+      <button class="btn-join" id="btnMainJoin" onclick="handleJoinBtnClick()">
+        🎟️ Buy Ticket (৳40)
       </button>
     </div>
 
-    <!-- 2. Last Week Winners Card -->
+    <!-- 2. Winners Card -->
     <div class="card winners-card">
       <div class="winners-title">
-        🏆 Last Week Winners
+        🏆 Draw Results & Winners
       </div>
 
-      <div class="winner-list">
-        <!-- Rank 1 -->
-        <div class="winner-row">
-          <div class="winner-left">
-            <span class="rank-circle rank-1">1</span>
-            <img class="avatar border-gold" src="https://i.pravatar.cc/100?img=11" alt="Hriday">
-            <div class="user-info">
-              <span class="name">Hriday***</span>
-              <span class="amount">100 USDT</span>
-            </div>
-          </div>
-          <div class="badge-icon">👑🥇</div>
-        </div>
-
-        <!-- Rank 2 -->
-        <div class="winner-row">
-          <div class="winner-left">
-            <span class="rank-circle rank-2">2</span>
-            <img class="avatar border-silver" src="https://i.pravatar.cc/100?img=12" alt="Sakib">
-            <div class="user-info">
-              <span class="name">Sakib***</span>
-              <span class="amount" style="color: #cbd5e1;">50 USDT</span>
-            </div>
-          </div>
-          <div class="badge-icon">🥈</div>
-        </div>
-
-        <!-- Rank 3 -->
-        <div class="winner-row">
-          <div class="winner-left">
-            <span class="rank-circle rank-3">3</span>
-            <img class="avatar border-bronze" src="https://i.pravatar.cc/100?img=13" alt="Nusrat">
-            <div class="user-info">
-              <span class="name">Nusrat***</span>
-              <span class="amount" style="color: #fb923c;">25 USDT</span>
-            </div>
-          </div>
-          <div class="badge-icon">🥉</div>
-        </div>
-
-        <!-- Rank 4 -->
-        <div class="winner-row">
-          <div class="winner-left">
-            <span class="rank-circle rank-4">4</span>
-            <img class="avatar border-blue" src="https://i.pravatar.cc/100?img=14" alt="MdRafi">
-            <div class="user-info">
-              <span class="name">MdRafi***</span>
-              <span class="amount" style="color: #cbd5e1;">10 USDT</span>
-            </div>
-          </div>
-          <div class="badge-icon">🏅</div>
-        </div>
-
-        <!-- Rank 5 -->
-        <div class="winner-row">
-          <div class="winner-left">
-            <span class="rank-circle rank-5">5</span>
-            <img class="avatar border-teal" src="https://i.pravatar.cc/100?img=15" alt="Tania">
-            <div class="user-info">
-              <span class="name">Tania***</span>
-              <span class="amount" style="color: #2dd4bf;">5 USDT</span>
-            </div>
-          </div>
-          <div class="badge-icon">🟢</div>
+      <div class="winner-list" id="winnerListContainer">
+        <div class="no-winner-msg">
+          <i class="fa-solid fa-trophy" style="font-size:22px; color:#facc15; margin-bottom:6px; display:block;"></i>
+          No winners announced yet for this draw.<br>The winner list will be displayed here once completed.
         </div>
       </div>
 
       <button class="btn-view-all" onclick="openModal('prizeTab')">
-        View All Winners &rsaquo;
+        🎁 View Prize Banners &rsaquo;
       </button>
     </div>
 
@@ -692,7 +794,7 @@
       <div class="gift-box">🎁</div>
       <div class="banner-text">
         <h3>Good Luck!</h3>
-        <p>May you be the next winner!</p>
+        <p>Test your luck and win big rewards!</p>
         <div class="curved-line"></div>
       </div>
     </div>
@@ -703,22 +805,26 @@
   <div class="modal-overlay" id="lotteryModal" onclick="closeModalOnOverlay(event)">
     <div class="modal-box">
       <div class="modal-header">
-        <h4>🎟️ Lottery Dashboard</h4>
+        <h4>🎟️ Lucky Lottery</h4>
         <button class="btn-close" onclick="closeModal()">&times;</button>
       </div>
 
       <div class="modal-tabs">
         <button class="tab-btn active" id="btn-buyTab" onclick="switchTab('buyTab')">🎫 Buy Ticket</button>
-        <button class="tab-btn" id="btn-myTicketsTab" onclick="switchTab('myTicketsTab')">🎟️ My Tickets</button>
         <button class="tab-btn" id="btn-prizeTab" onclick="switchTab('prizeTab')">🏆 Prize Pool</button>
+        <button class="tab-btn" id="btn-myTicketsTab" onclick="switchTab('myTicketsTab')">🎟️ My Tickets</button>
       </div>
 
       <div class="modal-body">
+        
         <!-- Tab 1: Buy Ticket -->
         <div class="tab-content active" id="buyTab">
+          <div class="ticket-price-box">
+            <p>Ticket Price (Charged from Main Balance):</p>
+            <strong>৳40 BDT (~$0.33 USD)</strong>
+          </div>
+
           <form id="buyTicketForm" onsubmit="handleTicketPurchase(event)">
-            <p class="ticket-price-info">Ticket Price: <strong>0.20$</strong></p>
-            
             <div class="form-group">
               <label>Full Name:</label>
               <input type="text" id="userName" class="form-control" placeholder="e.g. John Doe" required>
@@ -726,79 +832,97 @@
 
             <div class="form-group">
               <label>Phone Number:</label>
-              <input type="tel" id="userPhone" class="form-control" placeholder="e.g. +88017xxxxxxxx" required>
+              <input type="tel" id="userPhone" class="form-control" placeholder="e.g. 017xxxxxxxx" required>
             </div>
 
             <div class="form-group">
-              <label>Address:</label>
-              <input type="text" id="userAddress" class="form-control" placeholder="City, Street, Area" required>
+              <label>Address (City / Area):</label>
+              <input type="text" id="userAddress" class="form-control" placeholder="e.g. Dhaka, Mirpur" required>
             </div>
 
-            <button type="submit" class="btn-confirm-buy">
-              Confirm & Buy Ticket
+            <button type="submit" class="btn-confirm-buy" id="btnBuySubmit">
+              Pay ৳40 & Buy Ticket
             </button>
           </form>
         </div>
 
-        <!-- Tab 2: My Tickets -->
+        <!-- Tab 2: Prize Banner Slider (Admin Image Slides) -->
+        <div class="tab-content" id="prizeTab">
+          <div class="prize-slider-container">
+            <button type="button" class="slider-nav-btn prev" onclick="movePrizeSlide(-1)">❮</button>
+            <button type="button" class="slider-nav-btn next" onclick="movePrizeSlide(1)">❯</button>
+            <div class="prize-slider-track" id="prizeSliderTrack">
+              <!-- Dynamically rendered from admin panel -->
+            </div>
+            <div class="prize-slider-dots" id="prizeSliderDots"></div>
+          </div>
+          <p style="font-size: 11px; color:#94a3b8; text-align:center;">
+            <i class="fa-solid fa-hand-pointer"></i> Swipe or use arrows to view all prizes
+          </p>
+        </div>
+
+        <!-- Tab 3: My Tickets -->
         <div class="tab-content" id="myTicketsTab">
           <div id="ticketsContainer"></div>
         </div>
 
-        <!-- Tab 3: Prize Pool -->
-        <div class="tab-content" id="prizeTab">
-          <div class="prize-list">
-            <div class="prize-item">
-              <span class="rank-title">🥇 1st Place</span>
-              <span class="prize-val">100 USDT</span>
-            </div>
-            <div class="prize-item">
-              <span class="rank-title">🥈 2nd Place</span>
-              <span class="prize-val">50 USDT</span>
-            </div>
-            <div class="prize-item">
-              <span class="rank-title">🥉 3rd Place</span>
-              <span class="prize-val">25 USDT</span>
-            </div>
-            <div class="prize-item">
-              <span class="rank-title">🏅 4th Place</span>
-              <span class="prize-val">10 USDT</span>
-            </div>
-            <div class="prize-item">
-              <span class="rank-title">🟢 5th Place</span>
-              <span class="prize-val">5 USDT</span>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   </div>
 
-  <!-- JavaScript -->
-  <script>
-    function getNextSundayTarget() {
-      const now = new Date();
-      const target = new Date();
-      const day = target.getDay();
-      const diffDays = (7 - day) % 7; 
-      target.setDate(target.getDate() + diffDays);
-      target.setHours(22, 0, 0, 0);
+  <!-- Toast -->
+  <div class="toast-box" id="toastBox">
+    <i class="fa-solid fa-circle-info" id="toastIcon"></i>
+    <span id="toastMsg">Message</span>
+  </div>
 
-      if (target.getTime() <= now.getTime()) {
-        target.setDate(target.getDate() + 7);
-      }
-      return target;
+  <!-- JavaScript & Firebase -->
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBrG81DRVjx040QhiT68yyRErGXjuCPdS4",
+      authDomain: "micro-task-2906d.firebaseapp.com",
+      projectId: "micro-task-2906d",
+      storageBucket: "micro-task-2906d.firebasestorage.app",
+      messagingSenderId: "642332420854",
+      appId: "1:642332420854:web:67115930992e7685b49ad7",
+      measurementId: "G-N76WH82XYJ"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // Instant session cache restoration from Dashboard
+    let currentUserData = JSON.parse(localStorage.getItem('microtask_cached_user')) || null;
+    let isTicketSalesOpen = true;
+    const TICKET_PRICE_BDT = 40;
+    const TICKET_PRICE_USD = parseFloat((40 / 120).toFixed(4)); // ৳40 ≈ $0.3333 USD
+
+    // Fallback date until admin sets it
+    let fixedTargetTime = new Date("2026-11-20T22:00:00+06:00").getTime();
+
+    function showToast(msg, isSuccess = true) {
+      const toast = document.getElementById('toastBox');
+      const toastMsg = document.getElementById('toastMsg');
+      const icon = document.getElementById('toastIcon');
+      toastMsg.innerText = msg;
+      icon.className = isSuccess ? "fa-solid fa-circle-check" : "fa-solid fa-circle-exclamation";
+      icon.style.color = isSuccess ? "#10b981" : "#ef4444";
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2500);
     }
 
-    let targetDate = getNextSundayTarget();
-
+    // ================= 1. Countdown Timer =================
     function updateCountdown() {
       const now = new Date().getTime();
-      let diff = targetDate.getTime() - now;
+      let diff = fixedTargetTime - now;
 
       if (diff <= 0) {
-        targetDate = getNextSundayTarget();
-        diff = targetDate.getTime() - now;
+        document.getElementById("days").innerText = "00";
+        document.getElementById("hours").innerText = "00";
+        document.getElementById("minutes").innerText = "00";
+        document.getElementById("seconds").innerText = "00";
+        return;
       }
 
       const days = Math.floor(diff / (1000 * 60 * 60 * 24));
@@ -812,8 +936,310 @@
       document.getElementById("seconds").innerText = String(seconds).padStart(2, '0');
     }
 
-    updateCountdown();
     setInterval(updateCountdown, 1000);
+    updateCountdown();
+
+    // ================= 2. Admin Panel Realtime Sync =================
+    db.collection("settings").doc("lottery").onSnapshot(doc => {
+      if (doc.exists) {
+        const data = doc.data();
+
+        // Ticket Sales status
+        if (data.ticketSalesOpen !== undefined) {
+          isTicketSalesOpen = Boolean(data.ticketSalesOpen);
+          updateTicketSalesUI(isTicketSalesOpen);
+        }
+
+        // Draw schedule & target date
+        if (data.targetTimestamp) {
+          fixedTargetTime = data.targetTimestamp.toMillis ? data.targetTimestamp.toMillis() : new Date(data.targetTimestamp).getTime();
+        }
+        if (data.scheduleText) {
+          document.getElementById('targetDrawDateText').innerHTML = `Draw Date: <strong>${data.scheduleText}</strong>`;
+        }
+
+        // Prize banner slides
+        if (data.prizes && Array.isArray(data.prizes) && data.prizes.length > 0) {
+          renderPrizeBanners(data.prizes);
+        } else {
+          loadDefaultPrizeBanners();
+        }
+      } else {
+        loadDefaultPrizeBanners();
+      }
+    }, () => loadDefaultPrizeBanners());
+
+    function updateTicketSalesUI(isOpen) {
+      const mainBtn = document.getElementById('btnMainJoin');
+      const submitBtn = document.getElementById('btnBuySubmit');
+      const badge = document.getElementById('salesStatusBadge');
+
+      if (isOpen) {
+        badge.className = "sales-tag open";
+        badge.innerText = "Open";
+        mainBtn.className = "btn-join";
+        mainBtn.innerHTML = `🎟️ Buy Ticket (৳40)`;
+        submitBtn.disabled = false;
+        submitBtn.innerText = "Pay ৳40 & Buy Ticket";
+      } else {
+        badge.className = "sales-tag closed";
+        badge.innerText = "Closed";
+        mainBtn.className = "btn-join disabled-btn";
+        mainBtn.innerHTML = `🔒 Ticket Sales Closed`;
+        submitBtn.disabled = true;
+        submitBtn.innerText = "Ticket sales are currently closed";
+      }
+    }
+
+    function handleJoinBtnClick() {
+      if (!isTicketSalesOpen) {
+        showToast("Ticket sales are currently closed by admin!", false);
+        return;
+      }
+      openModal('buyTab');
+    }
+
+    // ================= 3. Prize Banner Slider System =================
+    let prizeBanners = [];
+    let currentSlideIdx = 0;
+    let autoSlideInterval = null;
+
+    function loadDefaultPrizeBanners() {
+      renderPrizeBanners([
+        { rank: 1, title: "1st Prize: iPhone 16 Pro Max", image: "https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=600&auto=format&fit=crop&q=80", valueText: "Worth ৳1,50,000" },
+        { rank: 2, title: "2nd Prize: 55\" 4K Smart TV", image: "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=600&auto=format&fit=crop&q=80", valueText: "Worth ৳60,000" },
+        { rank: 3, title: "3rd Prize: Smart Watch Ultra", image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&auto=format&fit=crop&q=80", valueText: "Worth ৳15,000" }
+      ]);
+    }
+
+    function renderPrizeBanners(prizes) {
+      prizeBanners = prizes;
+      currentSlideIdx = 0;
+      const track = document.getElementById('prizeSliderTrack');
+      const dotsContainer = document.getElementById('prizeSliderDots');
+
+      track.innerHTML = prizeBanners.map(p => `
+        <div class="prize-slide">
+          <img src="${p.image}" alt="${p.title}" onerror="this.src='https://images.unsplash.com/photo-1511556532299-8f662fc26c06?w=600&auto=format&fit=crop&q=80'">
+          <div class="prize-slide-overlay">
+            <span class="prize-badge-rank">🏆 ${getRankTitle(p.rank)}</span>
+            <div class="prize-slide-title">${p.title || 'Prize Reward'}</div>
+            <div class="prize-slide-value">${p.valueText || ''}</div>
+          </div>
+        </div>
+      `).join('');
+
+      dotsContainer.innerHTML = prizeBanners.map((_, i) => `<div class="prize-dot ${i === 0 ? 'active' : ''}"></div>`).join('');
+      updateSliderPosition();
+
+      if (autoSlideInterval) clearInterval(autoSlideInterval);
+      if (prizeBanners.length > 1) {
+        autoSlideInterval = setInterval(() => movePrizeSlide(1), 3500);
+      }
+    }
+
+    function getRankTitle(r) {
+      if (r == 1) return "1st Prize";
+      if (r == 2) return "2nd Prize";
+      if (r == 3) return "3rd Prize";
+      return `Rank #${r}`;
+    }
+
+    function movePrizeSlide(direction) {
+      if (prizeBanners.length <= 1) return;
+      currentSlideIdx = (currentSlideIdx + direction + prizeBanners.length) % prizeBanners.length;
+      updateSliderPosition();
+    }
+
+    function updateSliderPosition() {
+      const track = document.getElementById('prizeSliderTrack');
+      if (track) {
+        track.style.transform = `translateX(-${currentSlideIdx * 100}%)`;
+      }
+      document.querySelectorAll('.prize-dot').forEach((dot, idx) => {
+        dot.classList.toggle('active', idx === currentSlideIdx);
+      });
+    }
+
+    // ================= 4. Auth & Dashboard Sync =================
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        db.collection("users").doc(user.uid).onSnapshot(doc => {
+          if (doc.exists) {
+            currentUserData = doc.data();
+            localStorage.setItem('microtask_cached_user', JSON.stringify(currentUserData));
+
+            if (currentUserData.name && !document.getElementById('userName').value) {
+              document.getElementById('userName').value = currentUserData.name;
+            }
+
+            checkWinnerAutoCredit(user.uid, currentUserData);
+          }
+        });
+        loadMyTickets(user.uid);
+      }
+    });
+
+    // ================= 5. Live Winners Sync =================
+    db.collection("lottery_winners").orderBy("rank", "asc").onSnapshot(snap => {
+      const container = document.getElementById('winnerListContainer');
+      if (snap.empty) {
+        container.innerHTML = `
+          <div class="no-winner-msg">
+            <i class="fa-solid fa-trophy" style="font-size:22px; color:#facc15; margin-bottom:6px; display:block;"></i>
+            No winners announced yet for this draw.<br>The winner list will be displayed here once completed.
+          </div>`;
+      } else {
+        let html = '';
+        snap.forEach(doc => {
+          const w = doc.data();
+          html += `
+            <div class="winner-row">
+              <div class="winner-left">
+                <span class="rank-circle rank-${w.rank || 1}">${w.rank || 1}</span>
+                <div class="avatar-icon"><i class="fa-solid fa-user-astronaut"></i></div>
+                <div class="user-info">
+                  <span class="name">${w.userName || 'Winner'}</span>
+                  <span class="amount">Ticket #${w.ticketNumber || '000000'}</span>
+                </div>
+              </div>
+              <div class="badge-icon" style="color:#facc15; font-weight:800; font-size:13px;">
+                ${w.prizeText || '$5.00'}
+              </div>
+            </div>`;
+        });
+        container.innerHTML = html;
+      }
+    });
+
+    // ================= 6. Ticket Purchase & Balance Deduction =================
+    function handleTicketPurchase(e) {
+      e.preventDefault();
+
+      if (!isTicketSalesOpen) {
+        showToast("Ticket sales are currently closed!", false);
+        return;
+      }
+
+      const user = auth.currentUser;
+      if (!user) {
+        showToast("Please log in to your account first!", false);
+        setTimeout(() => window.location.href = "index.html", 1200);
+        return;
+      }
+
+      const curBal = currentUserData ? (currentUserData.balanceUSD || 0) : 0;
+      if (curBal < TICKET_PRICE_USD) {
+        showToast("Insufficient Balance! Need at least ৳40 (~$0.33).", false);
+        return;
+      }
+
+      const name = document.getElementById('userName').value.trim();
+      const phone = document.getElementById('userPhone').value.trim();
+      const address = document.getElementById('userAddress').value.trim();
+      const randomTicketNo = Math.floor(100000 + Math.random() * 900000);
+
+      const btn = document.getElementById('btnBuySubmit');
+      btn.disabled = true;
+      btn.innerText = "Processing Ticket...";
+
+      // Deduct ৳40 ($0.3333 USD) from main balance
+      db.collection("users").doc(user.uid).update({
+        balanceUSD: firebase.firestore.FieldValue.increment(-TICKET_PRICE_USD)
+      }).then(() => {
+        // Update local storage session
+        if (currentUserData) {
+          currentUserData.balanceUSD = Math.max(0, (currentUserData.balanceUSD || 0) - TICKET_PRICE_USD);
+          localStorage.setItem('microtask_cached_user', JSON.stringify(currentUserData));
+        }
+
+        // Store ticket record
+        return db.collection("lottery_tickets").add({
+          userId: user.uid,
+          userUID: currentUserData ? (currentUserData.uid || '000000') : '000000',
+          ticketNumber: randomTicketNo,
+          name: name,
+          phone: phone,
+          address: address,
+          priceBDT: TICKET_PRICE_BDT,
+          priceUSD: TICKET_PRICE_USD,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      }).then(() => {
+        showToast(`Congratulations! Ticket #${randomTicketNo} purchased successfully.`, true);
+        document.getElementById('buyTicketForm').reset();
+        switchTab('myTicketsTab');
+      }).catch(err => {
+        showToast("Error: " + err.message, false);
+      }).finally(() => {
+        if (isTicketSalesOpen) {
+          btn.disabled = false;
+          btn.innerText = "Pay ৳40 & Buy Ticket";
+        }
+      });
+    }
+
+    // Load User's Tickets
+    function loadMyTickets(uid) {
+      db.collection("lottery_tickets").where("userId", "==", uid).onSnapshot(snap => {
+        const container = document.getElementById('ticketsContainer');
+        if (snap.empty) {
+          container.innerHTML = `<div class="empty-tickets">You haven't bought any tickets yet.<br>Buy a ticket to join the draw!</div>`;
+          return;
+        }
+
+        let html = '';
+        snap.forEach(doc => {
+          const t = doc.data();
+          const time = t.createdAt ? new Date(t.createdAt.toDate ? t.createdAt.toDate() : t.createdAt).toLocaleDateString() : 'Today';
+          html += `
+            <div class="ticket-card">
+              <div class="ticket-header">
+                <span class="ticket-num">#${t.ticketNumber}</span>
+                <span class="ticket-date">${time}</span>
+              </div>
+              <div class="ticket-details">
+                <div><strong>Price:</strong> ৳40 ($${t.priceUSD || 0.33})</div>
+                <div><strong>Name:</strong> ${t.name}</div>
+                <div><strong>Phone:</strong> ${t.phone}</div>
+                <div><strong>Address:</strong> ${t.address}</div>
+              </div>
+            </div>`;
+        });
+        container.innerHTML = html;
+      });
+    }
+
+    // Auto-credit lottery winner prize to Main Balance
+    function checkWinnerAutoCredit(uid, userData) {
+      db.collection("lottery_winners").where("userId", "==", uid).where("claimed", "==", false).get().then(snap => {
+        if (!snap.empty) {
+          snap.forEach(winDoc => {
+            const winData = winDoc.data();
+            const prizeUSD = parseFloat(winData.prizeUSD || 0);
+
+            if (prizeUSD > 0) {
+              db.collection("users").doc(uid).update({
+                balanceUSD: firebase.firestore.FieldValue.increment(prizeUSD),
+                totalEarnUSD: firebase.firestore.FieldValue.increment(prizeUSD)
+              });
+
+              winDoc.ref.update({ claimed: true });
+
+              db.collection("notifications").add({
+                targetUid: String(userData.uid || ''),
+                category: "lottery",
+                title: "🎉 Congratulations! You won the Lottery!",
+                message: `Your lucky ticket #${winData.ticketNumber} won! $${prizeUSD.toFixed(2)} has been credited to your Main Balance.`,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+              });
+
+              showToast(`🎉 Congratulations! $${prizeUSD} added to Main Balance!`, true);
+            }
+          });
+        }
+      }).catch(err => console.log("Winner sync error:", err));
+    }
 
     function openModal(defaultTab = 'buyTab') {
       document.getElementById('lotteryModal').classList.add('active');
@@ -834,59 +1260,6 @@
 
       document.getElementById(tabId).classList.add('active');
       document.getElementById('btn-' + tabId).classList.add('active');
-
-      if (tabId === 'myTicketsTab') renderTickets();
-    }
-
-    let purchasedTickets = JSON.parse(localStorage.getItem('my_lottery_tickets')) || [];
-
-    function handleTicketPurchase(e) {
-      e.preventDefault();
-
-      const name = document.getElementById('userName').value.trim();
-      const phone = document.getElementById('userPhone').value.trim();
-      const address = document.getElementById('userAddress').value.trim();
-
-      const randomTicketNo = Math.floor(100000 + Math.random() * 900000);
-      
-      const newTicket = {
-        ticketNumber: randomTicketNo,
-        name: name,
-        phone: phone,
-        address: address,
-        price: '0.20$',
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      };
-
-      purchasedTickets.unshift(newTicket);
-      localStorage.setItem('my_lottery_tickets', JSON.stringify(purchasedTickets));
-
-      document.getElementById('buyTicketForm').reset();
-      alert(`Congratulations! Ticket purchased successfully.\nYour Ticket Number: #${randomTicketNo}`);
-      switchTab('myTicketsTab');
-    }
-
-    function renderTickets() {
-      const container = document.getElementById('ticketsContainer');
-      if (purchasedTickets.length === 0) {
-        container.innerHTML = `<div class="empty-tickets">No tickets purchased yet.<br>Buy a ticket to join the draw!</div>`;
-        return;
-      }
-
-      container.innerHTML = purchasedTickets.map(ticket => `
-        <div class="ticket-card">
-          <div class="ticket-header">
-            <span class="ticket-num">#${ticket.ticketNumber}</span>
-            <span class="ticket-date">${ticket.time}</span>
-          </div>
-          <div class="ticket-details">
-            <div><strong>Price:</strong> ${ticket.price}</div>
-            <div><strong>Name:</strong> ${ticket.name}</div>
-            <div><strong>Phone:</strong> ${ticket.phone}</div>
-            <div><strong>Address:</strong> ${ticket.address}</div>
-          </div>
-        </div>
-      `).join('');
     }
   </script>
 
