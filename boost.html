@@ -388,9 +388,10 @@
       const wordCount = countWords(post.content);
       const viewsDisplay = formatNumber(post.viewsCount || 1);
 
+      // বুস্টের মেয়াদ শেষ কি না চেক
       if (post.boostStatus === 'active' && post.boostExpiresAt && post.boostExpiresAt <= Date.now()) {
-        post.boostStatus = 'none';
-        post.boostExpiresAt = null;
+        handleBoostExpirationAndSettle(post);
+        return '';
       }
 
       const wordsArr = (post.content || '').trim().split(/\s+/);
@@ -444,7 +445,7 @@
             ${postBodyContent}
           </div>
 
-          <!-- ফেইসবুক স্টাইল ভিউ কাউন্টার ও লাইক স্ট্যাটাস -->
+          <!-- ভিউ ও লাইক স্ট্যাটাস -->
           <div class="px-3 py-1.5 flex items-center justify-between text-[11px] text-aqua-textSecondary border-t border-aqua-divider bg-aqua-cardTint/40">
             <div class="flex items-center space-x-2">
               <div class="flex items-center space-x-1">
@@ -456,7 +457,6 @@
               </div>
             </div>
 
-            <!-- ভিউজ ও কমেন্টস সংখ্যা -->
             <div class="flex items-center space-x-3 text-aqua-textSecondary font-medium text-[11px]">
               <span class="flex items-center space-x-1 text-teal-800">
                 <i data-lucide="eye" class="w-3.5 h-3.5 text-teal-600"></i>
@@ -580,7 +580,9 @@
 
       document.getElementById('rate-display-feed').innerText = `$${appSettings.likeRate.toFixed(2)} / Like`;
 
-      if (posts.length === 0) {
+      const visiblePosts = posts.filter(p => !(p.boostStatus === 'active' && p.boostExpiresAt && p.boostExpiresAt <= Date.now()));
+
+      if (visiblePosts.length === 0) {
         container.innerHTML = `
           <div class="bg-white rounded-2xl p-6 text-center border border-aqua-border shadow-xs mx-2 my-3">
             <div class="w-10 h-10 rounded-full bg-teal-50 text-teal-600 flex items-center justify-center mx-auto mb-2 border border-teal-200">
@@ -593,7 +595,7 @@
           </div>
         `;
       } else {
-        container.innerHTML = posts.map(buildPostCardHTML).join('');
+        container.innerHTML = visiblePosts.map(buildPostCardHTML).join('');
       }
 
       lucide.createIcons();
@@ -605,7 +607,14 @@
         posts = [];
         snapshot.forEach(doc => {
           const data = doc.data();
-          posts.push({ id: doc.id, ...data });
+          const postObj = { id: doc.id, ...data };
+
+          // যদি বুস্ট মেয়াদ শেষ হয়ে থাকে, সাথে সাথে অটো-ডিলিট ও ইনকাম ক্রেডিট
+          if (postObj.boostStatus === 'active' && postObj.boostExpiresAt && postObj.boostExpiresAt <= Date.now()) {
+            handleBoostExpirationAndSettle(postObj);
+          } else {
+            posts.push(postObj);
+          }
         });
         renderFeed();
       }, err => {
@@ -613,30 +622,63 @@
       });
     }
 
-    // ইউনিক প্রোফাইল ও কমেন্ট ব্যাংক (একটি আইডি থেকে একবারই কমেন্ট আসবে)
+    // ================= বুস্ট মেয়াদ শেষ হলে অটো-ডিলিট ও ব্যালেন্স ক্রেডিট =================
+    const settlingPostsSet = new Set();
+
+    function handleBoostExpirationAndSettle(post) {
+      if (settlingPostsSet.has(post.id)) return;
+      settlingPostsSet.add(post.id);
+
+      const earnedUSD = parseFloat(((post.likesCount || 0) * (appSettings.likeRate || 0.05)).toFixed(2));
+      const earnedBDT = (earnedUSD * 120).toFixed(2);
+      const authorUid = String(post.userId || '').trim();
+
+      // ১. অর্জিত ইনকাম মেইন ব্যালেন্সে ক্রেডিট করা
+      if (earnedUSD > 0 && authorUid) {
+        db.collection("users").where("uid", "==", authorUid).get().then(snap => {
+          if (!snap.empty) {
+            snap.docs[0].ref.update({
+              balanceUSD: firebase.firestore.FieldValue.increment(earnedUSD),
+              totalEarnUSD: firebase.firestore.FieldValue.increment(earnedUSD)
+            });
+          }
+        }).catch(err => console.log("Balance sync err:", err));
+
+        // ২. Earnings ক্যাটাগরিতে নোটিফিকেশন পাঠানো
+        db.collection("notifications").add({
+          targetUid: authorUid,
+          category: "earnings",
+          platform: "boost",
+          title: "🚀 বুস্ট ক্যাম্পেইন সম্পন্ন হয়েছে!",
+          message: `আপনার পোস্টের বুস্ট মেয়াদ শেষ হয়েছে। পোস্ট থেকে অর্জিত সর্বমোট ৳${earnedBDT} ($${earnedUSD.toFixed(2)}) মেইন ব্যালেন্সে জমা হয়েছে!`,
+          actionUrl: "history.html",
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        }).catch(() => {});
+      }
+
+      // ৩. পোস্টটি ডাটাবেজ থেকে স্থায়ীভাবে অটো-ডিলিট করা
+      db.collection("posts").doc(post.id).delete().then(() => {
+        console.log(`Boost post ${post.id} auto-deleted.`);
+      }).catch(err => console.log("Delete err:", err));
+    }
+
+    // ইউনিক কমেন্ট ব্যাংক
     const UNIQUE_PROFILES_POOL = [
       { id: "u_1", name: "Tanvir Hasan", avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80", text: "অসাধারণ তথ্যবহুল একটি লেখা, ধন্যবাদ!" },
       { id: "u_2", name: "Nusrat Jahan", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80", text: "খুব সুন্দর পয়েন্ট তুলে ধরেছেন।" },
       { id: "u_3", name: "Shakib Al Hasan", avatar: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=100&auto=format&fit=crop&q=80", text: "একদম সহমত আপনার বক্তব্যের সাথে।" },
       { id: "u_4", name: "Mehedi Hasan", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80", text: "পরবর্তী লেখার অপেক্ষায় রইলাম!" },
       { id: "u_5", name: "Ayesha Akter", avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&auto=format&fit=crop&q=80", text: "এমন চিন্তাভাবনা সত্যিই অনুপ্রেরণাদায়ক।" },
-      { id: "u_6", name: "Farhan Ahmed", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&auto=format&fit=crop&q=80", text: "পোস্টটি পড়ে অনেক কিছু জানতে পারলাম।" },
-      { id: "u_7", name: "Sadia Rahman", avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&auto=format&fit=crop&q=80", text: "চমৎকার ও অনুপ্রেরণাদায়ক উপস্থাপনা!" },
-      { id: "u_8", name: "Rifat Islam", avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&auto=format&fit=crop&q=80", text: "সত্যিই দারুণ একটি বিশ্লেষণ!" },
-      { id: "u_9", name: "Jannatul Ferdous", avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&auto=format&fit=crop&q=80", text: "খুব নিখুঁত ও সুন্দর লেখা।" },
-      { id: "u_10", name: "Kamrul Hasan", avatar: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=100&auto=format&fit=crop&q=80", text: "অসাধারণ ভাবনা, শুভকামনা আপনার জন্য।" },
-      { id: "u_11", name: "Sumaiya Islam", avatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=100&auto=format&fit=crop&q=80", text: "অনেক ভালো লাগলো পোস্টটি।" },
-      { id: "u_12", name: "Arif Chowdhury", avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&auto=format&fit=crop&q=80", text: "একদম সময়োপযোগী আলোচনা।" }
+      { id: "u_6", name: "Farhan Ahmed", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&auto=format&fit=crop&q=80", text: "পোস্টটি পড়ে অনেক কিছু জানতে পারলাম।" }
     ];
 
-    // লাইভ বুস্টিং লুপ (স্বয়ংক্রিয় ভিউজ, লাইক ও ইউনিক কমেন্ট বৃদ্ধি)
+    // লাইভ বুস্টিং লুপ
     setInterval(() => {
       posts.forEach(post => {
         if (post.boostStatus === 'active' && post.boostExpiresAt > Date.now()) {
           let updateData = {};
           let shouldUpdate = false;
 
-          // ১. ফেসবুকের মতো সময়ের সাথে ভিউ বৃদ্ধি
           if ((post.autoViewsQueue || 0) > 0) {
             const addViews = Math.min(post.autoViewsQueue, Math.floor(Math.random() * 4) + 2);
             post.viewsCount = (post.viewsCount || 0) + addViews;
@@ -646,7 +688,6 @@
             shouldUpdate = true;
           }
 
-          // ২. লাইক বৃদ্ধি
           if ((post.autoLikesQueue || 0) > 0 && Math.random() > 0.45) {
             post.likesCount = (post.likesCount || 0) + 1;
             post.autoLikesQueue -= 1;
@@ -655,7 +696,6 @@
             shouldUpdate = true;
           }
 
-          // ৩. ইউনিক কমেন্ট বৃদ্ধি (এক প্রোফাইল একবারই কমেন্ট করবে)
           if ((post.autoCommentsQueue || 0) > 0 && Math.random() > 0.65) {
             post.usedCommenters = post.usedCommenters || [];
             const availableProfiles = UNIQUE_PROFILES_POOL.filter(p => !post.usedCommenters.includes(p.id));
@@ -691,6 +731,7 @@
       });
     }, 4000);
 
+    // কাউন্টডাউন ট্র্যাকার
     function updateAllCountdowns() {
       posts.forEach(post => {
         if (post.boostStatus === 'active' && post.boostExpiresAt) {
@@ -698,9 +739,7 @@
           if (el) {
             const time = getRemainingTime(post.boostExpiresAt);
             if (time.totalSecs <= 0) {
-              post.boostStatus = 'none';
-              db.collection("posts").doc(post.id).update({ boostStatus: 'none' }).catch(() => {});
-              renderFeed();
+              handleBoostExpirationAndSettle(post);
             } else {
               const d = String(time.days).padStart(2, '0');
               const h = String(time.hours).padStart(2, '0');
@@ -1062,6 +1101,7 @@
         authorName: currentUser.name,
         userId: currentUser.uid,
         boostPackage: `${selectedBoostPackage} Tk`,
+        amountBDT: selectedBoostPackage,
         status: "pending",
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       }).then(() => {
