@@ -100,7 +100,7 @@
       <i class="fa-solid fa-xmark close-btn" onclick="closeModal()"></i>
       <h3 class="modal-title" id="m-title">Complete Task & Submit</h3>
       
-      <!-- Step 1: Open Video in Native App -->
+      <!-- Step 1: Open Video in Native Facebook App -->
       <div class="step-box">
         <div class="step-header"><i class="fa-solid fa-1"></i> Step 1: Open in Facebook App</div>
         <button type="button" class="video-link-btn" onclick="openTargetNativeApp()">
@@ -119,7 +119,7 @@
           <small>⚠️ এই ফেসবুক আইডি দিয়ে পূর্বে কাজ করা হয়েছে কি না তা স্বয়ংক্রিয়ভাবে যাচাই করা হবে।</small>
         </div>
 
-        <!-- অ্যাডমিন রুলস অনুযায়ী শুধু প্রয়োজনীয় স্ক্রিনশট স্লট আসবে -->
+        <!-- অ্যাডমিন রুলস অনুযায়ী ডায়নামিক স্ক্রিনশট স্লট -->
         <div class="upload-grid" id="dynamicUploadGrid"></div>
       </div>
 
@@ -149,7 +149,7 @@
     let activeRewardUSD = 0.20;
     let activeTaskData = null;
 
-    // সাবমিট করা টাস্কের লিস্ট (যাতে পেন্ডিং না দেখিয়ে সাথে সাথে মুছে যায়)
+    // অলরেডি সাবমিট করা টাস্কের লিস্ট (যাতে পেন্ডিং না দেখিয়ে সাথে সাথে মুছে যায়)
     let userSubmittedTasks = new Set(JSON.parse(localStorage.getItem('fb_submitted_tasks') || '[]'));
 
     function getUserUID() {
@@ -196,13 +196,17 @@
       });
     }
 
-    // অ্যাডমিন রুলস অনুযায়ী কার্ড রেন্ডার
+    // অ্যাডমিন রুলস অনুযায়ী সঠিক কার্ড রেন্ডার (Subscribe এবং Follow উভয় ফিল্ড চেক ফিক্সড)
     function renderSingleTaskCard(id, title, rewardUSD, duration, url, taskData) {
       const container = document.getElementById('taskListContainer');
 
       let tagsHtml = '';
       if (taskData.requiresLike !== false) tagsHtml += `<span class="tag">Like</span>`;
-      if (taskData.requiresFollow === true) tagsHtml += `<span class="tag">Follow</span>`;
+      
+      // অ্যাডমিন প্যানেলের requiresSubscribe অথবা requiresFollow দুটোই সাপোর্ট করবে
+      const isFollow = (taskData.requiresFollow === true || taskData.requiresSubscribe === true);
+      if (isFollow) tagsHtml += `<span class="tag">Follow</span>`;
+      
       if (taskData.requiresComment === true) tagsHtml += `<span class="tag">Comment</span>`;
       if (!tagsHtml) tagsHtml = `<span class="tag">Like</span>`;
 
@@ -232,7 +236,7 @@
       container.appendChild(card);
     }
 
-    // মডাল হ্যান্ডলার
+    // মডাল হ্যান্ডলার ও ইনপুট স্লট তৈরি
     function handleCardClick(id, title, rewardUSD, url, taskData) {
       activeTaskId = id;
       activeTaskUrl = url || 'https://www.facebook.com';
@@ -245,29 +249,31 @@
       const profileLinkBox = document.getElementById('profileLinkBox');
       uploadGrid.innerHTML = '';
 
+      const isFollowReq = (activeTaskData.requiresFollow === true || activeTaskData.requiresSubscribe === true);
+
       // ফলো করতে বললে ফেসবুক প্রোফাইল লিংক ইনপুট দেখাবে
-      if (activeTaskData.requiresFollow === true) {
+      if (isFollowReq) {
         profileLinkBox.style.display = 'flex';
         document.getElementById('userProfileUrl').value = '';
       } else {
         profileLinkBox.style.display = 'none';
       }
 
-      // অ্যাডমিন যা চাইবে শুধুই সেই স্লট শো করবে
+      // অ্যাডমিন যা যা চাইবে শুধুই সেই স্লট শো করবে (সব ৩টি অপশনই সাপোর্ট করবে)
       let slotIndex = 1;
 
       if (activeTaskData.requiresLike !== false) {
-        uploadGrid.innerHTML += createUploadSlotHTML(slotIndex, 'Like', 'fa-thumbs-up');
+        uploadGrid.innerHTML += createUploadSlotHTML(slotIndex, 'Like Screenshot', 'fa-thumbs-up');
         slotIndex++;
       }
 
-      if (activeTaskData.requiresFollow === true) {
-        uploadGrid.innerHTML += createUploadSlotHTML(slotIndex, 'Follow', 'fa-user-plus');
+      if (isFollowReq) {
+        uploadGrid.innerHTML += createUploadSlotHTML(slotIndex, 'Follow Screenshot', 'fa-user-plus');
         slotIndex++;
       }
 
       if (activeTaskData.requiresComment === true) {
-        uploadGrid.innerHTML += createUploadSlotHTML(slotIndex, 'Comment', 'fa-comment-dots');
+        uploadGrid.innerHTML += createUploadSlotHTML(slotIndex, 'Comment Screenshot', 'fa-comment-dots');
         slotIndex++;
       }
 
@@ -313,7 +319,16 @@
 
     function closeModal(){ document.getElementById('taskModal').style.display="none"; }
 
-    // ================= সাবমিশন ও ডুপ্লিকেট ফেসবুক আইডি ভেরিফিকেশন =================
+    function readFileAsBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // ================= সাবমিশন: আসল ছবিগুলো Base64 এ কনভার্ট হয়ে অ্যাডমিনে যাবে =================
     async function submitProof() {
       const btn = document.getElementById('submitBtn');
       const inputs = document.querySelectorAll('.slot-native-input');
@@ -327,9 +342,10 @@
       }
 
       let profileUrl = '';
+      const isFollowReq = (activeTaskData.requiresFollow === true || activeTaskData.requiresSubscribe === true);
 
       // ফলো টাস্ক হলে প্রোফাইল লিংক ডুপ্লিকেট চেক
-      if (activeTaskData && activeTaskData.requiresFollow === true) {
+      if (isFollowReq) {
         profileUrl = document.getElementById('userProfileUrl').value.trim().toLowerCase().replace(/\/+$/, "");
 
         if (!profileUrl) {
@@ -352,30 +368,40 @@
             btn.innerText = "Submit for Review";
             return;
           }
-        } catch (err) {
-          console.log("Check err:", err);
-        }
+        } catch (err) {}
       }
 
       btn.disabled = true;
-      btn.innerText = "Submitting to Admin...";
+      btn.innerText = "ছবি প্রসেসিং হচ্ছে...";
 
-      const userUID = getUserUID();
+      try {
+        // ছবিগুলো Base64 এ রূপান্তর করে proofs অ্যারে তৈরি (অ্যাডমিন প্যানেল প্রিভিউয়ের জন্য)
+        const screenshotBase64List = [];
+        for (let input of inputs) {
+          const file = input.files[0];
+          const base64Data = await readFileAsBase64(file);
+          screenshotBase64List.push(base64Data);
+        }
 
-      db.collection("task_submissions").add({
-        taskId: activeTaskId,
-        platform: "facebook",
-        uid: userUID,
-        profileUrl: profileUrl || null,
-        rewardUSD: activeRewardUSD,
-        status: "pending",
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(() => {
+        btn.innerText = "Submitting to Admin...";
+        const userUID = getUserUID();
+
+        await db.collection("task_submissions").add({
+          taskId: activeTaskId,
+          platform: "facebook",
+          uid: userUID,
+          profileUrl: profileUrl || null,
+          proofs: screenshotBase64List, // আসল স্ক্রিনশট ছবিগুলো অ্যাডমিনে পাঠানো হলো
+          rewardUSD: activeRewardUSD,
+          status: "pending",
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
         // ১. কাজ সাবমিট হওয়া মাত্রই ইউজারের লোকাল লিস্টে যোগ
         userSubmittedTasks.add(activeTaskId);
         localStorage.setItem('fb_submitted_tasks', JSON.stringify([...userSubmittedTasks]));
 
-        // ২. কার্ডটি সাথে সাথে স্ক্রিন থেকে মুছে ফেলা (আর পেন্ডিং দেখাবে না)
+        // ২. কার্ডটি সাথে সাথে স্ক্রিন থেকে চিরতরে মুছে ফেলা (আর পেন্ডিং দেখাবে না)
         const cardElem = document.getElementById(`card-${activeTaskId}`);
         if (cardElem) cardElem.remove();
 
@@ -389,14 +415,14 @@
           `;
         }
 
-        alert("টাস্কটি সফলভাবে জমা দেওয়া হয়েছে! অ্যাডমিন রিভিউয়ের পর ব্যালেন্স যোগ হবে।");
+        alert("টাস্কটি সফলভাবে জমা দেওয়া হয়েছে! স্ক্রিনশট সহ অ্যাডমিন প্যানেলে পাঠানো হয়েছে।");
         closeModal();
-      }).catch(err => {
+      } catch (err) {
         alert("ত্রুটি: " + err.message);
-      }).finally(() => {
+      } finally {
         btn.disabled = false;
         btn.innerText = "Submit for Review";
-      });
+      }
     }
 
     document.addEventListener('DOMContentLoaded', listenToLiveTasks);
