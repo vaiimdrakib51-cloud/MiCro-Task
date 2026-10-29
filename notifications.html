@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Notifications — MicroTask</title>
   <!-- Google Fonts & FontAwesome -->
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
   <!-- Firebase SDK -->
@@ -28,16 +28,16 @@
       min-height: 100vh;
       display: flex;
       justify-content: center;
-      padding: 12px 10px 30px;
+      padding: 10px 8px 24px;
     }
 
     .app-container {
       width: 100%;
-      max-width: 480px;
+      max-width: 440px;
       background: #ffffff;
-      border-radius: 24px;
-      padding: 18px 15px;
-      box-shadow: 0 8px 30px rgba(2, 132, 199, 0.08);
+      border-radius: 22px;
+      padding: 14px 12px;
+      box-shadow: 0 6px 25px rgba(2, 132, 199, 0.08);
       border: 1.5px solid #d4ebf8;
       min-height: 90vh;
       display: flex;
@@ -46,40 +46,39 @@
 
     /* হেডার */
     .header {
-      margin-bottom: 16px;
+      margin-bottom: 12px;
     }
 
     .title-row {
       display: flex;
       align-items: center;
       gap: 10px;
-      margin-bottom: 4px;
+      margin-bottom: 2px;
     }
 
     .back-btn {
-      width: 36px;
-      height: 36px;
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
       background: #f1f5f9;
       border: none;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 16px;
+      font-size: 14px;
       color: #0284c7;
       cursor: pointer;
-      margin-right: 2px;
       transition: transform 0.15s;
     }
     .back-btn:active { transform: scale(0.92); }
 
     .title-row .bell-icon {
-      font-size: 22px;
+      font-size: 18px;
       color: #f59e0b;
     }
 
     .title-row h1 {
-      font-size: 20px;
+      font-size: 18px;
       font-weight: 850;
       color: #0f172a;
     }
@@ -87,29 +86,29 @@
     .badge-count {
       background-color: #ef4444;
       color: #ffffff;
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 800;
-      min-width: 22px;
-      height: 22px;
-      padding: 0 6px;
-      border-radius: 12px;
-      display: flex;
+      min-width: 19px;
+      height: 19px;
+      padding: 0 5px;
+      border-radius: 10px;
+      display: none;
       align-items: center;
       justify-content: center;
     }
 
     .subtitle {
       color: #64748b;
-      font-size: 12px;
-      margin-left: 48px;
+      font-size: 11px;
+      margin-left: 42px;
     }
 
-    /* ফিল্টার বাটনস (সাপোর্ট অপশন সহ) */
+    /* ফিল্টার বাটনস */
     .filters {
       display: flex;
-      gap: 8px;
+      gap: 6px;
       overflow-x: auto;
-      padding-bottom: 12px;
+      padding-bottom: 10px;
       scrollbar-width: none;
     }
     .filters::-webkit-scrollbar { display: none; }
@@ -118,9 +117,9 @@
       background: #f8fafc;
       color: #475569;
       border: 1px solid #e2e8f0;
-      padding: 7px 13px;
+      padding: 6px 12px;
       border-radius: 50px;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 700;
       display: flex;
       align-items: center;
@@ -134,28 +133,28 @@
       background: #0284c7;
       color: #ffffff;
       border-color: #0284c7;
-      box-shadow: 0 4px 10px rgba(2, 132, 199, 0.25);
+      box-shadow: 0 3px 8px rgba(2, 132, 199, 0.2);
     }
 
-    /* নোটিফিকেশন কার্ড লিস্ট */
+    /* সরু ও কমপ্যাক্ট নোটিফিকেশন কার্ড লিস্ট */
     .notification-list {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 7px;
       flex: 1;
     }
 
     .notif-card {
       position: relative;
       background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 16px;
-      padding: 13px 14px;
+      border: 1.2px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 9px 11px;
       display: flex;
-      align-items: center;
-      gap: 11px;
+      align-items: flex-start;
+      gap: 9px;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.18s ease;
     }
     .notif-card:active { transform: scale(0.99); }
     .notif-card:hover { border-color: #bae6fd; }
@@ -165,30 +164,47 @@
       border-color: #bae6fd;
     }
 
-    .icon-box {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
+    /* বামদিকের ওপরের কোনায় ব্র্যান্ড লোগো বক্স */
+    .brand-logo-box {
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 17px;
       flex-shrink: 0;
+      overflow: hidden;
+      background: #ffffff;
+      border: 1.2px solid #e2e8f0;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+      padding: 2.5px;
+      margin-top: 1px;
+    }
+    .brand-logo-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    .brand-logo-box i {
+      font-size: 15px;
       color: #ffffff;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
     }
 
-    .card-content { flex: 1; min-width: 0; }
+    .card-content { 
+      flex: 1; 
+      min-width: 0; 
+      line-height: 1.2;
+    }
 
     .card-header-line {
       display: flex;
       align-items: center;
-      gap: 6px;
-      margin-bottom: 3px;
+      gap: 5px;
+      margin-bottom: 2px;
     }
 
     .card-title {
-      font-size: 13.5px;
+      font-size: 12px;
       font-weight: 800;
       color: #0f172a;
       white-space: nowrap;
@@ -197,53 +213,54 @@
     }
 
     .tag {
-      font-size: 9.5px;
+      font-size: 8px;
       font-weight: 800;
-      padding: 2px 7px;
-      border-radius: 6px;
+      padding: 1.5px 5px;
+      border-radius: 5px;
       text-transform: capitalize;
     }
 
     .tag-earnings { background: #dcfce7; color: #15803d; }
-    .tag-tasks { background: #e0f2fe; color: #0369a1; }
     .tag-support { background: #ccfbf1; color: #0f766e; }
     .tag-referral { background: #f3e8ff; color: #7e22ce; }
     .tag-system { background: #ffedd5; color: #c2410c; }
 
     .card-desc {
-      font-size: 11.5px;
+      font-size: 10.5px;
       color: #475569;
-      line-height: 1.4;
-      margin-bottom: 4px;
+      line-height: 1.35;
+      margin-bottom: 3px;
     }
 
     .card-time {
-      font-size: 10px;
+      font-size: 9px;
       color: #0284c7;
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 3px;
       font-weight: 700;
     }
 
     .card-actions-right {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 4px;
       margin-left: auto;
+      margin-top: 3px;
+      flex-shrink: 0;
     }
 
     .notif-del-btn {
-      background: rgba(239, 68, 68, 0.1);
-      border: 1px solid rgba(239, 68, 68, 0.25);
+      background: rgba(239, 68, 68, 0.08);
+      border: 1px solid rgba(239, 68, 68, 0.2);
       color: #ef4444;
-      width: 30px;
-      height: 30px;
-      border-radius: 9px;
+      width: 24px;
+      height: 24px;
+      border-radius: 7px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 12px;
+      font-size: 10.5px;
       cursor: pointer;
       transition: all 0.2s ease;
       flex-shrink: 0;
@@ -255,37 +272,31 @@
 
     .card-arrow {
       color: #94a3b8;
-      font-size: 11px;
+      font-size: 9px;
     }
 
     .unread-dot {
       position: absolute;
-      top: 10px;
-      right: 10px;
-      width: 7px;
-      height: 7px;
+      top: 7px;
+      right: 7px;
+      width: 6px;
+      height: 6px;
       background-color: #ef4444;
       border-radius: 50%;
     }
 
-    .bg-green { background: linear-gradient(135deg, #10b981, #059669); }
-    .bg-blue { background: linear-gradient(135deg, #0284c7, #0369a1); }
-    .bg-teal { background: linear-gradient(135deg, #14b8a6, #0f766e); }
-    .bg-purple { background: linear-gradient(135deg, #a855f7, #7c3aed); }
-    .bg-orange { background: linear-gradient(135deg, #f97316, #ea580c); }
-
     .empty-msg {
-      display: flex;
+      display: none;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       flex: 1;
-      padding: 60px 10px;
+      padding: 50px 10px;
       color: #94a3b8;
       text-align: center;
     }
-    .empty-msg i { font-size: 38px; margin-bottom: 10px; color: #cbd5e1; }
-    .empty-msg p { font-size: 13.5px; font-weight: 600; }
+    .empty-msg i { font-size: 32px; margin-bottom: 8px; color: #cbd5e1; }
+    .empty-msg p { font-size: 12px; font-weight: 600; }
   </style>
 </head>
 <body>
@@ -302,14 +313,13 @@
         <h1>Notifications</h1>
         <span class="badge-count" id="badgeCount">0</span>
       </div>
-      <p class="subtitle">System, Tasks, Support, Referral & Earnings updates</p>
+      <p class="subtitle">System, Support, Referral & Earnings updates</p>
     </div>
 
-    <!-- ক্যাটাগরি ফিল্টার: কাস্টমার সাপোর্ট আলাদা বাটন সহ -->
+    <!-- ক্যাটাগরি ফিল্টার -->
     <div class="filters">
       <button class="filter-btn active" data-filter="all">All</button>
       <button class="filter-btn" data-filter="system"><i class="fa-solid fa-bullhorn"></i> System</button>
-      <button class="filter-btn" data-filter="tasks"><i class="fa-solid fa-square-check"></i> Tasks</button>
       <button class="filter-btn" data-filter="support"><i class="fa-solid fa-headset"></i> Support</button>
       <button class="filter-btn" data-filter="referral"><i class="fa-solid fa-user-group"></i> Referral</button>
       <button class="filter-btn" data-filter="earnings"><i class="fa-solid fa-wallet"></i> Earnings</button>
@@ -318,7 +328,7 @@
     <!-- নোটিফিকেশন লিস্ট -->
     <div class="notification-list" id="notificationList"></div>
 
-    <!-- নোটিফিকেশন খালি থাকলে মেসেজ -->
+    <!-- কোনো নোটিফিকেশন না থাকলে দেখাবে -->
     <div class="empty-msg" id="emptyMsg">
       <i class="fa-regular fa-bell-slash"></i>
       <p>No notifications found</p>
@@ -358,7 +368,6 @@
       try { return JSON.parse(localStorage.getItem('deleted_notif_ids') || '[]'); } catch(e) { return []; }
     }
 
-    // লাইভ টাইম-অ্যাগো ফরম্যাটিং
     function formatTimeAgo(createdAt) {
       if (!createdAt) return 'Just now';
 
@@ -367,6 +376,8 @@
         millis = createdAt.toMillis();
       } else if (createdAt.seconds) {
         millis = createdAt.seconds * 1000;
+      } else if (createdAt instanceof Date) {
+        millis = createdAt.getTime();
       } else {
         millis = new Date(createdAt).getTime();
       }
@@ -386,15 +397,91 @@
       return new Date(millis).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
     }
 
-    // ক্যাটাগরি অনুযায়ী আইকন ও কালার মেটাডাটা
-    function getCategoryMeta(cat) {
-      switch((cat || '').toLowerCase()) {
-        case 'earnings': return { icon: 'fa-wallet', bg: 'bg-green', tagClass: 'tag-earnings', text: 'Earnings' };
-        case 'tasks': return { icon: 'fa-square-check', bg: 'bg-blue', tagClass: 'tag-tasks', text: 'Tasks' };
-        case 'support': return { icon: 'fa-headset', bg: 'bg-teal', tagClass: 'tag-support', text: 'Support' };
-        case 'referral': return { icon: 'fa-user-group', bg: 'bg-purple', tagClass: 'tag-referral', text: 'Referral' };
-        default: return { icon: 'fa-bullhorn', bg: 'bg-orange', tagClass: 'tag-system', text: 'System' };
+    // সেক্টর অনুযায়ী আসল ব্র্যান্ড লোগো
+    function getNotificationLogoMeta(n) {
+      const title = (n.title || '').toLowerCase();
+      const msg = (n.message || '').toLowerCase();
+      const cat = (n.category || '').toLowerCase();
+      const method = (n.method || '').toLowerCase();
+      const platform = (n.platform || '').toLowerCase();
+
+      // নগদ
+      if (method.includes('nagad') || title.includes('nagad') || msg.includes('nagad') || title.includes('নগদ') || msg.includes('নগদ')) {
+        return {
+          html: `<img src="https://i.ibb.co.com/gZSnQ6Xb/nagad-com-bd-logo.png" alt="Nagad">`,
+          borderColor: '#ff4d4d',
+          tagText: 'Nagad',
+          tagClass: 'tag-earnings'
+        };
       }
+
+      // বিকাশ
+      if (method.includes('bkash') || title.includes('bkash') || msg.includes('bkash') || title.includes('বিকাশ') || msg.includes('বিকাশ')) {
+        return {
+          html: `<img src="https://i.ibb.co.com/fzcrRGrf/bkash-com-logo.png" alt="bKash">`,
+          borderColor: '#e2136e',
+          tagText: 'bKash',
+          tagClass: 'tag-earnings'
+        };
+      }
+
+      // বাইনান্স
+      if (method.includes('binance') || title.includes('binance') || msg.includes('binance') || title.includes('বাইনান্স') || msg.includes('বাইনান্স')) {
+        return {
+          html: `<img src="https://cryptologos.cc/logos/bnb-bnb-logo.png" alt="Binance" style="padding:1px;">`,
+          borderColor: '#f59e0b',
+          tagText: 'Binance',
+          tagClass: 'tag-earnings'
+        };
+      }
+
+      // বুস্ট
+      if (platform.includes('boost') || title.includes('boost') || msg.includes('boost') || title.includes('বুস্ট')) {
+        return {
+          html: `<img src="https://i.ibb.co.com/S71wYZrD/capital-gain.png" alt="Boost">`,
+          borderColor: '#f59e0b',
+          tagText: 'Boost',
+          tagClass: 'tag-earnings'
+        };
+      }
+
+      // সাপোর্ট
+      if (cat === 'support' || title.includes('support') || title.includes('সাপোর্ট')) {
+        return {
+          html: `<img src="https://i.ibb.co.com/DHMB6J4S/file-00000000a6888211aa5b662731e1ff68.png" alt="Support">`,
+          borderColor: '#0284c7',
+          tagText: 'Support',
+          tagClass: 'tag-support'
+        };
+      }
+
+      // রেফারেল
+      if (cat === 'referral' || title.includes('refer') || title.includes('রেফার')) {
+        return {
+          html: `<img src="https://i.ibb.co.com/v4VRDgYQ/IMG-20261015-172656-563.png" alt="Referral">`,
+          borderColor: '#8b5cf6',
+          tagText: 'Referral',
+          tagClass: 'tag-referral'
+        };
+      }
+
+      // ওয়ালেট / আর্নিংস
+      if (cat === 'earnings' || cat === 'deposit' || cat === 'withdraw' || title.includes('deposit') || title.includes('withdraw') || title.includes('ডিপোজিট') || title.includes('উইথড্র') || title.includes('বোনাস')) {
+        return {
+          html: `<img src="https://i.ibb.co.com/CpmVs7PB/wallet.png" alt="Wallet">`,
+          borderColor: '#10b981',
+          tagText: 'Earnings',
+          tagClass: 'tag-earnings'
+        };
+      }
+
+      // সিস্টেম নোটিশ
+      return {
+        html: `<img src="https://i.ibb.co.com/5W2f2xg4/pngtree-money-icon-dollar-coins-cash-payment-online-earning-png-image-7589413.png" alt="MicroTask">`,
+        borderColor: '#0284c7',
+        tagText: 'System',
+        tagClass: 'tag-system'
+      };
     }
 
     function renderNotifications() {
@@ -407,22 +494,20 @@
       const filtered = allNotifs.filter(n => {
           if (deletedIds.includes(n.id)) return false;
 
-          const notifCat = (n.category || 'system').toLowerCase();
+          let notifCat = (n.category || 'system').toLowerCase();
+          if (notifCat === 'deposit' || notifCat === 'withdraw') {
+            notifCat = 'earnings';
+          }
+
           const target = String(n.targetUid || '').trim();
-
-          // পার্সোনাল নোটিফিকেশন চেক (ডিপোজিট, উইথড্র, টাস্ক এপ্রুভাল, রেফারেল বোনাস, সাপোর্ট)
           const isPersonal = target !== '' && (target === myUID || (auth.currentUser && target === auth.currentUser.uid));
-
-          // গ্লোবাল সিস্টেম নোটিশ
           const isGlobalSystem = (!n.targetUid || target === 'all');
 
-          // একাউন্ট খোলার আগের পুরোনো গ্লোবাল নোটিশ বাদ দেওয়া
+          // নতুন রেজিস্ট্রেশন করার পূর্বের গ্লোবাল নোটিশ বাদ দেওয়া
           let isTimeValid = true;
           if (isGlobalSystem && userSignupTime > 0 && n.createdAt) {
               const notifTime = n.createdAt.toMillis ? n.createdAt.toMillis() : new Date(n.createdAt).getTime();
-              if (notifTime < userSignupTime) {
-                  isTimeValid = false;
-              }
+              if (notifTime < userSignupTime) isTimeValid = false;
           }
 
           const isAllowedForMe = isPersonal || (isGlobalSystem && isTimeValid);
@@ -431,7 +516,12 @@
           return isAllowedForMe && isMatchingTab;
       });
 
-      badgeCount.textContent = filtered.length;
+      if (filtered.length > 0) {
+        badgeCount.textContent = filtered.length;
+        badgeCount.style.display = 'flex';
+      } else {
+        badgeCount.style.display = 'none';
+      }
 
       if (filtered.length === 0) {
         notifContainer.innerHTML = '';
@@ -439,21 +529,23 @@
       } else {
         emptyMsg.style.display = 'none';
         notifContainer.innerHTML = filtered.map(n => {
-          const cat = (n.category || 'system').toLowerCase();
-          const meta = getCategoryMeta(cat);
+          let cat = (n.category || 'system').toLowerCase();
+          if (cat === 'deposit' || cat === 'withdraw') cat = 'earnings';
+          
+          const visual = getNotificationLogoMeta(n);
           const isUnread = !readIds.includes(n.id);
           const targetUrl = n.actionUrl || '';
           const timeText = formatTimeAgo(n.createdAt);
 
           return `
             <div class="notif-card ${isUnread ? 'unread' : ''}" data-category="${cat}" onclick="handleNotificationClick('${n.id}', '${targetUrl}', '${cat}')">
-              <div class="icon-box ${meta.bg}">
-                <i class="fa-solid ${meta.icon}"></i>
+              <div class="brand-logo-box" style="border-color: ${visual.borderColor};">
+                ${visual.html}
               </div>
               <div class="card-content">
                 <div class="card-header-line">
                   <span class="card-title">${n.title || 'Notification'}</span>
-                  <span class="tag ${meta.tagClass}">${meta.text}</span>
+                  <span class="tag ${visual.tagClass}">${visual.tagText}</span>
                 </div>
                 <div class="card-desc">${n.message || ''}</div>
                 <div class="card-time"><i class="fa-regular fa-clock"></i> ${timeText}</div>
@@ -471,7 +563,6 @@
       }
     }
 
-    // স্মার্ট রিডাইরেক্ট ফাংশন (ট্যাপ করলে সরাসরি সঠিক পেজে নিয়ে যাবে)
     function handleNotificationClick(notifId, url, category) {
         const readIds = getReadIds();
         if (!readIds.includes(notifId)) {
@@ -483,7 +574,7 @@
             window.location.href = url;
         } else if (category === 'support') {
             window.location.href = 'support.html';
-        } else if (category === 'earnings' || category === 'tasks') {
+        } else if (category === 'earnings') {
             window.location.href = 'history.html';
         } else if (category === 'referral') {
             window.location.href = 'refer.html';
@@ -494,7 +585,6 @@
         }
     }
 
-    // নোটিফিকেশন ডিলিট
     function deleteNotification(event, notifId, targetUid) {
       event.stopPropagation();
       
@@ -522,19 +612,17 @@
       });
     });
 
-    // প্রতি ৩০ সেকেন্ড পর পর লাইভ টাইম রিফ্রেশ
     setInterval(() => {
-      if (allNotifs.length > 0) renderNotifications();
+      renderNotifications();
     }, 30000);
 
-    // ফায়ারবেস লাইভ সিঙ্ক
+    // ফায়ারবেস লাইভ লিসেনার (ড্যাশবোর্ডের সাথে লাইভ সিঙ্ক)
     auth.onAuthStateChanged(user => {
       if (user) {
         db.collection("users").doc(user.uid).get().then(doc => {
           if (doc.exists && doc.data().createdAt) {
             userSignupTime = doc.data().createdAt.toMillis ? doc.data().createdAt.toMillis() : new Date(doc.data().createdAt).getTime();
           }
-          renderNotifications();
         });
       }
 
@@ -543,6 +631,8 @@
         snapshot.forEach(doc => {
           allNotifs.push({ id: doc.id, ...doc.data() });
         });
+        renderNotifications();
+      }, () => {
         renderNotifications();
       });
     });
