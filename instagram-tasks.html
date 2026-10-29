@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -19,16 +20,15 @@
     .header { display: flex; align-items: center; gap: 12px; }
     .back-btn { color: #f7a8c4; font-size: 16px; cursor: pointer; width: 34px; height: 34px; border-radius: 50%; background: rgba(214, 41, 118, 0.15); border: 1px solid rgba(214, 41, 118, 0.35); display: flex; align-items: center; justify-content: center; }
     .back-btn:active { transform: scale(0.9); }
-    .logo-3d { width: 40px; height: 40px; background: linear-gradient(45deg, #f09433, #dc2743, #bc1888); border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 22px; color: white; flex-shrink: 0; }
+    .logo-3d { width: 40px; height: 40px; background: linear-gradient(45deg, #f09433, #dc2743, #bc1888); border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 22px; color: white; flex-shrink: 0; box-shadow: 0 4px 10px rgba(220, 39, 67, 0.4); }
     .header-title h2 { color: #ffffff; font-size: 16px; font-weight: 700; }
     .header-title p { color: #fa7e1e; font-size: 10px; font-weight: 500; }
     
     .notice-bar { background: rgba(214, 41, 118, 0.15); border: 1px dashed #d62976; border-radius: 12px; padding: 8px 12px; font-size: 10.5px; color: #ffd1e1; display: flex; align-items: center; gap: 8px; }
     
     .task-list { display: flex; flex-direction: column; gap: 10px; flex: 1; }
-    .task-card { background: linear-gradient(180deg, #330524 0%, #14020f 100%); border: 1.5px solid #cc2366; border-radius: 16px; padding: 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px; cursor: pointer; transition: 0.2s; }
+    .task-card { background: linear-gradient(180deg, #330524 0%, #14020f 100%); border: 1.5px solid #cc2366; border-radius: 16px; padding: 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px; cursor: pointer; transition: all 0.25s ease; }
     .task-card:hover { transform: translateY(-2px); border-color: #ff5b94; }
-    .task-card.is-pending { border-color: #e69500 !important; cursor: default; }
     
     .task-thumb { width: 66px; height: 52px; border-radius: 10px; background: #4a0d37; border: 1px solid #d62976; position: relative; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .play-circle { width: 20px; height: 20px; background: rgba(220, 39, 67, 0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 8.5px; }
@@ -40,23 +40,32 @@
     .mini-usd-tag { background: linear-gradient(135deg, #10b981, #059669); color: #ffffff; font-size: 9px; font-weight: 900; padding: 1px 6px; border-radius: 6px; }
     .reward-amount { color: #34d399; font-size: 11.5px; font-weight: 850; }
     
-    .task-tags { display: flex; gap: 3.5px; margin-top: 1px; }
-    .tag { background: rgba(214, 41, 118, 0.2); border: 0.5px solid #d62976; color: #ffb3ce; font-size: 8px; padding: 1.5px 4.5px; border-radius: 4px; font-weight: 600; }
+    .task-tags { display: flex; gap: 3.5px; margin-top: 1px; flex-wrap: wrap; }
+    .tag { background: rgba(214, 41, 118, 0.2); border: 0.5px solid #d62976; color: #ffb3ce; font-size: 8px; padding: 1.5px 5px; border-radius: 4px; font-weight: 600; }
     
-    .btn-3d { background: linear-gradient(180deg, #ff5b94 0%, #bc1888 100%); border: 1px solid #ff9ec3; color: white; font-size: 11px; font-weight: 700; padding: 6px 11px; border-radius: 14px; cursor: pointer; }
-    .btn-pending { background: linear-gradient(180deg, #ffb300 0%, #e67e00 100%); border: 1px solid #ffe082; color: #fff; font-size: 9.5px; font-weight: 700; padding: 5px 8px; border-radius: 12px; }
+    .btn-3d { background: linear-gradient(180deg, #ff5b94 0%, #bc1888 100%); border: 1px solid #ff9ec3; color: white; font-size: 11px; font-weight: 700; padding: 6px 12px; border-radius: 14px; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+
+    .no-tasks-state { text-align: center; color: #ff9ec3; padding: 40px 10px; font-size: 12px; font-weight: 600; line-height: 1.5; }
+    .no-tasks-state i { font-size: 32px; color: #d62976; margin-bottom: 8px; display: block; }
 
     /* Modal */
-    .modal-overlay { position: fixed; inset: 0; background: rgba(15, 0, 10, 0.85); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 100; padding: 15px; }
-    .modal-box { width: 100%; max-width: 390px; background: radial-gradient(circle at 50% 0%, #450830 0%, #1f0418 70%, #0a010c 100%); border: 1.5px solid #d62976; border-radius: 22px; padding: 18px 16px; display: flex; flex-direction: column; gap: 12px; position: relative; }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(15, 0, 10, 0.88); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 100; padding: 15px; }
+    .modal-box { width: 100%; max-width: 390px; background: radial-gradient(circle at 50% 0%, #450830 0%, #1f0418 70%, #0a010c 100%); border: 1.5px solid #d62976; border-radius: 22px; padding: 18px 16px; display: flex; flex-direction: column; gap: 12px; position: relative; max-height: 90vh; overflow-y: auto; }
     .close-btn { position: absolute; top: 15px; right: 16px; color: #ff9ec3; font-size: 18px; cursor: pointer; }
     .modal-title { color: #fff; font-size: 15px; font-weight: 700; }
-    .step-box { background: rgba(55, 6, 40, 0.5); border: 1px solid #a61c56; border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 6px; }
-    .step-header { color: #ff8cb7; font-size: 10.5px; font-weight: 700; }
+    
+    .step-box { background: rgba(55, 6, 40, 0.5); border: 1px solid #a61c56; border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 7px; }
+    .step-header { color: #ff8cb7; font-size: 11px; font-weight: 700; }
     
     .video-link-btn { display: flex; align-items: center; justify-content: center; gap: 7px; background: linear-gradient(45deg, #f09433, #dc2743, #bc1888); color: white; padding: 11px; border-radius: 12px; font-size: 12.5px; font-weight: 800; border: none; cursor: pointer; }
     
-    .upload-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 4px; }
+    /* প্রোফাইল লিংক ইনপুট বক্স */
+    .profile-input-box { background: rgba(40, 0, 25, 0.6); border: 1px solid #d62976; border-radius: 10px; padding: 9px 10px; margin-top: 4px; display: flex; flex-direction: column; gap: 4px; }
+    .profile-input-box label { font-size: 10.5px; color: #ffd6e4; font-weight: 700; }
+    .profile-input-box input { background: #1a0210; border: 1px solid #ff5b94; border-radius: 7px; padding: 7px 10px; color: #ffffff; font-size: 11.5px; outline: none; }
+    .profile-input-box small { font-size: 8.5px; color: #ff9ec3; }
+
+    .upload-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 8px; margin-top: 4px; }
     .upload-slot { border: 1.5px dashed #d62976; background: rgba(70, 10, 50, 0.3); border-radius: 10px; height: 82px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden; cursor: pointer; }
     .upload-slot i { font-size: 18px; color: #ff5b94; margin-bottom: 3px; }
     .upload-slot span { color: #ffd6e4; font-size: 9.5px; font-weight: 600; text-align: center; }
@@ -74,51 +83,48 @@
         <i class="fa-solid fa-arrow-left"></i>
       </div>
       <div class="logo-3d"><i class="fa-brands fa-instagram"></i></div>
-      <div class="header-title"><h2>Instagram Tasks</h2><p>Watch Video • Follow • Earn USD ($)</p></div>
+      <div class="header-title"><h2>Instagram Tasks</h2><p>Watch Video • Earn USD ($)</p></div>
     </div>
     
     <div class="notice-bar">
       <i class="fa-solid fa-circle-info"></i>
-      <span>Tap slots to select screenshots directly from your gallery.</span>
+      <span>Follow Admin task rules. Upload required proofs & profile link.</span>
     </div>
     
     <div class="task-list" id="taskListContainer"></div>
   </div>
 
+  <!-- TASK MODAL -->
   <div class="modal-overlay" id="taskModal">
     <div class="modal-box">
       <i class="fa-solid fa-xmark close-btn" onclick="closeModal()"></i>
       <h3 class="modal-title" id="m-title">Complete Task & Submit</h3>
       
+      <!-- Step 1: Open Video in Native App -->
       <div class="step-box">
-        <div class="step-header"><i class="fa-solid fa-1"></i> Step 1: Open Instagram Reel</div>
+        <div class="step-header"><i class="fa-solid fa-1"></i> Step 1: Open in Instagram App</div>
         <button type="button" class="video-link-btn" onclick="openTargetNativeApp()">
           <i class="fa-brands fa-instagram"></i> Open in Instagram App
         </button>
       </div>
 
+      <!-- Step 2: Dynamic Requirements from Admin -->
       <div class="step-box">
-        <div class="step-header"><i class="fa-solid fa-2"></i> Step 2: Select 3 Screenshots from Gallery</div>
-        <div class="upload-grid">
-          <div class="upload-slot">
-            <i class="fa-solid fa-thumbs-up"></i><span>1. Like</span><img id="prev-1" class="slot-preview">
-            <input type="file" id="file-1" accept="image/*" class="slot-native-input" onchange="previewSlot(1, event)">
-          </div>
-          
-          <div class="upload-slot">
-            <i class="fa-solid fa-user-plus"></i><span>2. Follow</span><img id="prev-2" class="slot-preview">
-            <input type="file" id="file-2" accept="image/*" class="slot-native-input" onchange="previewSlot(2, event)">
-          </div>
-          
-          <div class="upload-slot">
-            <i class="fa-solid fa-comment-dots"></i><span>3. Comment</span><img id="prev-3" class="slot-preview">
-            <input type="file" id="file-3" accept="image/*" class="slot-native-input" onchange="previewSlot(3, event)">
-          </div>
+        <div class="step-header"><i class="fa-solid fa-2"></i> Step 2: Upload Required Proofs</div>
+        
+        <!-- ডুপ্লিকেট ফলো রোধে ইনস্টাগ্রাম প্রোফাইল লিংক -->
+        <div id="profileLinkBox" class="profile-input-box" style="display:none;">
+          <label><i class="fa-solid fa-link"></i> আপনার ইনস্টাগ্রাম প্রোফাইল লিংক দিন:</label>
+          <input type="url" id="userProfileUrl" placeholder="https://instagram.com/yourprofile">
+          <small>⚠️ এই ইনস্টাগ্রাম আইডি দিয়ে পূর্বে কাজ করা হয়েছে কি না তা স্বয়ংক্রিয়ভাবে যাচাই করা হবে।</small>
         </div>
+
+        <!-- অ্যাডমিন রুলস অনুযায়ী ডায়নামিক স্লট -->
+        <div class="upload-grid" id="dynamicUploadGrid"></div>
       </div>
 
       <button class="submit-btn" id="submitBtn" onclick="submitProof()">
-        <i class="fa-solid fa-circle-check"></i> Submit for Admin Review
+        <i class="fa-solid fa-circle-check"></i> Submit for Review
       </button>
     </div>
   </div>
@@ -135,44 +141,75 @@
     };
 
     firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
     const db = firebase.firestore();
 
     let activeTaskId = null;
     let activeTaskUrl = '';
     let activeRewardUSD = 0.20;
-    let pendingTasks = new Set(JSON.parse(localStorage.getItem('ig_pending_tasks') || '[]'));
+    let activeTaskData = null;
 
-    const DEFAULT_IG_TASKS = [
-      { id: 'ig-1', title: 'Viral Instagram Reel #1', rewardUSD: 0.25, duration: '0:30', url: 'https://www.instagram.com' },
-      { id: 'ig-2', title: 'Fashion Brand Promo #2', rewardUSD: 0.20, duration: '0:45', url: 'https://www.instagram.com' }
-    ];
+    // সাবমিট করা টাস্কের লিস্ট (যাতে পেন্ডিং না দেখিয়ে সাথে সাথে মুছে যায়)
+    let userSubmittedTasks = new Set(JSON.parse(localStorage.getItem('ig_submitted_tasks') || '[]'));
+
+    function getUserUID() {
+      const cached = JSON.parse(localStorage.getItem('microtask_cached_user')) || {};
+      return String(cached.uid || (auth.currentUser ? auth.currentUser.uid : '000000')).trim();
+    }
 
     function listenToLiveTasks() {
+      const myUID = getUserUID();
+
+      // ইউজারের সাবমিট করা কাজগুলো টেনে আনা
+      db.collection("task_submissions").where("uid", "==", myUID).get().then(snap => {
+        snap.forEach(doc => {
+          if (doc.data().taskId) userSubmittedTasks.add(doc.data().taskId);
+        });
+        localStorage.setItem('ig_submitted_tasks', JSON.stringify([...userSubmittedTasks]));
+      }).catch(() => {});
+
       db.collection("tasks").where("platform", "==", "instagram").onSnapshot(snapshot => {
         const container = document.getElementById('taskListContainer');
         container.innerHTML = '';
-        if (snapshot.empty) {
-          DEFAULT_IG_TASKS.forEach(t => renderSingleTaskCard(t.id, t.title, t.rewardUSD, t.duration, t.url));
-        } else {
-          snapshot.forEach(doc => {
-            const data = doc.data();
-            const reward = data.rewardUSD || (data.coins ? (data.coins / 100) : 0.20);
-            renderSingleTaskCard(doc.id, data.title, reward, data.duration || '0:30', data.url || 'https://www.instagram.com');
-          });
+
+        let visibleCount = 0;
+
+        snapshot.forEach(doc => {
+          const tId = doc.id;
+          // কাজ সাবমিট করা হয়ে গেলে তা আর এই পেজে দেখাবে না (মুছে যাবে)
+          if (userSubmittedTasks.has(tId)) return;
+
+          const data = doc.data();
+          const reward = data.rewardUSD || (data.coins ? (data.coins / 100) : 0.20);
+          renderSingleTaskCard(tId, data.title || 'Instagram Task', reward, data.duration || '0:30', data.url, data);
+          visibleCount++;
+        });
+
+        if (visibleCount === 0) {
+          container.innerHTML = `
+            <div class="no-tasks-state">
+              <i class="fa-solid fa-circle-check"></i>
+              <p>সবগুলো টাস্ক সম্পন্ন হয়েছে!<br>নতুন টাস্ক আসলে এখানে দেখতে পাবেন।</p>
+            </div>
+          `;
         }
-      }, () => {
-        DEFAULT_IG_TASKS.forEach(t => renderSingleTaskCard(t.id, t.title, t.rewardUSD, t.duration, t.url));
       });
     }
 
-    function renderSingleTaskCard(id, title, rewardUSD, duration, url) {
+    // অ্যাডমিন রুলস অনুযায়ী কার্ড রেন্ডার
+    function renderSingleTaskCard(id, title, rewardUSD, duration, url, taskData) {
       const container = document.getElementById('taskListContainer');
-      const isPending = pendingTasks.has(id);
+
+      let tagsHtml = '';
+      if (taskData.requiresLike !== false) tagsHtml += `<span class="tag">Like</span>`;
+      if (taskData.requiresFollow === true) tagsHtml += `<span class="tag">Follow</span>`;
+      if (taskData.requiresComment === true) tagsHtml += `<span class="tag">Comment</span>`;
+      if (!tagsHtml) tagsHtml = `<span class="tag">Like</span>`;
 
       const card = document.createElement('div');
-      card.className = `task-card ${isPending ? 'is-pending' : ''}`;
-      card.id = id;
-      card.onclick = () => handleCardClick(id, title, rewardUSD, url);
+      card.className = `task-card`;
+      card.id = `card-${id}`;
+      card.onclick = () => handleCardClick(id, title, rewardUSD, url, taskData);
 
       card.innerHTML = `
         <div class="task-thumb">
@@ -185,36 +222,70 @@
             <span class="mini-usd-tag">USD</span>
             <span class="reward-amount">+$${parseFloat(rewardUSD).toFixed(2)}</span>
           </div>
-          <div class="task-tags">
-            <span class="tag">Like</span>
-            <span class="tag">Follow</span>
-            <span class="tag">Comment</span>
-          </div>
+          <div class="task-tags">${tagsHtml}</div>
         </div>
         <div class="action-btn-area">
-          ${isPending 
-            ? '<div class="btn-pending"><i class="fa-solid fa-clock"></i> Pending</div>' 
-            : '<button class="btn-3d"><i class="fa-solid fa-play"></i> Start</button>'}
+          <button class="btn-3d"><i class="fa-solid fa-play"></i> Start</button>
         </div>
       `;
 
       container.appendChild(card);
     }
 
-    function handleCardClick(id, title, rewardUSD, url) {
-      if(pendingTasks.has(id)) { alert("This task is currently Pending Admin review!"); return; }
+    // মডাল হ্যান্ডলার
+    function handleCardClick(id, title, rewardUSD, url, taskData) {
       activeTaskId = id;
       activeTaskUrl = url || 'https://www.instagram.com';
       activeRewardUSD = parseFloat(rewardUSD) || 0.20;
+      activeTaskData = taskData || {};
 
       document.getElementById('m-title').innerText = `${title} (+$${activeRewardUSD.toFixed(2)})`;
-      for(let i=1; i<=3; i++){ 
-        document.getElementById('file-'+i).value = ""; 
-        document.getElementById('prev-'+i).style.display = "none"; 
+
+      const uploadGrid = document.getElementById('dynamicUploadGrid');
+      const profileLinkBox = document.getElementById('profileLinkBox');
+      uploadGrid.innerHTML = '';
+
+      // ফলো করতে বললে ইনস্টাগ্রাম প্রোফাইল লিংক ইনপুট দেখাবে
+      if (activeTaskData.requiresFollow === true) {
+        profileLinkBox.style.display = 'flex';
+        document.getElementById('userProfileUrl').value = '';
+      } else {
+        profileLinkBox.style.display = 'none';
       }
+
+      // অ্যাডমিন যা চাইবে শুধুই সেই স্লট শো করবে
+      let slotIndex = 1;
+
+      if (activeTaskData.requiresLike !== false) {
+        uploadGrid.innerHTML += createUploadSlotHTML(slotIndex, 'Like', 'fa-thumbs-up');
+        slotIndex++;
+      }
+
+      if (activeTaskData.requiresFollow === true) {
+        uploadGrid.innerHTML += createUploadSlotHTML(slotIndex, 'Follow', 'fa-user-plus');
+        slotIndex++;
+      }
+
+      if (activeTaskData.requiresComment === true) {
+        uploadGrid.innerHTML += createUploadSlotHTML(slotIndex, 'Comment', 'fa-comment-dots');
+        slotIndex++;
+      }
+
       document.getElementById('taskModal').style.display = "flex";
     }
 
+    function createUploadSlotHTML(index, label, iconClass) {
+      return `
+        <div class="upload-slot">
+          <i class="fa-solid ${iconClass}"></i>
+          <span>${label}</span>
+          <img id="prev-${index}" class="slot-preview">
+          <input type="file" id="file-${index}" accept="image/*" class="slot-native-input" onchange="previewSlot(${index}, event)">
+        </div>
+      `;
+    }
+
+    // ফোনে ইনস্টল থাকা ইনস্টাগ্রাম অ্যাপে ওপেন করার মেকানিজম
     function openTargetNativeApp() {
       if (!activeTaskUrl) return;
       let target = activeTaskUrl.trim();
@@ -242,42 +313,89 @@
 
     function closeModal(){ document.getElementById('taskModal').style.display="none"; }
 
-    function submitProof(){
-      if(!document.getElementById('file-1').files.length || !document.getElementById('file-2').files.length || !document.getElementById('file-3').files.length){
-        alert("Please select all 3 screenshots from your gallery!"); return;
+    // ================= সাবমিশন ও ডুপ্লিকেট ইনস্টাগ্রাম আইডি ভেরিফিকেশন =================
+    async function submitProof() {
+      const btn = document.getElementById('submitBtn');
+      const inputs = document.querySelectorAll('.slot-native-input');
+
+      // সব কয়টি স্ক্রিনশট আপলোড হয়েছে কি না চেক
+      for (let input of inputs) {
+        if (!input.files || input.files.length === 0) {
+          alert("অ্যাডমিনের চাওয়া সব কয়টি স্ক্রিনশট সিলেক্ট করুন!");
+          return;
+        }
       }
 
-      const btn = document.getElementById('submitBtn');
+      let profileUrl = '';
+
+      // ফলো টাস্ক হলে প্রোফাইল লিংক ডুপ্লিকেট চেক
+      if (activeTaskData && activeTaskData.requiresFollow === true) {
+        profileUrl = document.getElementById('userProfileUrl').value.trim().toLowerCase().replace(/\/+$/, "");
+
+        if (!profileUrl) {
+          alert("অনুগ্রহ করে আপনার ইনস্টাগ্রাম প্রোফাইল লিংকটি প্রবেশ করান!");
+          return;
+        }
+
+        btn.disabled = true;
+        btn.innerText = "যাচাই করা হচ্ছে...";
+
+        try {
+          const duplicateCheck = await db.collection("task_submissions")
+            .where("taskId", "==", activeTaskId)
+            .where("profileUrl", "==", profileUrl)
+            .get();
+
+          if (!duplicateCheck.empty) {
+            alert("⚠️ এই ইনস্টাগ্রাম আইডি দিয়ে ইতিপূর্বে এই টাস্কটি সম্পন্ন করা হয়েছে! একই প্রোফাইল একাধিকবার ব্যবহার করা সম্পূর্ণ নিষিদ্ধ।");
+            btn.disabled = false;
+            btn.innerText = "Submit for Review";
+            return;
+          }
+        } catch (err) {
+          console.log("Check err:", err);
+        }
+      }
+
       btn.disabled = true;
       btn.innerText = "Submitting to Admin...";
-      
-      pendingTasks.add(activeTaskId);
-      localStorage.setItem('ig_pending_tasks', JSON.stringify([...pendingTasks]));
-      
-      let card = document.getElementById(activeTaskId);
-      if(card) {
-        card.classList.add('is-pending');
-        card.querySelector('.action-btn-area').innerHTML = '<div class="btn-pending"><i class="fa-solid fa-clock"></i> Pending</div>';
-      }
 
-      const cachedUser = JSON.parse(localStorage.getItem('microtask_cached_user')) || {};
-      const userUID = String(cachedUser.uid || '000000').trim();
+      const userUID = getUserUID();
 
       db.collection("task_submissions").add({
         taskId: activeTaskId,
         platform: "instagram",
         uid: userUID,
+        profileUrl: profileUrl || null,
         rewardUSD: activeRewardUSD,
         status: "pending",
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       }).then(() => {
-        alert("Proof submitted successfully! It is now Pending review in Admin Panel.");
+        // ১. কাজ সাবমিট হওয়া মাত্রই ইউজারের লোকাল লিস্টে যোগ
+        userSubmittedTasks.add(activeTaskId);
+        localStorage.setItem('ig_submitted_tasks', JSON.stringify([...userSubmittedTasks]));
+
+        // ২. কার্ডটি সাথে সাথে স্ক্রিন থেকে মুছে ফেলা (আর পেন্ডিং দেখাবে না)
+        const cardElem = document.getElementById(`card-${activeTaskId}`);
+        if (cardElem) cardElem.remove();
+
+        const container = document.getElementById('taskListContainer');
+        if (container.children.length === 0) {
+          container.innerHTML = `
+            <div class="no-tasks-state">
+              <i class="fa-solid fa-circle-check"></i>
+              <p>সবগুলো টাস্ক সম্পন্ন হয়েছে!<br>নতুন টাস্ক আসলে এখানে দেখতে পাবেন।</p>
+            </div>
+          `;
+        }
+
+        alert("টাস্কটি সফলভাবে জমা দেওয়া হয়েছে! অ্যাডমিন রিভিউয়ের পর ব্যালেন্স যোগ হবে।");
         closeModal();
       }).catch(err => {
-        alert("Submission error: " + err.message);
+        alert("ত্রুটি: " + err.message);
       }).finally(() => {
         btn.disabled = false;
-        btn.innerText = "Submit for Admin Review";
+        btn.innerText = "Submit for Review";
       });
     }
 
