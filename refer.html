@@ -11,6 +11,11 @@
     <!-- FontAwesome 6 Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
+    <!-- Firebase SDK (Live Connection) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
     <style>
         * {
             margin: 0;
@@ -29,7 +34,6 @@
             padding: 14px 6px;
         }
 
-        /* Phone Screen Outer Frame */
         .app-screen {
             width: 100%;
             max-width: 410px;
@@ -43,39 +47,48 @@
             position: relative;
         }
 
-        /* ================= 1. TOP HERO IMAGE BANNER WITH 3D BACK BUTTON ================= */
+        /* 0. TOP NAVIGATION BAR */
+        .top-header-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 14px;
+            background: #008761;
+            color: #ffffff;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .refer-back-btn {
+            background: rgba(255, 255, 255, 0.18);
+            border: 1.2px solid rgba(255, 255, 255, 0.35);
+            color: #ffffff;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            cursor: pointer;
+            transition: transform 0.15s;
+        }
+        .refer-back-btn:active {
+            transform: scale(0.92);
+        }
+
+        .top-header-bar h2 {
+            font-size: 16px;
+            font-weight: 850;
+            letter-spacing: -0.3px;
+        }
+
+        /* 1. TOP HERO BANNER */
         .hero-image-banner {
             width: 100%;
             overflow: hidden;
             background: #008761;
             line-height: 0;
             border-bottom: 2px solid #00936b;
-            position: relative;
-        }
-
-        /* ড্যাশবোর্ডে ফেরার ব্যাক বাটন */
-        .refer-back-btn {
-            position: absolute;
-            top: 14px;
-            left: 14px;
-            background: rgba(15, 23, 42, 0.65);
-            backdrop-filter: blur(8px);
-            border: 1.5px solid rgba(255, 255, 255, 0.4);
-            color: #ffffff;
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 15px;
-            cursor: pointer;
-            z-index: 10;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-            transition: all 0.2s ease;
-        }
-        .refer-back-btn:active {
-            transform: scale(0.92);
         }
 
         .banner-img {
@@ -85,7 +98,7 @@
             object-fit: cover;
         }
 
-        /* ================= 2. MAIN BODY ================= */
+        /* 2. MAIN BODY */
         .main-content {
             padding: 10px 9px 18px;
             display: flex;
@@ -120,8 +133,8 @@
         .mini-stat-card.orange { background: #fff5e6; border: 1px solid #fee3c5; }
 
         .stat-icon {
-            width: 22px;
-            height: 22px;
+            width: 23px;
+            height: 23px;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -133,7 +146,7 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         .mini-stat-card.green .stat-icon  { background: linear-gradient(135deg, #00c888, #009e66); }
-        .mini-stat-card.blue .stat-icon   { background: linear-gradient(135deg, #1e88e5, #0d47a1); }
+        .mini-stat-card.blue .stat-icon   { background: linear-gradient(135deg, #1e88e5, #0d47a1); font-weight: 900; font-size: 10px; }
         .mini-stat-card.purple .stat-icon { background: linear-gradient(135deg, #9c27b0, #6a1b9a); }
         .mini-stat-card.orange .stat-icon { background: linear-gradient(135deg, #ff9800, #f57c00); }
 
@@ -154,9 +167,10 @@
         .mini-stat-card.orange .stat-num { color: #e65100; }
 
         .stat-num {
-            font-size: 11.5px;
+            font-size: 10px;
             font-weight: 900;
             margin-top: 1px;
+            white-space: nowrap;
         }
 
         /* CARD 2: REFERRAL LINK */
@@ -242,7 +256,7 @@
 
         .buttons-row-line {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(3, 1fr);
             gap: 6px;
         }
         .social-share-btn {
@@ -254,7 +268,7 @@
             align-items: center;
             justify-content: center;
             gap: 3px;
-            font-size: 8.5px;
+            font-size: 9px;
             font-weight: 700;
             color: #ffffff;
             cursor: pointer;
@@ -266,7 +280,6 @@
         .social-share-btn.whatsapp { background: #25D366; }
         .social-share-btn.share    { background: #1877F2; }
         .social-share-btn.copy     { background: #143d6b; }
-        .social-share-btn.more     { background: #f8fafc; border: 1px solid #e2e8f0; color: #475569; }
 
         /* CARD 3: HOW IT WORKS */
         .card-how-it-works {
@@ -334,7 +347,7 @@
             flex-shrink: 0;
         }
 
-        /* CARD 4: RECENT REFERRALS */
+        /* CARD 4: TODAY'S BONUS & COMMISSION (শুধুমাত্র তারিখ দেখাবে, টুডে নয়) */
         .card-referrals-table {
             background: #ffffff;
             border: 1px solid #e2e8f0;
@@ -347,21 +360,28 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 8px;
+            margin-bottom: 3px;
         }
         .referrals-header-line h3 {
             font-size: 12.5px;
             font-weight: 800;
             color: #102a45;
         }
-        .referrals-header-line a {
+        .referral-live-counter {
             font-size: 10px;
-            font-weight: 700;
+            font-weight: 800;
             color: #00aa77;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 2px;
+            background: #e8f9f2;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        .chart-subtitle-note {
+            font-size: 9px;
+            color: #64748b;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: block;
         }
 
         .clean-table {
@@ -380,7 +400,7 @@
         }
 
         .clean-table td {
-            padding: 7px 2px;
+            padding: 8px 2px;
             font-size: 9px;
             vertical-align: middle;
             border-bottom: 1px solid #f1f5f9;
@@ -388,16 +408,32 @@
         .clean-table tr:last-child td { border-bottom: none; }
 
         .user-flex { display: flex; align-items: center; gap: 5px; }
-        .avatar-small { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; border: 1px solid #e2e8f0; flex-shrink: 0; }
-        .user-id-text { font-size: 9px; font-weight: 700; color: #1e293b; white-space: nowrap; }
-        .date-text { font-size: 8px; color: #64748b; font-weight: 600; white-space: nowrap; }
-        .comm-text { font-size: 9.5px; font-weight: 800; color: #1e293b; white-space: nowrap; }
-        .badge-completed { background: #dcfce7; border: 1px solid #bbf7d0; color: #15803d; font-size: 8px; font-weight: 800; padding: 2px 6px; border-radius: 10px; display: inline-block; white-space: nowrap; }
+        .avatar-small { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; border: 1px solid #e2e8f0; flex-shrink: 0; background: #e0f2fe; color: #0284c7; display: flex; align-items: center; justify-content: center; font-size: 10px; }
+        .user-id-text { font-size: 9.5px; font-weight: 700; color: #1e293b; white-space: nowrap; }
+        .date-text { font-size: 8px; color: #64748b; font-weight: 700; white-space: nowrap; }
+        
+        .bonus-badge-tag {
+            font-size: 8px;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 6px;
+            display: inline-block;
+            white-space: nowrap;
+        }
+        .bonus-badge-tag.verify { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+        .bonus-badge-tag.comm { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
 
-        .empty-history-box { text-align: center; padding: 24px 8px; color: #94a3b8; }
-        .empty-history-icon { font-size: 24px; color: #cbd5e1; margin-bottom: 6px; display: block; }
-        .empty-title { font-size: 11px; font-weight: 700; color: #64748b; display: block; }
-        .empty-sub { font-size: 9px; color: #94a3b8; display: block; margin-top: 2px; }
+        .comm-5pct-text { 
+            font-size: 10px; 
+            font-weight: 850; 
+            color: #059669; 
+            white-space: nowrap; 
+        }
+
+        .empty-history-box { text-align: center; padding: 26px 8px; color: #94a3b8; }
+        .empty-history-icon { font-size: 26px; color: #cbd5e1; margin-bottom: 6px; display: block; }
+        .empty-title { font-size: 11.5px; font-weight: 700; color: #64748b; display: block; }
+        .empty-sub { font-size: 9.5px; color: #94a3b8; display: block; margin-top: 3px; line-height: 1.35; }
 
         .toast {
             position: fixed;
@@ -426,16 +462,21 @@
 
     <div class="app-screen">
 
-        <!-- ================= 1. BANNER IMAGE WITH 3D BACK BUTTON ================= -->
-        <div class="hero-image-banner">
-            <!-- ড্যাশবোর্ডে ফিরে যাওয়ার বাটন -->
+        <!-- 0. TOP NAVIGATION BAR -->
+        <header class="top-header-bar">
             <button class="refer-back-btn" onclick="window.location.href='index.html'" title="Back to Dashboard">
                 <i class="fa-solid fa-arrow-left"></i>
             </button>
+            <h2>Refer & Earn</h2>
+            <div style="width:34px;"></div>
+        </header>
+
+        <!-- 1. BANNER IMAGE -->
+        <div class="hero-image-banner">
             <img src="https://i.ibb.co.com/m7yZ896/file-00000000d5a48211b3cf794a56119f6f.png" alt="MicroTask Refer & Earn Banner" class="banner-img">
         </div>
 
-        <!-- ================= 2. MAIN BODY ================= -->
+        <!-- 2. MAIN BODY -->
         <div class="main-content">
 
             <!-- CARD 1: 4 STATS ROW -->
@@ -447,25 +488,25 @@
                 </div>
 
                 <div class="mini-stat-card blue">
-                    <div class="stat-icon"><i class="fa-solid fa-sack-dollar"></i></div>
-                    <div class="stat-label">Referral Comm.</div>
-                    <div class="stat-num" id="statReferralCommission">$0.00</div>
+                    <div class="stat-icon">5%</div>
+                    <div class="stat-label">5% Commission</div>
+                    <div class="stat-num" id="statReferralCommission">0.00 BDT</div>
                 </div>
 
                 <div class="mini-stat-card purple">
                     <div class="stat-icon"><i class="fa-solid fa-wallet"></i></div>
                     <div class="stat-label">Total Earnings</div>
-                    <div class="stat-num" id="statTotalEarnings">$0.00</div>
+                    <div class="stat-num" id="statTotalEarnings">0.00 BDT</div>
                 </div>
 
                 <div class="mini-stat-card orange">
-                    <div class="stat-icon"><i class="fa-solid fa-share-nodes"></i></div>
+                    <div class="stat-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
                     <div class="stat-label">Pending Comm.</div>
-                    <div class="stat-num" id="statPendingCommission">$0.00</div>
+                    <div class="stat-num" id="statPendingCommission">0.00 BDT</div>
                 </div>
             </div>
 
-            <!-- CARD 2: REFERRAL LINK & ACTIONS -->
+            <!-- CARD 2: REFERRAL LINK & ACTIONS (https://microtask.page.gd/) -->
             <div class="card-refer-link">
                 <div class="card-header-line">
                     <div class="header-circle-icon">
@@ -473,12 +514,12 @@
                     </div>
                     <div class="header-title-text">
                         <h3>Your Referral Link</h3>
-                        <p>Share this link with your friends and earn commission</p>
+                        <p>Share this link with friends and earn 40 BDT + 5% daily commission!</p>
                     </div>
                 </div>
 
                 <div class="link-input-line">
-                    <input type="text" class="link-field" id="refLinkInput" value="https://microtask.app/ref/" readonly>
+                    <input type="text" class="link-field" id="refLinkInput" value="https://microtask.page.gd/" readonly>
                     <button class="copy-button" onclick="copyReferralLink()">
                         <i class="fa-regular fa-copy"></i>
                         <span>Copy</span>
@@ -498,10 +539,6 @@
                         <i class="fa-solid fa-link"></i>
                         <span>Copy Link</span>
                     </button>
-                    <button class="social-share-btn more" onclick="showToastNotification('More options coming soon!')">
-                        <i class="fa-solid fa-ellipsis"></i>
-                        <span>More</span>
-                    </button>
                 </div>
             </div>
 
@@ -515,44 +552,53 @@
                 <div class="steps-container-line">
                     <div class="single-step">
                         <div class="step-badge">1</div>
-                        <div class="step-text">Share Your Referral Link</div>
+                        <div class="step-text">Friend verifies account with 50 BDT</div>
                     </div>
 
                     <div class="step-arrow-icon"><i class="fa-solid fa-chevron-right"></i></div>
 
                     <div class="single-step">
                         <div class="step-badge">2</div>
-                        <div class="step-text">Friends Join & Complete Tasks</div>
+                        <div class="step-text">You get instant 40 BDT bonus</div>
                     </div>
 
                     <div class="step-arrow-icon"><i class="fa-solid fa-chevron-right"></i></div>
 
                     <div class="single-step">
                         <div class="step-badge">3</div>
-                        <div class="step-text">You Get Commission</div>
+                        <div class="step-text">Next day get 5% commission from work</div>
                     </div>
                 </div>
             </div>
 
-            <!-- CARD 4: RECENT REFERRALS -->
+            <!-- CARD 4: TODAY'S BONUS & COMMISSION CHART (ডেমো ছাড়া, শুধু ওই দিনের আসল তারিখ) -->
             <div class="card-referrals-table">
                 <div class="referrals-header-line">
-                    <h3>Recent Referrals</h3>
-                    <a href="#" onclick="showToastNotification('Viewing all referrals'); return false;">
-                        View All <i class="fa-solid fa-chevron-right" style="font-size: 8px;"></i>
-                    </a>
+                    <h3>Active Earnings History</h3>
+                    <span class="referral-live-counter" id="activeReferralCount">0 Active</span>
                 </div>
+                <span class="chart-subtitle-note">Bonuses and 5% commissions earned on this date</span>
 
                 <table class="clean-table">
                     <thead>
                         <tr>
-                            <th style="width: 38%;">User</th>
-                            <th style="width: 32%;">Join Date</th>
-                            <th style="width: 14%;">Commission</th>
-                            <th style="width: 16%; text-align: right;">Status</th>
+                            <th style="width: 32%;">User</th>
+                            <th style="width: 26%;">Date</th>
+                            <th style="width: 24%;">Bonus Type</th>
+                            <th style="width: 18%; text-align: right;">Earned</th>
                         </tr>
                     </thead>
-                    <tbody id="referralsTableBody"></tbody>
+                    <tbody id="referralsTableBody">
+                        <tr>
+                            <td colspan="4">
+                                <div class="empty-history-box">
+                                    <i class="fa-solid fa-user-plus empty-history-icon"></i>
+                                    <span class="empty-title">No referral earnings yet today</span>
+                                    <span class="empty-sub">Share your referral link to earn 40 BDT bonus + 5% daily commission!</span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
                 </table>
             </div>
 
@@ -565,64 +611,211 @@
         <span id="toastMessage">Referral link copied!</span>
     </div>
 
-    <!-- JavaScript Actions & Dynamic Integration -->
+    <!-- Firebase & Logic Script -->
     <script>
-        const USER_REFERRAL_STATS = {
-            totalReferrals: 0,
-            referralCommission: 0.00,
-            totalEarnings: 0.00,
-            pendingCommission: 0.00
+        const firebaseConfig = {
+            apiKey: "AIzaSyBrG81DRVjx040QhiT68yyRErGXjuCPdS4",
+            authDomain: "micro-task-2906d.firebaseapp.com",
+            projectId: "micro-task-2906d",
+            storageBucket: "micro-task-2906d.firebasestorage.app",
+            messagingSenderId: "642332420854",
+            appId: "1:642332420854:web:67115930992e7685b49ad7",
+            measurementId: "G-N76WH82XYJ"
         };
 
-        const USER_REFERRAL_HISTORY = [];
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
 
-        function initReferralScreen() {
-            // ইউজারের আসল UID দিয়ে ডাইনামিক রেফারেল লিংক তৈরি
-            const cachedUser = JSON.parse(localStorage.getItem('microtask_cached_user')) || JSON.parse(localStorage.getItem('microtask_user'));
-            const uid = (cachedUser && cachedUser.uid) ? cachedUser.uid : '000000';
-            
-            // সাইটের আসল লাইভ URL এর সাথে লিংক তৈরি
-            const baseUrl = window.location.origin + window.location.pathname.replace('refer.html', 'index.html');
-            document.getElementById('refLinkInput').value = `${baseUrl}?ref=${uid}`;
+        let myReferralUID = "000000";
+        let currentUserData = null;
 
-            // স্ট্যাটাস আপডেট
-            document.getElementById('statTotalReferrals').innerText = USER_REFERRAL_STATS.totalReferrals;
-            document.getElementById('statReferralCommission').innerText = `$${USER_REFERRAL_STATS.referralCommission.toFixed(2)}`;
-            document.getElementById('statTotalEarnings').innerText = `$${USER_REFERRAL_STATS.totalEarnings.toFixed(2)}`;
-            document.getElementById('statPendingCommission').innerText = `$${USER_REFERRAL_STATS.pendingCommission.toFixed(2)}`;
+        // আপনার চাওয়া নির্দিষ্ট ডোমেইন
+        const BASE_DOMAIN = "https://microtask.page.gd/";
 
-            // হিস্ট্রি টেবিল
-            const tbody = document.getElementById('referralsTableBody');
-            if (!USER_REFERRAL_HISTORY || USER_REFERRAL_HISTORY.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="4">
-                            <div class="empty-history-box">
-                                <i class="fa-solid fa-user-plus empty-history-icon"></i>
-                                <span class="empty-title">No referrals yet</span>
-                                <span class="empty-sub">Share your referral link to start earning!</span>
-                            </div>
-                        </td>
-                    </tr>
-                `;
+        function maskUserName(name) {
+            if (!name) return "User***";
+            name = name.trim();
+            if (name.length <= 2) return name + "***";
+            return name.slice(0, 2) + "****";
+        }
+
+        function getTodayString() {
+            const d = new Date();
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        // "Today" বাদ দিয়ে শুধু ওই দিনের তারিখ ফরম্যাট (যেমন: 29 Oct, 2026)
+        function getFormattedDate(dateObj) {
+            const d = dateObj || new Date();
+            return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+        }
+
+        function renderEmptyTable() {
+            document.getElementById('referralsTableBody').innerHTML = `
+                <tr>
+                    <td colspan="4">
+                        <div class="empty-history-box">
+                            <i class="fa-solid fa-user-plus empty-history-icon"></i>
+                            <span class="empty-title">No referral earnings yet today</span>
+                            <span class="empty-sub">Share your referral link to earn 40 BDT bonus + 5% daily commission!</span>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            document.getElementById('activeReferralCount').innerText = "0 Active";
+        }
+
+        // ================= ১. লাইভ রেফারেল ডাটা ও নির্দিষ্ট ডোমেইন লিংক সেট =================
+        auth.onAuthStateChanged(user => {
+            const cachedUser = JSON.parse(localStorage.getItem('microtask_cached_user')) || {};
+            myReferralUID = String(cachedUser.uid || '000000').trim();
+
+            // আপনার চাওয়া ডোমেইনের সাথে লিংক: https://microtask.page.gd/?ref=UID
+            document.getElementById('refLinkInput').value = `${BASE_DOMAIN}?ref=${myReferralUID}`;
+
+            if (user) {
+                db.collection("users").doc(user.uid).onSnapshot(doc => {
+                    if (doc.exists) {
+                        currentUserData = doc.data();
+                        myReferralUID = String(currentUserData.uid || myReferralUID).trim();
+                        document.getElementById('refLinkInput').value = `${BASE_DOMAIN}?ref=${myReferralUID}`;
+                    }
+                });
+
+                listenToTodayReferralEarnings(myReferralUID, user.uid);
             } else {
-                tbody.innerHTML = USER_REFERRAL_HISTORY.map(item => `
-                    <tr>
-                        <td>
-                            <div class="user-flex">
-                                <img src="${item.avatar || 'https://i.pravatar.cc/100?img=1'}" alt="Avatar" class="avatar-small">
-                                <span class="user-id-text">${item.username}</span>
-                            </div>
-                        </td>
-                        <td><span class="date-text">${item.date}</span></td>
-                        <td><span class="comm-text">$${Number(item.commission).toFixed(2)}</span></td>
-                        <td style="text-align: right;"><span class="badge-completed">${item.status}</span></td>
-                    </tr>
-                `).join('');
+                renderEmptyTable();
+            }
+        });
+
+        function listenToTodayReferralEarnings(refUID, currentAuthUid) {
+            db.collection("users").where("referredBy", "==", refUID).onSnapshot(snapshot => {
+                const tbody = document.getElementById('referralsTableBody');
+                const totalRefEl = document.getElementById('statTotalReferrals');
+                const activeCounterEl = document.getElementById('activeReferralCount');
+                const todayStr = getTodayString();
+                const todayFormatted = getFormattedDate(new Date());
+
+                if (snapshot.empty) {
+                    renderEmptyTable();
+                    updateStatsUI(0, 0, 0, 0);
+                    return;
+                }
+
+                const totalReferrals = snapshot.size;
+                totalRefEl.innerText = totalReferrals;
+
+                let todayRowsHtml = '';
+                let activeCountToday = 0;
+                let today5PctTotalBDT = 0;
+                let verifiedCount = 0;
+
+                snapshot.forEach(doc => {
+                    const u = doc.data();
+                    const maskedName = maskUserName(u.name || 'Member');
+                    const isVerified = u.isVerified === true;
+                    if (isVerified) verifiedCount++;
+
+                    // ১. আজকে ভেরিফাই হলে -> ৪০ টাকা বোনাস (তারিখ সহ)
+                    if (isVerified && u.verifiedDate === todayStr) {
+                        activeCountToday++;
+                        todayRowsHtml += `
+                            <tr>
+                                <td>
+                                    <div class="user-flex">
+                                        <div class="avatar-small"><i class="fa-solid fa-user"></i></div>
+                                        <span class="user-id-text">${maskedName}</span>
+                                    </div>
+                                </td>
+                                <td><span class="date-text">${todayFormatted}</span></td>
+                                <td><span class="bonus-badge-tag verify">Verify Bonus</span></td>
+                                <td style="text-align: right;"><span class="comm-5pct-text">+40.00 BDT</span></td>
+                            </tr>
+                        `;
+                    }
+
+                    // ২. আজকে কাজ করলে -> কাজের ৫% কমিশন (তারিখ সহ)
+                    if (u.lastEarnDate === todayStr && (u.todayEarnUSD || 0) > 0) {
+                        const user5PctBDT = parseFloat((u.todayEarnUSD * 120 * 0.05).toFixed(2));
+                        if (user5PctBDT > 0) {
+                            today5PctTotalBDT += user5PctBDT;
+                            activeCountToday++;
+
+                            todayRowsHtml += `
+                                <tr>
+                                    <td>
+                                        <div class="user-flex">
+                                            <div class="avatar-small"><i class="fa-solid fa-user"></i></div>
+                                            <span class="user-id-text">${maskedName}</span>
+                                        </div>
+                                    </td>
+                                    <td><span class="date-text">${todayFormatted}</span></td>
+                                    <td><span class="bonus-badge-tag comm">5% Comm.</span></td>
+                                    <td style="text-align: right;"><span class="comm-5pct-text">+${user5PctBDT.toFixed(2)} BDT</span></td>
+                                </tr>
+                            `;
+                        }
+                    }
+                });
+
+                if (activeCountToday === 0) {
+                    renderEmptyTable();
+                } else {
+                    tbody.innerHTML = todayRowsHtml;
+                    activeCounterEl.innerText = `${activeCountToday} Active`;
+                }
+
+                // স্ট্যাটাস হিসাব
+                const verificationBonusTotalBDT = verifiedCount * 40;
+                const totalComm5PctBDT = parseFloat(((currentUserData ? currentUserData.referralComm5PctUSD || 0 : 0) * 120).toFixed(2));
+                const grandTotalEarningsBDT = verificationBonusTotalBDT + totalComm5PctBDT;
+
+                updateStatsUI(totalReferrals, totalComm5PctBDT, grandTotalEarningsBDT, today5PctTotalBDT);
+                checkAndCreditMidnightCommission(currentAuthUid, today5PctTotalBDT, todayStr);
+            }, () => renderEmptyTable());
+        }
+
+        function updateStatsUI(totalRef, comm5Pct, totalEarn, pendingComm) {
+            document.getElementById('statTotalReferrals').innerText = totalRef;
+            document.getElementById('statReferralCommission').innerText = `${comm5Pct.toFixed(2)} BDT`;
+            document.getElementById('statTotalEarnings').innerText = `${totalEarn.toFixed(2)} BDT`;
+            document.getElementById('statPendingCommission').innerText = `${pendingComm.toFixed(2)} BDT`;
+        }
+
+        // ================= ২. রাত ১২টার পর স্বয়ংক্রিয় ৫% কমিশন মেইন ব্যালেন্সে ক্রেডিট =================
+        function checkAndCreditMidnightCommission(authUid, pendingBDT, todayStr) {
+            if (!currentUserData || pendingBDT <= 0) return;
+
+            const lastCreditDate = currentUserData.lastMidnightCommDate || '';
+            const now = new Date();
+            const currentHour = now.getHours();
+
+            if (lastCreditDate !== todayStr && currentHour >= 0) {
+                const commissionUSD = parseFloat((pendingBDT / 120).toFixed(4));
+
+                db.collection("users").doc(authUid).update({
+                    balanceUSD: firebase.firestore.FieldValue.increment(commissionUSD),
+                    totalEarnUSD: firebase.firestore.FieldValue.increment(commissionUSD),
+                    referralComm5PctUSD: firebase.firestore.FieldValue.increment(commissionUSD),
+                    lastMidnightCommDate: todayStr
+                }).then(() => {
+                    db.collection("notifications").add({
+                        targetUid: myReferralUID,
+                        category: "referral",
+                        title: "🎉 দৈনিক ৫% রেফারেল কমিশন জমা হয়েছে!",
+                        message: `আপনার রেফারেলদের সারাদিনের উপার্জনের ৫% কমিশন (${pendingBDT.toFixed(2)} BDT) রাত ১২টায় স্বয়ংক্রিয়ভাবে মেইন ব্যালেন্সে জমা হয়েছে!`,
+                        actionUrl: "refer.html",
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }).catch(e => console.log("Midnight credit sync:", e));
             }
         }
 
-        // ১০০% নির্ভরযোগ্য কপি ফাংশন
+        // ================= ৩. কপি ও শেয়ারিং হ্যান্ডলার =================
         function copyReferralLink() {
             const inputField = document.getElementById("refLinkInput");
             const text = inputField.value;
@@ -655,7 +848,7 @@
 
         function openWhatsAppShare() {
             const link = document.getElementById("refLinkInput").value;
-            const message = encodeURIComponent(`Join MicroTask and start earning money today! Sign up using my referral link: ${link}`);
+            const message = encodeURIComponent(`MicroTask-এ জয়েন করে ছোট ছোট কাজ করে টাকা আয় করুন! আমার রেফারেল লিংক দিয়ে অ্যাকাউন্ট খুলুন: ${link}`);
             window.open(`https://api.whatsapp.com/send?text=${message}`, '_blank');
         }
 
@@ -664,7 +857,7 @@
             if (navigator.share) {
                 navigator.share({
                     title: 'MicroTask - Refer & Earn',
-                    text: 'Earn money by completing simple tasks!',
+                    text: 'Join MicroTask and start earning today!',
                     url: link,
                 }).catch(() => {});
             } else {
@@ -682,8 +875,6 @@
                 toast.classList.remove("show");
             }, 2400);
         }
-
-        document.addEventListener('DOMContentLoaded', initReferralScreen);
     </script>
 </body>
 </html>
