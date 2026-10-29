@@ -334,9 +334,25 @@
       document.getElementById('modal-user-uid').innerText = `UID: #${currentUser.uid}`;
     }
 
+    // অথেন্টিকেশন সেশন লাইভ ট্র্যাকিং
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        db.collection("users").doc(user.uid).get().then(doc => {
+          if (doc.exists) {
+            const data = doc.data();
+            currentUser.uid = String(data.uid || currentUser.uid).trim();
+            currentUser.name = data.name || currentUser.name;
+            currentUser.isVerified = data.isVerified === true;
+            loadActiveUserSession();
+          }
+        }).catch(() => {});
+      }
+    });
+
     let posts = [];
     let selectedBoostPackage = 100;
     let targetBoostPostId = null;
+    let targetBoostPost = null;
     let targetDeletePostId = null;
 
     function countWords(str) {
@@ -445,7 +461,6 @@
             ${postBodyContent}
           </div>
 
-          <!-- ভিউ ও লাইক স্ট্যাটাস -->
           <div class="px-3 py-1.5 flex items-center justify-between text-[11px] text-aqua-textSecondary border-t border-aqua-divider bg-aqua-cardTint/40">
             <div class="flex items-center space-x-2">
               <div class="flex items-center space-x-1">
@@ -609,7 +624,6 @@
           const data = doc.data();
           const postObj = { id: doc.id, ...data };
 
-          // যদি বুস্ট মেয়াদ শেষ হয়ে থাকে, সাথে সাথে অটো-ডিলিট ও ইনকাম ক্রেডিট
           if (postObj.boostStatus === 'active' && postObj.boostExpiresAt && postObj.boostExpiresAt <= Date.now()) {
             handleBoostExpirationAndSettle(postObj);
           } else {
@@ -622,7 +636,7 @@
       });
     }
 
-    // ================= বুস্ট মেয়াদ শেষ হলে অটো-ডিলিট ও ব্যালেন্স ক্রেডিট =================
+    // বুস্ট মেয়াদ শেষ হলে অটো-ডিলিট ও ব্যালেন্স ক্রেডিট
     const settlingPostsSet = new Set();
 
     function handleBoostExpirationAndSettle(post) {
@@ -633,7 +647,6 @@
       const earnedBDT = (earnedUSD * 120).toFixed(2);
       const authorUid = String(post.userId || '').trim();
 
-      // ১. অর্জিত ইনকাম মেইন ব্যালেন্সে ক্রেডিট করা
       if (earnedUSD > 0 && authorUid) {
         db.collection("users").where("uid", "==", authorUid).get().then(snap => {
           if (!snap.empty) {
@@ -644,7 +657,6 @@
           }
         }).catch(err => console.log("Balance sync err:", err));
 
-        // ২. Earnings ক্যাটাগরিতে নোটিফিকেশন পাঠানো
         db.collection("notifications").add({
           targetUid: authorUid,
           category: "earnings",
@@ -656,7 +668,6 @@
         }).catch(() => {});
       }
 
-      // ৩. পোস্টটি ডাটাবেজ থেকে স্থায়ীভাবে অটো-ডিলিট করা
       db.collection("posts").doc(post.id).delete().then(() => {
         console.log(`Boost post ${post.id} auto-deleted.`);
       }).catch(err => console.log("Delete err:", err));
@@ -672,7 +683,6 @@
       { id: "u_6", name: "Farhan Ahmed", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&auto=format&fit=crop&q=80", text: "পোস্টটি পড়ে অনেক কিছু জানতে পারলাম।" }
     ];
 
-    // লাইভ বুস্টিং লুপ
     setInterval(() => {
       posts.forEach(post => {
         if (post.boostStatus === 'active' && post.boostExpiresAt > Date.now()) {
@@ -731,7 +741,6 @@
       });
     }, 4000);
 
-    // কাউন্টডাউন ট্র্যাকার
     function updateAllCountdowns() {
       posts.forEach(post => {
         if (post.boostStatus === 'active' && post.boostExpiresAt) {
@@ -1013,10 +1022,14 @@
 
     function openBoostModal(postId) {
       targetBoostPostId = postId;
-      const post = posts.find(p => p.id === postId);
-      if (!post) return;
+      targetBoostPost = posts.find(p => p.id === postId);
 
-      const words = countWords(post.content);
+      if (!targetBoostPost) {
+        alert("পোস্টটি খুঁজে পাওয়া যায়নি! পেজটি রিফ্রেশ করুন।");
+        return;
+      }
+
+      const words = countWords(targetBoostPost.content);
       const badge = document.getElementById('boost-tier-badge');
       const ruleText = document.getElementById('boost-rule-text');
 
@@ -1060,10 +1073,12 @@
       selectPackage(100);
       document.getElementById('modal-boost').classList.remove('hidden');
       document.getElementById('modal-boost').classList.add('flex');
+      lucide.createIcons();
     }
 
     function closeBoostModal() {
       targetBoostPostId = null;
+      targetBoostPost = null;
       document.getElementById('modal-boost').classList.add('hidden');
       document.getElementById('modal-boost').classList.remove('flex');
     }
@@ -1082,37 +1097,56 @@
       });
     }
 
-    function submitBoostRequest() {
-      const post = posts.find(p => p.id === targetBoostPostId);
-      if (!post) return;
+    // ================= বুস্ট রিকোয়েস্ট সাবমিশন (১০০% ফিক্সড) =================
+    async function submitBoostRequest() {
+      if (!targetBoostPostId || !targetBoostPost) {
+        alert("অনুগ্রহ করে যে পোস্টটি বুস্ট করবেন সেটি সিলেক্ট করুন!");
+        return;
+      }
 
       const btn = document.getElementById('btnSubmitBoostReq');
       btn.disabled = true;
       btn.innerText = "Submitting to Admin...";
 
-      db.collection("posts").doc(post.id).update({
-        boostStatus: "pending",
-        boostPackage: `${selectedBoostPackage} Tk`
-      });
+      try {
+        const user = auth.currentUser;
+        const cached = JSON.parse(localStorage.getItem('microtask_cached_user')) || {};
+        const finalUid = String(cached.uid || (user ? user.uid : currentUser.uid || '000000')).trim();
+        const finalName = cached.name || currentUser.name || 'User';
 
-      db.collection("boost_requests").add({
-        postId: post.id,
-        content: post.content,
-        authorName: currentUser.name,
-        userId: currentUser.uid,
-        boostPackage: `${selectedBoostPackage} Tk`,
-        amountBDT: selectedBoostPackage,
-        status: "pending",
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(() => {
-        alert(`Boost Request Submitted!\nPackage: ${selectedBoostPackage} Tk\nক্যাম্পেইনটি অ্যাডমিন প্যানেলে অনুমোদনের জন্য পাঠানো হয়েছে।`);
+        const boostPayload = {
+          postId: targetBoostPost.id,
+          content: targetBoostPost.content || '',
+          authorName: finalName,
+          userName: finalName,
+          userId: finalUid,
+          uid: finalUid,
+          userUID: finalUid,
+          boostPackage: `${selectedBoostPackage} Tk`,
+          amountBDT: Number(selectedBoostPackage),
+          amount: Number(selectedBoostPackage),
+          status: "pending",
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+
+        // ১. অ্যাডমিন প্যানেলের boost_requests কালেকশনে পাঠানো
+        await db.collection("boost_requests").add(boostPayload);
+
+        // ২. পোস্ট ডকুমেন্টে বুস্ট স্ট্যাটাস পেন্ডিং আপডেট করা
+        await db.collection("posts").doc(targetBoostPost.id).update({
+          boostStatus: "pending",
+          boostPackage: `${selectedBoostPackage} Tk`
+        });
+
+        alert(`✅ বুস্ট রিকোয়েস্ট সফলভাবে অ্যাডমিন প্যানেলে পাঠানো হয়েছে!\nপ্যাকেজ: ${selectedBoostPackage} Tk\nঅ্যাডমিন অনুমোদন দিলে পোস্টটি স্বয়ংক্রিয়ভাবে বুস্ট হওয়া শুরু করবে।`);
         closeBoostModal();
-      }).catch(err => {
-        alert("Error submitting boost: " + err.message);
-      }).finally(() => {
+      } catch (err) {
+        console.error("Boost submission error:", err);
+        alert("বুস্ট রিকোয়েস্ট পাঠাতে সমস্যা হয়েছে:\n" + err.message);
+      } finally {
         btn.disabled = false;
         btn.innerText = "Submit Boost Request";
-      });
+      }
     }
 
     function switchTab(tab) {
