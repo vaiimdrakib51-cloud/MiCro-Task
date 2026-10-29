@@ -385,7 +385,7 @@
         .video-card-3d span { font-size: 11px; color: #0f172a; font-weight: 800; margin-top: 2px; }
         .video-card-3d small { font-size: 9.5px; color: #059669; font-weight: 850; }
 
-        /* PROMO BANNER */
+        /* PROMO BANNER SLIDER */
         .promo-banner-container { 
             position: relative; 
             width: 100%; 
@@ -397,7 +397,7 @@
             box-shadow: 0 6px 18px rgba(2, 132, 199, 0.18); 
         }
         .promo-slider-track { display: flex; height: 100%; width: 100%; transition: transform 0.4s ease; }
-        .promo-slide { min-width: 100%; height: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .promo-slide { min-width: 100%; height: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; background: #071526; }
         .promo-slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
         .promo-dots { position: absolute; bottom: 8px; right: 12px; display: flex; gap: 5px; z-index: 5; background: rgba(0, 0, 0, 0.55); padding: 3px 7px; border-radius: 12px; }
         .promo-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255, 255, 255, 0.5); }
@@ -874,7 +874,7 @@
                     </div>
                 </div>
 
-                <!-- Promo Banner -->
+                <!-- Dynamic Promo / Offer Banners Slider (Multiple Banner Support) -->
                 <div class="promo-banner-container">
                     <div class="promo-slider-track" id="promoSliderTrack"></div>
                     <div class="promo-dots" id="promoDots"></div>
@@ -979,6 +979,35 @@
         let isBalanceHidden = false;
         let userCreatedAtMs = 0;
 
+        // ================= ১. পারমিশন বাগ ফিক্স (একবারই পারমিশন চাইবে, বারবার ডিস্টার্ব করবে না) =================
+        function initDeviceAndAppPermissions() {
+            // যদি পূর্বে অনুমতি নেওয়া হয়ে থাকে তবে আর চাইবে না
+            if (localStorage.getItem('microtask_permissions_settled')) return;
+
+            // নোটিফিকেশন পারমিশন ও স্টোরেজ সিঙ্ক একবারেই সম্পন্ন করা
+            if ('Notification' in window && Notification.permission === 'default') {
+                Notification.requestPermission().then(() => {
+                    localStorage.setItem('microtask_permissions_settled', 'true');
+                }).catch(() => {
+                    localStorage.setItem('microtask_permissions_settled', 'true');
+                });
+            } else {
+                localStorage.setItem('microtask_permissions_settled', 'true');
+            }
+        }
+        setTimeout(initDeviceAndAppPermissions, 1500);
+
+        // ================= ২. রেফারেল লিংক অটো-ডিটেক্ট (?ref=118603) =================
+        (function detectReferralFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const refFromUrl = urlParams.get('ref');
+            if (refFromUrl) {
+                localStorage.setItem('pending_refer_code', refFromUrl.trim());
+                const regReferField = document.getElementById('regReferCode');
+                if (regReferField) regReferField.value = refFromUrl.trim();
+            }
+        })();
+
         function getTodayString() {
             const d = new Date();
             const year = d.getFullYear();
@@ -987,7 +1016,6 @@
             return `${year}-${month}-${day}`;
         }
 
-        // নাম আংশিক গোপন করার হেল্পার (যেমন: Tanvir Hasan -> Ta****)
         function maskUserName(name) {
             if (!name) return "User***";
             name = name.trim();
@@ -1109,7 +1137,6 @@
             }
         }
 
-        // ================= ২. ভেরিফিকেশন হলে রেফারারকে ৪০ টাকা বোনাস + নোটিফিকেশন =================
         function processAccountVerification() {
             const user = auth.currentUser;
             if (!user) {
@@ -1134,24 +1161,29 @@
             btn.disabled = true;
             btn.innerText = "Processing...";
 
-            // ইউজার থেকে ৫০ টাকা কাটা এবং ভেরিফাই করা
+            const todayStr = getTodayString();
+
             db.collection("users").doc(user.uid).update({
                 balanceUSD: firebase.firestore.FieldValue.increment(-feeUSD),
-                isVerified: true
+                isVerified: true,
+                verifiedDate: todayStr
             }).then(() => {
-                if (currentUserDoc) currentUserDoc.isVerified = true;
+                if (currentUserDoc) {
+                    currentUserDoc.isVerified = true;
+                    currentUserDoc.verifiedDate = todayStr;
+                }
                 const cached = JSON.parse(localStorage.getItem('microtask_cached_user')) || {};
                 cached.isVerified = true;
+                cached.verifiedDate = todayStr;
                 localStorage.setItem('microtask_cached_user', JSON.stringify(cached));
 
                 updateVerificationUI();
                 closeVerifyModal();
                 showToast("Account Verified! ৳50 ($0.42) deducted.", "success");
 
-                // রেফারারকে স্বয়ংক্রিয়ভাবে ৪০ টাকা ($0.33) বোনাস দেওয়া
                 if (currentUserDoc && currentUserDoc.referredBy) {
                     const refUID = String(currentUserDoc.referredBy).trim();
-                    const bonusUSD = parseFloat((40 / 120).toFixed(4)); // ৪০ টাকা ≈ $0.3333 USD
+                    const bonusUSD = parseFloat((40 / 120).toFixed(4));
                     const maskedUser = maskUserName(currentUserDoc.name || 'Member');
 
                     db.collection("users").where("uid", "==", refUID).get().then(snap => {
@@ -1162,14 +1194,13 @@
                                 totalEarnUSD: firebase.firestore.FieldValue.increment(bonusUSD)
                             });
 
-                            // রেফারারের কাছে নোটিফিকেশন পাঠানো
                             db.collection("notifications").add({
                                 targetUid: refUID,
-                                category: "referral",
+                                category: "earnings",
+                                method: "referral_bonus",
                                 title: "🎉 ৳৪০ রেফারেল বোনাস জমা হয়েছে!",
-                                message: `অভিনন্দন! আপনার রেফারেল ${maskedUser} অ্যাকাউন্ট ভেরিফাই করেছে। আপনার অ্যাকাউন্টে ৳৪০ ($0.33) বোনাস যোগ হয়েছে!`,
+                                message: `অভিনন্দন! আপনার রেফারেল ${maskedUser} অ্যাকাউন্ট ৫০ টাকায় ভেরিফাই করেছে। আপনার অ্যাকাউন্টে ৳৪০ ($0.33) বোনাস যোগ হয়েছে!`,
                                 actionUrl: "refer.html",
-                                time: "Just now",
                                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
                             });
                         }
@@ -1275,7 +1306,17 @@
         }
 
         const sheet = document.getElementById('sheet');
-        function openSheet(view) { sheet.classList.add('open'); showView(view); }
+        function openSheet(view) { 
+            sheet.classList.add('open'); 
+            showView(view); 
+            if (view === 'register') {
+                const savedRef = localStorage.getItem('pending_refer_code');
+                if (savedRef) {
+                    const regField = document.getElementById('regReferCode');
+                    if (regField && !regField.value) regField.value = savedRef;
+                }
+            }
+        }
         function closeSheet() { sheet.classList.remove('open'); }
         function showView(view) {
             ['register','login','forgot'].forEach(v => {
@@ -1284,14 +1325,13 @@
             });
         }
 
-        // ================= ১. রেজিস্ট্রেশন সময়ে রেফারারের কাছে নোটিফিকেশন =================
         function handleInvezoRegister(e) {
             e.preventDefault();
             const name = document.getElementById('regName').value.trim();
             const email = document.getElementById('regIdentity').value.trim();
             const password = document.getElementById('regPassword').value;
             const confirm = document.getElementById('regConfirm').value;
-            const referCode = document.getElementById('regReferCode').value.trim();
+            const referCode = document.getElementById('regReferCode').value.trim() || localStorage.getItem('pending_refer_code');
             const msgEl = document.getElementById('regMessage');
             const btn = document.getElementById('regSubmitBtn');
 
@@ -1326,7 +1366,6 @@
 
                     localStorage.setItem('microtask_cached_user', JSON.stringify(userPayload));
 
-                    // রেফারারকে নোটিফিকেশন পাঠানো (নাম আংশিক গোপন রেখে)
                     if (referCode) {
                         const hiddenName = maskUserName(name);
                         db.collection("notifications").add({
@@ -1335,7 +1374,6 @@
                             title: "নতুন সদস্য জয়েন করেছে!",
                             message: `${hiddenName} আপনার রেফারেল কোড ব্যবহার করে অ্যাকাউন্ট খুলেছে। সে ৫০ টাকায় অ্যাকাউন্ট ভেরিফাই করলে পাবেন ৳৪০ ইনস্ট্যান্ট বোনাস!`,
                             actionUrl: "refer.html",
-                            time: "Just now",
                             createdAt: firebase.firestore.FieldValue.serverTimestamp()
                         });
                     }
@@ -1396,7 +1434,6 @@
             showToast(`${provider} login will be available in next update!`, "info");
         }
 
-        // নোটিফিকেশন ব্যাজ লাইভ ট্র্যাকিং
         function initNotificationBadge() {
             const badge = document.getElementById('notifBadgeCount');
             badge.innerText = '0';
@@ -1504,25 +1541,40 @@
             touchDiffY = 0;
         });
 
-        // ব্যানার স্লাইডার
+        // ================= ৩. একাধিক ব্যানার স্লাইডার (গ্যালারি ছবি সাপোর্ট সহ) =================
         let promoBanners = [{ id: 'default', image: "https://i.ibb.co.com/tTLNfcH6/file-000000001c1c82089a7b8b791e5b5e0e.png", action: "deposit.html" }];
         let currentBannerIdx = 0;
         let bannerInterval = null;
 
         function initBannerSlider() {
+            // ১. ফায়ারবেস banners কালেকশন থেকে ব্যানার লোড
             db.collection("banners").onSnapshot(snapshot => {
                 if (!snapshot.empty) {
                     const loadedBanners = [];
                     snapshot.forEach(doc => {
                         const data = doc.data();
-                        if (data.image) {
-                            loadedBanners.push({ id: doc.id, image: data.image, action: data.action || 'deposit.html' });
+                        // গ্যালারির ছবি (URL বা Base64) সাপোর্ট করবে
+                        const bannerImg = data.image || data.imageUrl || data.bannerUrl;
+                        if (bannerImg) {
+                            loadedBanners.push({
+                                id: doc.id,
+                                image: bannerImg,
+                                action: data.action || 'deposit.html'
+                            });
                         }
                     });
                     if (loadedBanners.length > 0) promoBanners = loadedBanners;
                 }
                 renderDynamicBanners();
-            }, () => renderDynamicBanners());
+            }, () => {
+                // ২. অল্টারনেট: settings/banners ডকুমেন্ট থেকেও চেক করা
+                db.collection("settings").doc("banners").get().then(doc => {
+                    if (doc.exists && doc.data().list && Array.isArray(doc.data().list)) {
+                        promoBanners = doc.data().list;
+                    }
+                    renderDynamicBanners();
+                }).catch(() => renderDynamicBanners());
+            });
         }
 
         function renderDynamicBanners() {
@@ -1531,8 +1583,8 @@
             if (!track || !dotsContainer) return;
 
             track.innerHTML = promoBanners.map(b => `
-                <div class="promo-slide" onclick="window.location.href='${b.action}'">
-                    <img src="${b.image}" alt="Promo Banner" onerror="this.src='https://i.ibb.co.com/tTLNfcH6/file-000000001c1c82089a7b8b791e5b5e0e.png'">
+                <div class="promo-slide" onclick="window.location.href='${b.action || 'deposit.html'}'">
+                    <img src="${b.image}" alt="Offer Banner" onerror="this.src='https://i.ibb.co.com/tTLNfcH6/file-000000001c1c82089a7b8b791e5b5e0e.png'">
                 </div>
             `).join('');
 
@@ -1544,7 +1596,7 @@
                     currentBannerIdx = (currentBannerIdx + 1) % promoBanners.length;
                     track.style.transform = `translateX(-${currentBannerIdx * 100}%)`;
                     document.querySelectorAll('.promo-dot').forEach((dot, idx) => dot.classList.toggle('active', idx === currentBannerIdx));
-                }, 4000);
+                }, 3500); // প্রতি ৩.৫ সেকেন্ড পর পর অটো-স্লাইড
             }
         }
 
