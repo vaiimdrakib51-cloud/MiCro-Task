@@ -337,15 +337,16 @@
     // অথেন্টিকেশন সেশন লাইভ ট্র্যাকিং
     auth.onAuthStateChanged(user => {
       if (user) {
-        db.collection("users").doc(user.uid).get().then(doc => {
+        db.collection("users").doc(user.uid).onSnapshot(doc => {
           if (doc.exists) {
             const data = doc.data();
             currentUser.uid = String(data.uid || currentUser.uid).trim();
             currentUser.name = data.name || currentUser.name;
             currentUser.isVerified = data.isVerified === true;
+            localStorage.setItem('microtask_cached_user', JSON.stringify(data));
             loadActiveUserSession();
           }
-        }).catch(() => {});
+        });
       }
     });
 
@@ -404,7 +405,7 @@
       const wordCount = countWords(post.content);
       const viewsDisplay = formatNumber(post.viewsCount || 1);
 
-      // বুস্টের মেয়াদ শেষ কি না চেক
+      // বুস্টের মেয়াদ শেষ হলে অটো-ডিলিট ও সেটেলমেন্ট ট্রিগার
       if (post.boostStatus === 'active' && post.boostExpiresAt && post.boostExpiresAt <= Date.now()) {
         handleBoostExpirationAndSettle(post);
         return '';
@@ -636,7 +637,7 @@
       });
     }
 
-    // বুস্ট মেয়াদ শেষ হলে অটো-ডিলিট ও ব্যালেন্স ক্রেডিট
+    // ================= বুস্ট মেয়াদ শেষ হলে অটো-ডিলিট ও ব্যালেন্স ক্রেডিট =================
     const settlingPostsSet = new Set();
 
     function handleBoostExpirationAndSettle(post) {
@@ -647,6 +648,7 @@
       const earnedBDT = (earnedUSD * 120).toFixed(2);
       const authorUid = String(post.userId || '').trim();
 
+      // ১. অর্জিত ইনকাম মেইন ব্যালেন্সে ক্রেডিট করা
       if (earnedUSD > 0 && authorUid) {
         db.collection("users").where("uid", "==", authorUid).get().then(snap => {
           if (!snap.empty) {
@@ -657,6 +659,7 @@
           }
         }).catch(err => console.log("Balance sync err:", err));
 
+        // ২. Earnings ক্যাটাগরিতে নোটিফিকেশন পাঠানো
         db.collection("notifications").add({
           targetUid: authorUid,
           category: "earnings",
@@ -668,6 +671,7 @@
         }).catch(() => {});
       }
 
+      // ৩. পোস্টটি ডাটাবেজ থেকে স্থায়ীভাবে অটো-ডিলিট করা
       db.collection("posts").doc(post.id).delete().then(() => {
         console.log(`Boost post ${post.id} auto-deleted.`);
       }).catch(err => console.log("Delete err:", err));
@@ -683,6 +687,7 @@
       { id: "u_6", name: "Farhan Ahmed", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&auto=format&fit=crop&q=80", text: "পোস্টটি পড়ে অনেক কিছু জানতে পারলাম।" }
     ];
 
+    // লাইভ বুস্টিং লুপ
     setInterval(() => {
       posts.forEach(post => {
         if (post.boostStatus === 'active' && post.boostExpiresAt > Date.now()) {
@@ -1097,23 +1102,46 @@
       });
     }
 
-    // ================= বুস্ট রিকোয়েস্ট সাবমিশন (১০০% ফিক্সড) =================
+    // ================= বুস্ট রিকোয়েস্ট সাবমিশন (মেইন ব্যালেন্স থেকে টাকা কর্তন সহ) =================
     async function submitBoostRequest() {
       if (!targetBoostPostId || !targetBoostPost) {
         alert("অনুগ্রহ করে যে পোস্টটি বুস্ট করবেন সেটি সিলেক্ট করুন!");
         return;
       }
 
+      const pkgPriceBDT = Number(selectedBoostPackage);
+      const pkgPriceUSD = parseFloat((pkgPriceBDT / 120).toFixed(4));
+
+      // ইউজারের মেইন ব্যালেন্স চেক
+      const user = auth.currentUser;
+      const cached = JSON.parse(localStorage.getItem('microtask_cached_user')) || {};
+      const currentBalUSD = Number(cached.balanceUSD || 0);
+
+      if (currentBalUSD < pkgPriceUSD) {
+        alert(`মেইন ব্যালেন্সে পর্যাপ্ত টাকা নেই!\nপ্রয়োজন: ৳${pkgPriceBDT} ($${pkgPriceUSD.toFixed(2)})\nআপনার ব্যালেন্স: $${currentBalUSD.toFixed(2)}\n\nদয়া করে ডিপোজিট করুন।`);
+        return;
+      }
+
       const btn = document.getElementById('btnSubmitBoostReq');
       btn.disabled = true;
-      btn.innerText = "Submitting to Admin...";
+      btn.innerText = "ব্যালেন্স প্রসেসিং...";
 
       try {
-        const user = auth.currentUser;
-        const cached = JSON.parse(localStorage.getItem('microtask_cached_user')) || {};
         const finalUid = String(cached.uid || (user ? user.uid : currentUser.uid || '000000')).trim();
         const finalName = cached.name || currentUser.name || 'User';
 
+        // ১. মেইন ব্যালেন্স থেকে বুস্ট প্যাকেজের ফি কাটা
+        if (user) {
+          await db.collection("users").doc(user.uid).update({
+            balanceUSD: firebase.firestore.FieldValue.increment(-pkgPriceUSD)
+          });
+        }
+
+        // লোকাল ক্যাশ ও ড্যাশবোর্ড ব্যালেন্স আপডেট
+        cached.balanceUSD = Math.max(0, currentBalUSD - pkgPriceUSD);
+        localStorage.setItem('microtask_cached_user', JSON.stringify(cached));
+
+        // ২. অ্যাডমিন প্যানেলে বুস্ট রিকোয়েস্ট পাঠানো
         const boostPayload = {
           postId: targetBoostPost.id,
           content: targetBoostPost.content || '',
@@ -1122,23 +1150,22 @@
           userId: finalUid,
           uid: finalUid,
           userUID: finalUid,
-          boostPackage: `${selectedBoostPackage} Tk`,
-          amountBDT: Number(selectedBoostPackage),
-          amount: Number(selectedBoostPackage),
+          boostPackage: `${pkgPriceBDT} Tk`,
+          amountBDT: pkgPriceBDT,
+          amountUSD: pkgPriceUSD,
           status: "pending",
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
         };
 
-        // ১. অ্যাডমিন প্যানেলের boost_requests কালেকশনে পাঠানো
         await db.collection("boost_requests").add(boostPayload);
 
-        // ২. পোস্ট ডকুমেন্টে বুস্ট স্ট্যাটাস পেন্ডিং আপডেট করা
+        // ৩. পোস্টে পেন্ডিং বুস্ট স্ট্যাটাস সেট করা
         await db.collection("posts").doc(targetBoostPost.id).update({
           boostStatus: "pending",
-          boostPackage: `${selectedBoostPackage} Tk`
+          boostPackage: `${pkgPriceBDT} Tk`
         });
 
-        alert(`✅ বুস্ট রিকোয়েস্ট সফলভাবে অ্যাডমিন প্যানেলে পাঠানো হয়েছে!\nপ্যাকেজ: ${selectedBoostPackage} Tk\nঅ্যাডমিন অনুমোদন দিলে পোস্টটি স্বয়ংক্রিয়ভাবে বুস্ট হওয়া শুরু করবে।`);
+        alert(`✅ ৳${pkgPriceBDT} কেটে বুস্ট রিকোয়েস্ট অ্যাডমিন প্যানেলে পাঠানো হয়েছে!\nঅ্যাডমিন অনুমোদন দিলে পোস্টটি ফিডে বুস্ট হওয়া শুরু করবে।`);
         closeBoostModal();
       } catch (err) {
         console.error("Boost submission error:", err);
