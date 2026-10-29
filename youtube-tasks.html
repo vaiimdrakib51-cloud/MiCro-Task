@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -26,9 +27,8 @@
     .notice-bar { background: rgba(255, 26, 26, 0.15); border: 1px dashed #ff3333; border-radius: 12px; padding: 8px 12px; font-size: 10.5px; color: #ffcccc; display: flex; align-items: center; gap: 8px; }
     
     .task-list { display: flex; flex-direction: column; gap: 10px; flex: 1; }
-    .task-card { background: linear-gradient(180deg, #360707 0%, #150202 100%); border: 1.5px solid #ff2a2a; border-radius: 16px; padding: 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px; cursor: pointer; transition: 0.2s; }
+    .task-card { background: linear-gradient(180deg, #360707 0%, #150202 100%); border: 1.5px solid #ff2a2a; border-radius: 16px; padding: 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px; cursor: pointer; transition: all 0.25s ease; }
     .task-card:hover { transform: translateY(-2px); border-color: #ff6666; }
-    .task-card.is-pending { border-color: #e69500 !important; cursor: default; }
     
     .task-thumb { width: 66px; height: 52px; border-radius: 10px; background: #5c0f0f; border: 1px solid #ff4d4d; position: relative; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .play-circle { width: 20px; height: 20px; background: rgba(255, 26, 26, 0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 8.5px; }
@@ -40,24 +40,32 @@
     .mini-usd-tag { background: linear-gradient(135deg, #10b981, #059669); color: #ffffff; font-size: 9px; font-weight: 900; padding: 1px 6px; border-radius: 6px; }
     .reward-amount { color: #34d399; font-size: 11.5px; font-weight: 850; }
     
-    .task-tags { display: flex; gap: 3.5px; margin-top: 1px; }
-    .tag { background: rgba(255, 26, 26, 0.2); border: 0.5px solid #ff4d4d; color: #ffb3b3; font-size: 8px; padding: 1.5px 4.5px; border-radius: 4px; font-weight: 600; }
+    .task-tags { display: flex; gap: 3.5px; margin-top: 1px; flex-wrap: wrap; }
+    .tag { background: rgba(255, 26, 26, 0.2); border: 0.5px solid #ff4d4d; color: #ffb3b3; font-size: 8px; padding: 1.5px 5px; border-radius: 4px; font-weight: 600; }
     
-    .btn-3d { background: linear-gradient(180deg, #ff4d4d 0%, #cc0000 100%); border: 1px solid #ff9999; color: white; font-size: 11px; font-weight: 700; padding: 6px 11px; border-radius: 14px; display: flex; align-items: center; gap: 4px; cursor: pointer; }
-    .btn-pending { background: linear-gradient(180deg, #ffb300 0%, #e67e00 100%); border: 1px solid #ffe082; color: #fff; font-size: 9.5px; font-weight: 700; padding: 5px 8px; border-radius: 12px; }
+    .btn-3d { background: linear-gradient(180deg, #ff4d4d 0%, #cc0000 100%); border: 1px solid #ff9999; color: white; font-size: 11px; font-weight: 700; padding: 6px 12px; border-radius: 14px; display: flex; align-items: center; gap: 4px; cursor: pointer; }
+
+    .no-tasks-state { text-align: center; color: #ff9999; padding: 40px 10px; font-size: 12px; font-weight: 600; line-height: 1.5; }
+    .no-tasks-state i { font-size: 32px; color: #ff4d4d; margin-bottom: 8px; display: block; }
 
     /* Modal */
-    .modal-overlay { position: fixed; inset: 0; background: rgba(10, 0, 0, 0.85); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 100; padding: 15px; }
-    .modal-box { width: 100%; max-width: 390px; background: radial-gradient(circle at 50% 0%, #4a0505 0%, #1f0303 70%, #0a0000 100%); border: 1.5px solid #ff2a2a; border-radius: 22px; padding: 18px 16px; display: flex; flex-direction: column; gap: 12px; position: relative; }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(10, 0, 0, 0.88); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 100; padding: 15px; }
+    .modal-box { width: 100%; max-width: 390px; background: radial-gradient(circle at 50% 0%, #4a0505 0%, #1f0303 70%, #0a0000 100%); border: 1.5px solid #ff2a2a; border-radius: 22px; padding: 18px 16px; display: flex; flex-direction: column; gap: 12px; position: relative; max-height: 90vh; overflow-y: auto; }
     .close-btn { position: absolute; top: 15px; right: 16px; color: #ff9999; font-size: 18px; cursor: pointer; }
     .modal-title { color: #fff; font-size: 15px; font-weight: 700; }
     
-    .step-box { background: rgba(60, 5, 5, 0.5); border: 1px solid #991a1a; border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 6px; }
-    .step-header { color: #ff8080; font-size: 10.5px; font-weight: 700; }
+    .step-box { background: rgba(60, 5, 5, 0.5); border: 1px solid #991a1a; border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 7px; }
+    .step-header { color: #ff8080; font-size: 11px; font-weight: 700; }
     
     .video-link-btn { display: flex; align-items: center; justify-content: center; gap: 7px; background: linear-gradient(180deg, #ff0000 0%, #b30000 100%); color: white; padding: 11px; border-radius: 12px; font-size: 12.5px; font-weight: 800; border: none; cursor: pointer; }
     
-    .upload-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 4px; }
+    /* প্রোফাইল লিংক ইনপুট বক্স */
+    .profile-input-box { background: rgba(30, 0, 0, 0.6); border: 1px solid #ff4d4d; border-radius: 10px; padding: 9px 10px; margin-top: 4px; display: flex; flex-direction: column; gap: 4px; }
+    .profile-input-box label { font-size: 10.5px; color: #ffcccc; font-weight: 700; }
+    .profile-input-box input { background: #120202; border: 1px solid #ff6666; border-radius: 7px; padding: 7px 10px; color: #ffffff; font-size: 11.5px; outline: none; }
+    .profile-input-box small { font-size: 8.5px; color: #ff9999; }
+
+    .upload-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 8px; margin-top: 4px; }
     .upload-slot { border: 1.5px dashed #ff4d4d; background: rgba(80, 10, 10, 0.3); border-radius: 10px; height: 82px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; position: relative; overflow: hidden; }
     .upload-slot i { font-size: 18px; color: #ff6666; margin-bottom: 3px; }
     .upload-slot span { color: #ffcccc; font-size: 9.5px; font-weight: 600; text-align: center; }
@@ -75,22 +83,24 @@
         <i class="fa-solid fa-arrow-left"></i>
       </div>
       <div class="logo-3d"><i class="fa-brands fa-youtube"></i></div>
-      <div class="header-title"><h2>YouTube Tasks</h2><p>Watch Video • Subscribe • Earn USD ($)</p></div>
+      <div class="header-title"><h2>YouTube Tasks</h2><p>Watch Video • Earn USD ($)</p></div>
     </div>
     
     <div class="notice-bar">
       <i class="fa-solid fa-circle-info"></i>
-      <span>Select screenshots directly from your phone gallery.</span>
+      <span>Follow Admin task rules. Upload required screenshots & profile link.</span>
     </div>
     
     <div class="task-list" id="taskListContainer"></div>
   </div>
 
+  <!-- TASK MODAL -->
   <div class="modal-overlay" id="taskModal">
     <div class="modal-box">
       <i class="fa-solid fa-xmark close-btn" onclick="closeModal()"></i>
       <h3 class="modal-title" id="m-title">Complete Task & Submit</h3>
       
+      <!-- Step 1: Open Video -->
       <div class="step-box">
         <div class="step-header"><i class="fa-solid fa-1"></i> Step 1: Open Video in YouTube App</div>
         <button type="button" class="video-link-btn" onclick="openTargetNativeApp()">
@@ -98,28 +108,23 @@
         </button>
       </div>
 
+      <!-- Step 2: Dynamic Requirements from Admin -->
       <div class="step-box">
-        <div class="step-header"><i class="fa-solid fa-2"></i> Step 2: Select 3 Screenshots from Gallery</div>
-        <div class="upload-grid">
-          <div class="upload-slot">
-            <i class="fa-solid fa-thumbs-up"></i><span>1. Like</span><img id="prev-1" class="slot-preview">
-            <input type="file" id="file-1" accept="image/*" class="slot-native-input" onchange="previewSlot(1, event)">
-          </div>
-          
-          <div class="upload-slot">
-            <i class="fa-solid fa-bell"></i><span>2. Subscribe</span><img id="prev-2" class="slot-preview">
-            <input type="file" id="file-2" accept="image/*" class="slot-native-input" onchange="previewSlot(2, event)">
-          </div>
-          
-          <div class="upload-slot">
-            <i class="fa-solid fa-comment-dots"></i><span>3. Comment</span><img id="prev-3" class="slot-preview">
-            <input type="file" id="file-3" accept="image/*" class="slot-native-input" onchange="previewSlot(3, event)">
-          </div>
+        <div class="step-header"><i class="fa-solid fa-2"></i> Step 2: Upload Required Proofs</div>
+        
+        <!-- ডুপ্লিকেট সাবস্ক্রাইব রোধে প্রোফাইল লিংক ইনপুট -->
+        <div id="profileLinkBox" class="profile-input-box" style="display:none;">
+          <label><i class="fa-solid fa-link"></i> আপনার ইউটিউব চ্যানেল / প্রোফাইল লিংক দিন:</label>
+          <input type="url" id="userProfileUrl" placeholder="https://youtube.com/@yourchannel">
+          <small>⚠️ এই প্রোফাইল দিয়ে পূর্বে কাজ করা হয়েছে কি না তা স্বয়ংক্রিয়ভাবে যাচাই করা হবে।</small>
         </div>
+
+        <!-- অ্যাডমিন রুলস অনুযায়ী শুধু প্রয়োজনীয় স্ক্রিনশট স্লট আসবে -->
+        <div class="upload-grid" id="dynamicUploadGrid"></div>
       </div>
 
       <button class="submit-btn" id="submitBtn" onclick="submitProof()">
-        <i class="fa-solid fa-circle-check"></i> Submit for Admin Review
+        <i class="fa-solid fa-circle-check"></i> Submit for Review
       </button>
     </div>
   </div>
@@ -136,44 +141,77 @@
     };
 
     firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
     const db = firebase.firestore();
 
     let activeTaskId = null;
     let activeTaskUrl = '';
     let activeRewardUSD = 0.20;
-    let pendingTasks = new Set(JSON.parse(localStorage.getItem('yt_pending_tasks') || '[]'));
+    let activeTaskData = null;
 
-    const DEFAULT_YT_TASKS = [
-      { id: 'yt-1', title: 'Official Music Video #1', rewardUSD: 0.25, duration: '3:45', url: 'https://www.youtube.com' },
-      { id: 'yt-2', title: 'Trending Shorts Episode #2', rewardUSD: 0.15, duration: '0:59', url: 'https://www.youtube.com' }
-    ];
+    // অলরেডি সাবমিট করা টাস্কের লিস্ট (যাতে পেন্ডিং না দেখিয়ে স্ক্রিন থেকে চিরতরে গায়েব হয়ে যায়)
+    let userSubmittedTasks = new Set(JSON.parse(localStorage.getItem('yt_submitted_tasks') || '[]'));
 
+    function getUserUID() {
+      const cached = JSON.parse(localStorage.getItem('microtask_cached_user')) || {};
+      return String(cached.uid || (auth.currentUser ? auth.currentUser.uid : '000000')).trim();
+    }
+
+    // ফায়ারবেস থেকে লাইভ টাস্ক লোড
     function listenToLiveTasks() {
+      const myUID = getUserUID();
+
+      // ইউজারের পূর্বের সাবমিট করা কাজগুলো টেনে আনা
+      db.collection("task_submissions").where("uid", "==", myUID).get().then(snap => {
+        snap.forEach(doc => {
+          if (doc.data().taskId) userSubmittedTasks.add(doc.data().taskId);
+        });
+        localStorage.setItem('yt_submitted_tasks', JSON.stringify([...userSubmittedTasks]));
+      }).catch(() => {});
+
       db.collection("tasks").where("platform", "==", "youtube").onSnapshot(snapshot => {
         const container = document.getElementById('taskListContainer');
         container.innerHTML = '';
-        if (snapshot.empty) {
-          DEFAULT_YT_TASKS.forEach(t => renderSingleTaskCard(t.id, t.title, t.rewardUSD, t.duration, t.url));
-        } else {
-          snapshot.forEach(doc => {
-            const data = doc.data();
-            const reward = data.rewardUSD || (data.coins ? (data.coins / 100) : 0.20);
-            renderSingleTaskCard(doc.id, data.title, reward, data.duration || '2:00', data.url || 'https://www.youtube.com');
-          });
+
+        let visibleCount = 0;
+
+        snapshot.forEach(doc => {
+          const tId = doc.id;
+          // কাজ সাবমিট করা হয়ে গেলে তা আর এই পেজে দেখাবে না (মুছে যাবে)
+          if (userSubmittedTasks.has(tId)) return;
+
+          const data = doc.data();
+          const reward = data.rewardUSD || (data.coins ? (data.coins / 100) : 0.20);
+          renderSingleTaskCard(tId, data.title || 'YouTube Task', reward, data.duration || '2:00', data.url, data);
+          visibleCount++;
+        });
+
+        if (visibleCount === 0) {
+          container.innerHTML = `
+            <div class="no-tasks-state">
+              <i class="fa-solid fa-circle-check"></i>
+              <p>সবগুলো টাস্ক সম্পন্ন হয়েছে!<br>নতুন টাস্ক আসলে এখানে দেখতে পাবেন।</p>
+            </div>
+          `;
         }
-      }, () => {
-        DEFAULT_YT_TASKS.forEach(t => renderSingleTaskCard(t.id, t.title, t.rewardUSD, t.duration, t.url));
       });
     }
 
-    function renderSingleTaskCard(id, title, rewardUSD, duration, url) {
+    // অ্যাডমিন যে রুলস দেবে শুধু সেই ট্যাগ শো করবে
+    function renderSingleTaskCard(id, title, rewardUSD, duration, url, taskData) {
       const container = document.getElementById('taskListContainer');
-      const isPending = pendingTasks.has(id);
+
+      // অ্যাডমিন রুলস ট্যাগ
+      let tagsHtml = '';
+      if (taskData.requiresLike !== false) tagsHtml += `<span class="tag">Like</span>`;
+      if (taskData.requiresSubscribe === true) tagsHtml += `<span class="tag">Subscribe</span>`;
+      if (taskData.requiresComment === true) tagsHtml += `<span class="tag">Comment</span>`;
+      if (!tagsHtml) tagsHtml = `<span class="tag">Like</span>`;
 
       const card = document.createElement('div');
-      card.className = `task-card ${isPending ? 'is-pending' : ''}`;
-      card.id = id;
-      card.onclick = () => handleCardClick(id, title, rewardUSD, url);
+      card.className = `task-card`;
+      card.id = `card-${id}`;
+      card.onclick = () => handleCardClick(id, title, rewardUSD, url, taskData);
 
       card.innerHTML = `
         <div class="task-thumb">
@@ -186,37 +224,72 @@
             <span class="mini-usd-tag">USD</span>
             <span class="reward-amount">+$${parseFloat(rewardUSD).toFixed(2)}</span>
           </div>
-          <div class="task-tags">
-            <span class="tag">Like</span>
-            <span class="tag">Subscribe</span>
-            <span class="tag">Comment</span>
-          </div>
+          <div class="task-tags">${tagsHtml}</div>
         </div>
         <div class="action-btn-area">
-          ${isPending 
-            ? '<div class="btn-pending"><i class="fa-solid fa-clock"></i> Pending</div>' 
-            : '<button class="btn-3d"><i class="fa-solid fa-play"></i> Start</button>'}
+          <button class="btn-3d"><i class="fa-solid fa-play"></i> Start</button>
         </div>
       `;
 
       container.appendChild(card);
     }
 
-    function handleCardClick(id, title, rewardUSD, url) {
-      if(pendingTasks.has(id)) { alert("This task is currently Pending Admin review!"); return; }
+    // মডাল ওপেন এবং অ্যাডমিনের রুলস অনুযায়ী ইনপুট সাজানো
+    function handleCardClick(id, title, rewardUSD, url, taskData) {
       activeTaskId = id;
       activeTaskUrl = url || 'https://www.youtube.com';
       activeRewardUSD = parseFloat(rewardUSD) || 0.20;
+      activeTaskData = taskData || {};
 
       document.getElementById('m-title').innerText = `${title} (+$${activeRewardUSD.toFixed(2)})`;
-      for(let i=1; i<=3; i++){ 
-        document.getElementById('file-'+i).value = ""; 
-        document.getElementById('prev-'+i).style.display = "none"; 
+
+      const uploadGrid = document.getElementById('dynamicUploadGrid');
+      const profileLinkBox = document.getElementById('profileLinkBox');
+      uploadGrid.innerHTML = '';
+
+      // ১. যদি Subscribe/Follow করতে বলা হয় -> প্রোফাইল লিংক ইনপুট দেখাবে
+      if (activeTaskData.requiresSubscribe === true) {
+        profileLinkBox.style.display = 'flex';
+        document.getElementById('userProfileUrl').value = '';
+      } else {
+        profileLinkBox.style.display = 'none';
       }
+
+      // ২. অ্যাডমিনের চাওয়া অনুযায়ী ডায়নামিক স্ক্রিনশট আপলোড স্লট তৈরি
+      let slotIndex = 1;
+
+      // লাইক স্লট
+      if (activeTaskData.requiresLike !== false) {
+        uploadGrid.innerHTML += createUploadSlotHTML(slotIndex, 'Like', 'fa-thumbs-up');
+        slotIndex++;
+      }
+
+      // সাবস্ক্রাইব স্লট
+      if (activeTaskData.requiresSubscribe === true) {
+        uploadGrid.innerHTML += createUploadSlotHTML(slotIndex, 'Subscribe', 'fa-bell');
+        slotIndex++;
+      }
+
+      // কমেন্ট স্লট
+      if (activeTaskData.requiresComment === true) {
+        uploadGrid.innerHTML += createUploadSlotHTML(slotIndex, 'Comment', 'fa-comment-dots');
+        slotIndex++;
+      }
+
       document.getElementById('taskModal').style.display = "flex";
     }
 
-    // সরাসরি ফোনে ইনস্টল থাকা ইউটিউব অ্যাপে চালু করার ফাংশন
+    function createUploadSlotHTML(index, label, iconClass) {
+      return `
+        <div class="upload-slot">
+          <i class="fa-solid ${iconClass}"></i>
+          <span>${label}</span>
+          <img id="prev-${index}" class="slot-preview">
+          <input type="file" id="file-${index}" accept="image/*" class="slot-native-input" onchange="previewSlot(${index}, event)">
+        </div>
+      `;
+    }
+
     function openTargetNativeApp() {
       if (!activeTaskUrl) return;
       let target = activeTaskUrl.trim();
@@ -242,44 +315,93 @@
       }
     }
 
-    function closeModal(){ document.getElementById('taskModal').style.display = "none"; }
+    function closeModal(){ document.getElementById('taskModal').style.display="none"; }
 
-    function submitProof(){
-      if(!document.getElementById('file-1').files.length || !document.getElementById('file-2').files.length || !document.getElementById('file-3').files.length){
-        alert("Please select all 3 screenshots from your gallery!"); return;
+    // ================= ৩. সাবমিশন এবং ডুপ্লিকেট প্রোফাইল লিংক ভেরিফিকেশন =================
+    async function submitProof() {
+      const btn = document.getElementById('submitBtn');
+      const inputs = document.querySelectorAll('.slot-native-input');
+
+      // সব কয়টি প্রয়োজনীয় স্ক্রিনশট আপলোড হয়েছে কি না চেক
+      for (let input of inputs) {
+        if (!input.files || input.files.length === 0) {
+          alert("অ্যাডমিনের চাওয়া সব কয়টি স্ক্রিনশট সিলেক্ট করুন!");
+          return;
+        }
       }
 
-      const btn = document.getElementById('submitBtn');
+      let profileUrl = '';
+
+      // সাবস্ক্রাইব টাস্ক হলে প্রোফাইল লিংক ডুপ্লিকেট চেক
+      if (activeTaskData && activeTaskData.requiresSubscribe === true) {
+        profileUrl = document.getElementById('userProfileUrl').value.trim().toLowerCase().replace(/\/+$/, "");
+
+        if (!profileUrl) {
+          alert("অনুগ্রহ করে আপনার ইউটিউব প্রোফাইল / চ্যানেল লিংকটি প্রবেশ করান!");
+          return;
+        }
+
+        btn.disabled = true;
+        btn.innerText = "যাচাই করা হচ্ছে...";
+
+        try {
+          // ডাটাবেজে চেক করা এই প্রোফাইল দিয়ে আগে এই চ্যানেলে সাবস্ক্রাইব করা হয়েছে কি না
+          const duplicateCheck = await db.collection("task_submissions")
+            .where("taskId", "==", activeTaskId)
+            .where("profileUrl", "==", profileUrl)
+            .get();
+
+          if (!duplicateCheck.empty) {
+            alert("⚠️ এই প্রোফাইল লিংক দিয়ে ইতিপূর্বে এই টাস্কটি সম্পন্ন করা হয়েছে! একই প্রোফাইল একাধিকবার ব্যবহার করা সম্পূর্ণ নিষিদ্ধ।");
+            btn.disabled = false;
+            btn.innerText = "Submit for Review";
+            return;
+          }
+        } catch (err) {
+          console.log("Check err:", err);
+        }
+      }
+
       btn.disabled = true;
       btn.innerText = "Submitting to Admin...";
-      
-      pendingTasks.add(activeTaskId);
-      localStorage.setItem('yt_pending_tasks', JSON.stringify([...pendingTasks]));
-      
-      let card = document.getElementById(activeTaskId);
-      if(card) {
-        card.classList.add('is-pending');
-        card.querySelector('.action-btn-area').innerHTML = '<div class="btn-pending"><i class="fa-solid fa-clock"></i> Pending</div>';
-      }
 
-      const cachedUser = JSON.parse(localStorage.getItem('microtask_cached_user')) || {};
-      const userUID = String(cachedUser.uid || '000000').trim();
+      const userUID = getUserUID();
 
       db.collection("task_submissions").add({
         taskId: activeTaskId,
         platform: "youtube",
         uid: userUID,
+        profileUrl: profileUrl || null,
         rewardUSD: activeRewardUSD,
         status: "pending",
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       }).then(() => {
-        alert("Proof submitted successfully! It is now Pending review in Admin Panel.");
+        // ১. কাজ সাবমিট হওয়া মাত্রই ইউজারের লোকাল লিস্টে যোগ
+        userSubmittedTasks.add(activeTaskId);
+        localStorage.setItem('yt_submitted_tasks', JSON.stringify([...userSubmittedTasks]));
+
+        // ২. কার্ডটি স্ক্রিন থেকে সাথে সাথে মুছে ফেলা (আর পেন্ডিং দেখাবে না)
+        const cardElem = document.getElementById(`card-${activeTaskId}`);
+        if (cardElem) cardElem.remove();
+
+        // যদি আর কোনো কাজ না থাকে
+        const container = document.getElementById('taskListContainer');
+        if (container.children.length === 0) {
+          container.innerHTML = `
+            <div class="no-tasks-state">
+              <i class="fa-solid fa-circle-check"></i>
+              <p>সবগুলো টাস্ক সম্পন্ন হয়েছে!<br>নতুন টাস্ক আসলে এখানে দেখতে পাবেন।</p>
+            </div>
+          `;
+        }
+
+        alert("টাস্কটি সফলভাবে জমা দেওয়া হয়েছে! অ্যাডমিন রিভিউয়ের পর ব্যালেন্স যোগ হবে।");
         closeModal();
       }).catch(err => {
-        alert("Submission error: " + err.message);
+        alert("ত্রুটি: " + err.message);
       }).finally(() => {
         btn.disabled = false;
-        btn.innerText = "Submit for Admin Review";
+        btn.innerText = "Submit for Review";
       });
     }
 
