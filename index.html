@@ -385,20 +385,36 @@
         .video-card-3d span { font-size: 11px; color: #0f172a; font-weight: 800; margin-top: 2px; }
         .video-card-3d small { font-size: 9.5px; color: #059669; font-weight: 850; }
 
-        /* PROMO BANNER SLIDER */
+        /* PROMO BANNER SLIDER (সম্পূর্ণ ছবি নিখুঁতভাবে দেখানোর আপডেট) */
         .promo-banner-container { 
             position: relative; 
             width: 100%; 
-            height: 155px; 
+            height: 165px; 
             border-radius: 22px; 
             overflow: hidden; 
-            background: #08192e; 
+            background: linear-gradient(135deg, #091a30, #041021); 
             border: 2px solid #bae6fd; 
             box-shadow: 0 6px 18px rgba(2, 132, 199, 0.18); 
         }
         .promo-slider-track { display: flex; height: 100%; width: 100%; transition: transform 0.4s ease; }
-        .promo-slide { min-width: 100%; height: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; background: #071526; }
-        .promo-slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .promo-slide { 
+            min-width: 100%; 
+            height: 100%; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            background: #071526; 
+            padding: 2px;
+        }
+        /* এখানে object-fit: contain ব্যবহার করায় ছবি কাটবে না */
+        .promo-slide img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: contain; 
+            display: block; 
+            border-radius: 18px;
+        }
         .promo-dots { position: absolute; bottom: 8px; right: 12px; display: flex; gap: 5px; z-index: 5; background: rgba(0, 0, 0, 0.55); padding: 3px 7px; border-radius: 12px; }
         .promo-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255, 255, 255, 0.5); }
         .promo-dot.active { width: 16px; border-radius: 5px; background: #00d2ff; }
@@ -874,7 +890,7 @@
                     </div>
                 </div>
 
-                <!-- Dynamic Promo / Offer Banners Slider (Multiple Banner Support) -->
+                <!-- Dynamic Promo / Offer Banners Slider (সম্পূর্ণ ছবি শো করার সুবিধাসহ) -->
                 <div class="promo-banner-container">
                     <div class="promo-slider-track" id="promoSliderTrack"></div>
                     <div class="promo-dots" id="promoDots"></div>
@@ -979,12 +995,8 @@
         let isBalanceHidden = false;
         let userCreatedAtMs = 0;
 
-        // ================= ১. পারমিশন বাগ ফিক্স (একবারই পারমিশন চাইবে, বারবার ডিস্টার্ব করবে না) =================
         function initDeviceAndAppPermissions() {
-            // যদি পূর্বে অনুমতি নেওয়া হয়ে থাকে তবে আর চাইবে না
             if (localStorage.getItem('microtask_permissions_settled')) return;
-
-            // নোটিফিকেশন পারমিশন ও স্টোরেজ সিঙ্ক একবারেই সম্পন্ন করা
             if ('Notification' in window && Notification.permission === 'default') {
                 Notification.requestPermission().then(() => {
                     localStorage.setItem('microtask_permissions_settled', 'true');
@@ -997,7 +1009,6 @@
         }
         setTimeout(initDeviceAndAppPermissions, 1500);
 
-        // ================= ২. রেফারেল লিংক অটো-ডিটেক্ট (?ref=118603) =================
         (function detectReferralFromUrl() {
             const urlParams = new URLSearchParams(window.location.search);
             const refFromUrl = urlParams.get('ref');
@@ -1137,6 +1148,46 @@
             }
         }
 
+        // ================= গ্লোবাল ইনকাম ও আজকের আয় আপডেট মেথড =================
+        window.addEarningToUser = function(amountUSD, taskType = 'general') {
+            const user = auth.currentUser;
+            if (!user || !currentUserDoc) return;
+
+            const todayStr = getTodayString();
+            const currentBal = currentUserDoc.balanceUSD || 0;
+            const currentTotal = currentUserDoc.totalEarnUSD || 0;
+            let currentToday = (currentUserDoc.lastEarnDate === todayStr) ? (currentUserDoc.todayEarnUSD || 0) : 0;
+
+            const updatedBal = parseFloat((currentBal + amountUSD).toFixed(4));
+            const updatedToday = parseFloat((currentToday + amountUSD).toFixed(4));
+            const updatedTotal = parseFloat((currentTotal + amountUSD).toFixed(4));
+
+            currentUserDoc.balanceUSD = updatedBal;
+            currentUserDoc.todayEarnUSD = updatedToday;
+            currentUserDoc.totalEarnUSD = updatedTotal;
+            currentUserDoc.lastEarnDate = todayStr;
+
+            updateBalanceDisplay();
+
+            db.collection("users").doc(user.uid).update({
+                balanceUSD: updatedBal,
+                todayEarnUSD: updatedToday,
+                totalEarnUSD: updatedTotal,
+                lastEarnDate: todayStr
+            }).catch(e => console.error("Earn update error:", e));
+
+            // হিস্ট্রিতে রেকর্ড রাখা
+            db.collection("task_history").add({
+                uid: user.uid,
+                amountUSD: amountUSD,
+                amountBDT: parseFloat((amountUSD * 120).toFixed(2)),
+                taskType: taskType,
+                date: todayStr,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            }).catch(e => console.error(e));
+        };
+
+        // ভেরিফিকেশন প্রসেস এবং রেফারেল বোনাস সিঙ্ক (Today Earn সহ)
         function processAccountVerification() {
             const user = auth.currentUser;
             if (!user) {
@@ -1181,6 +1232,7 @@
                 closeVerifyModal();
                 showToast("Account Verified! ৳50 ($0.42) deducted.", "success");
 
+                // রেফারেল বোনাস যোগ করার সময় রেফারারের TODAY EARN-এও সরাসরি কাউন্ট করা
                 if (currentUserDoc && currentUserDoc.referredBy) {
                     const refUID = String(currentUserDoc.referredBy).trim();
                     const bonusUSD = parseFloat((40 / 120).toFixed(4));
@@ -1189,9 +1241,31 @@
                     db.collection("users").where("uid", "==", refUID).get().then(snap => {
                         if (!snap.empty) {
                             const referrerDoc = snap.docs[0];
-                            referrerDoc.ref.update({
+                            const refData = referrerDoc.data();
+                            const isRefToday = (refData.lastEarnDate === todayStr);
+
+                            let refUpdatePayload = {
                                 balanceUSD: firebase.firestore.FieldValue.increment(bonusUSD),
-                                totalEarnUSD: firebase.firestore.FieldValue.increment(bonusUSD)
+                                totalEarnUSD: firebase.firestore.FieldValue.increment(bonusUSD),
+                                lastEarnDate: todayStr
+                            };
+
+                            if (isRefToday) {
+                                refUpdatePayload.todayEarnUSD = firebase.firestore.FieldValue.increment(bonusUSD);
+                            } else {
+                                refUpdatePayload.todayEarnUSD = bonusUSD;
+                            }
+
+                            referrerDoc.ref.update(refUpdatePayload);
+
+                            // রেফারেল হিস্ট্রি রেকর্ড
+                            db.collection("task_history").add({
+                                uid: referrerDoc.id,
+                                amountUSD: bonusUSD,
+                                amountBDT: 40.00,
+                                taskType: "referral_bonus",
+                                date: todayStr,
+                                createdAt: firebase.firestore.FieldValue.serverTimestamp()
                             });
 
                             db.collection("notifications").add({
@@ -1242,23 +1316,6 @@
             }
         }
 
-        function addEarningToUser(amountUSD) {
-            const user = auth.currentUser;
-            if (!user || !currentUserDoc) return;
-
-            const todayStr = getTodayString();
-            const currentBal = currentUserDoc.balanceUSD || 0;
-            const currentTotal = currentUserDoc.totalEarnUSD || 0;
-            let currentToday = (currentUserDoc.lastEarnDate === todayStr) ? (currentUserDoc.todayEarnUSD || 0) : 0;
-
-            db.collection("users").doc(user.uid).update({
-                balanceUSD: currentBal + amountUSD,
-                todayEarnUSD: currentToday + amountUSD,
-                totalEarnUSD: currentTotal + amountUSD,
-                lastEarnDate: todayStr
-            });
-        }
-
         function handleTelegramTaskClick() {
             if (!isUserVerified()) {
                 showToast("Verify account with 50 BDT to claim task bonus!", "error");
@@ -1273,7 +1330,7 @@
             if (currentUserDoc && currentUserDoc.telegramClaimed) return;
 
             setTimeout(() => {
-                addEarningToUser(0.10);
+                addEarningToUser(0.10, "telegram_bonus");
                 db.collection("users").doc(user.uid).update({ telegramClaimed: true }).then(() => {
                     showToast("$0.10 Telegram bonus added!", "success");
                 });
@@ -1488,6 +1545,7 @@
                             userCreatedAtMs = currentUserDoc.createdAt.toMillis ? currentUserDoc.createdAt.toMillis() : new Date(currentUserDoc.createdAt).getTime();
                         }
                         const todayStr = getTodayString();
+                        // নতুন দিন শুরু হলে টুডে আর্ন ০ হবে
                         if (currentUserDoc.lastEarnDate !== todayStr && (currentUserDoc.todayEarnUSD || 0) > 0) {
                             db.collection("users").doc(user.uid).update({ todayEarnUSD: 0.00, lastEarnDate: todayStr });
                         }
@@ -1541,19 +1599,17 @@
             touchDiffY = 0;
         });
 
-        // ================= ৩. একাধিক ব্যানার স্লাইডার (গ্যালারি ছবি সাপোর্ট সহ) =================
+        // ================= ৩. একাধিক ব্যানার স্লাইডার (ছবি পূর্ণাঙ্গভাবে দেখানোর সমাধান) =================
         let promoBanners = [{ id: 'default', image: "https://i.ibb.co.com/tTLNfcH6/file-000000001c1c82089a7b8b791e5b5e0e.png", action: "deposit.html" }];
         let currentBannerIdx = 0;
         let bannerInterval = null;
 
         function initBannerSlider() {
-            // ১. ফায়ারবেস banners কালেকশন থেকে ব্যানার লোড
             db.collection("banners").onSnapshot(snapshot => {
                 if (!snapshot.empty) {
                     const loadedBanners = [];
                     snapshot.forEach(doc => {
                         const data = doc.data();
-                        // গ্যালারির ছবি (URL বা Base64) সাপোর্ট করবে
                         const bannerImg = data.image || data.imageUrl || data.bannerUrl;
                         if (bannerImg) {
                             loadedBanners.push({
@@ -1567,7 +1623,6 @@
                 }
                 renderDynamicBanners();
             }, () => {
-                // ২. অল্টারনেট: settings/banners ডকুমেন্ট থেকেও চেক করা
                 db.collection("settings").doc("banners").get().then(doc => {
                     if (doc.exists && doc.data().list && Array.isArray(doc.data().list)) {
                         promoBanners = doc.data().list;
@@ -1596,7 +1651,7 @@
                     currentBannerIdx = (currentBannerIdx + 1) % promoBanners.length;
                     track.style.transform = `translateX(-${currentBannerIdx * 100}%)`;
                     document.querySelectorAll('.promo-dot').forEach((dot, idx) => dot.classList.toggle('active', idx === currentBannerIdx));
-                }, 3500); // প্রতি ৩.৫ সেকেন্ড পর পর অটো-স্লাইড
+                }, 3500);
             }
         }
 
