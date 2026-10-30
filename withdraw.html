@@ -103,13 +103,6 @@
             font-weight: 600;
         }
 
-        .header-right {
-            display: flex;
-            gap: 12px;
-            font-size: 18px;
-            color: #0369a1;
-        }
-
         /* Balance Card */
         .balance-card {
             background: linear-gradient(135deg, #0284c7 0%, #0d9488 50%, #059669 100%);
@@ -482,10 +475,9 @@
 <body>
 
     <div class="app-container" id="app-container">
-        <!-- Header -->
+        <!-- Header (নোটিফিকেশন এবং প্রোফাইল আইকন বাদ দেওয়া হয়েছে) -->
         <header>
             <div class="header-left">
-                <!-- ড্যাশবোর্ডে ফিরে যাওয়ার বাটন -->
                 <i class="fa-solid fa-chevron-left" onclick="handleBackNavigation()" title="Back"></i>
                 <div class="logo-area">
                     <img src="https://i.ibb.co.com/5W2f2xg4/pngtree-money-icon-dollar-coins-cash-payment-online-earning-png-image-7589413.png" alt="MicroTask Logo" class="header-money-icon">
@@ -494,10 +486,6 @@
                         <p>Earn & Grow</p>
                     </div>
                 </div>
-            </div>
-            <div class="header-right">
-                <i class="fa-regular fa-bell" onclick="window.location.href='notifications.html'" style="cursor:pointer;"></i>
-                <i class="fa-regular fa-circle-user" onclick="window.location.href='index.html'" style="cursor:pointer;"></i>
             </div>
         </header>
 
@@ -522,7 +510,7 @@
             <!-- Payment Methods -->
             <div class="section-title">Select Payment Method</div>
             <div class="payment-methods">
-                <div class="method-card active" data-provider="nagad" onclick="handleTopMethodClick('nagad')">
+                <div class="method-card" data-provider="nagad" onclick="handleTopMethodClick('nagad')">
                     <div class="check-icon"><i class="fa-solid fa-check"></i></div>
                     <img src="https://download.logo.wine/logo/Nagad/Nagad-Logo.wine.png" alt="Nagad">
                 </div>
@@ -586,7 +574,7 @@
                 </div>
 
                 <div class="saved-accounts-header" id="saved-header">
-                    <div class="section-title">Saved Accounts <span id="wallet-count" style="color: #64748b; font-size: 11px;">(1/3)</span></div>
+                    <div class="section-title">Saved Accounts <span id="wallet-count" style="color: #64748b; font-size: 11px;">(0/3)</span></div>
                     <div class="add-new-btn" onclick="triggerAddNew()">
                         <i class="fa-solid fa-plus"></i> Add New
                     </div>
@@ -674,12 +662,12 @@
 
                 <div class="review-row">
                     <span class="review-label">Account Holder</span>
-                    <span class="review-val" id="step3-holder-name">MD. RAKIB HOSSAIN</span>
+                    <span class="review-val" id="step3-holder-name">--</span>
                 </div>
 
                 <div class="review-row">
                     <span class="review-label">Wallet Number</span>
-                    <span class="review-val review-masked-wallet" id="step3-account-number">0171****678</span>
+                    <span class="review-val review-masked-wallet" id="step3-account-number">--</span>
                 </div>
 
                 <div class="review-row">
@@ -739,17 +727,17 @@
 
                 <div class="receipt-row">
                     <span class="receipt-label">Payment Method</span>
-                    <span class="receipt-val" id="success-method-name">NAGAD</span>
+                    <span class="receipt-val" id="success-method-name">--</span>
                 </div>
 
                 <div class="receipt-row">
                     <span class="receipt-label">Account Holder</span>
-                    <span class="receipt-val" id="success-holder-name">MD. RAKIB HOSSAIN</span>
+                    <span class="receipt-val" id="success-holder-name">--</span>
                 </div>
 
                 <div class="receipt-row">
                     <span class="receipt-label">Account Number</span>
-                    <span class="receipt-val" id="success-account-number" style="color:#0284c7; font-family:monospace;">0171****678</span>
+                    <span class="receipt-val" id="success-account-number" style="color:#0284c7; font-family:monospace;">--</span>
                 </div>
 
                 <div class="receipt-row">
@@ -768,7 +756,6 @@
                 </div>
             </div>
 
-            <!-- ড্যাশবোর্ডে ফিরে যাওয়ার বাটন -->
             <button class="home-btn" onclick="goToHome()">
                 <i class="fa-solid fa-house"></i> Back to Dashboard
             </button>
@@ -850,10 +837,9 @@
             binance: "https://cryptologos.cc/logos/bnb-bnb-logo.png"
         };
 
-        let savedAccounts = JSON.parse(localStorage.getItem('my_saved_wallets')) || [
-            { provider: 'nagad', holder: 'MD. RAKIB HOSSAIN', number: '01712345678', type: 'Personal' }
-        ];
-        let selectedIndex = 0;
+        // রেনডম ডিফল্ট অ্যাকাউন্ট মুছে দিয়ে সম্পূর্ণ খালি রাখা হয়েছে
+        let savedAccounts = JSON.parse(localStorage.getItem('my_saved_wallets')) || [];
+        let selectedIndex = savedAccounts.length > 0 ? 0 : null;
         let pendingProvider = null;
         const MAX_WALLETS = 3;
 
@@ -886,8 +872,8 @@
                 return;
             }
             const allProviders = ['nagad', 'bkash', 'binance'];
-            const nextAvailable = allProviders.find(p => !savedAccounts.some(acc => acc.provider === p));
-            if (nextAvailable) handleTopMethodClick(nextAvailable);
+            const nextAvailable = allProviders.find(p => !savedAccounts.some(acc => acc.provider === p)) || 'nagad';
+            handleTopMethodClick(nextAvailable);
         }
 
         function toggleForm(show, provider = 'nagad') {
@@ -963,6 +949,7 @@
             if (savedAccounts.length === 0) {
                 emptyState.style.display = 'block';
                 savedHeader.style.display = 'none';
+                document.querySelectorAll('.method-card').forEach(card => card.classList.remove('active'));
             } else {
                 emptyState.style.display = 'none';
                 savedHeader.style.display = 'flex';
@@ -998,6 +985,10 @@
         }
 
         function goToWithdrawStep() {
+            if (savedAccounts.length === 0 || selectedIndex === null || !savedAccounts[selectedIndex]) {
+                alert("অনুগ্রহ করে একটি অ্যাকাউন্ট যোগ অথবা সিলেক্ট করুন!");
+                return;
+            }
             currentStep = 2;
             document.getElementById('step-wallet').style.display = 'none';
             document.getElementById('step-withdraw').style.display = 'block';
@@ -1019,9 +1010,11 @@
                 return;
             }
 
-            const activeAcc = (savedAccounts && selectedIndex !== null && savedAccounts[selectedIndex]) 
-                ? savedAccounts[selectedIndex] 
-                : { provider: 'nagad', holder: 'User', number: '01700000000', type: 'Personal' };
+            const activeAcc = savedAccounts[selectedIndex];
+            if (!activeAcc) {
+                alert("অ্যাকাউন্ট সিলেক্ট করা নেই!");
+                return;
+            }
 
             const providerKey = activeAcc.provider || 'nagad';
             
@@ -1045,7 +1038,6 @@
             window.scrollTo(0, 0);
         }
 
-        // কনফার্ম করলে ফায়ারবেস থেকে ব্যালেন্স কর্তন ও রিকোয়েস্ট তৈরি
         function confirmFinalWithdrawal() {
             const amount = parseFloat(document.getElementById('withdraw-amount-input').value) || 0;
             if (amount <= 0 || amount > availableBalanceBDT) {
@@ -1053,7 +1045,9 @@
                 return;
             }
 
-            const activeAcc = savedAccounts[selectedIndex] || { provider: 'nagad', holder: 'User', number: '01700000000' };
+            const activeAcc = savedAccounts[selectedIndex];
+            if (!activeAcc) return;
+
             const providerKey = activeAcc.provider || 'nagad';
             const youReceive = Math.max(0, amount - WITHDRAW_FEE_FIXED);
             const randomTrx = 'MTX' + Math.floor(10000000 + Math.random() * 90000000);
@@ -1066,7 +1060,6 @@
             const deductionUSD = amount / 120;
             const newUSD = Math.max(0, liveBalanceUSD - deductionUSD);
 
-            // ফায়ারবেসে ব্যালেন্স আপডেট এবং উইথড্র রিকোয়েস্ট সেভ
             if (user) {
                 db.collection("users").doc(user.uid).update({
                     balanceUSD: newUSD
@@ -1123,12 +1116,10 @@
             });
         }
 
-        // সরাসরি মূল ড্যাশবোর্ডে ফিরবে
         function goToHome() {
             window.location.href = "index.html";
         }
 
-        // হেডার ব্যাক বাটন লজিক (প্রথম ধাপে চাপলে ড্যাশবোর্ডে ফিরবে)
         function handleBackNavigation() {
             if (currentStep === 4) {
                 goToHome();
