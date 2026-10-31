@@ -60,7 +60,7 @@
 
   <div class="w-full max-w-md bg-aqua-bg min-h-screen flex flex-col relative pb-8 shadow-xl border-x border-aqua-border">
     
-    <!-- 1. NAVIGATION BAR WITH BACK BUTTON -->
+    <!-- 1. NAVIGATION BAR -->
     <nav id="user-nav" class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-aqua-border flex items-center shadow-sm px-2">
       <!-- Back to Dashboard -->
       <button onclick="window.location.href='index.html'" title="Back to Dashboard" class="p-2.5 text-aqua-600 hover:text-aqua-700 transition">
@@ -101,12 +101,12 @@
               <span>Word Missions</span>
             </div>
             <div class="flex items-center space-x-1 text-emerald-600">
-              <i data-lucide="badge-dollar-sign" class="w-3.5 h-3.5"></i>
-              <span id="rate-display-feed">$0.05 / Like</span>
+              <i data-lucide="rocket" class="w-3.5 h-3.5"></i>
+              <span>Boost Campaigns</span>
             </div>
             <div class="flex items-center space-x-1 text-cyan-600">
               <i data-lucide="globe" class="w-3.5 h-3.5"></i>
-              <span>Public Feed</span>
+              <span>Global Feed</span>
             </div>
           </div>
         </div>
@@ -310,8 +310,6 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    let appSettings = { likeRate: 0.05 };
-
     let currentUser = {
       uid: "000000",
       name: "User",
@@ -334,7 +332,6 @@
       document.getElementById('modal-user-uid').innerText = `UID: #${currentUser.uid}`;
     }
 
-    // অথেন্টিকেশন সেশন লাইভ ট্র্যাকিং
     auth.onAuthStateChanged(user => {
       if (user) {
         db.collection("users").doc(user.uid).onSnapshot(doc => {
@@ -401,15 +398,11 @@
     function buildPostCardHTML(post) {
       const isLiked = Array.isArray(post.likedBy) && post.likedBy.includes(currentUser.uid);
       const isOwnPost = String(post.userId) === String(currentUser.uid);
-      const earnedValue = ((post.likesCount || 0) * appSettings.likeRate).toFixed(2);
       const wordCount = countWords(post.content);
       const viewsDisplay = formatNumber(post.viewsCount || 1);
 
-      // বুস্টের মেয়াদ শেষ হলে অটো-ডিলিট ও সেটেলমেন্ট ট্রিগার
-      if (post.boostStatus === 'active' && post.boostExpiresAt && post.boostExpiresAt <= Date.now()) {
-        handleBoostExpirationAndSettle(post);
-        return '';
-      }
+      // শুধু $0.00 দেখাবে (Earned এবং ৳ বাদ দেওয়া হয়েছে)
+      const displayPayoutUSD = Number(post.payoutUSD || 0).toFixed(2);
 
       const wordsArr = (post.content || '').trim().split(/\s+/);
       const isLong = wordsArr.length > 55;
@@ -462,6 +455,7 @@
             ${postBodyContent}
           </div>
 
+          <!-- লাইক ও শুধু $0.00 ফরম্যাট -->
           <div class="px-3 py-1.5 flex items-center justify-between text-[11px] text-aqua-textSecondary border-t border-aqua-divider bg-aqua-cardTint/40">
             <div class="flex items-center space-x-2">
               <div class="flex items-center space-x-1">
@@ -469,8 +463,13 @@
                   <i data-lucide="thumbs-up" class="w-2 h-2 text-white fill-white"></i>
                 </span>
                 <span class="font-bold text-aqua-textPrimary">${post.likesCount || 0}</span>
-                <span class="text-teal-700 font-semibold text-[10px]">• $${earnedValue}</span>
+                <span class="text-teal-700 font-semibold text-[10px]">likes</span>
               </div>
+
+              <!-- শুধু $0.00 ডিসপ্লে -->
+              <span class="text-teal-700 font-bold text-[10.5px]">
+                • $${displayPayoutUSD}
+              </span>
             </div>
 
             <div class="flex items-center space-x-3 text-aqua-textSecondary font-medium text-[11px]">
@@ -507,7 +506,6 @@
               <span>Share</span>
             </button>
 
-            <!-- ১. শুধুমাত্র নিজের পোস্টেই Boost বাটন আসবে, অন্যের পোস্টে আসবে না -->
             ${isOwnPost && post.boostStatus === 'none' ? `
               <button 
                 onclick="openBoostModal('${post.id}')" 
@@ -519,7 +517,7 @@
             ` : ''}
           </div>
 
-          <!-- ২. বুস্টের বাকি সময়ের কাউন্টডাউন টাইমার শুধুই পোস্টের মালিক দেখতে পারবে -->
+          <!-- বুস্ট স্ট্যাটাস বার -->
           ${post.boostStatus === 'active' ? `
             <div class="px-3 py-1 bg-gradient-to-r from-teal-50 to-cyan-50 border-t border-teal-200 flex items-center justify-between text-[10px] text-teal-900">
               <div class="flex items-center space-x-1 font-medium">
@@ -550,7 +548,10 @@
                   <img src="${c.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80'}" alt="${c.name}" class="w-6 h-6 rounded-full object-cover border border-aqua-200 mt-0.5">
                   <div class="flex-1">
                     <div class="bg-white border border-aqua-border rounded-xl px-2.5 py-1.5 inline-block max-w-[92%] shadow-xs">
-                      <span class="font-bold text-aqua-textPrimary block text-[10px] leading-tight">${c.name}</span>
+                      <span class="font-bold text-aqua-textPrimary block text-[10px] leading-tight flex items-center gap-1">
+                        ${c.name}
+                        ${c.country ? `<span class="text-[8px] text-gray-400 font-normal">(${c.country})</span>` : ''}
+                      </span>
                       <p class="text-aqua-textPrimary mt-0.5 text-xs leading-normal">${c.text}</p>
                     </div>
                     <div class="flex items-center space-x-2.5 text-[9px] text-aqua-textSecondary mt-0.5 ml-1.5 font-semibold">
@@ -598,11 +599,7 @@
       const container = document.getElementById('feed-container');
       if (!container) return;
 
-      document.getElementById('rate-display-feed').innerText = `$${appSettings.likeRate.toFixed(2)} / Like`;
-
-      const visiblePosts = posts.filter(p => !(p.boostStatus === 'active' && p.boostExpiresAt && p.boostExpiresAt <= Date.now()));
-
-      if (visiblePosts.length === 0) {
+      if (posts.length === 0) {
         container.innerHTML = `
           <div class="bg-white rounded-2xl p-6 text-center border border-aqua-border shadow-xs mx-2 my-3">
             <div class="w-10 h-10 rounded-full bg-teal-50 text-teal-600 flex items-center justify-center mx-auto mb-2 border border-teal-200">
@@ -615,7 +612,7 @@
           </div>
         `;
       } else {
-        container.innerHTML = visiblePosts.map(buildPostCardHTML).join('');
+        container.innerHTML = posts.map(buildPostCardHTML).join('');
       }
 
       lucide.createIcons();
@@ -626,14 +623,7 @@
       db.collection("posts").orderBy("createdAt", "desc").limit(40).onSnapshot(snapshot => {
         posts = [];
         snapshot.forEach(doc => {
-          const data = doc.data();
-          const postObj = { id: doc.id, ...data };
-
-          if (postObj.boostStatus === 'active' && postObj.boostExpiresAt && postObj.boostExpiresAt <= Date.now()) {
-            handleBoostExpirationAndSettle(postObj);
-          } else {
-            posts.push(postObj);
-          }
+          posts.push({ id: doc.id, ...doc.data() });
         });
         renderFeed();
       }, err => {
@@ -641,64 +631,29 @@
       });
     }
 
-    // ================= বুস্ট মেয়াদ শেষ হলে অটো-ডিলিট ও ব্যালেন্স ক্রেডিট =================
-    const settlingPostsSet = new Set();
-
-    function handleBoostExpirationAndSettle(post) {
-      if (settlingPostsSet.has(post.id)) return;
-      settlingPostsSet.add(post.id);
-
-      const earnedUSD = parseFloat(((post.likesCount || 0) * (appSettings.likeRate || 0.05)).toFixed(2));
-      const earnedBDT = (earnedUSD * 120).toFixed(2);
-      const authorUid = String(post.userId || '').trim();
-
-      // ১. অর্জিত ইনকাম মেইন ব্যালেন্সে ক্রেডিট করা
-      if (earnedUSD > 0 && authorUid) {
-        db.collection("users").where("uid", "==", authorUid).get().then(snap => {
-          if (!snap.empty) {
-            snap.docs[0].ref.update({
-              balanceUSD: firebase.firestore.FieldValue.increment(earnedUSD),
-              totalEarnUSD: firebase.firestore.FieldValue.increment(earnedUSD)
-            });
-          }
-        }).catch(err => console.log("Balance sync err:", err));
-
-        // ২. Earnings ক্যাটাগরিতে নোটিফিকেশন পাঠানো
-        db.collection("notifications").add({
-          targetUid: authorUid,
-          category: "earnings",
-          platform: "boost",
-          title: "🚀 বুস্ট ক্যাম্পেইন সম্পন্ন হয়েছে!",
-          message: `আপনার পোস্টের বুস্ট মেয়াদ শেষ হয়েছে। পোস্ট থেকে অর্জিত সর্বমোট ৳${earnedBDT} ($${earnedUSD.toFixed(2)}) মেইন ব্যালেন্সে জমা হয়েছে!`,
-          actionUrl: "history.html",
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        }).catch(() => {});
-      }
-
-      // ৩. পোস্টটি ডাটাবেজ থেকে স্থায়ীভাবে অটো-ডিলিট করা
-      db.collection("posts").doc(post.id).delete().then(() => {
-        console.log(`Boost post ${post.id} auto-deleted.`);
-      }).catch(err => console.log("Delete err:", err));
-    }
-
-    // ইউনিক কমেন্ট ব্যাংক
-    const UNIQUE_PROFILES_POOL = [
-      { id: "u_1", name: "Tanvir Hasan", avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80", text: "অসাধারণ তথ্যবহুল একটি লেখা, ধন্যবাদ!" },
-      { id: "u_2", name: "Nusrat Jahan", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80", text: "খুব সুন্দর পয়েন্ট তুলে ধরেছেন।" },
-      { id: "u_3", name: "Shakib Al Hasan", avatar: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=100&auto=format&fit=crop&q=80", text: "একদম সহমত আপনার বক্তব্যের সাথে।" },
-      { id: "u_4", name: "Mehedi Hasan", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80", text: "পরবর্তী লেখার অপেক্ষায় রইলাম!" },
-      { id: "u_5", name: "Ayesha Akter", avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&auto=format&fit=crop&q=80", text: "এমন চিন্তাভাবনা সত্যিই অনুপ্রেরণাদায়ক।" },
-      { id: "u_6", name: "Farhan Ahmed", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&auto=format&fit=crop&q=80", text: "পোস্টটি পড়ে অনেক কিছু জানতে পারলাম।" }
+    // আন্তর্জাতিক বহুভাষিক কমেন্ট ব্যাংক
+    const GLOBAL_PROFILES_POOL = [
+      { id: "g_us_1", name: "David Miller", country: "USA", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100", text: "Great insights! Very well articulated." },
+      { id: "g_uk_2", name: "Emma Watson", country: "UK", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100", text: "Impressive writing, totally loved reading this." },
+      { id: "g_us_3", name: "Alex Johnson", country: "USA", avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100", text: "Valuable points mentioned here. Keep up the good work!" },
+      { id: "g_de_1", name: "Lukas Schmidt", country: "Germany", avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100", text: "Sehr informativer Beitrag! Wirklich inspirierend." },
+      { id: "g_fr_1", name: "Camille Dubois", country: "France", avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100", text: "Excellent article! Merci pour ce partage précieux." },
+      { id: "g_es_1", name: "Mateo Garcia", country: "Spain", avatar: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=100", text: "¡Gran publicación! Me ha parecido muy interesante." },
+      { id: "g_it_1", name: "Marco Rossi", country: "Italy", avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100", text: "Ottimo articolo, argomenti trattati molto bene!" },
+      { id: "g_br_1", name: "Lucas Silva", country: "Brazil", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100", text: "Post incrível! Concordo plenamente com você." },
+      { id: "g_tr_1", name: "Emre Kaya", country: "Turkey", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100", text: "Harika bir paylaşım olmuş, emeğinize sağlık!" },
+      { id: "g_bd_1", name: "Tanvir Hasan", country: "BD", avatar: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=100", text: "অসাধারণ তথ্যবহুল একটি লেখা, ধন্যবাদ!" },
+      { id: "g_bd_2", name: "Ayesha Akter", country: "BD", avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100", text: "খুব সুন্দর পয়েন্ট তুলে ধরেছেন।" }
     ];
 
     setInterval(() => {
       posts.forEach(post => {
-        if (post.boostStatus === 'active' && post.boostExpiresAt > Date.now()) {
+        if (post.boostStatus === 'active') {
           let updateData = {};
           let shouldUpdate = false;
 
           if ((post.autoViewsQueue || 0) > 0) {
-            const addViews = Math.min(post.autoViewsQueue, Math.floor(Math.random() * 4) + 2);
+            const addViews = Math.min(post.autoViewsQueue, Math.floor(Math.random() * 3) + 2);
             post.viewsCount = (post.viewsCount || 0) + addViews;
             post.autoViewsQueue -= addViews;
             updateData.viewsCount = firebase.firestore.FieldValue.increment(addViews);
@@ -706,7 +661,7 @@
             shouldUpdate = true;
           }
 
-          if ((post.autoLikesQueue || 0) > 0 && Math.random() > 0.45) {
+          if ((post.autoLikesQueue || 0) > 0 && Math.random() > 0.4) {
             post.likesCount = (post.likesCount || 0) + 1;
             post.autoLikesQueue -= 1;
             updateData.likesCount = firebase.firestore.FieldValue.increment(1);
@@ -714,17 +669,18 @@
             shouldUpdate = true;
           }
 
-          if ((post.autoCommentsQueue || 0) > 0 && Math.random() > 0.65) {
+          if ((post.autoCommentsQueue || 0) > 0 && Math.random() > 0.6) {
             post.usedCommenters = post.usedCommenters || [];
-            const availableProfiles = UNIQUE_PROFILES_POOL.filter(p => !post.usedCommenters.includes(p.id));
+            const availableProfiles = GLOBAL_PROFILES_POOL.filter(p => !post.usedCommenters.includes(p.id));
 
             if (availableProfiles.length > 0) {
               const selectedUser = availableProfiles[Math.floor(Math.random() * availableProfiles.length)];
               
               const newComment = {
-                id: "c_auto_" + Date.now(),
+                id: "c_global_" + Date.now(),
                 commenterId: selectedUser.id,
                 name: selectedUser.name,
+                country: selectedUser.country,
                 avatar: selectedUser.avatar,
                 text: selectedUser.text,
                 time: "Just now"
@@ -757,9 +713,8 @@
           if (el) {
             const time = getRemainingTime(post.boostExpiresAt);
             if (time.totalSecs <= 0) {
-              handleBoostExpirationAndSettle(post);
+              el.innerText = `Campaign Running (Awaiting Admin Review)`;
             } else {
-              // শুধুমাত্র পোস্টের মালিক বিস্তারিত সময় দেখতে পাবে
               if (isOwn) {
                 const d = String(time.days).padStart(2, '0');
                 const h = String(time.hours).padStart(2, '0');
@@ -776,7 +731,6 @@
     }
     setInterval(updateAllCountdowns, 1000);
 
-    // ৩. লাইক ফাংশন ফিক্সড (হোম ও সার্চ উভয় ট্যাবে তাৎক্ষণিক কাজ করবে)
     function toggleLike(postId) {
       const post = posts.find(p => p.id === postId);
       if (!post) return;
@@ -805,7 +759,6 @@
         });
       }
 
-      // হোম ও সার্চ উভয় ট্যাবেই সাথে সাথে ভিউ আপডেট হবে
       renderFeed();
       if (!document.getElementById('view-search').classList.contains('hidden')) {
         searchUserByUID();
@@ -1020,6 +973,8 @@
         boostStatus: "none",
         boostPackage: null,
         boostExpiresAt: null,
+        payoutUSD: 0,
+        payoutBDT: 0,
         autoLikesQueue: 0,
         autoCommentsQueue: 0,
         autoViewsQueue: 0,
@@ -1116,7 +1071,6 @@
       });
     }
 
-    // ================= বুস্ট রিকোয়েস্ট সাবমিশন (মেইন ব্যালেন্স থেকে টাকা কর্তন সহ) =================
     async function submitBoostRequest() {
       if (!targetBoostPostId || !targetBoostPost) {
         alert("অনুগ্রহ করে যে পোস্টটি বুস্ট করবেন সেটি সিলেক্ট করুন!");
@@ -1126,7 +1080,6 @@
       const pkgPriceBDT = Number(selectedBoostPackage);
       const pkgPriceUSD = parseFloat((pkgPriceBDT / 120).toFixed(4));
 
-      // ইউজারের মেইন ব্যালেন্স চেক
       const user = auth.currentUser;
       const cached = JSON.parse(localStorage.getItem('microtask_cached_user')) || {};
       const currentBalUSD = Number(cached.balanceUSD || 0);
@@ -1144,18 +1097,15 @@
         const finalUid = String(cached.uid || (user ? user.uid : currentUser.uid || '000000')).trim();
         const finalName = cached.name || currentUser.name || 'User';
 
-        // ১. মেইন ব্যালেন্স থেকে বুস্ট প্যাকেজের ফি কাটা
         if (user) {
           await db.collection("users").doc(user.uid).update({
             balanceUSD: firebase.firestore.FieldValue.increment(-pkgPriceUSD)
           });
         }
 
-        // লোকাল ক্যাশ ও ড্যাশবোর্ড ব্যালেন্স আপডেট
         cached.balanceUSD = Math.max(0, currentBalUSD - pkgPriceUSD);
         localStorage.setItem('microtask_cached_user', JSON.stringify(cached));
 
-        // ২. অ্যাডমিন প্যানেলে বুস্ট রিকোয়েস্ট পাঠানো
         const boostPayload = {
           postId: targetBoostPost.id,
           content: targetBoostPost.content || '',
@@ -1173,7 +1123,6 @@
 
         await db.collection("boost_requests").add(boostPayload);
 
-        // ৩. পোস্টে পেন্ডিং বুস্ট স্ট্যাটাস সেট করা
         await db.collection("posts").doc(targetBoostPost.id).update({
           boostStatus: "pending",
           boostPackage: `${pkgPriceBDT} Tk`
