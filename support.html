@@ -11,6 +11,11 @@
     <!-- FontAwesome 6 Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
+    <!-- Firebase SDK (Compat Version) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
     <style>
         * {
             margin: 0;
@@ -44,7 +49,7 @@
             min-height: 680px;
         }
 
-        /* ================= 1. TOP APP BAR ================= */
+        /* 1. TOP APP BAR */
         .top-app-bar {
             background: linear-gradient(135deg, #1d72fe 0%, #0d5ee8 100%);
             padding: 16px 16px 18px;
@@ -109,7 +114,7 @@
             border-radius: 50%;
         }
 
-        /* ================= 2. MAIN BODY CONTENT ================= */
+        /* 2. MAIN BODY CONTENT */
         .app-body {
             padding: 14px 12px 20px;
             display: flex;
@@ -117,7 +122,6 @@
             gap: 12px;
         }
 
-        /* HERO IMAGE BANNER */
         .hero-image-banner {
             width: 100%;
             border-radius: 20px;
@@ -134,7 +138,7 @@
             object-fit: cover;
         }
 
-        /* ================= 3. SUPPORT CHANNELS ================= */
+        /* 3. SUPPORT CHANNELS */
         .support-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -193,7 +197,6 @@
             text-overflow: ellipsis;
         }
 
-        /* Live Chat (Blue) */
         .card-livechat {
             background: #eff6ff;
             border: 1px solid #dbeafe;
@@ -201,7 +204,6 @@
         .card-livechat .channel-icon { background: linear-gradient(135deg, #1d72fe, #0d5ee8); }
         .card-livechat .card-chevron { color: #3b82f6; }
 
-        /* Telegram (Cyan) */
         .card-telegram {
             background: #eef9ff;
             border: 1px solid #d7f0fd;
@@ -209,7 +211,7 @@
         .card-telegram .channel-icon { background: linear-gradient(135deg, #0099ff, #0077cc); }
         .card-telegram .card-chevron { color: #0099ff; }
 
-        /* ================= 4. FREQUENTLY ASKED QUESTIONS ================= */
+        /* 4. FREQUENTLY ASKED QUESTIONS */
         .faq-container-card {
             background: #ffffff;
             border: 1px solid #e2e8f0;
@@ -270,7 +272,7 @@
             color: #94a3b8;
         }
 
-        /* ================= 5. BOTTOM TRUST BAR ================= */
+        /* 5. BOTTOM TRUST BAR */
         .bottom-trust-badge {
             background: #eefbf4;
             border: 1.2px solid #c7f4db;
@@ -357,7 +359,7 @@
             display: inline-block;
         }
 
-        /* ================= 6. LIVE CHAT / MESSENGER INBOX MODAL ================= */
+        /* 6. LIVE CHAT MODAL */
         .chat-modal-overlay {
             position: absolute;
             inset: 0;
@@ -431,7 +433,6 @@
             margin-top: 2px;
         }
 
-        /* Chat Messages Feed */
         .chat-messages-container {
             flex: 1;
             padding: 14px 12px;
@@ -449,7 +450,6 @@
             margin: 4px 0 6px;
         }
 
-        /* Message Bubbles */
         .msg-row {
             display: flex;
             flex-direction: column;
@@ -502,32 +502,6 @@
 
         .msg-meta-row { display: flex; align-items: center; gap: 4px; margin-top: 3px; }
         .msg-time { font-size: 8.5px; color: #94a3b8; font-weight: 600; }
-
-        .seen-indicator { display: none; align-items: center; margin-top: 3px; }
-        .seen-indicator.visible { display: flex; }
-        .seen-avatar { width: 14px; height: 14px; border-radius: 50%; object-fit: cover; border: 1px solid #ffffff; }
-
-        .typing-bubble-wrap {
-            display: none;
-            align-items: center;
-            align-self: flex-start;
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 18px 18px 18px 4px;
-            padding: 8px 12px;
-            gap: 4px;
-            margin-top: 4px;
-        }
-        .typing-bubble-wrap.active { display: flex; }
-        .dot { width: 6px; height: 6px; background: #64748b; border-radius: 50%; animation: bounceTyping 1.3s infinite ease-in-out; }
-        .dot:nth-child(1) { animation-delay: 0s; }
-        .dot:nth-child(2) { animation-delay: 0.2s; }
-        .dot:nth-child(3) { animation-delay: 0.4s; }
-
-        @keyframes bounceTyping {
-            0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
-            30% { transform: translateY(-4px); opacity: 1; }
-        }
 
         .chat-input-bar {
             background: #ffffff;
@@ -604,10 +578,9 @@
 
     <div class="app-container">
 
-        <!-- ================= 1. TOP APP BAR ================= -->
+        <!-- 1. TOP APP BAR -->
         <header class="top-app-bar">
             <div class="bar-left">
-                <!-- সরাসরি ড্যাশবোর্ডে ফিরে যাওয়ার বাটন -->
                 <button class="back-btn" onclick="window.location.href='index.html'" title="Back to Dashboard">
                     <i class="fa-solid fa-arrow-left"></i>
                 </button>
@@ -617,13 +590,12 @@
                 </div>
             </div>
             
-            <!-- আপনার দেওয়া সাপোর্ট হেডসেট লোগো -->
             <div class="bar-headset-badge">
                 <img src="https://i.ibb.co.com/DHMB6J4S/file-00000000a6888211aa5b662731e1ff68.png" alt="Headset Support">
             </div>
         </header>
 
-        <!-- ================= 2. MAIN BODY ================= -->
+        <!-- 2. MAIN BODY -->
         <main class="app-body">
 
             <section class="hero-image-banner">
@@ -708,7 +680,7 @@
 
         </main>
 
-        <!-- ================= 6. LIVE CHAT MODAL ================= -->
+        <!-- 6. LIVE CHAT MODAL -->
         <div class="chat-modal-overlay" id="liveChatModal">
             <div class="chat-header">
                 <div class="chat-header-left">
@@ -740,12 +712,6 @@
                         <span class="msg-time" id="initialTime">Just now</span>
                     </div>
                 </div>
-
-                <div class="typing-bubble-wrap" id="typingIndicator">
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                </div>
             </div>
 
             <div class="chat-input-bar">
@@ -757,7 +723,7 @@
 
                 <input type="text" class="chat-input-field" id="chatInput" placeholder="Type a message..." autocomplete="off" onkeypress="handleKeyPress(event)">
                 
-                <button type="button" class="chat-send-btn" onclick="sendUserMessage()">
+                <button type="button" class="chat-send-btn" id="btnChatSend" onclick="sendUserMessage()">
                     <i class="fa-solid fa-paper-plane"></i>
                 </button>
             </div>
@@ -770,13 +736,142 @@
         <span id="toastMessage">Notification message</span>
     </div>
 
-    <!-- JavaScript Logic -->
+    <!-- ফায়ারবেস কানেকশন ও লাইভ সিঙ্ক লজিক -->
     <script>
-        const agentAvatarUrl = "https://i.pravatar.cc/100?img=47";
+        const firebaseConfig = {
+            apiKey: "AIzaSyBrG81DRVjx040QhiT68yyRErGXjuCPdS4",
+            authDomain: "micro-task-2906d.firebaseapp.com",
+            projectId: "micro-task-2906d",
+            storageBucket: "micro-task-2906d.firebasestorage.app",
+            messagingSenderId: "642332420854",
+            appId: "1:642332420854:web:67115930992e7685b49ad7",
+            measurementId: "G-N76WH82XYJ"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        let cachedUser = JSON.parse(localStorage.getItem('microtask_cached_user')) || null;
+        let currentUserId = null;
+        let currentUserName = "User";
+        let messageListener = null;
+
+        // ইমেজ কম্প্রেসার ফাংশন (স্ক্রিনশটের সাইজ কমিয়ে ফায়ারবেসে পাঠাবে)
+        function compressChatImage(file, maxWidth, maxHeight, quality, callback) {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = function(e) {
+                const img = new Image();
+                img.src = e.target.result;
+                img.onload = function() {
+                    let w = img.width, h = img.height;
+                    if (w > h) {
+                        if (w > maxWidth) { h = Math.round((h * maxWidth) / w); w = maxWidth; }
+                    } else {
+                        if (h > maxHeight) { w = Math.round((w * maxHeight) / h); h = maxHeight; }
+                    }
+                    const canvas = document.createElement('canvas');
+                    canvas.width = w; canvas.height = h;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, w, h);
+                    callback(canvas.toDataURL('image/jpeg', quality));
+                };
+            };
+        }
+
+        // ইউজার অথেন্টিকেশন ও চ্যাট হিস্ট্রি লোড
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                currentUserId = user.uid;
+                db.collection("users").doc(user.uid).get().then(doc => {
+                    if (doc.exists) {
+                        cachedUser = doc.data();
+                        currentUserName = cachedUser.name || "User";
+                        // ইউজারের ড্যাশবোর্ড ৬ ডিজিট UID থাকলে তা ব্যবহার হবে
+                        currentUserId = cachedUser.uid ? String(cachedUser.uid) : user.uid;
+                    }
+                    initLiveChatListener();
+                }).catch(() => {
+                    initLiveChatListener();
+                });
+            } else if (cachedUser && cachedUser.uid) {
+                currentUserId = String(cachedUser.uid);
+                currentUserName = cachedUser.name || "User";
+                initLiveChatListener();
+            } else {
+                // ব্রাউজার ইউনিক সেশন
+                currentUserId = localStorage.getItem('temp_guest_uid');
+                if (!currentUserId) {
+                    currentUserId = "G-" + Math.floor(100000 + Math.random() * 900000);
+                    localStorage.setItem('temp_guest_uid', currentUserId);
+                }
+                initLiveChatListener();
+            }
+        });
+
+        function initLiveChatListener() {
+            if (!currentUserId || messageListener) return;
+
+            // এডমিন ও ইউজারের চ্যাট লাইভ লিসেনার
+            messageListener = db.collection("support_messages")
+                .where("userUid", "==", currentUserId)
+                .orderBy("createdAt", "asc")
+                .onSnapshot(snap => {
+                    const chatFeed = document.getElementById('chatFeed');
+                    // প্রথম ওয়েলকাম মেসেজ রেখে বাকিগুলো নতুন করে সিঙ্ক
+                    chatFeed.innerHTML = `
+                        <div class="chat-time-stamp">Live Customer Support</div>
+                        <div class="msg-row incoming">
+                            <div class="bubble">
+                                Hello! 👋 Welcome to MicroTask Support. How can we assist you today?
+                            </div>
+                            <div class="msg-meta-row">
+                                <span class="msg-time">${getCurrentTime()}</span>
+                            </div>
+                        </div>
+                    `;
+
+                    snap.forEach(doc => {
+                        const m = doc.data();
+                        const isOutgoing = (m.sender === "user");
+                        const timeStr = m.createdAt ? new Date(m.createdAt.toDate ? m.createdAt.toDate() : m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : getCurrentTime();
+
+                        let contentHTML = '';
+                        if (m.image) {
+                            contentHTML += `
+                                <div class="bubble-image-wrap">
+                                    <img src="${m.image}" alt="Chat Image" class="chat-uploaded-img" onclick="previewImage('${m.image}')">
+                                </div>
+                            `;
+                        }
+                        if (m.text) {
+                            contentHTML += `<div class="bubble">${escapeHTML(m.text)}</div>`;
+                        }
+
+                        const msgRow = document.createElement('div');
+                        msgRow.className = `msg-row ${isOutgoing ? 'outgoing' : 'incoming'}`;
+                        msgRow.innerHTML = `
+                            ${contentHTML}
+                            <div class="msg-meta-row">
+                                <span class="msg-time">${timeStr}</span>
+                            </div>
+                        `;
+                        chatFeed.appendChild(msgRow);
+                    });
+
+                    scrollChatToBottom();
+                }, err => {
+                    console.log("Chat sync error: ", err);
+                });
+        }
 
         function openLiveChatInbox() {
             document.getElementById('liveChatModal').classList.add('active');
-            setTimeout(() => { document.getElementById('chatInput').focus(); }, 300);
+            setTimeout(() => { 
+                document.getElementById('chatInput').focus(); 
+                scrollChatToBottom();
+            }, 300);
         }
 
         function closeLiveChatInbox() {
@@ -803,110 +898,71 @@
             return hours + ':' + minutes + ' ' + ampm;
         }
 
+        // ইউজার থেকে এডমিনের কাছে মেসেজ পাঠানো
         function sendUserMessage() {
             const input = document.getElementById('chatInput');
             const text = input.value.trim();
-            if (!text) return;
+            if (!text || !currentUserId) return;
 
-            appendOutgoingMessage(`<div class="bubble">${escapeHTML(text)}</div>`);
-            input.value = '';
+            const sendBtn = document.getElementById('btnChatSend');
+            sendBtn.disabled = true;
+
+            // ১. ফায়ারস্টোরের মেসেজে সংরক্ষণ
+            db.collection("support_messages").add({
+                userUid: currentUserId,
+                userName: currentUserName,
+                sender: "user",
+                text: text,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(() => {
+                // ২. এডমিনের ইনবক্সের জন্য কনভার্সেশন আপডেট
+                return db.collection("support_conversations").doc(currentUserId).set({
+                    userUid: currentUserId,
+                    userName: currentUserName,
+                    lastMessage: text,
+                    unreadByAdmin: true,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+            }).then(() => {
+                input.value = '';
+                scrollChatToBottom();
+            }).catch(err => {
+                showToast("মেসেজ পাঠাতে সমস্যা: " + err.message);
+            }).finally(() => {
+                sendBtn.disabled = false;
+            });
         }
 
+        // ছবি বা স্ক্রিনশট পাঠানো
         function handleImageSelected(e) {
             const file = e.target.files[0];
-            if (!file) return;
+            if (!file || !currentUserId) return;
 
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                const imgData = event.target.result;
-                appendOutgoingMessage(`
-                    <div class="bubble-image-wrap">
-                        <img src="${imgData}" alt="Uploaded image" class="chat-uploaded-img" onclick="previewImage('${imgData}')">
-                    </div>
-                `);
-            };
-            reader.readAsDataURL(file);
+            showToast("ছবি প্রসেসিং হচ্ছে...");
+            compressChatImage(file, 600, 600, 0.7, function(compressedData) {
+                db.collection("support_messages").add({
+                    userUid: currentUserId,
+                    userName: currentUserName,
+                    sender: "user",
+                    image: compressedData,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                }).then(() => {
+                    return db.collection("support_conversations").doc(currentUserId).set({
+                        userUid: currentUserId,
+                        userName: currentUserName,
+                        lastMessage: "📷 Sent a photo",
+                        unreadByAdmin: true,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    }, { merge: true });
+                }).then(() => {
+                    showToast("ছবি পাঠানো হয়েছে!");
+                    scrollChatToBottom();
+                }).catch(err => {
+                    showToast("ছবি পাঠাতে সমস্যা: " + err.message);
+                });
+            });
+
             e.target.value = '';
-        }
-
-        function appendOutgoingMessage(contentHTML) {
-            const chatFeed = document.getElementById('chatFeed');
-            const typingIndicator = document.getElementById('typingIndicator');
-            const currentTime = getCurrentTime();
-
-            document.querySelectorAll('.seen-indicator').forEach(el => el.remove());
-
-            const userMsgRow = document.createElement('div');
-            userMsgRow.className = 'msg-row outgoing';
-            userMsgRow.innerHTML = `
-                ${contentHTML}
-                <div class="msg-meta-row">
-                    <span class="msg-time">${currentTime}</span>
-                </div>
-                <div class="seen-indicator">
-                    <img src="${agentAvatarUrl}" alt="Seen" class="seen-avatar" title="Seen by Support">
-                </div>
-            `;
-
-            chatFeed.insertBefore(userMsgRow, typingIndicator);
-            scrollChatToBottom();
-            notifyAdminNewMessage();
-        }
-
-        window.setAdminTyping = function(isTyping) {
-            const typingIndicator = document.getElementById('typingIndicator');
-            typingIndicator.classList.toggle('active', isTyping);
-            scrollChatToBottom();
-        };
-
-        window.setAdminSeen = function() {
-            const seenBadges = document.querySelectorAll('.msg-row.outgoing .seen-indicator');
-            if (seenBadges.length > 0) {
-                seenBadges[seenBadges.length - 1].classList.add('visible');
-                scrollChatToBottom();
-            }
-        };
-
-        window.receiveAdminMessage = function(text, imageUrl = null) {
-            window.setAdminTyping(false);
-            const chatFeed = document.getElementById('chatFeed');
-            const typingIndicator = document.getElementById('typingIndicator');
-            const currentTime = getCurrentTime();
-
-            let bubbleContent = '';
-            if (imageUrl) {
-                bubbleContent += `
-                    <div class="bubble-image-wrap">
-                        <img src="${imageUrl}" alt="Admin Photo" class="chat-uploaded-img" onclick="previewImage('${imageUrl}')">
-                    </div>
-                `;
-            }
-            if (text) bubbleContent += `<div class="bubble">${escapeHTML(text)}</div>`;
-
-            const agentMsgRow = document.createElement('div');
-            agentMsgRow.className = 'msg-row incoming';
-            agentMsgRow.innerHTML = `
-                ${bubbleContent}
-                <div class="msg-meta-row">
-                    <span class="msg-time">${currentTime}</span>
-                </div>
-            `;
-
-            chatFeed.insertBefore(agentMsgRow, typingIndicator);
-            scrollChatToBottom();
-        };
-
-        window.addEventListener('storage', (e) => {
-            if (e.key === 'admin_support_action') {
-                const action = JSON.parse(e.newValue);
-                if (action.type === 'typing') window.setAdminTyping(action.status);
-                else if (action.type === 'seen') window.setAdminSeen();
-                else if (action.type === 'message') window.receiveAdminMessage(action.text, action.image);
-            }
-        });
-
-        function notifyAdminNewMessage() {
-            localStorage.setItem('user_last_sent_msg', JSON.stringify({ time: Date.now() }));
         }
 
         function scrollChatToBottom() {
@@ -929,7 +985,7 @@
             const toastText = document.getElementById("toastMessage");
             toastText.innerText = message;
             toast.classList.add("show");
-            setTimeout(() => { toast.classList.remove("show"); }, 2300);
+            setTimeout(() => { toast.classList.remove("show"); }, 2400);
         }
 
         document.addEventListener('DOMContentLoaded', () => {
