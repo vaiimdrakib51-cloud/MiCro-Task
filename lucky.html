@@ -5,747 +5,223 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Lucky Draw — MicroTask</title>
   <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Caveat:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <!-- FontAwesome 6 Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-  <!-- Firebase SDK (Compat Version) -->
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Poppins', sans-serif;
-      -webkit-tap-highlight-color: transparent;
+    :root {
+      --bg-main: #040817;
+      --card-bg: rgba(10, 20, 48, 0.7);
+      --card-border: rgba(56, 189, 248, 0.2);
+      --gold: #facc15;
+      --gold-glow: rgba(250, 204, 21, 0.35);
+      --accent: #38bdf8;
+      --text-muted: #94a3b8;
     }
 
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
     body {
-      background-color: #030712;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 16px 10px;
+      background: radial-gradient(circle at top, #09173d 0%, var(--bg-main) 100%);
+      display: flex; justify-content: center; align-items: flex-start;
+      min-height: 100vh; padding: 12px 10px 25px; color: #fff;
     }
 
-    .container {
-      width: 100%;
-      max-width: 400px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
+    .container { width: 100%; max-width: 390px; display: flex; flex-direction: column; gap: 11px; }
 
-    /* 0. Top Navigation Header */
-    .top-nav-bar {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 4px 4px 8px;
-    }
-
+    /* Top Nav */
+    .top-nav-bar { display: flex; align-items: center; justify-content: space-between; padding: 2px 4px 6px; }
+    .nav-left { display: flex; align-items: center; gap: 10px; }
     .back-btn-top {
-      background: rgba(255, 255, 255, 0.08);
-      border: 1.5px solid #1e3a8a;
-      color: #ffffff;
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 15px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-      transition: all 0.2s ease;
+      background: rgba(255, 255, 255, 0.06); border: 1px solid var(--card-border); color: #fff;
+      width: 34px; height: 34px; border-radius: 50%; cursor: pointer; display: flex;
+      align-items: center; justify-content: center; font-size: 13px; backdrop-filter: blur(5px);
     }
     .back-btn-top:active { transform: scale(0.92); }
-
-    .top-nav-bar h2 {
-      color: #ffffff;
-      font-size: 19px;
-      font-weight: 800;
-      letter-spacing: -0.3px;
+    .top-nav-bar h2 { font-size: 17px; font-weight: 850; letter-spacing: -0.3px; }
+    
+    .btn-my-tickets-top {
+      background: rgba(56, 189, 248, 0.12); border: 1px solid rgba(56, 189, 248, 0.35);
+      color: var(--accent); font-size: 11px; font-weight: 800; padding: 5px 12px; border-radius: 20px;
+      cursor: pointer; display: flex; align-items: center; gap: 5px;
     }
 
+    /* Cards */
     .card {
-      background: linear-gradient(180deg, #060b24 0%, #030617 100%);
-      border-radius: 20px;
-      padding: 18px;
-      position: relative;
+      background: var(--card-bg); backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border); border-radius: 18px;
+      padding: 13px 14px; position: relative; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
     }
 
-    /* 1. Next Draw Card */
-    .draw-card {
-      border: 1.5px solid #1e3a8a;
-      box-shadow: 0 0 15px rgba(30, 58, 138, 0.4);
+    .draw-card { border: 1.5px solid rgba(250, 204, 21, 0.35); box-shadow: 0 0 20px rgba(250, 204, 21, 0.12); }
+    
+    .draw-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 9px; }
+    
+    /* Live Draw Beeping Button at Top */
+    .btn-live-badge {
+      background: linear-gradient(135deg, #ef4444, #b91c1c);
+      color: #fff; font-size: 10.5px; font-weight: 900; padding: 4px 10px; border-radius: 20px;
+      display: inline-flex; align-items: center; gap: 6px; cursor: pointer; border: 1px solid #f87171;
+      box-shadow: 0 0 12px rgba(239, 68, 68, 0.75);
+      animation: livePulse 1.2s infinite ease-in-out;
+    }
+    @keyframes livePulse {
+      0% { transform: scale(1); box-shadow: 0 0 6px rgba(239,68,68,0.5); }
+      50% { transform: scale(1.04); box-shadow: 0 0 16px rgba(239,68,68,0.9); }
+      100% { transform: scale(1); box-shadow: 0 0 6px rgba(239,68,68,0.5); }
     }
 
-    .draw-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 12px;
-    }
-
-    .draw-header-left {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .live-badge {
-      background: linear-gradient(90deg, #ef4444, #dc2626);
-      color: #fff;
-      font-size: 11px;
-      font-weight: 800;
-      padding: 4px 10px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      letter-spacing: 0.5px;
-      animation: pulse 1.5s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.8; }
-    }
-
-    .draw-title {
-      color: #ffffff;
-      font-size: 16px;
-      font-weight: 700;
-    }
-
-    .sales-tag {
-      font-size: 10.5px;
-      font-weight: 800;
-      padding: 3px 9px;
-      border-radius: 6px;
-    }
+    .sales-tag { font-size: 10px; font-weight: 800; padding: 2.5px 8px; border-radius: 6px; }
     .sales-tag.open { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981; }
     .sales-tag.closed { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; }
 
-    .schedule {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: #f1f5f9;
-      font-size: 13px;
-      font-weight: 600;
-      margin-bottom: 16px;
+    .schedule-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(0, 0, 0, 0.3); border-radius: 10px; padding: 6px 10px;
+      margin-bottom: 11px; font-size: 11.5px; font-weight: 600; border: 1px solid rgba(255,255,255,0.06);
     }
+    .schedule-bar span strong { color: var(--gold); }
 
-    .calendar-icon {
-      background: #0ea5e9;
-      width: 24px;
-      height: 24px;
-      border-radius: 6px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 13px;
-    }
-
-    /* Countdown Grid */
-    .countdown-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      margin-bottom: 18px;
-    }
-
+    /* Compact Countdown */
+    .countdown-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 12px; }
     .count-box {
-      background: #050d26;
-      border: 1.5px solid #1e3a8a;
-      border-radius: 12px;
-      padding: 10px 4px;
-      text-align: center;
+      background: #060e24; border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 10px;
+      padding: 7px 2px; text-align: center;
     }
+    .count-box .num { display: block; color: #fff; font-size: 17px; font-weight: 850; line-height: 1.1; }
+    .count-box .label { color: var(--text-muted); font-size: 9px; font-weight: 700; text-transform: uppercase; }
 
-    .count-box .num {
-      display: block;
-      color: #ffffff;
-      font-size: 20px;
-      font-weight: 700;
-      line-height: 1.1;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .count-box .label {
-      color: #94a3b8;
-      font-size: 10px;
-      font-weight: 500;
-    }
-
-    /* Join Now Button */
     .btn-join {
-      width: 100%;
-      background: linear-gradient(180deg, #facc15 0%, #eab308 50%, #ca8a04 100%);
-      color: #000000;
-      font-size: 15.5px;
-      font-weight: 800;
-      padding: 12px;
-      border: none;
-      border-radius: 25px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      cursor: pointer;
-      box-shadow: 0 4px 15px rgba(234, 179, 8, 0.4);
-      transition: transform 0.2s, background 0.3s;
+      width: 100%; background: linear-gradient(135deg, #facc15, #eab308, #ca8a04);
+      color: #000; font-size: 14.5px; font-weight: 850; padding: 10.5px; border: none;
+      border-radius: 20px; display: flex; align-items: center; justify-content: center; gap: 7px;
+      cursor: pointer; box-shadow: 0 4px 18px var(--gold-glow); transition: transform 0.15s;
     }
+    .btn-join:active { transform: scale(0.97); }
+    .btn-join.disabled-btn { background: #334155; color: #94a3b8; box-shadow: none; cursor: not-allowed; }
 
-    .btn-join:active {
-      transform: scale(0.98);
-    }
-
-    .btn-join.disabled-btn {
-      background: #334155;
-      color: #94a3b8;
-      box-shadow: none;
-      cursor: not-allowed;
-    }
-
-    /* 2. Winners Card */
-    .winners-card {
-      border: 1.5px solid #6366f1;
-      box-shadow: 0 0 15px rgba(99, 102, 241, 0.25);
-    }
-
-    .winners-title {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      color: #ffffff;
-      font-size: 17px;
-      font-weight: 700;
-      margin-bottom: 16px;
-    }
-
-    .winner-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-bottom: 16px;
-      min-height: 80px;
-    }
-
-    .no-winner-msg {
-      text-align: center;
-      color: #94a3b8;
-      font-size: 12px;
-      padding: 22px 10px;
-      background: rgba(255, 255, 255, 0.02);
-      border-radius: 12px;
-      border: 1px dashed rgba(255, 255, 255, 0.1);
-      line-height: 1.5;
-    }
-
-    .winner-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-      padding-bottom: 8px;
-    }
-
-    .winner-left {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .rank-circle {
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 11px;
-      font-weight: 700;
-      color: #fff;
-    }
-    .rank-1 { background: #eab308; color: #000; box-shadow: 0 0 8px #eab308; }
-    .rank-2 { background: #93c5fd; color: #000; }
-    .rank-3 { background: #f97316; }
-
-    .avatar-icon {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: #1e293b;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #facc15;
-      font-size: 14px;
-    }
-
-    .user-info .name {
-      display: block;
-      color: #ffffff;
-      font-size: 13px;
-      font-weight: 700;
-    }
-
-    .user-info .amount {
-      color: #facc15;
-      font-size: 11px;
-      font-weight: 600;
-    }
-
-    .btn-view-all {
-      width: 100%;
-      background: linear-gradient(90deg, #4338ca 0%, #6366f1 100%);
-      color: #ffffff;
-      font-size: 13.5px;
-      font-weight: 700;
-      padding: 10px;
-      border: 1px solid #818cf8;
-      border-radius: 25px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      cursor: pointer;
-      box-shadow: 0 0 10px rgba(99, 102, 241, 0.4);
-    }
-
-    /* 3. Bottom Banner */
-    .bottom-banner {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      padding: 10px 5px;
-    }
-
-    .gift-box {
-      font-size: 46px;
-      filter: drop-shadow(0 0 12px #a855f7);
-    }
-
-    .banner-text h3 {
-      font-family: 'Caveat', cursive;
-      font-size: 28px;
-      color: #facc15;
-      font-weight: 700;
-      line-height: 1;
-    }
-
-    .banner-text p {
-      color: #ffffff;
-      font-size: 12px;
-      font-weight: 600;
-      margin-top: 4px;
-    }
-
-    .curved-line {
-      height: 3px;
-      width: 90%;
-      background: linear-gradient(90deg, #facc15, transparent);
-      border-radius: 5px;
-      margin-top: 4px;
-    }
-
-    /* Modal Styling */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(2, 6, 23, 0.88);
-      backdrop-filter: blur(8px);
-      z-index: 1000;
-      justify-content: center;
-      align-items: center;
-      padding: 16px;
-    }
-
-    .modal-overlay.active {
-      display: flex;
-    }
-
-    .modal-box {
-      background: linear-gradient(180deg, #0a1130 0%, #030718 100%);
-      border: 1.5px solid #6366f1;
-      box-shadow: 0 0 30px rgba(99, 102, 241, 0.4);
-      border-radius: 20px;
-      width: 100%;
-      max-width: 370px;
-      overflow: hidden;
-      animation: modalFade 0.25s ease-out;
-    }
-
-    @keyframes modalFade {
-      from { transform: scale(0.92); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
-    }
-
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 14px 18px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    .modal-header h4 {
-      color: #facc15;
-      font-size: 16px;
-      font-weight: 700;
-    }
-
-    .btn-close {
-      background: none;
-      border: none;
-      color: #94a3b8;
-      font-size: 24px;
-      cursor: pointer;
-      line-height: 1;
-    }
-    .btn-close:hover { color: #fff; }
-
-    .modal-tabs {
-      display: flex;
-      background: #04081e;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    .tab-btn {
-      flex: 1;
-      padding: 11px 4px;
-      background: none;
-      border: none;
-      color: #94a3b8;
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: 0.2s;
-      border-bottom: 2px solid transparent;
-      text-align: center;
-    }
-
-    .tab-btn.active {
-      color: #facc15;
-      border-bottom: 2px solid #facc15;
-      background: rgba(250, 204, 21, 0.05);
-    }
-
-    .modal-body {
-      padding: 16px;
-      max-height: 420px;
-      overflow-y: auto;
-    }
-
-    .tab-content {
-      display: none;
-    }
-    .tab-content.active {
-      display: block;
-    }
-
-    .form-group {
-      margin-bottom: 10px;
-      text-align: left;
-    }
-
-    .form-group label {
-      display: block;
-      color: #cbd5e1;
-      font-size: 11px;
-      margin-bottom: 4px;
-      font-weight: 600;
-    }
-
-    .form-control {
-      width: 100%;
-      background: #060e26;
-      border: 1px solid #1e293b;
-      color: #ffffff;
-      padding: 8px 12px;
-      border-radius: 8px;
-      font-size: 12px;
-      outline: none;
-    }
-
-    .form-control:focus {
-      border-color: #6366f1;
-    }
-
-    .ticket-price-box {
-      background: rgba(250, 204, 21, 0.1);
-      border: 1px dashed #facc15;
-      border-radius: 12px;
-      padding: 10px;
-      text-align: center;
-      margin-bottom: 12px;
-    }
-
-    .ticket-price-box p {
-      color: #94a3b8;
-      font-size: 11px;
-    }
-
-    .ticket-price-box strong {
-      color: #facc15;
-      font-size: 16px;
-      display: block;
-      margin-top: 2px;
-    }
-
-    .btn-confirm-buy {
-      width: 100%;
-      background: linear-gradient(90deg, #10b981, #059669);
-      color: #fff;
-      font-weight: 700;
-      border: none;
-      padding: 11px;
-      border-radius: 20px;
-      font-size: 13.5px;
-      cursor: pointer;
-      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-      margin-top: 8px;
-      transition: transform 0.15s;
-    }
-    .btn-confirm-buy:active { transform: scale(0.97); }
-
-    .btn-confirm-buy:disabled {
-      background: #475569;
-      box-shadow: none;
-      cursor: not-allowed;
-    }
-
-    /* Prize Banner Slider */
+    /* Prize Slider (Compact & Modern) */
+    .prize-card-slider { padding: 11px 12px; border: 1px solid rgba(56, 189, 248, 0.3); }
+    .prize-top-title { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 12.5px; font-weight: 800; color: var(--gold); }
+    
     .prize-slider-container {
-      position: relative;
-      width: 100%;
-      height: 235px;
-      border-radius: 18px;
-      overflow: hidden;
-      background: #070e28;
-      border: 1.5px solid #6366f1;
-      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.3);
-      margin-bottom: 12px;
+      position: relative; width: 100%; height: 165px; border-radius: 12px; overflow: hidden;
+      background: #020617; border: 1px solid rgba(255, 255, 255, 0.08);
     }
-
-    .prize-slider-track {
-      display: flex;
-      height: 100%;
-      width: 100%;
-      transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .prize-slide {
-      min-width: 100%;
-      height: 100%;
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #030718;
-    }
-
-    .prize-slide img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
+    .prize-slider-track { display: flex; height: 100%; width: 100%; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+    .prize-slide { min-width: 100%; height: 100%; position: relative; display: flex; align-items: center; justify-content: center; background: #030718; }
+    .prize-slide img { width: 100%; height: 100%; object-fit: cover; }
     .prize-slide-overlay {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: linear-gradient(180deg, transparent 0%, rgba(3, 7, 24, 0.94) 100%);
-      padding: 20px 14px 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-      text-align: left;
+      position: absolute; inset: 0; background: linear-gradient(180deg, transparent 40%, rgba(2, 6, 23, 0.95) 100%);
+      padding: 10px; display: flex; flex-direction: column; justify-content: flex-end; text-align: left;
     }
-
     .prize-badge-rank {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      background: linear-gradient(90deg, #facc15, #ca8a04);
-      color: #000;
-      font-size: 11px;
-      font-weight: 800;
-      padding: 2px 10px;
-      border-radius: 14px;
-      width: fit-content;
+      background: linear-gradient(90deg, #facc15, #eab308); color: #000; font-size: 9.5px;
+      font-weight: 850; padding: 2px 7px; border-radius: 8px; width: fit-content; margin-bottom: 2px;
     }
-
-    .prize-slide-title {
-      color: #ffffff;
-      font-size: 14px;
-      font-weight: 700;
-      line-height: 1.25;
-    }
-
-    .prize-slide-value {
-      color: #38bdf8;
-      font-size: 12px;
-      font-weight: 700;
-    }
+    .prize-slide-title { font-size: 12.5px; font-weight: 800; color: #fff; line-height: 1.2; }
+    .prize-slide-value { font-size: 10.5px; font-weight: 700; color: #38bdf8; }
 
     .slider-nav-btn {
-      position: absolute;
-      top: 45%;
-      transform: translateY(-50%);
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: rgba(0, 0, 0, 0.65);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 13px;
-      cursor: pointer;
-      z-index: 5;
+      position: absolute; top: 50%; transform: translateY(-50%); width: 26px; height: 26px;
+      border-radius: 50%; background: rgba(0, 0, 0, 0.7); border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #fff; display: flex; align-items: center; justify-content: center; font-size: 11px; cursor: pointer; z-index: 5;
     }
-    .slider-nav-btn.prev { left: 8px; }
-    .slider-nav-btn.next { right: 8px; }
+    .slider-nav-btn.prev { left: 6px; }
+    .slider-nav-btn.next { right: 6px; }
+    .prize-slider-dots { position: absolute; bottom: 6px; right: 8px; display: flex; gap: 4px; z-index: 6; }
+    .prize-dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255, 255, 255, 0.35); transition: all 0.2s; }
+    .prize-dot.active { width: 14px; border-radius: 6px; background: var(--gold); }
 
-    .prize-slider-dots {
-      position: absolute;
-      bottom: 6px;
-      right: 12px;
-      display: flex;
-      gap: 5px;
-      z-index: 6;
-      background: rgba(0,0,0,0.5);
-      padding: 3px 7px;
-      border-radius: 12px;
-    }
+    /* Winners Card */
+    .winners-card { padding: 12px 14px; }
+    .winners-title { font-size: 13.5px; font-weight: 800; margin-bottom: 9px; display: flex; align-items: center; gap: 6px; color: #f1f5f9; }
+    .winner-list { display: flex; flex-direction: column; gap: 7px; }
+    .no-winner-msg { text-align: center; color: var(--text-muted); font-size: 11px; padding: 14px 6px; background: rgba(255,255,255,0.02); border-radius: 10px; border: 1px dashed rgba(255,255,255,0.1); }
+    .winner-row { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 6px; }
+    .winner-left { display: flex; align-items: center; gap: 8px; }
+    .rank-circle { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; }
+    .rank-1 { background: #eab308; color: #000; box-shadow: 0 0 6px #eab308; }
+    .rank-2 { background: #93c5fd; color: #000; }
+    .rank-3 { background: #f97316; color: #fff; }
+    .user-info .name { font-size: 12px; font-weight: 700; color: #fff; }
+    .user-info .amount { font-size: 10px; color: var(--gold); }
 
-    .prize-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.4);
-      transition: all 0.25s;
-    }
-    .prize-dot.active {
-      width: 16px;
-      border-radius: 8px;
-      background: #facc15;
-    }
+    /* Modal */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(2, 6, 23, 0.88); backdrop-filter: blur(8px); z-index: 1000; justify-content: center; align-items: center; padding: 16px; }
+    .modal-overlay.active { display: flex; }
+    .modal-box { background: #08112e; border: 1.5px solid var(--card-border); border-radius: 18px; width: 100%; max-width: 360px; overflow: hidden; animation: modalFade 0.2s ease-out; }
+    @keyframes modalFade { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.07); }
+    .modal-header h4 { color: var(--gold); font-size: 15px; font-weight: 800; }
+    .btn-close { background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer; }
+    .modal-tabs { display: flex; background: #050b1f; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .tab-btn { flex: 1; padding: 10px; background: none; border: none; color: var(--text-muted); font-size: 11.5px; font-weight: 800; cursor: pointer; border-bottom: 2px solid transparent; text-align: center; }
+    .tab-btn.active { color: var(--gold); border-bottom: 2px solid var(--gold); background: rgba(250,204,21,0.04); }
+    .modal-body { padding: 14px; max-height: 400px; overflow-y: auto; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .form-group { margin-bottom: 9px; text-align: left; }
+    .form-group label { display: block; color: #cbd5e1; font-size: 10.5px; margin-bottom: 3px; font-weight: 700; }
+    .form-control { width: 100%; background: #050c22; border: 1px solid rgba(56,189,248,0.25); color: #fff; padding: 8px 12px; border-radius: 8px; font-size: 11.5px; outline: none; }
+    .form-control:focus { border-color: var(--accent); }
+    .ticket-price-box { background: rgba(250, 204, 21, 0.08); border: 1px dashed var(--gold); border-radius: 10px; padding: 9px; text-align: center; margin-bottom: 10px; }
+    .ticket-price-box p { color: var(--text-muted); font-size: 10px; }
+    .ticket-price-box strong { color: var(--gold); font-size: 15px; display: block; margin-top: 2px; }
+    .btn-confirm-buy { width: 100%; background: linear-gradient(135deg, #10b981, #059669); color: #fff; font-weight: 800; border: none; padding: 10.5px; border-radius: 18px; font-size: 13px; cursor: pointer; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); margin-top: 6px; }
 
-    /* Ticket Card */
-    .ticket-card {
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px dashed #6366f1;
-      border-radius: 10px;
-      padding: 10px;
-      margin-bottom: 10px;
-      text-align: left;
-    }
-
-    .ticket-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 6px;
-    }
-
-    .ticket-num {
-      background: #facc15;
-      color: #000;
-      font-weight: 800;
-      font-size: 12px;
-      padding: 2px 8px;
-      border-radius: 6px;
-      letter-spacing: 1px;
-    }
-
-    .ticket-date {
-      color: #94a3b8;
-      font-size: 10px;
-    }
-
-    .ticket-details {
-      color: #cbd5e1;
-      font-size: 11px;
-      line-height: 1.5;
-    }
-
-    .empty-tickets {
-      color: #64748b;
-      font-size: 12px;
-      text-align: center;
-      padding: 30px 0;
-    }
+    .ticket-card { background: rgba(255, 255, 255, 0.03); border: 1px dashed #38bdf8; border-radius: 10px; padding: 9px; margin-bottom: 8px; font-size: 10.5px; }
+    .ticket-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+    .ticket-num { background: var(--gold); color: #000; font-weight: 850; font-size: 11px; padding: 2px 7px; border-radius: 5px; }
 
     /* Toast */
     .toast-box {
-      position: fixed;
-      bottom: 25px;
-      left: 50%;
-      transform: translateX(-50%) translateY(100px);
-      background: #0f172a;
-      color: #fff;
-      padding: 11px 22px;
-      border-radius: 30px;
-      font-size: 12.5px;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      opacity: 0;
-      transition: all 0.3s ease;
-      z-index: 9999;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px);
+      background: #0f172a; color: #fff; padding: 9px 18px; border-radius: 25px; font-size: 11.5px;
+      font-weight: 700; display: flex; align-items: center; gap: 7px; opacity: 0; transition: all 0.25s ease;
+      z-index: 9999; box-shadow: 0 8px 24px rgba(0,0,0,0.5); border: 1px solid var(--accent);
     }
-    .toast-box.show {
-      transform: translateX(-50%) translateY(0);
-      opacity: 1;
-    }
+    .toast-box.show { transform: translateX(-50%) translateY(0); opacity: 1; }
   </style>
 </head>
 <body>
 
   <div class="container">
     
-    <!-- 0. Header with Back Button to Dashboard -->
+    <!-- Top Nav Header -->
     <div class="top-nav-bar">
-      <button onclick="window.location.href='index.html'" class="back-btn-top" title="Back to Dashboard">
-        <i class="fa-solid fa-arrow-left"></i>
+      <div class="nav-left">
+        <button onclick="window.location.href='index.html'" class="back-btn-top">
+          <i class="fa-solid fa-arrow-left"></i>
+        </button>
+        <h2>Lucky Draw</h2>
+      </div>
+      <button class="btn-my-tickets-top" onclick="openModal('myTicketsTab')">
+        <i class="fa-solid fa-ticket"></i> My Tickets
       </button>
-      <h2>Lucky Draw</h2>
     </div>
 
     <!-- 1. Next Draw Card -->
     <div class="card draw-card">
       <div class="draw-header">
-        <div class="draw-header-left">
-          <span class="live-badge">LIVE <span>((•))</span></span>
-          <span class="draw-title">Mega Lucky Draw</span>
+        <!-- Live Beeping Draw Button -->
+        <div class="btn-live-badge" onclick="handleLiveDrawClick()" title="Click to watch Live Stream">
+          <i class="fa-solid fa-video"></i> 🔴 LIVE DRAW <span>((•))</span>
         </div>
         <span class="sales-tag open" id="salesStatusBadge">Open</span>
       </div>
 
-      <div class="schedule">
-        <span class="calendar-icon">📅</span>
-        <span id="targetDrawDateText">Draw Date: <strong>Loading schedule...</strong></span>
+      <div class="schedule-bar">
+        <span>📅 Schedule:</span>
+        <span id="targetDrawDateText"><strong>১৫ নভেম্বর, ২০২৬ রাত ১০:০০</strong></span>
       </div>
 
-      <!-- Real-Time Countdown Grid (Admin Configured) -->
+      <!-- Real-Time Countdown Grid -->
       <div class="countdown-grid">
         <div class="count-box">
           <span class="num" id="days">00</span>
@@ -757,45 +233,43 @@
         </div>
         <div class="count-box">
           <span class="num" id="minutes">00</span>
-          <span class="label">Minutes</span>
+          <span class="label">Mins</span>
         </div>
         <div class="count-box">
           <span class="num" id="seconds">00</span>
-          <span class="label">Seconds</span>
+          <span class="label">Secs</span>
         </div>
       </div>
 
-      <!-- Join Button (Controlled by Admin) -->
+      <!-- Buy Ticket Button -->
       <button class="btn-join" id="btnMainJoin" onclick="handleJoinBtnClick()">
-        🎟️ Buy Ticket (৳40)
+        🎟️ Buy Ticket (<span class="dynPriceText">৳40</span>)
       </button>
     </div>
 
-    <!-- 2. Winners Card -->
+    <!-- 2. Prize Pool Slider Card (5 Banners) -->
+    <div class="card prize-card-slider">
+      <div class="prize-top-title">
+        <span><i class="fa-solid fa-gift"></i> Prize Pool Rewards</span>
+        <span style="font-size:10px; color:var(--text-muted);">Top 5 Prizes</span>
+      </div>
+      <div class="prize-slider-container">
+        <button type="button" class="slider-nav-btn prev" onclick="movePrizeSlide(-1)">❮</button>
+        <button type="button" class="slider-nav-btn next" onclick="movePrizeSlide(1)">❯</button>
+        <div class="prize-slider-track" id="prizeSliderTrack"></div>
+        <div class="prize-slider-dots" id="prizeSliderDots"></div>
+      </div>
+    </div>
+
+    <!-- 3. Winners Card -->
     <div class="card winners-card">
       <div class="winners-title">
-        🏆 Draw Results & Winners
+        <i class="fa-solid fa-trophy" style="color:var(--gold);"></i> Recent Winners
       </div>
-
       <div class="winner-list" id="winnerListContainer">
         <div class="no-winner-msg">
-          <i class="fa-solid fa-trophy" style="font-size:22px; color:#facc15; margin-bottom:6px; display:block;"></i>
-          No winners announced yet for this draw.<br>The winner list will be displayed here once completed.
+          No winners announced yet for this draw.<br>Live draw result will appear here.
         </div>
-      </div>
-
-      <button class="btn-view-all" onclick="openModal('prizeTab')">
-        🎁 View Prize Banners &rsaquo;
-      </button>
-    </div>
-
-    <!-- 3. Bottom Banner -->
-    <div class="bottom-banner">
-      <div class="gift-box">🎁</div>
-      <div class="banner-text">
-        <h3>Good Luck!</h3>
-        <p>Test your luck and win big rewards!</p>
-        <div class="curved-line"></div>
       </div>
     </div>
 
@@ -811,61 +285,43 @@
 
       <div class="modal-tabs">
         <button class="tab-btn active" id="btn-buyTab" onclick="switchTab('buyTab')">🎫 Buy Ticket</button>
-        <button class="tab-btn" id="btn-prizeTab" onclick="switchTab('prizeTab')">🏆 Prize Pool</button>
         <button class="tab-btn" id="btn-myTicketsTab" onclick="switchTab('myTicketsTab')">🎟️ My Tickets</button>
       </div>
 
       <div class="modal-body">
-        
         <!-- Tab 1: Buy Ticket -->
         <div class="tab-content active" id="buyTab">
           <div class="ticket-price-box">
-            <p>Ticket Price (Charged from Main Balance):</p>
-            <strong>৳40 BDT (~$0.33 USD)</strong>
+            <p>Ticket Price (Deducted from Main Balance):</p>
+            <strong id="modalPriceSummary">৳40 BDT (~$0.33 USD)</strong>
           </div>
 
           <form id="buyTicketForm" onsubmit="handleTicketPurchase(event)">
             <div class="form-group">
               <label>Full Name:</label>
-              <input type="text" id="userName" class="form-control" placeholder="e.g. John Doe" required>
+              <input type="text" id="userName" class="form-control" placeholder="e.g. Shakil Ahmed" required>
             </div>
 
             <div class="form-group">
               <label>Phone Number:</label>
-              <input type="tel" id="userPhone" class="form-control" placeholder="e.g. 017xxxxxxxx" required>
+              <input type="tel" id="userPhone" class="form-control" placeholder="017xxxxxxxx" required>
             </div>
 
             <div class="form-group">
-              <label>Address (City / Area):</label>
+              <label>Address (District / Area):</label>
               <input type="text" id="userAddress" class="form-control" placeholder="e.g. Dhaka, Mirpur" required>
             </div>
 
             <button type="submit" class="btn-confirm-buy" id="btnBuySubmit">
-              Pay ৳40 & Buy Ticket
+              Pay <span class="dynPriceText">৳40</span> & Buy Ticket
             </button>
           </form>
         </div>
 
-        <!-- Tab 2: Prize Banner Slider (Admin Image Slides) -->
-        <div class="tab-content" id="prizeTab">
-          <div class="prize-slider-container">
-            <button type="button" class="slider-nav-btn prev" onclick="movePrizeSlide(-1)">❮</button>
-            <button type="button" class="slider-nav-btn next" onclick="movePrizeSlide(1)">❯</button>
-            <div class="prize-slider-track" id="prizeSliderTrack">
-              <!-- Dynamically rendered from admin panel -->
-            </div>
-            <div class="prize-slider-dots" id="prizeSliderDots"></div>
-          </div>
-          <p style="font-size: 11px; color:#94a3b8; text-align:center;">
-            <i class="fa-solid fa-hand-pointer"></i> Swipe or use arrows to view all prizes
-          </p>
-        </div>
-
-        <!-- Tab 3: My Tickets -->
+        <!-- Tab 2: My Tickets -->
         <div class="tab-content" id="myTicketsTab">
           <div id="ticketsContainer"></div>
         </div>
-
       </div>
     </div>
   </div>
@@ -876,7 +332,6 @@
     <span id="toastMsg">Message</span>
   </div>
 
-  <!-- JavaScript & Firebase -->
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyBrG81DRVjx040QhiT68yyRErGXjuCPdS4",
@@ -892,14 +347,15 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // Instant session cache restoration from Dashboard
     let currentUserData = JSON.parse(localStorage.getItem('microtask_cached_user')) || null;
     let isTicketSalesOpen = true;
-    const TICKET_PRICE_BDT = 40;
-    const TICKET_PRICE_USD = parseFloat((40 / 120).toFixed(4)); // ৳40 ≈ $0.3333 USD
+    let currentTicketPriceBDT = 40;
+    let currentTicketPriceUSD = 0.3333;
+    let usdToBdtRate = 120;
+    let liveDrawUrl = "";
 
-    // Fallback date until admin sets it
-    let fixedTargetTime = new Date("2026-11-20T22:00:00+06:00").getTime();
+    // Default target time
+    let fixedTargetTime = new Date().getTime() + (7 * 24 * 60 * 60 * 1000);
 
     function showToast(msg, isSuccess = true) {
       const toast = document.getElementById('toastBox');
@@ -909,10 +365,10 @@
       icon.className = isSuccess ? "fa-solid fa-circle-check" : "fa-solid fa-circle-exclamation";
       icon.style.color = isSuccess ? "#10b981" : "#ef4444";
       toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 2500);
+      setTimeout(() => toast.classList.remove('show'), 2400);
     }
 
-    // ================= 1. Countdown Timer =================
+    // 1. Countdown
     function updateCountdown() {
       const now = new Date().getTime();
       let diff = fixedTargetTime - now;
@@ -935,30 +391,44 @@
       document.getElementById("minutes").innerText = String(minutes).padStart(2, '0');
       document.getElementById("seconds").innerText = String(seconds).padStart(2, '0');
     }
-
     setInterval(updateCountdown, 1000);
     updateCountdown();
 
-    // ================= 2. Admin Panel Realtime Sync =================
+    // 2. Settings Sync
+    db.collection("settings").doc("gateways").onSnapshot(doc => {
+      if (doc.exists && doc.data().usd_bdt_rate) {
+        usdToBdtRate = Number(doc.data().usd_bdt_rate) || 120;
+        recalculateTicketUsd();
+      }
+    });
+
     db.collection("settings").doc("lottery").onSnapshot(doc => {
       if (doc.exists) {
         const data = doc.data();
 
-        // Ticket Sales status
+        if (data.ticketPriceBDT !== undefined) {
+          currentTicketPriceBDT = Number(data.ticketPriceBDT) || 40;
+          recalculateTicketUsd();
+        }
+
         if (data.ticketSalesOpen !== undefined) {
           isTicketSalesOpen = Boolean(data.ticketSalesOpen);
           updateTicketSalesUI(isTicketSalesOpen);
         }
 
-        // Draw schedule & target date
-        if (data.targetTimestamp) {
-          fixedTargetTime = data.targetTimestamp.toMillis ? data.targetTimestamp.toMillis() : new Date(data.targetTimestamp).getTime();
-        }
-        if (data.scheduleText) {
-          document.getElementById('targetDrawDateText').innerHTML = `Draw Date: <strong>${data.scheduleText}</strong>`;
+        if (data.liveDrawUrl) {
+          liveDrawUrl = data.liveDrawUrl.trim();
         }
 
-        // Prize banner slides
+        if (data.targetTimestamp) {
+          fixedTargetTime = Number(data.targetTimestamp);
+          updateCountdown();
+        }
+
+        if (data.scheduleText && data.scheduleText.trim() !== '') {
+          document.getElementById('targetDrawDateText').innerHTML = `<strong>${data.scheduleText}</strong>`;
+        }
+
         if (data.prizes && Array.isArray(data.prizes) && data.prizes.length > 0) {
           renderPrizeBanners(data.prizes);
         } else {
@@ -969,6 +439,12 @@
       }
     }, () => loadDefaultPrizeBanners());
 
+    function recalculateTicketUsd() {
+      currentTicketPriceUSD = parseFloat((currentTicketPriceBDT / usdToBdtRate).toFixed(4));
+      document.querySelectorAll('.dynPriceText').forEach(el => el.innerText = `৳${currentTicketPriceBDT}`);
+      document.getElementById('modalPriceSummary').innerHTML = `৳${currentTicketPriceBDT} BDT (~$${currentTicketPriceUSD.toFixed(2)} USD)`;
+    }
+
     function updateTicketSalesUI(isOpen) {
       const mainBtn = document.getElementById('btnMainJoin');
       const submitBtn = document.getElementById('btnBuySubmit');
@@ -978,9 +454,9 @@
         badge.className = "sales-tag open";
         badge.innerText = "Open";
         mainBtn.className = "btn-join";
-        mainBtn.innerHTML = `🎟️ Buy Ticket (৳40)`;
+        mainBtn.innerHTML = `🎟️ Buy Ticket (<span class="dynPriceText">৳${currentTicketPriceBDT}</span>)`;
         submitBtn.disabled = false;
-        submitBtn.innerText = "Pay ৳40 & Buy Ticket";
+        submitBtn.innerHTML = `Pay <span class="dynPriceText">৳${currentTicketPriceBDT}</span> & Buy Ticket`;
       } else {
         badge.className = "sales-tag closed";
         badge.innerText = "Closed";
@@ -999,31 +475,41 @@
       openModal('buyTab');
     }
 
-    // ================= 3. Prize Banner Slider System =================
+    function handleLiveDrawClick() {
+      if (!liveDrawUrl) {
+        showToast("লাইভ ড্র লিংক শীঘ্রই যুক্ত করা হবে!", false);
+        return;
+      }
+      window.open(liveDrawUrl, '_blank');
+    }
+
+    // 3. Prize Slider
     let prizeBanners = [];
     let currentSlideIdx = 0;
     let autoSlideInterval = null;
 
     function loadDefaultPrizeBanners() {
       renderPrizeBanners([
-        { rank: 1, title: "1st Prize: iPhone 16 Pro Max", image: "https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=600&auto=format&fit=crop&q=80", valueText: "Worth ৳1,50,000" },
-        { rank: 2, title: "2nd Prize: 55\" 4K Smart TV", image: "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=600&auto=format&fit=crop&q=80", valueText: "Worth ৳60,000" },
-        { rank: 3, title: "3rd Prize: Smart Watch Ultra", image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&auto=format&fit=crop&q=80", valueText: "Worth ৳15,000" }
+        { rank: 1, title: "1st Prize: iPhone 16 Pro Max", image: "https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=500&auto=format&fit=crop&q=80", valueText: "Worth ৳1,50,000" },
+        { rank: 2, title: "2nd Prize: 55\" 4K Smart TV", image: "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=500&auto=format&fit=crop&q=80", valueText: "Worth ৳60,000" },
+        { rank: 3, title: "3rd Prize: Smart Watch Ultra", image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&auto=format&fit=crop&q=80", valueText: "Worth ৳15,000" },
+        { rank: 4, title: "4th Prize: Bluetooth Speaker", image: "https://images.unsplash.com/photo-1545454675-3531b543be5d?w=500&auto=format&fit=crop&q=80", valueText: "Worth ৳5,000" },
+        { rank: 5, title: "5th Prize: Wireless Earbuds", image: "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=500&auto=format&fit=crop&q=80", valueText: "Worth ৳3,000" }
       ]);
     }
 
     function renderPrizeBanners(prizes) {
-      prizeBanners = prizes;
+      prizeBanners = prizes.slice(0, 5);
       currentSlideIdx = 0;
       const track = document.getElementById('prizeSliderTrack');
       const dotsContainer = document.getElementById('prizeSliderDots');
 
       track.innerHTML = prizeBanners.map(p => `
         <div class="prize-slide">
-          <img src="${p.image}" alt="${p.title}" onerror="this.src='https://images.unsplash.com/photo-1511556532299-8f662fc26c06?w=600&auto=format&fit=crop&q=80'">
+          <img src="${p.image}" alt="${p.title}" onerror="this.src='https://images.unsplash.com/photo-1511556532299-8f662fc26c06?w=500&auto=format&fit=crop&q=80'">
           <div class="prize-slide-overlay">
-            <span class="prize-badge-rank">🏆 ${getRankTitle(p.rank)}</span>
-            <div class="prize-slide-title">${p.title || 'Prize Reward'}</div>
+            <span class="prize-badge-rank">🏆 Prize #${p.rank || 1}</span>
+            <div class="prize-slide-title">${p.title || 'Special Prize'}</div>
             <div class="prize-slide-value">${p.valueText || ''}</div>
           </div>
         </div>
@@ -1034,104 +520,51 @@
 
       if (autoSlideInterval) clearInterval(autoSlideInterval);
       if (prizeBanners.length > 1) {
-        autoSlideInterval = setInterval(() => movePrizeSlide(1), 3500);
+        autoSlideInterval = setInterval(() => movePrizeSlide(1), 3200);
       }
     }
 
-    function getRankTitle(r) {
-      if (r == 1) return "1st Prize";
-      if (r == 2) return "2nd Prize";
-      if (r == 3) return "3rd Prize";
-      return `Rank #${r}`;
-    }
-
-    function movePrizeSlide(direction) {
+    function movePrizeSlide(dir) {
       if (prizeBanners.length <= 1) return;
-      currentSlideIdx = (currentSlideIdx + direction + prizeBanners.length) % prizeBanners.length;
+      currentSlideIdx = (currentSlideIdx + dir + prizeBanners.length) % prizeBanners.length;
       updateSliderPosition();
     }
 
     function updateSliderPosition() {
       const track = document.getElementById('prizeSliderTrack');
-      if (track) {
-        track.style.transform = `translateX(-${currentSlideIdx * 100}%)`;
-      }
-      document.querySelectorAll('.prize-dot').forEach((dot, idx) => {
-        dot.classList.toggle('active', idx === currentSlideIdx);
-      });
+      if (track) track.style.transform = `translateX(-${currentSlideIdx * 100}%)`;
+      document.querySelectorAll('.prize-dot').forEach((d, i) => d.classList.toggle('active', i === currentSlideIdx));
     }
 
-    // ================= 4. Auth & Dashboard Sync =================
+    // 4. Auth & Ticket Buy
     auth.onAuthStateChanged(user => {
       if (user) {
         db.collection("users").doc(user.uid).onSnapshot(doc => {
           if (doc.exists) {
             currentUserData = doc.data();
             localStorage.setItem('microtask_cached_user', JSON.stringify(currentUserData));
-
             if (currentUserData.name && !document.getElementById('userName').value) {
               document.getElementById('userName').value = currentUserData.name;
             }
-
-            checkWinnerAutoCredit(user.uid, currentUserData);
           }
         });
         loadMyTickets(user.uid);
       }
     });
 
-    // ================= 5. Live Winners Sync =================
-    db.collection("lottery_winners").orderBy("rank", "asc").onSnapshot(snap => {
-      const container = document.getElementById('winnerListContainer');
-      if (snap.empty) {
-        container.innerHTML = `
-          <div class="no-winner-msg">
-            <i class="fa-solid fa-trophy" style="font-size:22px; color:#facc15; margin-bottom:6px; display:block;"></i>
-            No winners announced yet for this draw.<br>The winner list will be displayed here once completed.
-          </div>`;
-      } else {
-        let html = '';
-        snap.forEach(doc => {
-          const w = doc.data();
-          html += `
-            <div class="winner-row">
-              <div class="winner-left">
-                <span class="rank-circle rank-${w.rank || 1}">${w.rank || 1}</span>
-                <div class="avatar-icon"><i class="fa-solid fa-user-astronaut"></i></div>
-                <div class="user-info">
-                  <span class="name">${w.userName || 'Winner'}</span>
-                  <span class="amount">Ticket #${w.ticketNumber || '000000'}</span>
-                </div>
-              </div>
-              <div class="badge-icon" style="color:#facc15; font-weight:800; font-size:13px;">
-                ${w.prizeText || '$5.00'}
-              </div>
-            </div>`;
-        });
-        container.innerHTML = html;
-      }
-    });
-
-    // ================= 6. Ticket Purchase & Balance Deduction =================
     function handleTicketPurchase(e) {
       e.preventDefault();
-
-      if (!isTicketSalesOpen) {
-        showToast("Ticket sales are currently closed!", false);
-        return;
-      }
+      if (!isTicketSalesOpen) return showToast("Ticket sales closed!", false);
 
       const user = auth.currentUser;
       if (!user) {
-        showToast("Please log in to your account first!", false);
-        setTimeout(() => window.location.href = "index.html", 1200);
+        showToast("Please log in first!", false);
         return;
       }
 
       const curBal = currentUserData ? (currentUserData.balanceUSD || 0) : 0;
-      if (curBal < TICKET_PRICE_USD) {
-        showToast("Insufficient Balance! Need at least ৳40 (~$0.33).", false);
-        return;
+      if (curBal < currentTicketPriceUSD) {
+        return showToast(`Insufficient Balance! Need ৳${currentTicketPriceBDT} (~$${currentTicketPriceUSD.toFixed(2)}).`, false);
       }
 
       const name = document.getElementById('userName').value.trim();
@@ -1141,19 +574,16 @@
 
       const btn = document.getElementById('btnBuySubmit');
       btn.disabled = true;
-      btn.innerText = "Processing Ticket...";
+      btn.innerText = "Processing...";
 
-      // Deduct ৳40 ($0.3333 USD) from main balance
       db.collection("users").doc(user.uid).update({
-        balanceUSD: firebase.firestore.FieldValue.increment(-TICKET_PRICE_USD)
+        balanceUSD: firebase.firestore.FieldValue.increment(-currentTicketPriceUSD)
       }).then(() => {
-        // Update local storage session
         if (currentUserData) {
-          currentUserData.balanceUSD = Math.max(0, (currentUserData.balanceUSD || 0) - TICKET_PRICE_USD);
+          currentUserData.balanceUSD = Math.max(0, (currentUserData.balanceUSD || 0) - currentTicketPriceUSD);
           localStorage.setItem('microtask_cached_user', JSON.stringify(currentUserData));
         }
 
-        // Store ticket record
         return db.collection("lottery_tickets").add({
           userId: user.uid,
           userUID: currentUserData ? (currentUserData.uid || '000000') : '000000',
@@ -1161,30 +591,29 @@
           name: name,
           phone: phone,
           address: address,
-          priceBDT: TICKET_PRICE_BDT,
-          priceUSD: TICKET_PRICE_USD,
+          priceBDT: currentTicketPriceBDT,
+          priceUSD: currentTicketPriceUSD,
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
       }).then(() => {
-        showToast(`Congratulations! Ticket #${randomTicketNo} purchased successfully.`, true);
+        showToast(`🎉 Ticket #${randomTicketNo} purchased!`, true);
         document.getElementById('buyTicketForm').reset();
         switchTab('myTicketsTab');
       }).catch(err => {
-        showToast("Error: " + err.message, false);
+        showToast(err.message, false);
       }).finally(() => {
         if (isTicketSalesOpen) {
           btn.disabled = false;
-          btn.innerText = "Pay ৳40 & Buy Ticket";
+          btn.innerHTML = `Pay <span class="dynPriceText">৳${currentTicketPriceBDT}</span> & Buy Ticket`;
         }
       });
     }
 
-    // Load User's Tickets
     function loadMyTickets(uid) {
       db.collection("lottery_tickets").where("userId", "==", uid).onSnapshot(snap => {
         const container = document.getElementById('ticketsContainer');
         if (snap.empty) {
-          container.innerHTML = `<div class="empty-tickets">You haven't bought any tickets yet.<br>Buy a ticket to join the draw!</div>`;
+          container.innerHTML = `<div style="text-align:center; color:#94a3b8; font-size:11px; padding:20px;">No tickets purchased yet.</div>`;
           return;
         }
 
@@ -1196,12 +625,11 @@
             <div class="ticket-card">
               <div class="ticket-header">
                 <span class="ticket-num">#${t.ticketNumber}</span>
-                <span class="ticket-date">${time}</span>
+                <span style="color:#94a3b8;">${time}</span>
               </div>
-              <div class="ticket-details">
-                <div><strong>Price:</strong> ৳40 ($${t.priceUSD || 0.33})</div>
-                <div><strong>Name:</strong> ${t.name}</div>
-                <div><strong>Phone:</strong> ${t.phone}</div>
+              <div style="line-height:1.4;">
+                <div><strong>Price:</strong> ৳${t.priceBDT || 40} (~$${(t.priceUSD || 0.33).toFixed(2)})</div>
+                <div><strong>Name:</strong> ${t.name} | <strong>Phone:</strong> ${t.phone}</div>
                 <div><strong>Address:</strong> ${t.address}</div>
               </div>
             </div>`;
@@ -1210,58 +638,15 @@
       });
     }
 
-    // Auto-credit lottery winner prize to Main Balance
-    function checkWinnerAutoCredit(uid, userData) {
-      db.collection("lottery_winners").where("userId", "==", uid).where("claimed", "==", false).get().then(snap => {
-        if (!snap.empty) {
-          snap.forEach(winDoc => {
-            const winData = winDoc.data();
-            const prizeUSD = parseFloat(winData.prizeUSD || 0);
-
-            if (prizeUSD > 0) {
-              db.collection("users").doc(uid).update({
-                balanceUSD: firebase.firestore.FieldValue.increment(prizeUSD),
-                totalEarnUSD: firebase.firestore.FieldValue.increment(prizeUSD)
-              });
-
-              winDoc.ref.update({ claimed: true });
-
-              db.collection("notifications").add({
-                targetUid: String(userData.uid || ''),
-                category: "lottery",
-                title: "🎉 Congratulations! You won the Lottery!",
-                message: `Your lucky ticket #${winData.ticketNumber} won! $${prizeUSD.toFixed(2)} has been credited to your Main Balance.`,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-              });
-
-              showToast(`🎉 Congratulations! $${prizeUSD} added to Main Balance!`, true);
-            }
-          });
-        }
-      }).catch(err => console.log("Winner sync error:", err));
-    }
-
-    function openModal(defaultTab = 'buyTab') {
-      document.getElementById('lotteryModal').classList.add('active');
-      switchTab(defaultTab);
-    }
-
-    function closeModal() {
-      document.getElementById('lotteryModal').classList.remove('active');
-    }
-
-    function closeModalOnOverlay(e) {
-      if (e.target.id === 'lotteryModal') closeModal();
-    }
-
-    function switchTab(tabId) {
+    function openModal(tab = 'buyTab') { document.getElementById('lotteryModal').classList.add('active'); switchTab(tab); }
+    function closeModal() { document.getElementById('lotteryModal').classList.remove('active'); }
+    function closeModalOnOverlay(e) { if (e.target.id === 'lotteryModal') closeModal(); }
+    function switchTab(t) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-
-      document.getElementById(tabId).classList.add('active');
-      document.getElementById('btn-' + tabId).classList.add('active');
+      document.getElementById(t).classList.add('active');
+      document.getElementById('btn-' + t).classList.add('active');
     }
   </script>
-
 </body>
 </html>
