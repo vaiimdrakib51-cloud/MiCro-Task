@@ -385,18 +385,24 @@
         .video-card-3d span { font-size: 11px; color: #0f172a; font-weight: 800; margin-top: 2px; }
         .video-card-3d small { font-size: 9.5px; color: #059669; font-weight: 850; }
 
-        /* PROMO BANNER SLIDER (সম্পূর্ণ ছবি নিখুঁতভাবে দেখানোর আপডেট) */
+        /* ================= PROMO BANNER SLIDER (আনলিমিটেড অটো স্লাইডার) ================= */
         .promo-banner-container { 
             position: relative; 
             width: 100%; 
-            height: 165px; 
-            border-radius: 22px; 
+            height: 155px; 
+            border-radius: 20px; 
             overflow: hidden; 
-            background: linear-gradient(135deg, #091a30, #041021); 
-            border: 2px solid #bae6fd; 
+            background: #091a30; 
+            border: 1.5px solid #bae6fd; 
             box-shadow: 0 6px 18px rgba(2, 132, 199, 0.18); 
+            user-select: none;
         }
-        .promo-slider-track { display: flex; height: 100%; width: 100%; transition: transform 0.4s ease; }
+        .promo-slider-track { 
+            display: flex; 
+            height: 100%; 
+            width: 100%; 
+            transition: transform 0.45s cubic-bezier(0.25, 1, 0.5, 1); 
+        }
         .promo-slide { 
             min-width: 100%; 
             height: 100%; 
@@ -404,20 +410,43 @@
             display: flex; 
             align-items: center; 
             justify-content: center; 
-            background: #071526; 
-            padding: 2px;
+            position: relative;
+            overflow: hidden;
+            background: #071526;
         }
-        /* এখানে object-fit: contain ব্যবহার করায় ছবি কাটবে না */
         .promo-slide img { 
             width: 100%; 
             height: 100%; 
-            object-fit: contain; 
+            object-fit: cover; 
             display: block; 
-            border-radius: 18px;
+            -webkit-user-drag: none;
         }
-        .promo-dots { position: absolute; bottom: 8px; right: 12px; display: flex; gap: 5px; z-index: 5; background: rgba(0, 0, 0, 0.55); padding: 3px 7px; border-radius: 12px; }
-        .promo-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255, 255, 255, 0.5); }
-        .promo-dot.active { width: 16px; border-radius: 5px; background: #00d2ff; }
+        .promo-dots { 
+            position: absolute; 
+            bottom: 8px; 
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex; 
+            gap: 5px; 
+            z-index: 5; 
+            background: rgba(0, 0, 0, 0.55); 
+            backdrop-filter: blur(4px);
+            padding: 3px 8px; 
+            border-radius: 12px; 
+        }
+        .promo-dot { 
+            width: 6px; 
+            height: 6px; 
+            border-radius: 50%; 
+            background: rgba(255, 255, 255, 0.5); 
+            transition: all 0.3s ease;
+        }
+        .promo-dot.active { 
+            width: 18px; 
+            border-radius: 6px; 
+            background: #00d2ff; 
+            box-shadow: 0 0 8px rgba(0, 210, 255, 0.8);
+        }
 
         /* BOTTOM NAVIGATION */
         .bottom-nav {
@@ -544,7 +573,7 @@
         .logout-modal-overlay.active { display: flex; }
         .logout-modal-card { background: #ffffff; border-radius: 20px; width: 100%; max-width: 300px; padding: 20px 16px; text-align: center; }
         .logout-icon-box { width: 48px; height: 48px; border-radius: 50%; background: #fee2e2; color: #ef4444; display: flex; align-items: center; justify-content: center; font-size: 20px; margin: 0 auto 10px; }
-        .logout-modal-card h3 { font-size: 15px; font-weight: 800; color: #0f172a; margin-bottom: 4px; }
+        .logout-modal-card h3 { font-size: 15px; font-weight: 850; color: #0f172a; margin-bottom: 4px; }
         .logout-modal-card p { font-size: 11px; color: #64748b; margin-bottom: 16px; }
         .logout-actions { display: flex; gap: 8px; }
         .btn-cancel-logout { flex: 1; padding: 9px; border-radius: 12px; border: 1px solid #cbd5e1; background: #f8fafc; font-weight: 700; font-size: 12px; cursor: pointer; }
@@ -890,8 +919,8 @@
                     </div>
                 </div>
 
-                <!-- Dynamic Promo / Offer Banners Slider (সম্পূর্ণ ছবি শো করার সুবিধাসহ) -->
-                <div class="promo-banner-container">
+                <!-- Dynamic Promo / Offer Banners Slider (আনলিমিটেড অটো স্লাইডার) -->
+                <div class="promo-banner-container" id="mainPromoBannerBox">
                     <div class="promo-slider-track" id="promoSliderTrack"></div>
                     <div class="promo-dots" id="promoDots"></div>
                 </div>
@@ -1148,7 +1177,6 @@
             }
         }
 
-        // ================= গ্লোবাল ইনকাম ও আজকের আয় আপডেট মেথড =================
         window.addEarningToUser = function(amountUSD, taskType = 'general') {
             const user = auth.currentUser;
             if (!user || !currentUserDoc) return;
@@ -1176,7 +1204,6 @@
                 lastEarnDate: todayStr
             }).catch(e => console.error("Earn update error:", e));
 
-            // হিস্ট্রিতে রেকর্ড রাখা
             db.collection("task_history").add({
                 uid: user.uid,
                 amountUSD: amountUSD,
@@ -1187,7 +1214,6 @@
             }).catch(e => console.error(e));
         };
 
-        // ভেরিফিকেশন প্রসেস এবং রেফারেল বোনাস সিঙ্ক (Today Earn সহ)
         function processAccountVerification() {
             const user = auth.currentUser;
             if (!user) {
@@ -1232,7 +1258,6 @@
                 closeVerifyModal();
                 showToast("Account Verified! ৳50 ($0.42) deducted.", "success");
 
-                // রেফারেল বোনাস যোগ করার সময় রেফারারের TODAY EARN-এও সরাসরি কাউন্ট করা
                 if (currentUserDoc && currentUserDoc.referredBy) {
                     const refUID = String(currentUserDoc.referredBy).trim();
                     const bonusUSD = parseFloat((40 / 120).toFixed(4));
@@ -1258,7 +1283,6 @@
 
                             referrerDoc.ref.update(refUpdatePayload);
 
-                            // রেফারেল হিস্ট্রি রেকর্ড
                             db.collection("task_history").add({
                                 uid: referrerDoc.id,
                                 amountUSD: bonusUSD,
@@ -1545,7 +1569,6 @@
                             userCreatedAtMs = currentUserDoc.createdAt.toMillis ? currentUserDoc.createdAt.toMillis() : new Date(currentUserDoc.createdAt).getTime();
                         }
                         const todayStr = getTodayString();
-                        // নতুন দিন শুরু হলে টুডে আর্ন ০ হবে
                         if (currentUserDoc.lastEarnDate !== todayStr && (currentUserDoc.todayEarnUSD || 0) > 0) {
                             db.collection("users").doc(user.uid).update({ todayEarnUSD: 0.00, lastEarnDate: todayStr });
                         }
@@ -1599,36 +1622,45 @@
             touchDiffY = 0;
         });
 
-        // ================= ৩. একাধিক ব্যানার স্লাইডার (ছবি পূর্ণাঙ্গভাবে দেখানোর সমাধান) =================
-        let promoBanners = [{ id: 'default', image: "https://i.ibb.co.com/tTLNfcH6/file-000000001c1c82089a7b8b791e5b5e0e.png", action: "deposit.html" }];
+        // ================= ৩. আনলিমিটেড অটো ব্যানার স্লাইডার (১০০% নিখুঁত অটো-রোটেশন ও সোয়াইপ) =================
+        let promoBanners = [];
         let currentBannerIdx = 0;
         let bannerInterval = null;
+        let bannerTouchStartX = 0;
+        let bannerTouchEndX = 0;
 
         function initBannerSlider() {
+            // ফায়ারস্টোর থেকে সরাসরি সব ব্যানার আনলিমিটেড সিঙ্ক
             db.collection("banners").onSnapshot(snapshot => {
-                if (!snapshot.empty) {
-                    const loadedBanners = [];
-                    snapshot.forEach(doc => {
-                        const data = doc.data();
-                        const bannerImg = data.image || data.imageUrl || data.bannerUrl;
-                        if (bannerImg) {
-                            loadedBanners.push({
-                                id: doc.id,
-                                image: bannerImg,
-                                action: data.action || 'deposit.html'
-                            });
-                        }
-                    });
-                    if (loadedBanners.length > 0) promoBanners = loadedBanners;
+                const loaded = [];
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const bannerImg = data.image || data.imageUrl || data.bannerUrl;
+                    if (bannerImg) {
+                        loaded.push({
+                            id: doc.id,
+                            image: bannerImg,
+                            action: data.action || 'deposit.html',
+                            createdAt: data.createdAt ? (data.createdAt.toMillis ? data.createdAt.toMillis() : new Date(data.createdAt).getTime()) : 0
+                        });
+                    }
+                });
+
+                // নতুন থেকে পুরাতন ব্যানার ক্রমানুসারে সাজানো
+                loaded.sort((a, b) => b.createdAt - a.createdAt);
+
+                if (loaded.length > 0) {
+                    promoBanners = loaded;
+                } else {
+                    promoBanners = [{ id: 'default', image: "https://i.ibb.co.com/tTLNfcH6/file-000000001c1c82089a7b8b791e5b5e0e.png", action: "deposit.html" }];
                 }
                 renderDynamicBanners();
-            }, () => {
-                db.collection("settings").doc("banners").get().then(doc => {
-                    if (doc.exists && doc.data().list && Array.isArray(doc.data().list)) {
-                        promoBanners = doc.data().list;
-                    }
+            }, err => {
+                console.error("Banner load error:", err);
+                if (promoBanners.length === 0) {
+                    promoBanners = [{ id: 'default', image: "https://i.ibb.co.com/tTLNfcH6/file-000000001c1c82089a7b8b791e5b5e0e.png", action: "deposit.html" }];
                     renderDynamicBanners();
-                }).catch(() => renderDynamicBanners());
+                }
             });
         }
 
@@ -1637,22 +1669,70 @@
             const dotsContainer = document.getElementById('promoDots');
             if (!track || !dotsContainer) return;
 
+            currentBannerIdx = 0;
+            track.style.transform = `translateX(0%)`;
+
+            // এডমিন থেকে যত খুশি ছবি আপলোড করা হোক, সবগুলো এখানে রেন্ডার হবে
             track.innerHTML = promoBanners.map(b => `
-                <div class="promo-slide" onclick="window.location.href='${b.action || 'deposit.html'}'">
+                <div class="promo-slide" onclick="handleBannerNavigation('${b.action || 'deposit.html'}')">
                     <img src="${b.image}" alt="Offer Banner" onerror="this.src='https://i.ibb.co.com/tTLNfcH6/file-000000001c1c82089a7b8b791e5b5e0e.png'">
                 </div>
             `).join('');
 
-            dotsContainer.innerHTML = promoBanners.map((_, i) => `<div class="promo-dot ${i === 0 ? 'active' : ''}"></div>`).join('');
-            
+            // একাধিক ব্যানার থাকলে নিচে ডট নির্দেশক শো করবে
+            if (promoBanners.length > 1) {
+                dotsContainer.style.display = 'flex';
+                dotsContainer.innerHTML = promoBanners.map((_, i) => `<div class="promo-dot ${i === 0 ? 'active' : ''}"></div>`).join('');
+            } else {
+                dotsContainer.style.display = 'none';
+            }
+
+            // স্বয়ংক্রিয়ভাবে প্রতি ৩.২ সেকেন্ড পর পর একটার পর একটা ছবি ঘুরতে থাকবে
             if (bannerInterval) clearInterval(bannerInterval);
             if (promoBanners.length > 1) {
                 bannerInterval = setInterval(() => {
-                    currentBannerIdx = (currentBannerIdx + 1) % promoBanners.length;
-                    track.style.transform = `translateX(-${currentBannerIdx * 100}%)`;
-                    document.querySelectorAll('.promo-dot').forEach((dot, idx) => dot.classList.toggle('active', idx === currentBannerIdx));
-                }, 3500);
+                    moveBannerSlide(1);
+                }, 3200);
             }
+        }
+
+        function moveBannerSlide(step = 1) {
+            if (promoBanners.length <= 1) return;
+            const track = document.getElementById('promoSliderTrack');
+            if (!track) return;
+            currentBannerIdx = (currentBannerIdx + step + promoBanners.length) % promoBanners.length;
+            track.style.transform = `translateX(-${currentBannerIdx * 100}%)`;
+            document.querySelectorAll('.promo-dot').forEach((dot, idx) => dot.classList.toggle('active', idx === currentBannerIdx));
+        }
+
+        function handleBannerNavigation(actionUrl) {
+            if (!actionUrl) return;
+            if (actionUrl.startsWith('http://') || actionUrl.startsWith('https://')) {
+                window.open(actionUrl, '_blank');
+            } else {
+                window.location.href = actionUrl;
+            }
+        }
+
+        // মোবাইলে আঙুল দিয়ে ডানে-বামে সোয়াইপ করার সাপোর্ট
+        const promoContainer = document.getElementById('mainPromoBannerBox');
+        if (promoContainer) {
+            promoContainer.addEventListener('touchstart', (e) => {
+                bannerTouchStartX = e.changedTouches[0].screenX;
+                if (bannerInterval) clearInterval(bannerInterval);
+            }, { passive: true });
+
+            promoContainer.addEventListener('touchend', (e) => {
+                bannerTouchEndX = e.changedTouches[0].screenX;
+                if (bannerTouchStartX - bannerTouchEndX > 40) {
+                    moveBannerSlide(1); // বামে সোয়াইপ -> পরের ছবি
+                } else if (bannerTouchEndX - bannerTouchStartX > 40) {
+                    moveBannerSlide(-1); // ডানে সোয়াইপ -> আগের ছবি
+                }
+                if (promoBanners.length > 1) {
+                    bannerInterval = setInterval(() => moveBannerSlide(1), 3200);
+                }
+            }, { passive: true });
         }
 
         initBannerSlider();
