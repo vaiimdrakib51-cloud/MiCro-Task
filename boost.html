@@ -353,7 +353,6 @@
     let targetBoostPost = null;
     let targetDeletePostId = null;
 
-    // সেশনে কোন কোন পোস্ট ভিউ হয়েছে তা মনে রাখার সেট
     const recordedViewsSession = new Set(JSON.parse(sessionStorage.getItem('microtask_viewed_posts') || '[]'));
 
     function countWords(str) {
@@ -391,15 +390,13 @@
       return { totalSecs, days, hours, minutes, seconds };
     }
 
-    // ================= রিয়েল ভিউ কাউন্টার মেথড (পোস্টে ঢুকলে বা দেখলে সাথে সাথে ভিউ বাড়বে) =================
+    // ================= রিয়েল ভিউ কাউন্টার মেথড =================
     function registerPostView(postId) {
       if (!postId || recordedViewsSession.has(postId)) return;
 
-      // সেশনে সেভ যাতে একই ব্যক্তি বারবার রিফ্রেশ ছাড়া স্প্যাম না করে
       recordedViewsSession.add(postId);
       sessionStorage.setItem('microtask_viewed_posts', JSON.stringify([...recordedViewsSession]));
 
-      // ১. পেজে ইনস্ট্যান্ট +১ ভিউ শো করানো
       const post = posts.find(p => p.id === postId);
       if (post) {
         post.viewsCount = (post.viewsCount || 0) + 1;
@@ -407,7 +404,6 @@
         if (viewEl) viewEl.innerText = formatNumber(post.viewsCount);
       }
 
-      // ২. ফায়ারবেস ডেটাবেজে লাইভ +১ ভিউ সেভ করা
       db.collection("posts").doc(postId).update({
         viewsCount: firebase.firestore.FieldValue.increment(1)
       }).catch(err => console.log("View update err:", err));
@@ -417,7 +413,7 @@
       const post = posts.find(p => p.id === postId);
       if (!post) return;
       post.isExpanded = !post.isExpanded;
-      registerPostView(postId); // পোস্ট পুরোটা পড়ার সময়ও নিশ্চিত ভিউ যোগ হবে
+      registerPostView(postId);
       renderFeed();
     }
 
@@ -427,7 +423,6 @@
       const wordCount = countWords(post.content);
       const viewsDisplay = formatNumber(post.viewsCount || 1);
 
-      // এডমিন ব্যালেন্স দিলে সাথে সাথে লাইভ ব্যালেন্স রিড করবে
       const rawPayout = post.payoutUSD !== undefined ? post.payoutUSD : (post.earnedUSD !== undefined ? post.earnedUSD : 0);
       const displayPayoutUSD = Number(rawPayout || 0).toFixed(2);
 
@@ -622,7 +617,6 @@
       `;
     }
 
-    // স্ক্রিনে পোস্ট আসা মাত্র ভিউ কাউন্ট করার ইন্টারসেকশন অবজারভার
     function attachViewObservers() {
       if (!('IntersectionObserver' in window)) return;
       
@@ -665,7 +659,7 @@
 
       lucide.createIcons();
       updateAllCountdowns();
-      attachViewObservers(); // ভিউ অবজারভার সক্রিয় করা
+      attachViewObservers();
     }
 
     function initFirebasePostsListener() {
@@ -682,30 +676,42 @@
       });
     }
 
-    // আন্তর্জাতিক বহুভাষিক কমেন্ট ব্যাংক
+    // আন্তর্জাতিক বহুভাষিক বৃহৎ কমেন্ট ব্যাংক
     const GLOBAL_PROFILES_POOL = [
-      { id: "g_us_1", name: "David Miller", country: "USA", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100", text: "Great insights! Very well articulated." },
-      { id: "g_uk_2", name: "Emma Watson", country: "UK", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100", text: "Impressive writing, totally loved reading this." },
-      { id: "g_us_3", name: "Alex Johnson", country: "USA", avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100", text: "Valuable points mentioned here. Keep up the good work!" },
-      { id: "g_de_1", name: "Lukas Schmidt", country: "Germany", avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100", text: "Sehr informativer Beitrag! Wirklich inspirierend." },
-      { id: "g_fr_1", name: "Camille Dubois", country: "France", avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100", text: "Excellent article! Merci pour ce partage précieux." },
-      { id: "g_es_1", name: "Mateo Garcia", country: "Spain", avatar: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=100", text: "¡Gran publicación! Me ha parecido muy interesante." },
-      { id: "g_it_1", name: "Marco Rossi", country: "Italy", avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100", text: "Ottimo articolo, argomenti trattati molto bene!" },
-      { id: "g_br_1", name: "Lucas Silva", country: "Brazil", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100", text: "Post incrível! Concordo plenamente com você." },
-      { id: "g_tr_1", name: "Emre Kaya", country: "Turkey", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100", text: "Harika bir paylaşım olmuş, emeğinize sağlık!" },
-      { id: "g_bd_1", name: "Tanvir Hasan", country: "BD", avatar: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=100", text: "অসাধারণ তথ্যবহুল একটি লেখা, ধন্যবাদ!" },
-      { id: "g_bd_2", name: "Ayesha Akter", country: "BD", avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100", text: "খুব সুন্দর পয়েন্ট তুলে ধরেছেন।" }
+      { name: "David Miller", country: "USA", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100", text: "Great insights! Very well articulated." },
+      { name: "Emma Watson", country: "UK", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100", text: "Impressive writing, totally loved reading this." },
+      { name: "Alex Johnson", country: "USA", avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100", text: "Valuable points mentioned here. Keep up the good work!" },
+      { name: "Lukas Schmidt", country: "Germany", avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100", text: "Sehr informativer Beitrag! Wirklich inspirierend." },
+      { name: "Camille Dubois", country: "France", avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100", text: "Excellent article! Merci pour ce partage précieux." },
+      { name: "Mateo Garcia", country: "Spain", avatar: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=100", text: "¡Gran publicación! Me ha parecido muy interesante." },
+      { name: "Marco Rossi", country: "Italy", avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100", text: "Ottimo articolo, argomenti trattati molto bene!" },
+      { name: "Lucas Silva", country: "Brazil", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100", text: "Post incrível! Concordo plenamente com você." },
+      { name: "Emre Kaya", country: "Turkey", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100", text: "Harika bir paylaşım olmuş, emeğinize sağlık!" },
+      { name: "Tanvir Hasan", country: "BD", avatar: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=100", text: "অসাধারণ তথ্যবহুল একটি লেখা, ধন্যবাদ!" },
+      { name: "Ayesha Akter", country: "BD", avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100", text: "খুব সুন্দর পয়েন্ট তুলে ধরেছেন।" },
+      { name: "Liam O'Connor", country: "Ireland", avatar: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=100", text: "Spot on! Really enjoyed your perspective." },
+      { name: "Sophie Martin", country: "Canada", avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100", text: "Fascinating read from start to finish." },
+      { name: "Hassan Ali", country: "UAE", avatar: "https://images.unsplash.com/photo-1501196354995-cbb51c65aaea?w=100", text: "Well thought out and very helpful." },
+      { name: "Elena Petrova", country: "Bulgaria", avatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=100", text: "Such an inspiring piece! Thanks for writing." }
     ];
 
-    // ================= ব্যাকগ্রাউন্ড টাইম-প্রগ্রেস ইঞ্জিন =================
+    // ================= যেকোনো কাস্টম শিডিউল (১০ ঘণ্টা থেকে ৭ দিন) ডায়নামিক টাইম প্রগ্রেস ইঞ্জিন =================
     function syncPostProgressWithTime(post) {
       if (post.boostStatus !== 'active' || !post.boostExpiresAt) return false;
 
       const now = Date.now();
-      const totalDuration = 24 * 60 * 60 * 1000;
+      
+      // এডমিনের দেওয়া শুরু ও শেষের সময়ের ব্যবধান থেকে মোট সময় বের করা
+      let totalDuration = 24 * 60 * 60 * 1000;
+      if (post.boostExpiresAt && post.boostStartedAt && post.boostExpiresAt > post.boostStartedAt) {
+        totalDuration = post.boostExpiresAt - post.boostStartedAt;
+      } else if (post.boostDurationMs) {
+        totalDuration = post.boostDurationMs;
+      }
+
       const startedAt = post.boostStartedAt || (post.boostExpiresAt - totalDuration);
       const elapsed = Math.max(0, now - startedAt);
-      const progress = Math.min(1, elapsed / totalDuration);
+      const progress = Math.min(1, elapsed / totalDuration); // ০.০ থেকে ১.০
 
       const totalLikesTarget = (post.initialLikesTarget != null) 
         ? post.initialLikesTarget 
@@ -719,6 +725,7 @@
         ? post.initialCommentsTarget 
         : ((post.commentsCount || (post.comments ? post.comments.length : 0)) + (post.autoCommentsQueue || 0));
 
+      // সময়ের ক্রমানুসারে এই মুহূর্তে যতগুলো হওয়া উচিত
       const expectedLikes = Math.floor(totalLikesTarget * progress);
       const expectedViews = Math.max(1, Math.floor(totalViewsTarget * progress));
       const expectedComments = Math.floor(totalCommentsTarget * progress);
@@ -749,13 +756,13 @@
         updateData.commentsCount = expectedComments;
         updateData.autoCommentsQueue = post.autoCommentsQueue;
 
-        const neededNewComments = Math.min(6, expectedComments - (post.comments ? post.comments.length : 0));
-        if (neededNewComments > 0 && (post.comments || []).length < 50) {
+        const neededNewComments = Math.min(8, expectedComments - (post.comments ? post.comments.length : 0));
+        if (neededNewComments > 0) {
           post.comments = post.comments || [];
           for (let i = 0; i < neededNewComments; i++) {
             const user = GLOBAL_PROFILES_POOL[Math.floor(Math.random() * GLOBAL_PROFILES_POOL.length)];
             post.comments.push({
-              id: "c_g_" + Date.now() + "_" + i,
+              id: "c_g_" + Date.now() + "_" + Math.floor(Math.random() * 100000),
               name: user.name,
               country: user.country,
               avatar: user.avatar,
@@ -763,6 +770,7 @@
               time: "Just now"
             });
           }
+          if (post.comments.length > 70) post.comments = post.comments.slice(-70);
           updateData.comments = post.comments;
         }
         updated = true;
@@ -773,10 +781,12 @@
         updateData.initialViewsTarget = totalViewsTarget;
         updateData.initialCommentsTarget = totalCommentsTarget;
         updateData.boostStartedAt = startedAt;
+        updateData.boostDurationMs = totalDuration;
         post.initialLikesTarget = totalLikesTarget;
         post.initialViewsTarget = totalViewsTarget;
         post.initialCommentsTarget = totalCommentsTarget;
         post.boostStartedAt = startedAt;
+        post.boostDurationMs = totalDuration;
         updated = true;
       }
 
@@ -786,15 +796,16 @@
       return updated;
     }
 
-    // স্ক্রিনে থাকাকালীন দ্রুত গতিতে লাইভ ব্যাচ ইনক্রিমেন্ট
+    // লাইভ স্ক্রিন ব্যাচিং ইঞ্জিন (কোনো অবস্থাতেই কমেন্ট আর আটকাবে না)
     setInterval(() => {
       posts.forEach(post => {
         if (post.boostStatus === 'active') {
           let updateData = {};
           let shouldUpdate = false;
 
+          // ১. ভিউ ব্যাচিং
           if ((post.autoViewsQueue || 0) > 0) {
-            const addViews = Math.max(1, Math.min(post.autoViewsQueue, Math.ceil(post.autoViewsQueue / 100)));
+            const addViews = Math.max(1, Math.min(post.autoViewsQueue, Math.ceil(post.autoViewsQueue / 90)));
             post.viewsCount = (post.viewsCount || 0) + addViews;
             post.autoViewsQueue -= addViews;
             updateData.viewsCount = firebase.firestore.FieldValue.increment(addViews);
@@ -802,8 +813,9 @@
             shouldUpdate = true;
           }
 
+          // ২. লাইক ব্যাচিং
           if ((post.autoLikesQueue || 0) > 0) {
-            const addLikes = Math.max(1, Math.min(post.autoLikesQueue, Math.ceil(post.autoLikesQueue / 120)));
+            const addLikes = Math.max(1, Math.min(post.autoLikesQueue, Math.ceil(post.autoLikesQueue / 100)));
             post.likesCount = (post.likesCount || 0) + addLikes;
             post.autoLikesQueue -= addLikes;
             updateData.likesCount = firebase.firestore.FieldValue.increment(addLikes);
@@ -811,35 +823,34 @@
             shouldUpdate = true;
           }
 
-          if ((post.autoCommentsQueue || 0) > 0 && Math.random() > 0.45) {
-            post.usedCommenters = post.usedCommenters || [];
-            const availableProfiles = GLOBAL_PROFILES_POOL.filter(p => !post.usedCommenters.includes(p.id));
-
-            if (availableProfiles.length > 0) {
-              const selectedUser = availableProfiles[Math.floor(Math.random() * availableProfiles.length)];
-              
-              const newComment = {
-                id: "c_global_" + Date.now(),
-                commenterId: selectedUser.id,
+          // ৩. কমেন্ট আনলিমিটেড লাইভ জেনারেশন
+          if ((post.autoCommentsQueue || 0) > 0) {
+            const addComments = Math.max(1, Math.min(post.autoCommentsQueue, Math.ceil(post.autoCommentsQueue / 80)));
+            post.comments = post.comments || [];
+            
+            for (let c = 0; c < addComments; c++) {
+              const selectedUser = GLOBAL_PROFILES_POOL[Math.floor(Math.random() * GLOBAL_PROFILES_POOL.length)];
+              post.comments.push({
+                id: "c_g_" + Date.now() + "_" + Math.floor(Math.random() * 100000),
                 name: selectedUser.name,
                 country: selectedUser.country,
                 avatar: selectedUser.avatar,
                 text: selectedUser.text,
                 time: "Just now"
-              };
-
-              post.comments = post.comments || [];
-              post.comments.push(newComment);
-              post.usedCommenters.push(selectedUser.id);
-              post.autoCommentsQueue -= 1;
-              post.commentsCount = (post.commentsCount || 0) + 1;
-
-              updateData.comments = firebase.firestore.FieldValue.arrayUnion(newComment);
-              updateData.usedCommenters = firebase.firestore.FieldValue.arrayUnion(selectedUser.id);
-              updateData.autoCommentsQueue = firebase.firestore.FieldValue.increment(-1);
-              updateData.commentsCount = firebase.firestore.FieldValue.increment(1);
-              shouldUpdate = true;
+              });
             }
+
+            if (post.comments.length > 70) {
+              post.comments = post.comments.slice(-70);
+            }
+
+            post.autoCommentsQueue -= addComments;
+            post.commentsCount = (post.commentsCount || 0) + addComments;
+
+            updateData.comments = post.comments;
+            updateData.autoCommentsQueue = firebase.firestore.FieldValue.increment(-addComments);
+            updateData.commentsCount = firebase.firestore.FieldValue.increment(addComments);
+            shouldUpdate = true;
           }
 
           if (shouldUpdate) {
@@ -847,7 +858,7 @@
           }
         }
       });
-    }, 2500);
+    }, 2000);
 
     function updateAllCountdowns() {
       posts.forEach(post => {
@@ -860,11 +871,10 @@
               el.innerText = `Campaign Running (Awaiting Admin Review)`;
             } else {
               if (isOwn) {
-                const d = String(time.days).padStart(2, '0');
-                const h = String(time.hours).padStart(2, '0');
-                const m = String(time.minutes).padStart(2, '0');
-                const s = String(time.seconds).padStart(2, '0');
-                el.innerText = `${d}d : ${h}h : ${m}m : ${s}s`;
+                let str = '';
+                if (time.days > 0) str += `${time.days}d : `;
+                str += `${String(time.hours).padStart(2, '0')}h : ${String(time.minutes).padStart(2, '0')}m : ${String(time.seconds).padStart(2, '0')}s`;
+                el.innerText = str;
               } else {
                 el.innerText = `Active Promotion`;
               }
@@ -1119,13 +1129,13 @@
         boostStatus: "none",
         boostPackage: null,
         boostExpiresAt: null,
+        boostStartedAt: null,
         payoutUSD: 0,
         payoutBDT: 0,
         autoLikesQueue: 0,
         autoCommentsQueue: 0,
         autoViewsQueue: 0,
         commentsCount: 0,
-        usedCommenters: [],
         comments: []
       };
 
