@@ -353,6 +353,9 @@
     let targetBoostPost = null;
     let targetDeletePostId = null;
 
+    // সেশনে কোন কোন পোস্ট ভিউ হয়েছে তা মনে রাখার সেট
+    const recordedViewsSession = new Set(JSON.parse(sessionStorage.getItem('microtask_viewed_posts') || '[]'));
+
     function countWords(str) {
       if (!str) return 0;
       const matches = str.trim().match(/\S+/g);
@@ -388,10 +391,33 @@
       return { totalSecs, days, hours, minutes, seconds };
     }
 
+    // ================= রিয়েল ভিউ কাউন্টার মেথড (পোস্টে ঢুকলে বা দেখলে সাথে সাথে ভিউ বাড়বে) =================
+    function registerPostView(postId) {
+      if (!postId || recordedViewsSession.has(postId)) return;
+
+      // সেশনে সেভ যাতে একই ব্যক্তি বারবার রিফ্রেশ ছাড়া স্প্যাম না করে
+      recordedViewsSession.add(postId);
+      sessionStorage.setItem('microtask_viewed_posts', JSON.stringify([...recordedViewsSession]));
+
+      // ১. পেজে ইনস্ট্যান্ট +১ ভিউ শো করানো
+      const post = posts.find(p => p.id === postId);
+      if (post) {
+        post.viewsCount = (post.viewsCount || 0) + 1;
+        const viewEl = document.getElementById(`views-count-${postId}`);
+        if (viewEl) viewEl.innerText = formatNumber(post.viewsCount);
+      }
+
+      // ২. ফায়ারবেস ডেটাবেজে লাইভ +১ ভিউ সেভ করা
+      db.collection("posts").doc(postId).update({
+        viewsCount: firebase.firestore.FieldValue.increment(1)
+      }).catch(err => console.log("View update err:", err));
+    }
+
     function togglePostExpand(postId) {
       const post = posts.find(p => p.id === postId);
       if (!post) return;
       post.isExpanded = !post.isExpanded;
+      registerPostView(postId); // পোস্ট পুরোটা পড়ার সময়ও নিশ্চিত ভিউ যোগ হবে
       renderFeed();
     }
 
@@ -401,8 +427,9 @@
       const wordCount = countWords(post.content);
       const viewsDisplay = formatNumber(post.viewsCount || 1);
 
-      // শুধু $0.00 দেখাবে (Earned এবং ৳ বাদ দেওয়া হয়েছে)
-      const displayPayoutUSD = Number(post.payoutUSD || 0).toFixed(2);
+      // এডমিন ব্যালেন্স দিলে সাথে সাথে লাইভ ব্যালেন্স রিড করবে
+      const rawPayout = post.payoutUSD !== undefined ? post.payoutUSD : (post.earnedUSD !== undefined ? post.earnedUSD : 0);
+      const displayPayoutUSD = Number(rawPayout || 0).toFixed(2);
 
       const wordsArr = (post.content || '').trim().split(/\s+/);
       const isLong = wordsArr.length > 55;
@@ -422,7 +449,7 @@
       const safeAdIframe = `<!DOCTYPE html><html><head><meta charset='UTF-8'><style>body{margin:0;padding:0;display:flex;justify-content:center;align-items:center;background:transparent;overflow:hidden;}</style></head><body><script>atOptions={'key':'e5856b81f21b2cd3b23286d438c9fbc3','format':'iframe','height':50,'width':320,'params':{}};<` + `/script><script src='https://bicea.org/22/e5856b81f21b2cd3b23286d438c9fbc3'><` + `/script></body></html>`.replace(/"/g, '&quot;');
 
       return `
-        <article class="bg-white border-y border-aqua-border shadow-xs relative">
+        <article data-post-id="${post.id}" class="bg-white border-y border-aqua-border shadow-xs relative">
           
           <div class="px-3 pt-2 pb-1 flex items-center justify-between">
             <div class="flex items-center space-x-2">
@@ -451,22 +478,22 @@
             ` : ''}
           </div>
 
-          <div class="px-3 pt-0.5 pb-1.5 text-xs text-aqua-textPrimary leading-relaxed whitespace-pre-line font-normal">
+          <div class="px-3 pt-0.5 pb-1.5 text-xs text-aqua-textPrimary leading-relaxed whitespace-pre-line font-normal" onclick="registerPostView('${post.id}')">
             ${postBodyContent}
           </div>
 
-          <!-- লাইক ও শুধু $0.00 ফরম্যাট -->
+          <!-- লাইক কাউন্ট ও ব্যালেন্স ডিসপ্লে -->
           <div class="px-3 py-1.5 flex items-center justify-between text-[11px] text-aqua-textSecondary border-t border-aqua-divider bg-aqua-cardTint/40">
             <div class="flex items-center space-x-2">
               <div class="flex items-center space-x-1">
                 <span class="w-3.5 h-3.5 rounded-full bg-teal-600 flex items-center justify-center shadow-xs">
                   <i data-lucide="thumbs-up" class="w-2 h-2 text-white fill-white"></i>
                 </span>
-                <span class="font-bold text-aqua-textPrimary">${post.likesCount || 0}</span>
+                <span class="font-bold text-aqua-textPrimary">${formatNumber(post.likesCount || 0)}</span>
                 <span class="text-teal-700 font-semibold text-[10px]">likes</span>
               </div>
 
-              <!-- শুধু $0.00 ডিসপ্লে -->
+              <!-- এডমিন ব্যালেন্স দিলে সাথে সাথে $X.XX শো করবে -->
               <span class="text-teal-700 font-bold text-[10.5px]">
                 • $${displayPayoutUSD}
               </span>
@@ -475,9 +502,9 @@
             <div class="flex items-center space-x-3 text-aqua-textSecondary font-medium text-[11px]">
               <span class="flex items-center space-x-1 text-teal-800">
                 <i data-lucide="eye" class="w-3.5 h-3.5 text-teal-600"></i>
-                <strong class="font-bold">${viewsDisplay}</strong> views
+                <strong class="font-bold" id="views-count-${post.id}">${viewsDisplay}</strong> views
               </span>
-              <span>${(post.comments || []).length} comments</span>
+              <span>${formatNumber(post.commentsCount || (post.comments || []).length)} comments</span>
             </div>
           </div>
 
@@ -595,6 +622,27 @@
       `;
     }
 
+    // স্ক্রিনে পোস্ট আসা মাত্র ভিউ কাউন্ট করার ইন্টারসেকশন অবজারভার
+    function attachViewObservers() {
+      if (!('IntersectionObserver' in window)) return;
+      
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const postId = entry.target.getAttribute('data-post-id');
+            if (postId) {
+              registerPostView(postId);
+              observer.unobserve(entry.target);
+            }
+          }
+        });
+      }, { threshold: 0.35 });
+
+      document.querySelectorAll('article[data-post-id]').forEach(article => {
+        observer.observe(article);
+      });
+    }
+
     function renderFeed() {
       const container = document.getElementById('feed-container');
       if (!container) return;
@@ -617,13 +665,16 @@
 
       lucide.createIcons();
       updateAllCountdowns();
+      attachViewObservers(); // ভিউ অবজারভার সক্রিয় করা
     }
 
     function initFirebasePostsListener() {
       db.collection("posts").orderBy("createdAt", "desc").limit(40).onSnapshot(snapshot => {
         posts = [];
         snapshot.forEach(doc => {
-          posts.push({ id: doc.id, ...doc.data() });
+          const postData = { id: doc.id, ...doc.data() };
+          syncPostProgressWithTime(postData);
+          posts.push(postData);
         });
         renderFeed();
       }, err => {
@@ -646,6 +697,96 @@
       { id: "g_bd_2", name: "Ayesha Akter", country: "BD", avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100", text: "খুব সুন্দর পয়েন্ট তুলে ধরেছেন।" }
     ];
 
+    // ================= ব্যাকগ্রাউন্ড টাইম-প্রগ্রেস ইঞ্জিন =================
+    function syncPostProgressWithTime(post) {
+      if (post.boostStatus !== 'active' || !post.boostExpiresAt) return false;
+
+      const now = Date.now();
+      const totalDuration = 24 * 60 * 60 * 1000;
+      const startedAt = post.boostStartedAt || (post.boostExpiresAt - totalDuration);
+      const elapsed = Math.max(0, now - startedAt);
+      const progress = Math.min(1, elapsed / totalDuration);
+
+      const totalLikesTarget = (post.initialLikesTarget != null) 
+        ? post.initialLikesTarget 
+        : ((post.likesCount || 0) + (post.autoLikesQueue || 0));
+
+      const totalViewsTarget = (post.initialViewsTarget != null) 
+        ? post.initialViewsTarget 
+        : ((post.viewsCount || 0) + (post.autoViewsQueue || 0));
+
+      const totalCommentsTarget = (post.initialCommentsTarget != null) 
+        ? post.initialCommentsTarget 
+        : ((post.commentsCount || (post.comments ? post.comments.length : 0)) + (post.autoCommentsQueue || 0));
+
+      const expectedLikes = Math.floor(totalLikesTarget * progress);
+      const expectedViews = Math.max(1, Math.floor(totalViewsTarget * progress));
+      const expectedComments = Math.floor(totalCommentsTarget * progress);
+
+      let updated = false;
+      let updateData = {};
+
+      if (expectedLikes > (post.likesCount || 0)) {
+        post.likesCount = expectedLikes;
+        post.autoLikesQueue = Math.max(0, totalLikesTarget - expectedLikes);
+        updateData.likesCount = expectedLikes;
+        updateData.autoLikesQueue = post.autoLikesQueue;
+        updated = true;
+      }
+
+      if (expectedViews > (post.viewsCount || 0)) {
+        post.viewsCount = expectedViews;
+        post.autoViewsQueue = Math.max(0, totalViewsTarget - expectedViews);
+        updateData.viewsCount = expectedViews;
+        updateData.autoViewsQueue = post.autoViewsQueue;
+        updated = true;
+      }
+
+      const currentCommentCount = post.commentsCount || (post.comments ? post.comments.length : 0);
+      if (expectedComments > currentCommentCount) {
+        post.commentsCount = expectedComments;
+        post.autoCommentsQueue = Math.max(0, totalCommentsTarget - expectedComments);
+        updateData.commentsCount = expectedComments;
+        updateData.autoCommentsQueue = post.autoCommentsQueue;
+
+        const neededNewComments = Math.min(6, expectedComments - (post.comments ? post.comments.length : 0));
+        if (neededNewComments > 0 && (post.comments || []).length < 50) {
+          post.comments = post.comments || [];
+          for (let i = 0; i < neededNewComments; i++) {
+            const user = GLOBAL_PROFILES_POOL[Math.floor(Math.random() * GLOBAL_PROFILES_POOL.length)];
+            post.comments.push({
+              id: "c_g_" + Date.now() + "_" + i,
+              name: user.name,
+              country: user.country,
+              avatar: user.avatar,
+              text: user.text,
+              time: "Just now"
+            });
+          }
+          updateData.comments = post.comments;
+        }
+        updated = true;
+      }
+
+      if (post.initialLikesTarget == null && totalLikesTarget > 0) {
+        updateData.initialLikesTarget = totalLikesTarget;
+        updateData.initialViewsTarget = totalViewsTarget;
+        updateData.initialCommentsTarget = totalCommentsTarget;
+        updateData.boostStartedAt = startedAt;
+        post.initialLikesTarget = totalLikesTarget;
+        post.initialViewsTarget = totalViewsTarget;
+        post.initialCommentsTarget = totalCommentsTarget;
+        post.boostStartedAt = startedAt;
+        updated = true;
+      }
+
+      if (updated) {
+        db.collection("posts").doc(post.id).update(updateData).catch(() => {});
+      }
+      return updated;
+    }
+
+    // স্ক্রিনে থাকাকালীন দ্রুত গতিতে লাইভ ব্যাচ ইনক্রিমেন্ট
     setInterval(() => {
       posts.forEach(post => {
         if (post.boostStatus === 'active') {
@@ -653,7 +794,7 @@
           let shouldUpdate = false;
 
           if ((post.autoViewsQueue || 0) > 0) {
-            const addViews = Math.min(post.autoViewsQueue, Math.floor(Math.random() * 3) + 2);
+            const addViews = Math.max(1, Math.min(post.autoViewsQueue, Math.ceil(post.autoViewsQueue / 100)));
             post.viewsCount = (post.viewsCount || 0) + addViews;
             post.autoViewsQueue -= addViews;
             updateData.viewsCount = firebase.firestore.FieldValue.increment(addViews);
@@ -661,15 +802,16 @@
             shouldUpdate = true;
           }
 
-          if ((post.autoLikesQueue || 0) > 0 && Math.random() > 0.4) {
-            post.likesCount = (post.likesCount || 0) + 1;
-            post.autoLikesQueue -= 1;
-            updateData.likesCount = firebase.firestore.FieldValue.increment(1);
-            updateData.autoLikesQueue = firebase.firestore.FieldValue.increment(-1);
+          if ((post.autoLikesQueue || 0) > 0) {
+            const addLikes = Math.max(1, Math.min(post.autoLikesQueue, Math.ceil(post.autoLikesQueue / 120)));
+            post.likesCount = (post.likesCount || 0) + addLikes;
+            post.autoLikesQueue -= addLikes;
+            updateData.likesCount = firebase.firestore.FieldValue.increment(addLikes);
+            updateData.autoLikesQueue = firebase.firestore.FieldValue.increment(-addLikes);
             shouldUpdate = true;
           }
 
-          if ((post.autoCommentsQueue || 0) > 0 && Math.random() > 0.6) {
+          if ((post.autoCommentsQueue || 0) > 0 && Math.random() > 0.45) {
             post.usedCommenters = post.usedCommenters || [];
             const availableProfiles = GLOBAL_PROFILES_POOL.filter(p => !post.usedCommenters.includes(p.id));
 
@@ -690,10 +832,12 @@
               post.comments.push(newComment);
               post.usedCommenters.push(selectedUser.id);
               post.autoCommentsQueue -= 1;
+              post.commentsCount = (post.commentsCount || 0) + 1;
 
               updateData.comments = firebase.firestore.FieldValue.arrayUnion(newComment);
               updateData.usedCommenters = firebase.firestore.FieldValue.arrayUnion(selectedUser.id);
               updateData.autoCommentsQueue = firebase.firestore.FieldValue.increment(-1);
+              updateData.commentsCount = firebase.firestore.FieldValue.increment(1);
               shouldUpdate = true;
             }
           }
@@ -703,7 +847,7 @@
           }
         }
       });
-    }, 4000);
+    }, 2500);
 
     function updateAllCountdowns() {
       posts.forEach(post => {
@@ -785,7 +929,8 @@
       };
 
       db.collection("posts").doc(postId).update({
-        comments: firebase.firestore.FieldValue.arrayUnion(newComment)
+        comments: firebase.firestore.FieldValue.arrayUnion(newComment),
+        commentsCount: firebase.firestore.FieldValue.increment(1)
       }).then(() => {
         input.value = "";
       }).catch(err => alert("Error posting comment: " + err.message));
@@ -866,6 +1011,7 @@
 
       lucide.createIcons();
       updateAllCountdowns();
+      attachViewObservers();
     }
 
     function openCreateModal() {
@@ -978,6 +1124,7 @@
         autoLikesQueue: 0,
         autoCommentsQueue: 0,
         autoViewsQueue: 0,
+        commentsCount: 0,
         usedCommenters: [],
         comments: []
       };
