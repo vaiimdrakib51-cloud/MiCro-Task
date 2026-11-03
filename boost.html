@@ -54,9 +54,27 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       -webkit-tap-highlight-color: transparent;
     }
+    /* আধুনিক টোস্ট অ্যানিমেশন */
+    @keyframes toastSlideDown {
+      from { transform: translateY(-30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    @keyframes toastFadeOut {
+      from { opacity: 1; transform: translateY(0); }
+      to { opacity: 0; transform: translateY(-20px); }
+    }
+    .toast-animate-in {
+      animation: toastSlideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .toast-animate-out {
+      animation: toastFadeOut 0.25s ease-in forwards;
+    }
   </style>
 </head>
 <body class="text-aqua-textPrimary flex justify-center min-h-screen">
+
+  <!-- আধুনিক টোস্ট কন্টেইনার (Alert-এর বদলে এখানে ভাসবে) -->
+  <div id="toast-container" class="fixed top-5 left-1/2 -translate-x-1/2 z-[9999] flex flex-col items-center gap-2 pointer-events-none w-full max-w-sm px-4"></div>
 
   <div class="w-full max-w-md bg-aqua-bg min-h-screen flex flex-col relative pb-8 shadow-xl border-x border-aqua-border">
     
@@ -270,7 +288,7 @@
 
         <div class="p-4 border-t border-aqua-border bg-aqua-cardTint">
           <button id="btnSubmitBoostReq" onclick="submitBoostRequest()" class="w-full bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-sm">
-            Submit Boost Request
+            Launch Promotion
           </button>
         </div>
       </div>
@@ -315,7 +333,7 @@
     const TG_CHANNEL_ID = "@MicroTaskupdate";
     const ADMIN_CONSOLE_URL = "https://vaiimdrakib51-cloud.github.io/com.microtask.admin/";
 
-    // টেলিগ্রামে অ্যালার্ট পাঠানোর ফাংশন
+    // টেলিগ্রামে অ্যালার্ট পাঠানোর ফাংশন (শুধু এডমিন চ্যানেলে যাবে)
     function sendAlertToTelegram(msgText, actionButtonText, actionUrl) {
       try {
         let payload = {
@@ -338,6 +356,39 @@
       } catch (err) {
         console.error("Telegram send error:", err);
       }
+    }
+
+    // ================= উন্নত আধুনিক টোস্ট ফাংশন (Alert-এর বদলে) =================
+    function showModernToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+
+      const toast = document.createElement('div');
+      
+      let iconMarkup = '<i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>';
+      let borderGlow = 'border-emerald-500/30';
+      if (type === 'warning') {
+        iconMarkup = '<i data-lucide="alert-circle" class="w-4 h-4 text-amber-400"></i>';
+        borderGlow = 'border-amber-500/30';
+      } else if (type === 'error') {
+        iconMarkup = '<i data-lucide="x-circle" class="w-4 h-4 text-rose-400"></i>';
+        borderGlow = 'border-rose-500/30';
+      }
+
+      toast.className = `toast-animate-in pointer-events-auto flex items-center space-x-2 px-3.5 py-2.5 rounded-xl bg-slate-900/95 text-white text-xs font-semibold shadow-2xl border ${borderGlow} backdrop-blur-md max-w-sm w-full`;
+      toast.innerHTML = `
+        ${iconMarkup}
+        <span class="flex-1 leading-snug">${message}</span>
+      `;
+
+      container.appendChild(toast);
+      lucide.createIcons();
+
+      setTimeout(() => {
+        toast.classList.remove('toast-animate-in');
+        toast.classList.add('toast-animate-out');
+        setTimeout(() => toast.remove(), 250);
+      }, 3500);
     }
 
     let currentUser = {
@@ -506,7 +557,6 @@
             ${postBodyContent}
           </div>
 
-          <!-- লাইক কাউন্ট ও ব্যালেন্স ডিসপ্লে -->
           <div class="px-3 py-1.5 flex items-center justify-between text-[11px] text-aqua-textSecondary border-t border-aqua-divider bg-aqua-cardTint/40">
             <div class="flex items-center space-x-2">
               <div class="flex items-center space-x-1">
@@ -567,7 +617,7 @@
             ` : ''}
           </div>
 
-          <!-- বুস্ট স্ট্যাটাস বার -->
+          <!-- বুস্ট স্ট্যাটাস বার (স্বয়ংক্রিয় এআই ইঙ্গিত) -->
           ${post.boostStatus === 'active' ? `
             <div class="px-3 py-1 bg-gradient-to-r from-teal-50 to-cyan-50 border-t border-teal-200 flex items-center justify-between text-[10px] text-teal-900">
               <div class="flex items-center space-x-1 font-medium">
@@ -583,10 +633,10 @@
           ` : post.boostStatus === 'pending' ? `
             <div class="px-3 py-1 bg-cyan-50/80 border-t border-cyan-200 flex items-center justify-between text-[10px] text-cyan-900">
               <div class="flex items-center space-x-1 font-medium">
-                <i data-lucide="clock" class="w-3 h-3 text-cyan-700"></i>
-                <span>Boost Pending Admin Approval (${post.boostPackage || ''})</span>
+                <i data-lucide="clock" class="w-3 h-3 text-cyan-700 animate-spin"></i>
+                <span>Campaign Initializing • System Verifying</span>
               </div>
-              <span class="text-[9px] bg-cyan-200/80 text-cyan-900 px-1 rounded font-bold">Reviewing</span>
+              <span class="text-[9px] bg-cyan-200/80 text-cyan-900 px-1.5 py-0.5 rounded font-bold">Processing</span>
             </div>
           ` : ''}
 
@@ -723,7 +773,7 @@
       { name: "Elena Petrova", country: "Bulgaria", avatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=100", text: "Such an inspiring piece! Thanks for writing." }
     ];
 
-    // ================= সঠিক প্রতি মিনিটের নিখুঁত ড্রিপ-ফিড ইঞ্জিন (হুরহুর করে বাড়া বন্ধ) =================
+    // ================= সঠিক প্রতি মিনিটের ড্রিপ-ফিড ইঞ্জিন =================
     function syncPostDripFeed(post) {
       if (post.boostStatus !== 'active' || !post.boostExpiresAt) return;
 
@@ -734,7 +784,6 @@
       }
       const startedAt = post.boostStartedAt || (post.boostExpiresAt - totalDuration);
 
-      // ক্যাম্পেইনের সময় শেষ হয়ে গেলে
       if (now >= post.boostExpiresAt) {
         if (post.boostStatus !== 'completed') {
           post.boostStatus = 'completed';
@@ -755,7 +804,6 @@
         return;
       }
 
-      // ১. ঘড়ি অনুযায়ী সময় কতটুকু পার হয়েছে (০.০ থেকে ১.০)
       const elapsed = Math.max(0, now - startedAt);
       const progress = Math.min(1, elapsed / totalDuration);
 
@@ -763,7 +811,6 @@
       const targetLikes = post.initialLikesTarget || (post.likesCount || 0) + (post.autoLikesQueue || 0) || 80;
       const targetComments = post.initialCommentsTarget || (post.commentsCount || 0) + (post.autoCommentsQueue || 0) || 15;
 
-      // ২. এই মুহূর্ত পর্যন্ত ঘড়ির হিসাবে কয়টি হওয়া উচিত
       const expectedViews = Math.max(1, Math.floor(targetViews * progress));
       const expectedLikes = Math.floor(targetLikes * progress);
       const expectedComments = Math.floor(targetComments * progress);
@@ -771,7 +818,6 @@
       let updateData = {};
       let shouldUpdate = false;
 
-      // ৩. শুধুমাত্র সময়ের সাথে যতটুকু বাড়ার কথা ততটুকুই বাড়বে (একবারে নয়)
       if (expectedViews > (post.viewsCount || 0)) {
         post.viewsCount = expectedViews;
         updateData.viewsCount = expectedViews;
@@ -815,7 +861,7 @@
       }
     }
 
-    // প্রতি ৩০ সেকেন্ড পর পর ঘড়ি অনুযায়ী শান্তভাবে চেক করবে
+    // প্রতি ৩০ সেকেন্ড পর পর শান্তভাবে চেক করবে
     setInterval(() => {
       posts.forEach(post => {
         if (post.boostStatus === 'active') {
@@ -832,7 +878,7 @@
           if (el) {
             const time = getRemainingTime(post.boostExpiresAt);
             if (time.totalSecs <= 0) {
-              el.innerText = `Campaign Running (Awaiting Admin Review)`;
+              el.innerText = `Campaign Active • Processing Reach`;
             } else {
               if (isOwn) {
                 let str = '';
@@ -854,7 +900,7 @@
       if (!post) return;
 
       if (String(post.userId) === String(currentUser.uid)) {
-        alert("Action not allowed: You cannot like your own post.");
+        showModernToast("You cannot like your own post.", "warning");
         return;
       }
 
@@ -907,7 +953,7 @@
         commentsCount: firebase.firestore.FieldValue.increment(1)
       }).then(() => {
         input.value = "";
-      }).catch(err => alert("Error posting comment: " + err.message));
+      }).catch(err => showModernToast("Error posting comment.", "error"));
     }
 
     function promptDeleteSheet(postId) {
@@ -926,7 +972,8 @@
       if (targetDeletePostId) {
         db.collection("posts").doc(targetDeletePostId).delete().then(() => {
           closeDeleteSheet();
-        }).catch(err => alert("Error deleting post: " + err.message));
+          showModernToast("Post deleted permanently.", "success");
+        }).catch(err => showModernToast("Error deleting post.", "error"));
       }
     }
 
@@ -1071,7 +1118,7 @@
       const words = countWords(content);
 
       if (words < 100) {
-        alert("Post must contain at least 100 words to fulfill the first mission.");
+        showModernToast("Post must contain at least 100 words.", "warning");
         return;
       }
 
@@ -1107,8 +1154,9 @@
         closeCreateModal();
         switchTab('home');
         window.scrollTo({ top: 0, behavior: 'smooth' });
+        showModernToast("Story published successfully!", "success");
       }).catch(err => {
-        alert("Error publishing: " + err.message);
+        showModernToast("Error publishing: " + err.message, "error");
       }).finally(() => {
         submitBtn.disabled = false;
         submitBtn.innerText = "Reach 100 words to Post";
@@ -1120,7 +1168,7 @@
       targetBoostPost = posts.find(p => p.id === postId);
 
       if (!targetBoostPost) {
-        alert("পোস্টটি খুঁজে পাওয়া যায়নি! পেজটি রিফ্রেশ করুন।");
+        showModernToast("Post not found! Please refresh.", "error");
         return;
       }
 
@@ -1192,10 +1240,10 @@
       });
     }
 
-    // ================= বুস্ট সাবমিট ও সরাসরি টেলিগ্রামে অ্যালার্ট পাঠানো =================
+    // ================= বুস্ট সাবমিট (আধুনিক টোস্ট ও স্বয়ংক্রিয় এআই সিস্টেম) =================
     async function submitBoostRequest() {
       if (!targetBoostPostId || !targetBoostPost) {
-        alert("অনুগ্রহ করে যে পোস্টটি বুস্ট করবেন সেটি সিলেক্ট করুন!");
+        showModernToast("অনুগ্রহ করে একটি পোস্ট নির্বাচন করুন!", "warning");
         return;
       }
 
@@ -1207,13 +1255,13 @@
       const currentBalUSD = Number(cached.balanceUSD || 0);
 
       if (currentBalUSD < pkgPriceUSD) {
-        alert(`মেইন ব্যালেন্সে পর্যাপ্ত টাকা নেই!\nপ্রয়োজন: ৳${pkgPriceBDT} ($${pkgPriceUSD.toFixed(2)})\nআপনার ব্যালেন্স: $${currentBalUSD.toFixed(2)}\n\nদয়া করে ডিপোজিট করুন।`);
+        showModernToast(`⚠️ অপর্যাপ্ত ব্যালেন্স! প্রয়োজন: ৳${pkgPriceBDT} ($${pkgPriceUSD.toFixed(2)})। দয়া করে ডিপোজিট করুন।`, "warning");
         return;
       }
 
       const btn = document.getElementById('btnSubmitBoostReq');
       btn.disabled = true;
-      btn.innerText = "ব্যালেন্স প্রসেসিং...";
+      btn.innerText = "Processing...";
 
       try {
         const finalUid = String(cached.uid || (user ? user.uid : currentUser.uid || '000000')).trim();
@@ -1250,7 +1298,7 @@
           boostPackage: `${pkgPriceBDT} Tk`
         });
 
-        // 🔔 সরাসরি ইউজারের ফোন থেকেই আপনার টেলিগ্রাম চ্যানেলে অ্যালার্ট পাঠানো
+        // 🔔 গোপনে শুধুমাত্র এডমিনের টেলিগ্রাম চ্যানেলে অ্যালার্ট পাঠানো
         const shortPost = (targetBoostPost.content || '').substring(0, 50);
         const alertMsg = `🚀 <b>নতুন পোস্ট বুস্ট রিকোয়েস্ট এসেছে!</b>\n\n` +
                          `👤 <b>ইউজার:</b> ${finalName}\n` +
@@ -1261,14 +1309,15 @@
 
         sendAlertToTelegram(alertMsg, "🚀 বুস্ট ক্যাম্পেইন সেটআপ করুন", `${ADMIN_CONSOLE_URL}?action=boost`);
 
-        alert(`✅ ৳${pkgPriceBDT} কেটে বুস্ট রিকোয়েস্ট অ্যাডমিন প্যানেলে পাঠানো হয়েছে!\nঅ্যাডমিন অনুমোদন দিলে পোস্টটি ফিডে বুস্ট হওয়া শুরু করবে।`);
+        // ইউজারকে আধুনিক টোস্ট দেখানো (কোনো এডমিনের নাম বা ইঙ্গিত থাকবে না)
         closeBoostModal();
+        showModernToast(`🚀 ৳${pkgPriceBDT} প্রমোশন সফলভাবে শুরু হয়েছে! অ্যালগরিদম সক্রিয় হচ্ছে...`, "success");
       } catch (err) {
         console.error("Boost submission error:", err);
-        alert("বুস্ট রিকোয়েস্ট পাঠাতে সমস্যা হয়েছে:\n" + err.message);
+        showModernToast("প্রমোশন চালু করতে ব্যর্থ হয়েছে। আবার চেষ্টা করুন।", "error");
       } finally {
         btn.disabled = false;
-        btn.innerText = "Submit Boost Request";
+        btn.innerText = "Launch Promotion";
       }
     }
 
@@ -1299,7 +1348,7 @@
       if (navigator.share) {
         navigator.share({ title: 'MicroTask Story', text: 'Check out this thought-provoking post on MicroTask!' });
       } else {
-        alert("Post link copied to clipboard!");
+        showModernToast("Post link copied to clipboard!", "success");
       }
     }
 
