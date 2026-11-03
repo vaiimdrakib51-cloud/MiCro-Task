@@ -62,22 +62,18 @@
     
     <!-- 1. NAVIGATION BAR -->
     <nav id="user-nav" class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-aqua-border flex items-center shadow-sm px-2">
-      <!-- Back to Dashboard -->
       <button onclick="window.location.href='index.html'" title="Back to Dashboard" class="p-2.5 text-aqua-600 hover:text-aqua-700 transition">
         <i data-lucide="arrow-left" class="w-5 h-5"></i>
       </button>
 
-      <!-- Feed -->
       <button onclick="switchTab('home')" id="tab-btn-home" title="Home Feed" class="flex-1 py-3 flex justify-center border-b-2 border-aqua-600 text-aqua-600 transition">
         <i data-lucide="home" class="w-5 h-5"></i>
       </button>
 
-      <!-- Create Post -->
       <button onclick="openCreateModal()" id="tab-btn-plus" title="Create Story" class="flex-1 py-3 flex justify-center border-b-2 border-transparent text-aqua-textSecondary hover:text-aqua-textPrimary transition">
         <i data-lucide="plus-circle" class="w-5 h-5"></i>
       </button>
 
-      <!-- Search by UID -->
       <button onclick="switchTab('search')" id="tab-btn-search" title="Search User" class="flex-1 py-3 flex justify-center border-b-2 border-transparent text-aqua-textSecondary hover:text-aqua-textPrimary transition">
         <i data-lucide="search" class="w-5 h-5"></i>
       </button>
@@ -293,6 +289,20 @@
       </div>
     </div>
 
+    <!-- 🌟 প্রিমিয়াম ইন-অ্যাপ কাস্টম ডায়লগ (কোনো ব্রাউজার ডোমেইন ছাড়া) -->
+    <div id="custom-app-dialog" class="fixed inset-0 z-[100] bg-black/60 backdrop-blur-[2px] hidden items-center justify-center p-4">
+      <div id="custom-app-dialog-card" class="bg-white rounded-2xl w-full max-w-xs p-5 text-center shadow-2xl border border-aqua-border transform scale-95 opacity-0 transition-all duration-200">
+        <div id="dialog-icon-wrap" class="w-12 h-12 rounded-full mx-auto mb-3 flex items-center justify-center text-xl bg-teal-50 text-teal-600 border border-teal-200">
+          <i data-lucide="check-circle" class="w-6 h-6"></i>
+        </div>
+        <h4 id="dialog-title" class="font-bold text-sm text-aqua-textPrimary mb-1.5">সফল হয়েছে</h4>
+        <p id="dialog-message" class="text-xs text-aqua-textSecondary leading-relaxed mb-4"></p>
+        <button onclick="closeAppDialog()" class="w-full bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-sm">
+          ঠিক আছে
+        </button>
+      </div>
+    </div>
+
   </div>
 
   <script>
@@ -310,12 +320,53 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // ================= আপনার টেলিগ্রাম বট ও চ্যানেল কনফিগ =================
+    // ================= ইন-অ্যাপ ডায়ালগ সিস্টেম (ব্রাউজার অ্যালার্টমুক্ত) =================
+    function showAppDialog(title, message, type = 'success') {
+      const dialog = document.getElementById('custom-app-dialog');
+      const card = document.getElementById('custom-app-dialog-card');
+      const iconWrap = document.getElementById('dialog-icon-wrap');
+      const titleEl = document.getElementById('dialog-title');
+      const msgEl = document.getElementById('dialog-message');
+
+      titleEl.innerText = title;
+      msgEl.innerHTML = message;
+
+      if (type === 'success') {
+        iconWrap.className = "w-12 h-12 rounded-full mx-auto mb-3 flex items-center justify-center bg-teal-50 text-teal-600 border border-teal-200";
+        iconWrap.innerHTML = '<i data-lucide="check-circle" class="w-6 h-6"></i>';
+      } else if (type === 'error' || type === 'danger') {
+        iconWrap.className = "w-12 h-12 rounded-full mx-auto mb-3 flex items-center justify-center bg-rose-50 text-rose-600 border border-rose-200";
+        iconWrap.innerHTML = '<i data-lucide="alert-circle" class="w-6 h-6"></i>';
+      } else {
+        iconWrap.className = "w-12 h-12 rounded-full mx-auto mb-3 flex items-center justify-center bg-amber-50 text-amber-600 border border-amber-200";
+        iconWrap.innerHTML = '<i data-lucide="alert-triangle" class="w-6 h-6"></i>';
+      }
+
+      dialog.classList.remove('hidden');
+      dialog.classList.add('flex');
+      setTimeout(() => {
+        card.classList.remove('scale-95', 'opacity-0');
+        card.classList.add('scale-100', 'opacity-100');
+      }, 10);
+      lucide.createIcons();
+    }
+
+    function closeAppDialog() {
+      const dialog = document.getElementById('custom-app-dialog');
+      const card = document.getElementById('custom-app-dialog-card');
+      card.classList.remove('scale-100', 'opacity-100');
+      card.classList.add('scale-95', 'opacity-0');
+      setTimeout(() => {
+        dialog.classList.add('hidden');
+        dialog.classList.remove('flex');
+      }, 150);
+    }
+
+    // ================= টেলিগ্রাম বট ও চ্যানেল কনফিগ =================
     const TELEGRAM_BOT_TOKEN = "9166237872:AAEnqeRwrUYAoKzCL_yTBZJqqYx-J_Q-bKo";
     const TELEGRAM_CHAT_ID = "@MicroTaskupdate";
     const ADMIN_CONSOLE_URL = "https://vaiimdrakib51-cloud.github.io/com.microtask.admin/";
 
-    // টেলিগ্রামে সরাসরি অ্যালার্ট ও বাটন পাঠানোর ফাংশন
     function sendTelegramAlert(messageText, actionBtnText, actionUrl) {
       try {
         let payload = {
@@ -702,7 +753,6 @@
       });
     }
 
-    // আন্তর্জাতিক বহুভাষিক কমেন্ট ব্যাংক
     const GLOBAL_PROFILES_POOL = [
       { name: "David Miller", country: "USA", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100", text: "Great insights! Very well articulated." },
       { name: "Emma Watson", country: "UK", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100", text: "Impressive writing, totally loved reading this." },
@@ -721,7 +771,6 @@
       { name: "Elena Petrova", country: "Bulgaria", avatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=100", text: "Such an inspiring piece! Thanks for writing." }
     ];
 
-    // ================= সঠিক প্রতি মিনিটের হিসাব ইঞ্জিন (Drip-Feed Formula) =================
     function syncPostProgressWithTime(post) {
       if (post.boostStatus !== 'active' || !post.boostExpiresAt || !post.boostStartedAt) return false;
 
@@ -729,7 +778,6 @@
       const startTime = post.boostStartedAt;
       const endTime = post.boostExpiresAt;
 
-      // ক্যাম্পেইন সময় শেষ হয়ে গেলে কমপ্লিট হবে
       if (now >= endTime) {
         const finalViews = post.initialViewsTarget || 500;
         const finalLikes = post.initialLikesTarget || 80;
@@ -750,16 +798,13 @@
         return false;
       }
 
-      // কত মিনিট অতিবাহিত হয়েছে
       const elapsedMinutes = Math.max(0, Math.floor((now - startTime) / (1000 * 60)));
       const totalMinutes = Math.max(1, Math.floor((endTime - startTime) / (1000 * 60)));
 
-      // এডমিন প্যানেল থেকে পাঠানো প্রতি মিনিটের নিখুঁত রেট
       const viewsPerMin = post.viewsPerMinute || ((post.initialViewsTarget || 500) / totalMinutes);
       const likesPerMin = post.likesPerMinute || ((post.initialLikesTarget || 80) / totalMinutes);
       const commentsPerMin = post.commentsPerMinute || ((post.initialCommentsTarget || 15) / totalMinutes);
 
-      // এই মুহূর্তে যতগুলো হওয়ার কথা (টার্গেটের চেয়ে বেশি হবে না)
       const shouldHaveViews = Math.min(post.initialViewsTarget || 500, Math.floor(elapsedMinutes * viewsPerMin));
       const shouldHaveLikes = Math.min(post.initialLikesTarget || 80, Math.floor(elapsedMinutes * likesPerMin));
       const shouldHaveComments = Math.min(post.initialCommentsTarget || 15, Math.floor(elapsedMinutes * commentsPerMin));
@@ -808,7 +853,6 @@
       return updated;
     }
 
-    // প্রতি ৩০ সেকেন্ড পরপর ধাপে ধাপে আপডেট চেক করবে (কোনো হুরহুর ছাড়া স্বাভাবিক গতি)
     setInterval(() => {
       posts.forEach(post => {
         if (post.boostStatus === 'active') {
@@ -847,7 +891,7 @@
       if (!post) return;
 
       if (String(post.userId) === String(currentUser.uid)) {
-        alert("Action not allowed: You cannot like your own post.");
+        showAppDialog("অনুমতি নেই", "আপনি নিজের পোস্টে নিজে লাইক দিতে পারবেন না।", "warning");
         return;
       }
 
@@ -900,7 +944,7 @@
         commentsCount: firebase.firestore.FieldValue.increment(1)
       }).then(() => {
         input.value = "";
-      }).catch(err => alert("Error posting comment: " + err.message));
+      }).catch(err => showAppDialog("ত্রুটি", err.message, "error"));
     }
 
     function promptDeleteSheet(postId) {
@@ -919,7 +963,8 @@
       if (targetDeletePostId) {
         db.collection("posts").doc(targetDeletePostId).delete().then(() => {
           closeDeleteSheet();
-        }).catch(err => alert("Error deleting post: " + err.message));
+          showAppDialog("মুছে ফেলা হয়েছে", "পোস্টটি সফলভাবে ডিলিট করা হয়েছে।", "success");
+        }).catch(err => showAppDialog("ত্রুটি", err.message, "error"));
       }
     }
 
@@ -1064,7 +1109,7 @@
       const words = countWords(content);
 
       if (words < 100) {
-        alert("Post must contain at least 100 words to fulfill the first mission.");
+        showAppDialog("শব্দ সংখ্যা কম", "পোস্ট করতে অন্তত ১০০ শব্দ লিখতে হবে।", "warning");
         return;
       }
 
@@ -1097,8 +1142,9 @@
         closeCreateModal();
         switchTab('home');
         window.scrollTo({ top: 0, behavior: 'smooth' });
+        showAppDialog("পোস্ট পাবলিশ হয়েছে!", "আপনার পোস্টটি সফলভাবে ফিডে পাবলিশ করা হয়েছে।", "success");
       }).catch(err => {
-        alert("Error publishing: " + err.message);
+        showAppDialog("ত্রুটি", err.message, "error");
       }).finally(() => {
         submitBtn.disabled = false;
         submitBtn.innerText = "Reach 100 words to Post";
@@ -1110,7 +1156,7 @@
       targetBoostPost = posts.find(p => p.id === postId);
 
       if (!targetBoostPost) {
-        alert("পোস্টটি খুঁজে পাওয়া যায়নি! পেজটি রিফ্রেশ করুন।");
+        showAppDialog("পোস্ট পাওয়া যায়নি", "পোস্টটি খুঁজে পাওয়া যায়নি! পেজটি রিফ্রেশ করুন।", "warning");
         return;
       }
 
@@ -1185,7 +1231,7 @@
     // ================= বুস্ট রিকোয়েস্ট সাবমিট ও টেলিগ্রাম অটো-অ্যালার্ট =================
     async function submitBoostRequest() {
       if (!targetBoostPostId || !targetBoostPost) {
-        alert("অনুগ্রহ করে যে পোস্টটি বুস্ট করবেন সেটি সিলেক্ট করুন!");
+        showAppDialog("পোস্ট নির্বাচন করুন", "অনুগ্রহ করে যে পোস্টটি বুস্ট করবেন সেটি সিলেক্ট করুন।", "warning");
         return;
       }
 
@@ -1196,8 +1242,13 @@
       const cached = JSON.parse(localStorage.getItem('microtask_cached_user')) || {};
       const currentBalUSD = Number(cached.balanceUSD || 0);
 
+      // ব্যালেন্স না থাকলে প্রিমিয়াম মেসেজ
       if (currentBalUSD < pkgPriceUSD) {
-        alert(`মেইন ব্যালেন্সে পর্যাপ্ত টাকা নেই!\nপ্রয়োজন: ৳${pkgPriceBDT} ($${pkgPriceUSD.toFixed(2)})\nআপনার ব্যালেন্স: $${currentBalUSD.toFixed(2)}\n\nদয়া করে ডিপোজিট করুন।`);
+        showAppDialog(
+          "অপর্যাপ্ত ব্যালেন্স!",
+          `আপনার অ্যাকাউন্টে পর্যাপ্ত ব্যালেন্স নেই।<br>প্রয়োজন: <strong>৳${pkgPriceBDT} ($${pkgPriceUSD.toFixed(2)})</strong><br>বর্তমান ব্যালেন্স: <strong>$${currentBalUSD.toFixed(2)}</strong>`,
+          "error"
+        );
         return;
       }
 
@@ -1250,11 +1301,18 @@
 
         sendTelegramAlert(tgAlertMsg, "🚀 বুস্ট সেটআপ ও অ্যাপ্রুভ করুন", `${ADMIN_CONSOLE_URL}?action=boost`);
 
-        alert(`✅ ৳${pkgPriceBDT} কেটে বুস্ট রিকোয়েস্ট পাঠানো হয়েছে!\nঅ্যাডমিন অনুমোদন দিলে পোস্টটি প্রতি মিনিটে নিয়মতান্ত্রিকভাবে বুস্ট হওয়া শুরু করবে।`);
         closeBoostModal();
+        
+        // 🌟 সফলতার সুন্দর ইন-অ্যাপ ডায়ালগ
+        showAppDialog(
+          "বুস্ট সফলভাবে সক্রিয় হয়েছে!",
+          `আপনার <strong>৳${pkgPriceBDT}</strong> প্যাকেজের বুস্ট সফলভাবে পাঠানো হয়েছে। অ্যাডমিন অনুমোদন দিলে পোস্টটি ক্রমানুসারে বুস্ট হওয়া শুরু করবে।`,
+          "success"
+        );
+
       } catch (err) {
         console.error("Boost submission error:", err);
-        alert("বুস্ট রিকোয়েস্ট পাঠাতে সমস্যা হয়েছে:\n" + err.message);
+        showAppDialog("ত্রুটি ঘটেছে!", "বুস্ট রিকোয়েস্ট পাঠাতে সমস্যা হয়েছে:<br>" + err.message, "error");
       } finally {
         btn.disabled = false;
         btn.innerText = "Submit Boost Request";
@@ -1288,7 +1346,7 @@
       if (navigator.share) {
         navigator.share({ title: 'MicroTask Story', text: 'Check out this thought-provoking post on MicroTask!' });
       } else {
-        alert("Post link copied to clipboard!");
+        showAppDialog("লিংক কপি হয়েছে", "পোস্টের লিংক ক্লিপবোর্ডে কপি করা হয়েছে!", "success");
       }
     }
 
