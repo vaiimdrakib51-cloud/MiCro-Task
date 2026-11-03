@@ -289,16 +289,16 @@
       </div>
     </div>
 
-    <!-- 🌟 প্রিমিয়াম ইন-অ্যাপ কাস্টম ডায়লগ (কোনো ব্রাউজার ডোমেইন ছাড়া) -->
+    <!-- 🌟 প্রিমিয়াম ইন-অ্যাপ কাস্টম ডায়লগ -->
     <div id="custom-app-dialog" class="fixed inset-0 z-[100] bg-black/60 backdrop-blur-[2px] hidden items-center justify-center p-4">
       <div id="custom-app-dialog-card" class="bg-white rounded-2xl w-full max-w-xs p-5 text-center shadow-2xl border border-aqua-border transform scale-95 opacity-0 transition-all duration-200">
         <div id="dialog-icon-wrap" class="w-12 h-12 rounded-full mx-auto mb-3 flex items-center justify-center text-xl bg-teal-50 text-teal-600 border border-teal-200">
           <i data-lucide="check-circle" class="w-6 h-6"></i>
         </div>
-        <h4 id="dialog-title" class="font-bold text-sm text-aqua-textPrimary mb-1.5">সফল হয়েছে</h4>
+        <h4 id="dialog-title" class="font-bold text-sm text-aqua-textPrimary mb-1.5">Notification</h4>
         <p id="dialog-message" class="text-xs text-aqua-textSecondary leading-relaxed mb-4"></p>
         <button onclick="closeAppDialog()" class="w-full bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-sm">
-          ঠিক আছে
+          OK
         </button>
       </div>
     </div>
@@ -320,7 +320,7 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // ================= ইন-অ্যাপ ডায়ালগ সিস্টেম (ব্রাউজার অ্যালার্টমুক্ত) =================
+    // ================= ইন-অ্যাপ ডায়ালগ সিস্টেম =================
     function showAppDialog(title, message, type = 'success') {
       const dialog = document.getElementById('custom-app-dialog');
       const card = document.getElementById('custom-app-dialog-card');
@@ -348,7 +348,7 @@
         card.classList.remove('scale-95', 'opacity-0');
         card.classList.add('scale-100', 'opacity-100');
       }, 10);
-      lucide.createIcons();
+      if (window.lucide) lucide.createIcons();
     }
 
     function closeAppDialog() {
@@ -398,17 +398,25 @@
     };
 
     function loadActiveUserSession() {
-      const cached = JSON.parse(localStorage.getItem('microtask_cached_user'));
-      if (cached && cached.uid) {
-        currentUser.uid = String(cached.uid).trim();
-        currentUser.name = cached.name || 'User';
-        currentUser.username = '@' + (cached.name ? cached.name.toLowerCase().replace(/\s+/g, '_') : 'user');
-        currentUser.isVerified = cached.isVerified === true;
+      try {
+        const cached = JSON.parse(localStorage.getItem('microtask_cached_user'));
+        if (cached && cached.uid) {
+          currentUser.uid = String(cached.uid).trim();
+          currentUser.name = cached.name || 'User';
+          currentUser.username = '@' + (cached.name ? cached.name.toLowerCase().replace(/\s+/g, '_') : 'user');
+          currentUser.isVerified = cached.isVerified === true;
+        }
+        const av1 = document.getElementById('creator-avatar');
+        if (av1) av1.src = currentUser.avatar;
+        const av2 = document.getElementById('modal-user-avatar');
+        if (av2) av2.src = currentUser.avatar;
+        const n1 = document.getElementById('modal-user-name');
+        if (n1) n1.innerText = currentUser.name;
+        const u1 = document.getElementById('modal-user-uid');
+        if (u1) u1.innerText = `UID: #${currentUser.uid}`;
+      } catch (e) {
+        console.error("User session load error:", e);
       }
-      document.getElementById('creator-avatar').src = currentUser.avatar;
-      document.getElementById('modal-user-avatar').src = currentUser.avatar;
-      document.getElementById('modal-user-name').innerText = currentUser.name;
-      document.getElementById('modal-user-uid').innerText = `UID: #${currentUser.uid}`;
     }
 
     auth.onAuthStateChanged(user => {
@@ -555,7 +563,6 @@
             ${postBodyContent}
           </div>
 
-          <!-- লাইক কাউন্ট ও ব্যালেন্স ডিসপ্লে -->
           <div class="px-3 py-1.5 flex items-center justify-between text-[11px] text-aqua-textSecondary border-t border-aqua-divider bg-aqua-cardTint/40">
             <div class="flex items-center space-x-2">
               <div class="flex items-center space-x-1">
@@ -616,7 +623,6 @@
             ` : ''}
           </div>
 
-          <!-- বুস্ট স্ট্যাটাস বার -->
           ${post.boostStatus === 'active' ? `
             <div class="px-3 py-1 bg-gradient-to-r from-teal-50 to-cyan-50 border-t border-teal-200 flex items-center justify-between text-[10px] text-teal-900">
               <div class="flex items-center space-x-1 font-medium">
@@ -718,7 +724,7 @@
       const container = document.getElementById('feed-container');
       if (!container) return;
 
-      if (posts.length === 0) {
+      if (!posts || posts.length === 0) {
         container.innerHTML = `
           <div class="bg-white rounded-2xl p-6 text-center border border-aqua-border shadow-xs mx-2 my-3">
             <div class="w-10 h-10 rounded-full bg-teal-50 text-teal-600 flex items-center justify-center mx-auto mb-2 border border-teal-200">
@@ -734,22 +740,38 @@
         container.innerHTML = posts.map(buildPostCardHTML).join('');
       }
 
-      lucide.createIcons();
+      if (window.lucide) lucide.createIcons();
       updateAllCountdowns();
       attachViewObservers();
     }
 
+    // ================= ফায়ারবেস পোস্ট লোডার (নিরাপদ ট্রাই-ক্যাচসহ) =================
     function initFirebasePostsListener() {
       db.collection("posts").orderBy("createdAt", "desc").limit(40).onSnapshot(snapshot => {
         posts = [];
         snapshot.forEach(doc => {
-          const postData = { id: doc.id, ...doc.data() };
-          syncPostProgressWithTime(postData);
-          posts.push(postData);
+          try {
+            const postData = { id: doc.id, ...doc.data() };
+            syncPostProgressWithTime(postData);
+            posts.push(postData);
+          } catch (e) {
+            console.error("Error processing post:", doc.id, e);
+          }
         });
         renderFeed();
       }, err => {
         console.error("Firestore posts load error:", err);
+        const container = document.getElementById('feed-container');
+        if (container) {
+          container.innerHTML = `
+            <div class="p-6 text-center text-xs text-rose-500 bg-white rounded-xl mx-2 my-4 border border-rose-200">
+              <p class="font-bold mb-1">Failed to load posts!</p>
+              <p class="text-[11px] text-gray-500 mb-2">${err.message}</p>
+              <button onclick="location.reload()" class="bg-teal-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold">Try Again</button>
+            </div>
+          `;
+          if (window.lucide) lucide.createIcons();
+        }
       });
     }
 
@@ -772,11 +794,11 @@
     ];
 
     function syncPostProgressWithTime(post) {
-      if (post.boostStatus !== 'active' || !post.boostExpiresAt || !post.boostStartedAt) return false;
+      if (!post || post.boostStatus !== 'active' || !post.boostExpiresAt || !post.boostStartedAt) return false;
 
       const now = Date.now();
-      const startTime = post.boostStartedAt;
-      const endTime = post.boostExpiresAt;
+      const startTime = Number(post.boostStartedAt);
+      const endTime = Number(post.boostExpiresAt);
 
       if (now >= endTime) {
         const finalViews = post.initialViewsTarget || 500;
@@ -891,7 +913,7 @@
       if (!post) return;
 
       if (String(post.userId) === String(currentUser.uid)) {
-        showAppDialog("অনুমতি নেই", "আপনি নিজের পোস্টে নিজে লাইক দিতে পারবেন না।", "warning");
+        showAppDialog("Permission Denied", "You cannot like your own post.", "warning");
         return;
       }
 
@@ -944,7 +966,7 @@
         commentsCount: firebase.firestore.FieldValue.increment(1)
       }).then(() => {
         input.value = "";
-      }).catch(err => showAppDialog("ত্রুটি", err.message, "error"));
+      }).catch(err => showAppDialog("Error", err.message, "error"));
     }
 
     function promptDeleteSheet(postId) {
@@ -963,8 +985,8 @@
       if (targetDeletePostId) {
         db.collection("posts").doc(targetDeletePostId).delete().then(() => {
           closeDeleteSheet();
-          showAppDialog("মুছে ফেলা হয়েছে", "পোস্টটি সফলভাবে ডিলিট করা হয়েছে।", "success");
-        }).catch(err => showAppDialog("ত্রুটি", err.message, "error"));
+          showAppDialog("Deleted", "Your post was deleted permanently.", "success");
+        }).catch(err => showAppDialog("Error", err.message, "error"));
       }
     }
 
@@ -993,7 +1015,7 @@
             <p class="font-bold text-aqua-textPrimary">No posts found with UID: "#${uid}"</p>
           </div>
         `;
-        lucide.createIcons();
+        if (window.lucide) lucide.createIcons();
         return;
       }
 
@@ -1021,7 +1043,7 @@
         </div>
       `;
 
-      lucide.createIcons();
+      if (window.lucide) lucide.createIcons();
       updateAllCountdowns();
       attachViewObservers();
     }
@@ -1029,6 +1051,7 @@
     function openCreateModal() {
       document.getElementById('modal-create').classList.remove('hidden');
       document.getElementById('modal-create').classList.add('flex');
+      if (window.lucide) lucide.createIcons();
     }
 
     function closeCreateModal() {
@@ -1109,7 +1132,7 @@
       const words = countWords(content);
 
       if (words < 100) {
-        showAppDialog("শব্দ সংখ্যা কম", "পোস্ট করতে অন্তত ১০০ শব্দ লিখতে হবে।", "warning");
+        showAppDialog("Word Limit", "Post must contain at least 100 words to publish.", "warning");
         return;
       }
 
@@ -1142,9 +1165,9 @@
         closeCreateModal();
         switchTab('home');
         window.scrollTo({ top: 0, behavior: 'smooth' });
-        showAppDialog("পোস্ট পাবলিশ হয়েছে!", "আপনার পোস্টটি সফলভাবে ফিডে পাবলিশ করা হয়েছে।", "success");
+        showAppDialog("Success", "Your story was published successfully!", "success");
       }).catch(err => {
-        showAppDialog("ত্রুটি", err.message, "error");
+        showAppDialog("Error", err.message, "error");
       }).finally(() => {
         submitBtn.disabled = false;
         submitBtn.innerText = "Reach 100 words to Post";
@@ -1156,7 +1179,7 @@
       targetBoostPost = posts.find(p => p.id === postId);
 
       if (!targetBoostPost) {
-        showAppDialog("পোস্ট পাওয়া যায়নি", "পোস্টটি খুঁজে পাওয়া যায়নি! পেজটি রিফ্রেশ করুন।", "warning");
+        showAppDialog("Not Found", "Post not found! Please refresh page.", "warning");
         return;
       }
 
@@ -1204,7 +1227,7 @@
       selectPackage(100);
       document.getElementById('modal-boost').classList.remove('hidden');
       document.getElementById('modal-boost').classList.add('flex');
-      lucide.createIcons();
+      if (window.lucide) lucide.createIcons();
     }
 
     function closeBoostModal() {
@@ -1228,10 +1251,10 @@
       });
     }
 
-    // ================= বুস্ট রিকোয়েস্ট সাবমিট ও টেলিগ্রাম অটো-অ্যালার্ট =================
+    // ================= বুস্ট রিকোয়েস্ট সাবমিট =================
     async function submitBoostRequest() {
       if (!targetBoostPostId || !targetBoostPost) {
-        showAppDialog("পোস্ট নির্বাচন করুন", "অনুগ্রহ করে যে পোস্টটি বুস্ট করবেন সেটি সিলেক্ট করুন।", "warning");
+        showAppDialog("Select Post", "Please select a post to boost.", "warning");
         return;
       }
 
@@ -1242,11 +1265,10 @@
       const cached = JSON.parse(localStorage.getItem('microtask_cached_user')) || {};
       const currentBalUSD = Number(cached.balanceUSD || 0);
 
-      // ব্যালেন্স না থাকলে প্রিমিয়াম মেসেজ
       if (currentBalUSD < pkgPriceUSD) {
         showAppDialog(
-          "অপর্যাপ্ত ব্যালেন্স!",
-          `আপনার অ্যাকাউন্টে পর্যাপ্ত ব্যালেন্স নেই।<br>প্রয়োজন: <strong>৳${pkgPriceBDT} ($${pkgPriceUSD.toFixed(2)})</strong><br>বর্তমান ব্যালেন্স: <strong>$${currentBalUSD.toFixed(2)}</strong>`,
+          "Insufficient Balance!",
+          `You need <strong>৳${pkgPriceBDT} ($${pkgPriceUSD.toFixed(2)})</strong>.<br>Current balance: <strong>$${currentBalUSD.toFixed(2)}</strong>`,
           "error"
         );
         return;
@@ -1254,7 +1276,7 @@
 
       const btn = document.getElementById('btnSubmitBoostReq');
       btn.disabled = true;
-      btn.innerText = "ব্যালেন্স প্রসেসিং...";
+      btn.innerText = "Processing...";
 
       try {
         const finalUid = String(cached.uid || (user ? user.uid : currentUser.uid || '000000')).trim();
@@ -1291,7 +1313,6 @@
           boostPackage: `${pkgPriceBDT} Tk`
         });
 
-        // 🔔 টেলিগ্রাম চ্যানেলে সরাসরি অ্যাকশন বাটনসহ অ্যালার্ট পাঠানো
         const tgAlertMsg = `🚀 <b>নতুন পোস্ট বুস্ট রিকোয়েস্ট এসেছে!</b>\n\n` +
                            `👤 <b>ইউজার:</b> ${finalName}\n` +
                            `🆔 <b>UID:</b> <code>#${finalUid}</code>\n` +
@@ -1303,17 +1324,15 @@
 
         closeBoostModal();
         
-        // 🌟 সফলতার সুন্দর ইন-অ্যাপ ডায়ালগ
         showAppDialog(
-  "Boost Submitted!",
-  `Your <strong>৳${pkgPriceBDT}</strong> campaign is under review and will go live shortly.`,
-  "success"
-);
+          "Boost Submitted!",
+          `Your <strong>৳${pkgPriceBDT}</strong> campaign is under review and will go live shortly.`,
+          "success"
         );
 
       } catch (err) {
         console.error("Boost submission error:", err);
-        showAppDialog("ত্রুটি ঘটেছে!", "বুস্ট রিকোয়েস্ট পাঠাতে সমস্যা হয়েছে:<br>" + err.message, "error");
+        showAppDialog("Error", "Boost request failed:<br>" + err.message, "error");
       } finally {
         btn.disabled = false;
         btn.innerText = "Submit Boost Request";
@@ -1340,20 +1359,26 @@
         searchView.classList.remove('hidden');
         tabBtnSearch.className = "flex-1 py-3 flex justify-center border-b-2 border-aqua-600 text-aqua-600 transition";
       }
-      lucide.createIcons();
+      if (window.lucide) lucide.createIcons();
     }
 
     function handleShare() {
       if (navigator.share) {
         navigator.share({ title: 'MicroTask Story', text: 'Check out this thought-provoking post on MicroTask!' });
       } else {
-        showAppDialog("লিংক কপি হয়েছে", "পোস্টের লিংক ক্লিপবোর্ডে কপি করা হয়েছে!", "success");
+        showAppDialog("Copied", "Post link copied to clipboard!", "success");
       }
     }
 
-    window.onload = () => {
+    // পেজ লোড হওয়া মাত্রই সাথে সাথে আইকন লোড করানোর ফিক্স
+    document.addEventListener('DOMContentLoaded', () => {
       loadActiveUserSession();
+      if (window.lucide) lucide.createIcons();
       initFirebasePostsListener();
+    });
+
+    window.onload = () => {
+      if (window.lucide) lucide.createIcons();
     };
   </script>
 
