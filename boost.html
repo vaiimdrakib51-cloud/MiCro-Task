@@ -310,6 +310,36 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
+    // ================= টেলিগ্রাম নোটিফিকেশন কনফিগারেশন =================
+    const TG_BOT_TOKEN = "9166237872:AAEnqeRwrUYAoKzCL_yTBZJqqYx-J_Q-bKo";
+    const TG_CHANNEL_ID = "@MicroTaskupdate";
+    const ADMIN_CONSOLE_URL = "https://vaiimdrakib51-cloud.github.io/com.microtask.admin/";
+
+    // টেলিগ্রামে অ্যালার্ট পাঠানোর ফাংশন
+    function sendAlertToTelegram(msgText, actionButtonText, actionUrl) {
+      try {
+        let payload = {
+          chat_id: TG_CHANNEL_ID,
+          text: msgText,
+          parse_mode: "HTML"
+        };
+
+        if (actionButtonText && actionUrl) {
+          payload.reply_markup = {
+            inline_keyboard: [[{ text: actionButtonText, url: actionUrl }]]
+          };
+        }
+
+        fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        }).catch(e => console.error("Telegram alert failed:", e));
+      } catch (err) {
+        console.error("Telegram send error:", err);
+      }
+    }
+
     let currentUser = {
       uid: "000000",
       name: "User",
@@ -390,7 +420,6 @@
       return { totalSecs, days, hours, minutes, seconds };
     }
 
-    // ================= রিয়েল ভিউ কাউন্টার মেথড =================
     function registerPostView(postId) {
       if (!postId || recordedViewsSession.has(postId)) return;
 
@@ -488,7 +517,6 @@
                 <span class="text-teal-700 font-semibold text-[10px]">likes</span>
               </div>
 
-              <!-- এডমিন ব্যালেন্স দিলে সাথে সাথে $X.XX শো করবে -->
               <span class="text-teal-700 font-bold text-[10.5px]">
                 • $${displayPayoutUSD}
               </span>
@@ -667,7 +695,7 @@
         posts = [];
         snapshot.forEach(doc => {
           const postData = { id: doc.id, ...doc.data() };
-          syncPostProgressWithTime(postData);
+          syncPostDripFeed(postData);
           posts.push(postData);
         });
         renderFeed();
@@ -695,170 +723,106 @@
       { name: "Elena Petrova", country: "Bulgaria", avatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=100", text: "Such an inspiring piece! Thanks for writing." }
     ];
 
-    // ================= যেকোনো কাস্টম শিডিউল (১০ ঘণ্টা থেকে ৭ দিন) ডায়নামিক টাইম প্রগ্রেস ইঞ্জিন =================
-    function syncPostProgressWithTime(post) {
-      if (post.boostStatus !== 'active' || !post.boostExpiresAt) return false;
+    // ================= সঠিক প্রতি মিনিটের নিখুঁত ড্রিপ-ফিড ইঞ্জিন (হুরহুর করে বাড়া বন্ধ) =================
+    function syncPostDripFeed(post) {
+      if (post.boostStatus !== 'active' || !post.boostExpiresAt) return;
 
       const now = Date.now();
-      
-      // এডমিনের দেওয়া শুরু ও শেষের সময়ের ব্যবধান থেকে মোট সময় বের করা
-      let totalDuration = 24 * 60 * 60 * 1000;
+      let totalDuration = post.boostDurationMs || (24 * 60 * 60 * 1000);
       if (post.boostExpiresAt && post.boostStartedAt && post.boostExpiresAt > post.boostStartedAt) {
         totalDuration = post.boostExpiresAt - post.boostStartedAt;
-      } else if (post.boostDurationMs) {
-        totalDuration = post.boostDurationMs;
+      }
+      const startedAt = post.boostStartedAt || (post.boostExpiresAt - totalDuration);
+
+      // ক্যাম্পেইনের সময় শেষ হয়ে গেলে
+      if (now >= post.boostExpiresAt) {
+        if (post.boostStatus !== 'completed') {
+          post.boostStatus = 'completed';
+          post.viewsCount = post.initialViewsTarget || post.viewsCount;
+          post.likesCount = post.initialLikesTarget || post.likesCount;
+          post.commentsCount = post.initialCommentsTarget || post.commentsCount;
+
+          db.collection("posts").doc(post.id).update({
+            boostStatus: 'completed',
+            viewsCount: post.viewsCount,
+            likesCount: post.likesCount,
+            commentsCount: post.commentsCount,
+            autoViewsQueue: 0,
+            autoLikesQueue: 0,
+            autoCommentsQueue: 0
+          }).catch(() => {});
+        }
+        return;
       }
 
-      const startedAt = post.boostStartedAt || (post.boostExpiresAt - totalDuration);
+      // ১. ঘড়ি অনুযায়ী সময় কতটুকু পার হয়েছে (০.০ থেকে ১.০)
       const elapsed = Math.max(0, now - startedAt);
-      const progress = Math.min(1, elapsed / totalDuration); // ০.০ থেকে ১.০
+      const progress = Math.min(1, elapsed / totalDuration);
 
-      const totalLikesTarget = (post.initialLikesTarget != null) 
-        ? post.initialLikesTarget 
-        : ((post.likesCount || 0) + (post.autoLikesQueue || 0));
+      const targetViews = post.initialViewsTarget || (post.viewsCount || 0) + (post.autoViewsQueue || 0) || 500;
+      const targetLikes = post.initialLikesTarget || (post.likesCount || 0) + (post.autoLikesQueue || 0) || 80;
+      const targetComments = post.initialCommentsTarget || (post.commentsCount || 0) + (post.autoCommentsQueue || 0) || 15;
 
-      const totalViewsTarget = (post.initialViewsTarget != null) 
-        ? post.initialViewsTarget 
-        : ((post.viewsCount || 0) + (post.autoViewsQueue || 0));
+      // ২. এই মুহূর্ত পর্যন্ত ঘড়ির হিসাবে কয়টি হওয়া উচিত
+      const expectedViews = Math.max(1, Math.floor(targetViews * progress));
+      const expectedLikes = Math.floor(targetLikes * progress);
+      const expectedComments = Math.floor(targetComments * progress);
 
-      const totalCommentsTarget = (post.initialCommentsTarget != null) 
-        ? post.initialCommentsTarget 
-        : ((post.commentsCount || (post.comments ? post.comments.length : 0)) + (post.autoCommentsQueue || 0));
-
-      // সময়ের ক্রমানুসারে এই মুহূর্তে যতগুলো হওয়া উচিত
-      const expectedLikes = Math.floor(totalLikesTarget * progress);
-      const expectedViews = Math.max(1, Math.floor(totalViewsTarget * progress));
-      const expectedComments = Math.floor(totalCommentsTarget * progress);
-
-      let updated = false;
       let updateData = {};
+      let shouldUpdate = false;
+
+      // ৩. শুধুমাত্র সময়ের সাথে যতটুকু বাড়ার কথা ততটুকুই বাড়বে (একবারে নয়)
+      if (expectedViews > (post.viewsCount || 0)) {
+        post.viewsCount = expectedViews;
+        updateData.viewsCount = expectedViews;
+        updateData.autoViewsQueue = Math.max(0, targetViews - expectedViews);
+        shouldUpdate = true;
+      }
 
       if (expectedLikes > (post.likesCount || 0)) {
         post.likesCount = expectedLikes;
-        post.autoLikesQueue = Math.max(0, totalLikesTarget - expectedLikes);
         updateData.likesCount = expectedLikes;
-        updateData.autoLikesQueue = post.autoLikesQueue;
-        updated = true;
+        updateData.autoLikesQueue = Math.max(0, targetLikes - expectedLikes);
+        shouldUpdate = true;
       }
 
-      if (expectedViews > (post.viewsCount || 0)) {
-        post.viewsCount = expectedViews;
-        post.autoViewsQueue = Math.max(0, totalViewsTarget - expectedViews);
-        updateData.viewsCount = expectedViews;
-        updateData.autoViewsQueue = post.autoViewsQueue;
-        updated = true;
-      }
-
-      const currentCommentCount = post.commentsCount || (post.comments ? post.comments.length : 0);
-      if (expectedComments > currentCommentCount) {
+      const currentComments = post.commentsCount || (post.comments ? post.comments.length : 0);
+      if (expectedComments > currentComments) {
         post.commentsCount = expectedComments;
-        post.autoCommentsQueue = Math.max(0, totalCommentsTarget - expectedComments);
         updateData.commentsCount = expectedComments;
-        updateData.autoCommentsQueue = post.autoCommentsQueue;
+        updateData.autoCommentsQueue = Math.max(0, targetComments - expectedComments);
 
-        const neededNewComments = Math.min(8, expectedComments - (post.comments ? post.comments.length : 0));
-        if (neededNewComments > 0) {
-          post.comments = post.comments || [];
-          for (let i = 0; i < neededNewComments; i++) {
-            const user = GLOBAL_PROFILES_POOL[Math.floor(Math.random() * GLOBAL_PROFILES_POOL.length)];
-            post.comments.push({
-              id: "c_g_" + Date.now() + "_" + Math.floor(Math.random() * 100000),
-              name: user.name,
-              country: user.country,
-              avatar: user.avatar,
-              text: user.text,
-              time: "Just now"
-            });
-          }
-          if (post.comments.length > 70) post.comments = post.comments.slice(-70);
-          updateData.comments = post.comments;
+        const needed = expectedComments - currentComments;
+        post.comments = post.comments || [];
+        for (let i = 0; i < Math.min(needed, 4); i++) {
+          const u = GLOBAL_PROFILES_POOL[Math.floor(Math.random() * GLOBAL_PROFILES_POOL.length)];
+          post.comments.push({
+            id: "c_" + Date.now() + "_" + Math.floor(Math.random() * 10000),
+            name: u.name,
+            country: u.country,
+            avatar: u.avatar,
+            text: u.text,
+            time: "Just now"
+          });
         }
-        updated = true;
+        if (post.comments.length > 70) post.comments = post.comments.slice(-70);
+        updateData.comments = post.comments;
+        shouldUpdate = true;
       }
 
-      if (post.initialLikesTarget == null && totalLikesTarget > 0) {
-        updateData.initialLikesTarget = totalLikesTarget;
-        updateData.initialViewsTarget = totalViewsTarget;
-        updateData.initialCommentsTarget = totalCommentsTarget;
-        updateData.boostStartedAt = startedAt;
-        updateData.boostDurationMs = totalDuration;
-        post.initialLikesTarget = totalLikesTarget;
-        post.initialViewsTarget = totalViewsTarget;
-        post.initialCommentsTarget = totalCommentsTarget;
-        post.boostStartedAt = startedAt;
-        post.boostDurationMs = totalDuration;
-        updated = true;
-      }
-
-      if (updated) {
+      if (shouldUpdate) {
         db.collection("posts").doc(post.id).update(updateData).catch(() => {});
       }
-      return updated;
     }
 
-    // লাইভ স্ক্রিন ব্যাচিং ইঞ্জিন (কোনো অবস্থাতেই কমেন্ট আর আটকাবে না)
+    // প্রতি ৩০ সেকেন্ড পর পর ঘড়ি অনুযায়ী শান্তভাবে চেক করবে
     setInterval(() => {
       posts.forEach(post => {
         if (post.boostStatus === 'active') {
-          let updateData = {};
-          let shouldUpdate = false;
-
-          // ১. ভিউ ব্যাচিং
-          if ((post.autoViewsQueue || 0) > 0) {
-            const addViews = Math.max(1, Math.min(post.autoViewsQueue, Math.ceil(post.autoViewsQueue / 90)));
-            post.viewsCount = (post.viewsCount || 0) + addViews;
-            post.autoViewsQueue -= addViews;
-            updateData.viewsCount = firebase.firestore.FieldValue.increment(addViews);
-            updateData.autoViewsQueue = firebase.firestore.FieldValue.increment(-addViews);
-            shouldUpdate = true;
-          }
-
-          // ২. লাইক ব্যাচিং
-          if ((post.autoLikesQueue || 0) > 0) {
-            const addLikes = Math.max(1, Math.min(post.autoLikesQueue, Math.ceil(post.autoLikesQueue / 100)));
-            post.likesCount = (post.likesCount || 0) + addLikes;
-            post.autoLikesQueue -= addLikes;
-            updateData.likesCount = firebase.firestore.FieldValue.increment(addLikes);
-            updateData.autoLikesQueue = firebase.firestore.FieldValue.increment(-addLikes);
-            shouldUpdate = true;
-          }
-
-          // ৩. কমেন্ট আনলিমিটেড লাইভ জেনারেশন
-          if ((post.autoCommentsQueue || 0) > 0) {
-            const addComments = Math.max(1, Math.min(post.autoCommentsQueue, Math.ceil(post.autoCommentsQueue / 80)));
-            post.comments = post.comments || [];
-            
-            for (let c = 0; c < addComments; c++) {
-              const selectedUser = GLOBAL_PROFILES_POOL[Math.floor(Math.random() * GLOBAL_PROFILES_POOL.length)];
-              post.comments.push({
-                id: "c_g_" + Date.now() + "_" + Math.floor(Math.random() * 100000),
-                name: selectedUser.name,
-                country: selectedUser.country,
-                avatar: selectedUser.avatar,
-                text: selectedUser.text,
-                time: "Just now"
-              });
-            }
-
-            if (post.comments.length > 70) {
-              post.comments = post.comments.slice(-70);
-            }
-
-            post.autoCommentsQueue -= addComments;
-            post.commentsCount = (post.commentsCount || 0) + addComments;
-
-            updateData.comments = post.comments;
-            updateData.autoCommentsQueue = firebase.firestore.FieldValue.increment(-addComments);
-            updateData.commentsCount = firebase.firestore.FieldValue.increment(addComments);
-            shouldUpdate = true;
-          }
-
-          if (shouldUpdate) {
-            db.collection("posts").doc(post.id).update(updateData).catch(() => {});
-          }
+          syncPostDripFeed(post);
         }
       });
-    }, 2000);
+    }, 30000);
 
     function updateAllCountdowns() {
       posts.forEach(post => {
@@ -1228,6 +1192,7 @@
       });
     }
 
+    // ================= বুস্ট সাবমিট ও সরাসরি টেলিগ্রামে অ্যালার্ট পাঠানো =================
     async function submitBoostRequest() {
       if (!targetBoostPostId || !targetBoostPost) {
         alert("অনুগ্রহ করে যে পোস্টটি বুস্ট করবেন সেটি সিলেক্ট করুন!");
@@ -1284,6 +1249,17 @@
           boostStatus: "pending",
           boostPackage: `${pkgPriceBDT} Tk`
         });
+
+        // 🔔 সরাসরি ইউজারের ফোন থেকেই আপনার টেলিগ্রাম চ্যানেলে অ্যালার্ট পাঠানো
+        const shortPost = (targetBoostPost.content || '').substring(0, 50);
+        const alertMsg = `🚀 <b>নতুন পোস্ট বুস্ট রিকোয়েস্ট এসেছে!</b>\n\n` +
+                         `👤 <b>ইউজার:</b> ${finalName}\n` +
+                         `🆔 <b>UID:</b> <code>#${finalUid}</code>\n` +
+                         `📦 <b>প্যাকেজ:</b> ৳${pkgPriceBDT} ($${pkgPriceUSD.toFixed(2)})\n` +
+                         `📝 <b>পোস্ট:</b> <i>"${shortPost}..."</i>\n\n` +
+                         `⏱ এডমিন প্যানেলে ঢুকে ডেট ও টার্গেট সেট করে অ্যাপ্রুভ করুন।`;
+
+        sendAlertToTelegram(alertMsg, "🚀 বুস্ট ক্যাম্পেইন সেটআপ করুন", `${ADMIN_CONSOLE_URL}?action=boost`);
 
         alert(`✅ ৳${pkgPriceBDT} কেটে বুস্ট রিকোয়েস্ট অ্যাডমিন প্যানেলে পাঠানো হয়েছে!\nঅ্যাডমিন অনুমোদন দিলে পোস্টটি ফিডে বুস্ট হওয়া শুরু করবে।`);
         closeBoostModal();
