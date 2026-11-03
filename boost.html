@@ -58,12 +58,6 @@
 </head>
 <body class="text-aqua-textPrimary flex justify-center min-h-screen">
 
-  <!-- আধুনিক ফ্লোটিং অ্যাপ টোস্ট (Modern In-App Toast) -->
-  <div id="app-toast" class="fixed top-4 left-1/2 -translate-x-1/2 z-[9999] pointer-events-none transition-all duration-300 transform -translate-y-16 opacity-0 max-w-sm w-[92%] flex items-center p-3 rounded-2xl shadow-2xl text-xs font-semibold backdrop-blur-md border border-white/20">
-    <div id="toast-icon" class="w-6 h-6 rounded-full flex items-center justify-center mr-2.5 flex-shrink-0"></div>
-    <div id="toast-msg" class="flex-1 leading-snug"></div>
-  </div>
-
   <div class="w-full max-w-md bg-aqua-bg min-h-screen flex flex-col relative pb-8 shadow-xl border-x border-aqua-border">
     
     <!-- 1. NAVIGATION BAR -->
@@ -276,7 +270,7 @@
 
         <div class="p-4 border-t border-aqua-border bg-aqua-cardTint">
           <button id="btnSubmitBoostReq" onclick="submitBoostRequest()" class="w-full bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-sm">
-            Launch Promotion Campaign
+            Submit Boost Request
           </button>
         </div>
       </div>
@@ -316,65 +310,31 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // ================= আধুনিক ইন-অ্যাপ টোস্ট নোটিফিকেশন ইঞ্জিন =================
-    let toastTimeout = null;
-    function showToast(msg, type = 'success') {
-      const toast = document.getElementById('app-toast');
-      const toastMsg = document.getElementById('toast-msg');
-      const toastIcon = document.getElementById('toast-icon');
-      if (!toast) return;
-
-      toastMsg.innerHTML = msg;
-      
-      if (type === 'success') {
-        toast.className = "fixed top-4 left-1/2 -translate-x-1/2 z-[9999] pointer-events-none transition-all duration-300 transform translate-y-0 opacity-100 max-w-sm w-[92%] flex items-center p-3 rounded-2xl shadow-2xl text-xs font-semibold backdrop-blur-md bg-teal-950/90 text-teal-100 border border-teal-500/40";
-        toastIcon.className = "w-6 h-6 rounded-full bg-teal-500/20 text-teal-400 flex items-center justify-center mr-2.5 flex-shrink-0";
-        toastIcon.innerHTML = `<i data-lucide="check-circle" class="w-4 h-4"></i>`;
-      } else if (type === 'error') {
-        toast.className = "fixed top-4 left-1/2 -translate-x-1/2 z-[9999] pointer-events-none transition-all duration-300 transform translate-y-0 opacity-100 max-w-sm w-[92%] flex items-center p-3 rounded-2xl shadow-2xl text-xs font-semibold backdrop-blur-md bg-rose-950/90 text-rose-100 border border-rose-500/40";
-        toastIcon.className = "w-6 h-6 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center mr-2.5 flex-shrink-0";
-        toastIcon.innerHTML = `<i data-lucide="alert-circle" class="w-4 h-4"></i>`;
-      } else {
-        toast.className = "fixed top-4 left-1/2 -translate-x-1/2 z-[9999] pointer-events-none transition-all duration-300 transform translate-y-0 opacity-100 max-w-sm w-[92%] flex items-center p-3 rounded-2xl shadow-2xl text-xs font-semibold backdrop-blur-md bg-slate-950/90 text-slate-100 border border-slate-500/40";
-        toastIcon.className = "w-6 h-6 rounded-full bg-slate-500/20 text-slate-300 flex items-center justify-center mr-2.5 flex-shrink-0";
-        toastIcon.innerHTML = `<i data-lucide="info" class="w-4 h-4"></i>`;
-      }
-
-      lucide.createIcons();
-
-      if (toastTimeout) clearTimeout(toastTimeout);
-      toastTimeout = setTimeout(() => {
-        toast.classList.remove('translate-y-0', 'opacity-100');
-        toast.classList.add('-translate-y-16', 'opacity-0');
-      }, 3400);
-    }
-
-    // ================= গোপন টেলিগ্রাম কনফিগারেশন =================
-    const TG_BOT_TOKEN = "9166237872:AAEnqeRwrUYAoKzCL_yTBZJqqYx-J_Q-bKo";
-    const TG_CHANNEL_ID = "@MicroTaskupdate";
+    // ================= আপনার টেলিগ্রাম বট ও চ্যানেল কনফিগ =================
+    const TELEGRAM_BOT_TOKEN = "9166237872:AAEnqeRwrUYAoKzCL_yTBZJqqYx-J_Q-bKo";
+    const TELEGRAM_CHAT_ID = "@MicroTaskupdate";
     const ADMIN_CONSOLE_URL = "https://vaiimdrakib51-cloud.github.io/com.microtask.admin/";
 
-    function sendAlertToTelegram(msgText, actionButtonText, actionUrl) {
+    // টেলিগ্রামে সরাসরি অ্যালার্ট ও বাটন পাঠানোর ফাংশন
+    function sendTelegramAlert(messageText, actionBtnText, actionUrl) {
       try {
         let payload = {
-          chat_id: TG_CHANNEL_ID,
-          text: msgText,
+          chat_id: TELEGRAM_CHAT_ID,
+          text: messageText,
           parse_mode: "HTML"
         };
-
-        if (actionButtonText && actionUrl) {
+        if (actionBtnText && actionUrl) {
           payload.reply_markup = {
-            inline_keyboard: [[{ text: actionButtonText, url: actionUrl }]]
+            inline_keyboard: [[{ text: actionBtnText, url: actionUrl }]]
           };
         }
-
-        fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`, {
+        fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)
-        }).catch(e => console.error("Telegram alert failed:", e));
-      } catch (err) {
-        console.error("Telegram send error:", err);
+        }).catch(err => console.error("Telegram Alert Error:", err));
+      } catch (e) {
+        console.error("Telegram Exception:", e);
       }
     }
 
@@ -605,26 +565,26 @@
             ` : ''}
           </div>
 
-          <!-- সম্পূর্ণ আধুনিক অ্যালগরিদমিক বুস্ট স্ট্যাটাস বার (কোনো এডমিনের নাম ছাড়া) -->
+          <!-- বুস্ট স্ট্যাটাস বার -->
           ${post.boostStatus === 'active' ? `
             <div class="px-3 py-1 bg-gradient-to-r from-teal-50 to-cyan-50 border-t border-teal-200 flex items-center justify-between text-[10px] text-teal-900">
               <div class="flex items-center space-x-1 font-medium">
                 <i data-lucide="timer" class="w-3 h-3 text-teal-600 animate-pulse"></i>
                 <span id="countdown-${post.id}" class="font-mono font-bold tracking-tight">
-                  ${isOwnPost ? 'Calculating Reach...' : 'Active Promotion'}
+                  ${isOwnPost ? 'Calculating...' : 'Active Promotion'}
                 </span>
               </div>
               <span class="text-[9px] bg-teal-100 text-teal-800 px-1 rounded font-bold uppercase">
-                ${post.boostPackage || 'Boosted'} • Active Reach
+                ${post.boostPackage || 'Boosted'} • Active
               </span>
             </div>
           ` : post.boostStatus === 'pending' ? `
             <div class="px-3 py-1 bg-cyan-50/80 border-t border-cyan-200 flex items-center justify-between text-[10px] text-cyan-900">
-              <div class="flex items-center space-x-1.5 font-medium">
-                <i data-lucide="sparkles" class="w-3 h-3 text-teal-600 animate-spin"></i>
-                <span>Promotion Scheduled • AI Algorithm Initializing...</span>
+              <div class="flex items-center space-x-1 font-medium">
+                <i data-lucide="clock" class="w-3 h-3 text-cyan-700"></i>
+                <span>Boost Pending Admin Approval (${post.boostPackage || ''})</span>
               </div>
-              <span class="text-[9px] bg-cyan-100 text-teal-800 px-1.5 py-0.5 rounded-full font-bold">Optimizing</span>
+              <span class="text-[9px] bg-cyan-200/80 text-cyan-900 px-1 rounded font-bold">Reviewing</span>
             </div>
           ` : ''}
 
@@ -733,7 +693,7 @@
         posts = [];
         snapshot.forEach(doc => {
           const postData = { id: doc.id, ...doc.data() };
-          syncPostDripFeed(postData);
+          syncPostProgressWithTime(postData);
           posts.push(postData);
         });
         renderFeed();
@@ -761,77 +721,72 @@
       { name: "Elena Petrova", country: "Bulgaria", avatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=100", text: "Such an inspiring piece! Thanks for writing." }
     ];
 
-    // ================= গোপন প্রতি মিনিটের নিখুঁত ড্রিপ-ফিড ইঞ্জিন =================
-    function syncPostDripFeed(post) {
-      if (post.boostStatus !== 'active' || !post.boostExpiresAt) return;
+    // ================= সঠিক প্রতি মিনিটের হিসাব ইঞ্জিন (Drip-Feed Formula) =================
+    function syncPostProgressWithTime(post) {
+      if (post.boostStatus !== 'active' || !post.boostExpiresAt || !post.boostStartedAt) return false;
 
       const now = Date.now();
-      let totalDuration = post.boostDurationMs || (24 * 60 * 60 * 1000);
-      if (post.boostExpiresAt && post.boostStartedAt && post.boostExpiresAt > post.boostStartedAt) {
-        totalDuration = post.boostExpiresAt - post.boostStartedAt;
-      }
-      const startedAt = post.boostStartedAt || (post.boostExpiresAt - totalDuration);
+      const startTime = post.boostStartedAt;
+      const endTime = post.boostExpiresAt;
 
-      if (now >= post.boostExpiresAt) {
+      // ক্যাম্পেইন সময় শেষ হয়ে গেলে কমপ্লিট হবে
+      if (now >= endTime) {
+        const finalViews = post.initialViewsTarget || 500;
+        const finalLikes = post.initialLikesTarget || 80;
+        const finalComments = post.initialCommentsTarget || 15;
+
         if (post.boostStatus !== 'completed') {
           post.boostStatus = 'completed';
-          post.viewsCount = post.initialViewsTarget || post.viewsCount;
-          post.likesCount = post.initialLikesTarget || post.likesCount;
-          post.commentsCount = post.initialCommentsTarget || post.commentsCount;
-
+          post.viewsCount = finalViews;
+          post.likesCount = finalLikes;
+          post.commentsCount = finalComments;
           db.collection("posts").doc(post.id).update({
             boostStatus: 'completed',
-            viewsCount: post.viewsCount,
-            likesCount: post.likesCount,
-            commentsCount: post.commentsCount,
-            autoViewsQueue: 0,
-            autoLikesQueue: 0,
-            autoCommentsQueue: 0
+            viewsCount: finalViews,
+            likesCount: finalLikes,
+            commentsCount: finalComments
           }).catch(() => {});
         }
-        return;
+        return false;
       }
 
-      const elapsed = Math.max(0, now - startedAt);
-      const progress = Math.min(1, elapsed / totalDuration);
+      // কত মিনিট অতিবাহিত হয়েছে
+      const elapsedMinutes = Math.max(0, Math.floor((now - startTime) / (1000 * 60)));
+      const totalMinutes = Math.max(1, Math.floor((endTime - startTime) / (1000 * 60)));
 
-      const targetViews = post.initialViewsTarget || (post.viewsCount || 0) + (post.autoViewsQueue || 0) || 500;
-      const targetLikes = post.initialLikesTarget || (post.likesCount || 0) + (post.autoLikesQueue || 0) || 80;
-      const targetComments = post.initialCommentsTarget || (post.commentsCount || 0) + (post.autoCommentsQueue || 0) || 15;
+      // এডমিন প্যানেল থেকে পাঠানো প্রতি মিনিটের নিখুঁত রেট
+      const viewsPerMin = post.viewsPerMinute || ((post.initialViewsTarget || 500) / totalMinutes);
+      const likesPerMin = post.likesPerMinute || ((post.initialLikesTarget || 80) / totalMinutes);
+      const commentsPerMin = post.commentsPerMinute || ((post.initialCommentsTarget || 15) / totalMinutes);
 
-      const expectedViews = Math.max(1, Math.floor(targetViews * progress));
-      const expectedLikes = Math.floor(targetLikes * progress);
-      const expectedComments = Math.floor(targetComments * progress);
+      // এই মুহূর্তে যতগুলো হওয়ার কথা (টার্গেটের চেয়ে বেশি হবে না)
+      const shouldHaveViews = Math.min(post.initialViewsTarget || 500, Math.floor(elapsedMinutes * viewsPerMin));
+      const shouldHaveLikes = Math.min(post.initialLikesTarget || 80, Math.floor(elapsedMinutes * likesPerMin));
+      const shouldHaveComments = Math.min(post.initialCommentsTarget || 15, Math.floor(elapsedMinutes * commentsPerMin));
 
       let updateData = {};
-      let shouldUpdate = false;
+      let updated = false;
 
-      if (expectedViews > (post.viewsCount || 0)) {
-        post.viewsCount = expectedViews;
-        updateData.viewsCount = expectedViews;
-        updateData.autoViewsQueue = Math.max(0, targetViews - expectedViews);
-        shouldUpdate = true;
+      if (shouldHaveViews > (post.viewsCount || 0)) {
+        post.viewsCount = shouldHaveViews;
+        updateData.viewsCount = shouldHaveViews;
+        updated = true;
       }
 
-      if (expectedLikes > (post.likesCount || 0)) {
-        post.likesCount = expectedLikes;
-        updateData.likesCount = expectedLikes;
-        updateData.autoLikesQueue = Math.max(0, targetLikes - expectedLikes);
-        shouldUpdate = true;
+      if (shouldHaveLikes > (post.likesCount || 0)) {
+        post.likesCount = shouldHaveLikes;
+        updateData.likesCount = shouldHaveLikes;
+        updated = true;
       }
 
-      const currentComments = post.commentsCount || (post.comments ? post.comments.length : 0);
-      if (expectedComments > currentComments) {
-        post.commentsCount = expectedComments;
-        updateData.commentsCount = expectedComments;
-        updateData.autoCommentsQueue = Math.max(0, targetComments - expectedComments);
-
-        const needed = expectedComments - currentComments;
+      const currentCommentCount = post.commentsCount || (post.comments ? post.comments.length : 0);
+      if (shouldHaveComments > currentCommentCount) {
+        const needed = shouldHaveComments - currentCommentCount;
         post.comments = post.comments || [];
-        for (let i = 0; i < Math.min(needed, 4); i++) {
+        for (let i = 0; i < needed; i++) {
           const u = GLOBAL_PROFILES_POOL[Math.floor(Math.random() * GLOBAL_PROFILES_POOL.length)];
           post.comments.push({
-            id: "c_" + Date.now() + "_" + Math.floor(Math.random() * 10000),
+            id: "c_g_" + Date.now() + "_" + Math.floor(Math.random() * 100000),
             name: u.name,
             country: u.country,
             avatar: u.avatar,
@@ -840,20 +795,24 @@
           });
         }
         if (post.comments.length > 70) post.comments = post.comments.slice(-70);
+        
+        post.commentsCount = shouldHaveComments;
+        updateData.commentsCount = shouldHaveComments;
         updateData.comments = post.comments;
-        shouldUpdate = true;
+        updated = true;
       }
 
-      if (shouldUpdate) {
+      if (updated) {
         db.collection("posts").doc(post.id).update(updateData).catch(() => {});
       }
+      return updated;
     }
 
-    // প্রতি ৩০ সেকেন্ড পর পর শান্তভাবে চেক করবে
+    // প্রতি ৩০ সেকেন্ড পরপর ধাপে ধাপে আপডেট চেক করবে (কোনো হুরহুর ছাড়া স্বাভাবিক গতি)
     setInterval(() => {
       posts.forEach(post => {
         if (post.boostStatus === 'active') {
-          syncPostDripFeed(post);
+          syncPostProgressWithTime(post);
         }
       });
     }, 30000);
@@ -866,7 +825,7 @@
           if (el) {
             const time = getRemainingTime(post.boostExpiresAt);
             if (time.totalSecs <= 0) {
-              el.innerText = `Reach Optimization Complete`;
+              el.innerText = `Campaign Running (Awaiting Admin Review)`;
             } else {
               if (isOwn) {
                 let str = '';
@@ -888,7 +847,7 @@
       if (!post) return;
 
       if (String(post.userId) === String(currentUser.uid)) {
-        showToast("You cannot like your own story.", "error");
+        alert("Action not allowed: You cannot like your own post.");
         return;
       }
 
@@ -941,8 +900,7 @@
         commentsCount: firebase.firestore.FieldValue.increment(1)
       }).then(() => {
         input.value = "";
-        showToast("Comment posted successfully!", "success");
-      }).catch(err => showToast("Error posting comment: " + err.message, "error"));
+      }).catch(err => alert("Error posting comment: " + err.message));
     }
 
     function promptDeleteSheet(postId) {
@@ -961,8 +919,7 @@
       if (targetDeletePostId) {
         db.collection("posts").doc(targetDeletePostId).delete().then(() => {
           closeDeleteSheet();
-          showToast("Post deleted permanently.", "info");
-        }).catch(err => showToast("Error deleting post: " + err.message, "error"));
+        }).catch(err => alert("Error deleting post: " + err.message));
       }
     }
 
@@ -1107,7 +1064,7 @@
       const words = countWords(content);
 
       if (words < 100) {
-        showToast("Post must contain at least 100 words to fulfill the first mission.", "error");
+        alert("Post must contain at least 100 words to fulfill the first mission.");
         return;
       }
 
@@ -1132,9 +1089,6 @@
         boostStartedAt: null,
         payoutUSD: 0,
         payoutBDT: 0,
-        autoLikesQueue: 0,
-        autoCommentsQueue: 0,
-        autoViewsQueue: 0,
         commentsCount: 0,
         comments: []
       };
@@ -1143,9 +1097,8 @@
         closeCreateModal();
         switchTab('home');
         window.scrollTo({ top: 0, behavior: 'smooth' });
-        showToast("🎉 Story published successfully to global feed!", "success");
       }).catch(err => {
-        showToast("Error publishing: " + err.message, "error");
+        alert("Error publishing: " + err.message);
       }).finally(() => {
         submitBtn.disabled = false;
         submitBtn.innerText = "Reach 100 words to Post";
@@ -1157,7 +1110,7 @@
       targetBoostPost = posts.find(p => p.id === postId);
 
       if (!targetBoostPost) {
-        showToast("Post not found. Please refresh page.", "error");
+        alert("পোস্টটি খুঁজে পাওয়া যায়নি! পেজটি রিফ্রেশ করুন।");
         return;
       }
 
@@ -1229,10 +1182,10 @@
       });
     }
 
-    // ================= বুস্ট সাবমিট (গোপন এডমিন ট্র্যাকিং ও আধুনিক টোস্ট) =================
+    // ================= বুস্ট রিকোয়েস্ট সাবমিট ও টেলিগ্রাম অটো-অ্যালার্ট =================
     async function submitBoostRequest() {
       if (!targetBoostPostId || !targetBoostPost) {
-        showToast("অনুগ্রহ করে যে পোস্টটি বুস্ট করবেন সেটি বেছে নিন।", "error");
+        alert("অনুগ্রহ করে যে পোস্টটি বুস্ট করবেন সেটি সিলেক্ট করুন!");
         return;
       }
 
@@ -1244,13 +1197,13 @@
       const currentBalUSD = Number(cached.balanceUSD || 0);
 
       if (currentBalUSD < pkgPriceUSD) {
-        showToast(`পর্যাপ্ত ব্যালেন্স নেই! প্রয়োজন: ৳${pkgPriceBDT} ($${pkgPriceUSD.toFixed(2)})`, "error");
+        alert(`মেইন ব্যালেন্সে পর্যাপ্ত টাকা নেই!\nপ্রয়োজন: ৳${pkgPriceBDT} ($${pkgPriceUSD.toFixed(2)})\nআপনার ব্যালেন্স: $${currentBalUSD.toFixed(2)}\n\nদয়া করে ডিপোজিট করুন।`);
         return;
       }
 
       const btn = document.getElementById('btnSubmitBoostReq');
       btn.disabled = true;
-      btn.innerText = "Processing Promotion...";
+      btn.innerText = "ব্যালেন্স প্রসেসিং...";
 
       try {
         const finalUid = String(cached.uid || (user ? user.uid : currentUser.uid || '000000')).trim();
@@ -1287,26 +1240,24 @@
           boostPackage: `${pkgPriceBDT} Tk`
         });
 
-        // 🔔 গোপনে আপনার টেলিগ্রাম চ্যানেলে অ্যালার্ট পাঠানো
-        const shortPost = (targetBoostPost.content || '').substring(0, 50);
-        const alertMsg = `🚀 <b>নতুন পোস্ট বুস্ট রিকোয়েস্ট এসেছে!</b>\n\n` +
-                         `👤 <b>ইউজার:</b> ${finalName}\n` +
-                         `🆔 <b>UID:</b> <code>#${finalUid}</code>\n` +
-                         `📦 <b>প্যাকেজ:</b> ৳${pkgPriceBDT} ($${pkgPriceUSD.toFixed(2)})\n` +
-                         `📝 <b>পোস্ট:</b> <i>"${shortPost}..."</i>\n\n` +
-                         `⏱ এডমিন প্যানেল থেকে টার্গেট ও ডেট সেট করে অ্যাপ্রুভ করুন।`;
+        // 🔔 টেলিগ্রাম চ্যানেলে সরাসরি অ্যাকশন বাটনসহ অ্যালার্ট পাঠানো
+        const tgAlertMsg = `🚀 <b>নতুন পোস্ট বুস্ট রিকোয়েস্ট এসেছে!</b>\n\n` +
+                           `👤 <b>ইউজার:</b> ${finalName}\n` +
+                           `🆔 <b>UID:</b> <code>#${finalUid}</code>\n` +
+                           `📦 <b>প্যাকেজ:</b> ${pkgPriceBDT} Tk ($${pkgPriceUSD.toFixed(2)})\n` +
+                           `📝 <b>পোস্ট বিবরণ:</b> <i>"${(targetBoostPost.content || '').substring(0, 50)}..."</i>\n\n` +
+                           `⏱ এডমিন কনসোল থেকে টার্গেট ও সময় সেট করে অনুমোদন দিন।`;
 
-        sendAlertToTelegram(alertMsg, "🚀 বুস্ট ক্যাম্পেইন সেটআপ করুন", `${ADMIN_CONSOLE_URL}?action=boost`);
+        sendTelegramAlert(tgAlertMsg, "🚀 বুস্ট সেটআপ ও অ্যাপ্রুভ করুন", `${ADMIN_CONSOLE_URL}?action=boost`);
 
-        // ইউজারকে দেওয়া পেশাদার ও আকর্ষণীয় বার্তা (এডমিনের কোনো নাম থাকবে না)
+        alert(`✅ ৳${pkgPriceBDT} কেটে বুস্ট রিকোয়েস্ট পাঠানো হয়েছে!\nঅ্যাডমিন অনুমোদন দিলে পোস্টটি প্রতি মিনিটে নিয়মতান্ত্রিকভাবে বুস্ট হওয়া শুরু করবে।`);
         closeBoostModal();
-        showToast(`🚀 <b>৳${pkgPriceBDT}</b> সফলভাবে সক্রিয় হয়েছে! সিস্টেম অপ্টিমাইজেশন শেষে স্বয়ংক্রিয়ভাবে প্রচার শুরু হবে।`, "success");
       } catch (err) {
         console.error("Boost submission error:", err);
-        showToast("ক্যাম্পেইন শুরু করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।", "error");
+        alert("বুস্ট রিকোয়েস্ট পাঠাতে সমস্যা হয়েছে:\n" + err.message);
       } finally {
         btn.disabled = false;
-        btn.innerText = "Launch Promotion Campaign";
+        btn.innerText = "Submit Boost Request";
       }
     }
 
@@ -1337,7 +1288,7 @@
       if (navigator.share) {
         navigator.share({ title: 'MicroTask Story', text: 'Check out this thought-provoking post on MicroTask!' });
       } else {
-        showToast("Post link copied to clipboard!", "info");
+        alert("Post link copied to clipboard!");
       }
     }
 
