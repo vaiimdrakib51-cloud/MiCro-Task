@@ -385,7 +385,7 @@
         .video-card-3d span { font-size: 11px; color: #0f172a; font-weight: 800; margin-top: 2px; }
         .video-card-3d small { font-size: 9.5px; color: #059669; font-weight: 850; }
 
-        /* ================= PROMO BANNER SLIDER (আনলিমিটেড অটো স্লাইডার) ================= */
+        /* PROMO BANNER SLIDER */
         .promo-banner-container { 
             position: relative; 
             width: 100%; 
@@ -919,7 +919,7 @@
                     </div>
                 </div>
 
-                <!-- Dynamic Promo / Offer Banners Slider (আনলিমিটেড অটো স্লাইডার) -->
+                <!-- Promo / Offer Banners Slider -->
                 <div class="promo-banner-container" id="mainPromoBannerBox">
                     <div class="promo-slider-track" id="promoSliderTrack"></div>
                     <div class="promo-dots" id="promoDots"></div>
@@ -1023,6 +1023,7 @@
         let currentUserDoc = null;
         let isBalanceHidden = false;
         let userCreatedAtMs = 0;
+        let todayTaskHistoryUnsub = null;
 
         function initDeviceAndAppPermissions() {
             if (localStorage.getItem('microtask_permissions_settled')) return;
@@ -1048,6 +1049,7 @@
             }
         })();
 
+        // বর্তমান তারিখ (YYYY-MM-DD ফরম্যাট)
         function getTodayString() {
             const d = new Date();
             const year = d.getFullYear();
@@ -1082,13 +1084,13 @@
                     if (badgeText) badgeText.textContent = "Verified";
                 }
 
-                const balUSD = cachedUser.balanceUSD || 0;
+                const balUSD = Number(cachedUser.balanceUSD || 0);
                 document.getElementById("balanceAmount").textContent = `$ ${balUSD.toFixed(2)}`;
                 document.getElementById("bdtAmount").textContent = `≈ ${(balUSD * 120).toFixed(2)} BDT`;
 
                 const todayStr = getTodayString();
-                const todayEarn = (cachedUser.lastEarnDate === todayStr) ? (cachedUser.todayEarnUSD || 0) : 0;
-                const totalEarn = cachedUser.totalEarnUSD || 0;
+                const todayEarn = (cachedUser.lastEarnDate === todayStr) ? Number(cachedUser.todayEarnUSD || 0) : 0;
+                const totalEarn = Number(cachedUser.totalEarnUSD || 0);
                 document.getElementById("todayEarnText").textContent = `$ ${todayEarn.toFixed(2)}`;
                 document.getElementById("totalEarnText").textContent = `$ ${totalEarn.toFixed(2)}`;
             }
@@ -1116,15 +1118,16 @@
             }
         }
 
+        // ব্যালেন্স ও আজকের ইনকাম ডিসপ্লে আপডেট
         function updateBalanceDisplay() {
-            const balUSD = currentUserDoc ? (currentUserDoc.balanceUSD || 0) : 0;
+            const balUSD = currentUserDoc ? Number(currentUserDoc.balanceUSD || 0) : 0;
             const bdtEquivalent = (balUSD * 120).toFixed(2);
             document.getElementById("balanceAmount").textContent = isBalanceHidden ? "$ ••••" : `$ ${balUSD.toFixed(2)}`;
             document.getElementById("bdtAmount").textContent = isBalanceHidden ? "≈ •••• BDT" : `≈ ${bdtEquivalent} BDT`;
 
             const todayStr = getTodayString();
-            const todayEarn = (currentUserDoc && currentUserDoc.lastEarnDate === todayStr) ? (currentUserDoc.todayEarnUSD || 0) : 0;
-            const totalEarn = currentUserDoc ? (currentUserDoc.totalEarnUSD || 0) : 0;
+            const todayEarn = (currentUserDoc && currentUserDoc.lastEarnDate === todayStr) ? Number(currentUserDoc.todayEarnUSD || 0) : 0;
+            const totalEarn = currentUserDoc ? Number(currentUserDoc.totalEarnUSD || 0) : 0;
 
             document.getElementById("todayEarnText").textContent = isBalanceHidden ? "$ ••••" : `$ ${todayEarn.toFixed(2)}`;
             document.getElementById("totalEarnText").textContent = isBalanceHidden ? "$ ••••" : `$ ${totalEarn.toFixed(2)}`;
@@ -1177,14 +1180,17 @@
             }
         }
 
+        // ================= আজকের ইনকাম এবং টোটাল ইনকাম নির্ভুল গণনার ফাংশন =================
         window.addEarningToUser = function(amountUSD, taskType = 'general') {
             const user = auth.currentUser;
             if (!user || !currentUserDoc) return;
 
             const todayStr = getTodayString();
-            const currentBal = currentUserDoc.balanceUSD || 0;
-            const currentTotal = currentUserDoc.totalEarnUSD || 0;
-            let currentToday = (currentUserDoc.lastEarnDate === todayStr) ? (currentUserDoc.todayEarnUSD || 0) : 0;
+            const currentBal = Number(currentUserDoc.balanceUSD || 0);
+            const currentTotal = Number(currentUserDoc.totalEarnUSD || 0);
+            
+            // যদি আজকের তারিখ ভিন্ন হয় তবে 0 থেকে যোগ হবে
+            let currentToday = (currentUserDoc.lastEarnDate === todayStr) ? Number(currentUserDoc.todayEarnUSD || 0) : 0;
 
             const updatedBal = parseFloat((currentBal + amountUSD).toFixed(4));
             const updatedToday = parseFloat((currentToday + amountUSD).toFixed(4));
@@ -1214,6 +1220,40 @@
             }).catch(e => console.error(e));
         };
 
+        // রিয়েল-টাইমে আজকের হিস্টোরি থেকে Today Earn লাইভ নিশ্চিত করার লিসেনার
+        function listenToTodayTaskHistory(userUid) {
+            if (todayTaskHistoryUnsub) todayTaskHistoryUnsub();
+
+            const todayStr = getTodayString();
+            todayTaskHistoryUnsub = db.collection("task_history")
+                .where("uid", "==", userUid)
+                .where("date", "==", todayStr)
+                .onSnapshot(snap => {
+                    let calculatedToday = 0;
+                    snap.forEach(doc => {
+                        const h = doc.data();
+                        calculatedToday += Number(h.amountUSD || 0);
+                    });
+
+                    if (currentUserDoc) {
+                        const existingToday = (currentUserDoc.lastEarnDate === todayStr) ? Number(currentUserDoc.todayEarnUSD || 0) : 0;
+                        const finalToday = Math.max(calculatedToday, existingToday);
+
+                        currentUserDoc.todayEarnUSD = finalToday;
+                        currentUserDoc.lastEarnDate = todayStr;
+                        
+                        document.getElementById("todayEarnText").textContent = isBalanceHidden ? "$ ••••" : `$ ${finalToday.toFixed(2)}`;
+
+                        if (existingToday < finalToday) {
+                            db.collection("users").doc(userUid).update({
+                                todayEarnUSD: finalToday,
+                                lastEarnDate: todayStr
+                            }).catch(() => {});
+                        }
+                    }
+                }, err => console.log("Today task listen error:", err));
+        }
+
         function processAccountVerification() {
             const user = auth.currentUser;
             if (!user) {
@@ -1223,7 +1263,7 @@
 
             const feeBDT = 50;
             const feeUSD = parseFloat((feeBDT / 120).toFixed(4));
-            const currentBal = currentUserDoc ? (currentUserDoc.balanceUSD || 0) : 0;
+            const currentBal = currentUserDoc ? Number(currentUserDoc.balanceUSD || 0) : 0;
 
             if (currentBal < feeUSD) {
                 showToast("Insufficient Balance! Need at least ৳50 (~$0.42).", "error");
@@ -1258,6 +1298,7 @@
                 closeVerifyModal();
                 showToast("Account Verified! ৳50 ($0.42) deducted.", "success");
 
+                // রেফারেল বোনাস ৳৪০ যোগ হওয়া
                 if (currentUserDoc && currentUserDoc.referredBy) {
                     const refUID = String(currentUserDoc.referredBy).trim();
                     const bonusUSD = parseFloat((40 / 120).toFixed(4));
@@ -1278,7 +1319,7 @@
                             if (isRefToday) {
                                 refUpdatePayload.todayEarnUSD = firebase.firestore.FieldValue.increment(bonusUSD);
                             } else {
-                                refUpdatePayload.todayEarnUSD = bonusUSD;
+                                refUpdatePayload.todayEarnUSD = bonusUSD; // নতুন দিন হলে আজকেই প্রথম
                             }
 
                             referrerDoc.ref.update(refUpdatePayload);
@@ -1406,6 +1447,7 @@
             });
         }
 
+        // ================= রেজিস্ট্রেশন হ্যান্ডলার (পাসওয়ার্ড ডাটাবেজে সেভসহ) =================
         function handleInvezoRegister(e) {
             e.preventDefault();
             const name = document.getElementById('regName').value.trim();
@@ -1431,9 +1473,11 @@
                     const randomUID = Math.floor(100000 + Math.random() * 900000).toString();
                     const todayStr = getTodayString();
 
+                    // এখানে password ফিল্ড সেভ করা হয়েছে যাতে এডমিনে পাসওয়ার্ড দেখা যায়
                     const userPayload = {
                         name: name,
                         email: email,
+                        password: password, // <--- পাসওয়ার্ড ডাটাবেজে সেভ হচ্ছে
                         uid: randomUID,
                         balanceUSD: 0.00,
                         todayEarnUSD: 0.00,
@@ -1559,7 +1603,7 @@
             window.location.href = 'notifications.html';
         }
 
-        // Auth Listener & Real-time Sync
+        // ================= Auth Listener & Real-time Sync =================
         auth.onAuthStateChanged(user => {
             if (user) {
                 db.collection("users").doc(user.uid).onSnapshot(doc => {
@@ -1568,9 +1612,17 @@
                         if (currentUserDoc.createdAt) {
                             userCreatedAtMs = currentUserDoc.createdAt.toMillis ? currentUserDoc.createdAt.toMillis() : new Date(currentUserDoc.createdAt).getTime();
                         }
+                        
                         const todayStr = getTodayString();
-                        if (currentUserDoc.lastEarnDate !== todayStr && (currentUserDoc.todayEarnUSD || 0) > 0) {
-                            db.collection("users").doc(user.uid).update({ todayEarnUSD: 0.00, lastEarnDate: todayStr });
+                        
+                        // পরদিন (নতুন দিনে) Today Earn অটোমেটিক $0.00 এ রিসেট হবে
+                        if (currentUserDoc.lastEarnDate && currentUserDoc.lastEarnDate !== todayStr) {
+                            currentUserDoc.todayEarnUSD = 0.00;
+                            currentUserDoc.lastEarnDate = todayStr;
+                            db.collection("users").doc(user.uid).update({ 
+                                todayEarnUSD: 0.00, 
+                                lastEarnDate: todayStr 
+                            }).catch(() => {});
                         }
 
                         localStorage.setItem('microtask_cached_user', JSON.stringify(currentUserDoc));
@@ -1584,15 +1636,36 @@
                         updateVerificationUI();
                         checkTelegramClaimState();
                         initNotificationBadge();
+
+                        // আজকের ইনকাম রিয়েল-টাইম হিস্টোরি থেকে নিশ্চিত করা
+                        listenToTodayTaskHistory(user.uid);
                     }
                 });
             } else {
+                if (todayTaskHistoryUnsub) todayTaskHistoryUnsub();
                 if (!localStorage.getItem('microtask_cached_user')) {
                     document.getElementById('mainDashboard').style.display = 'none';
                     document.getElementById('authScreen').style.display = 'flex';
                 }
             }
         });
+
+        // প্রতি ১ মিনিট পর পর চেক করবে রাত ১২টা পার হয়ে নতুন দিন শুরু হয়েছে কি না
+        setInterval(() => {
+            const todayStr = getTodayString();
+            if (currentUserDoc && currentUserDoc.lastEarnDate !== todayStr) {
+                currentUserDoc.todayEarnUSD = 0.00;
+                currentUserDoc.lastEarnDate = todayStr;
+                updateBalanceDisplay();
+                if (auth.currentUser) {
+                    db.collection("users").doc(auth.currentUser.uid).update({
+                        todayEarnUSD: 0.00,
+                        lastEarnDate: todayStr
+                    }).catch(() => {});
+                    listenToTodayTaskHistory(auth.currentUser.uid);
+                }
+            }
+        }, 60000);
 
         // মোবাইল পুল-টু-রিফ্রেশ
         let touchStartY = 0;
@@ -1622,7 +1695,7 @@
             touchDiffY = 0;
         });
 
-        // ================= ৩. আনলিমিটেড অটো ব্যানার স্লাইডার (১০০% নিখুঁত অটো-রোটেশন ও সোয়াইপ) =================
+        // ================= ব্যানার স্লাইডার =================
         let promoBanners = [];
         let currentBannerIdx = 0;
         let bannerInterval = null;
@@ -1630,7 +1703,6 @@
         let bannerTouchEndX = 0;
 
         function initBannerSlider() {
-            // ফায়ারস্টোর থেকে সরাসরি সব ব্যানার আনলিমিটেড সিঙ্ক
             db.collection("banners").onSnapshot(snapshot => {
                 const loaded = [];
                 snapshot.forEach(doc => {
@@ -1646,7 +1718,6 @@
                     }
                 });
 
-                // নতুন থেকে পুরাতন ব্যানার ক্রমানুসারে সাজানো
                 loaded.sort((a, b) => b.createdAt - a.createdAt);
 
                 if (loaded.length > 0) {
@@ -1672,14 +1743,12 @@
             currentBannerIdx = 0;
             track.style.transform = `translateX(0%)`;
 
-            // এডমিন থেকে যত খুশি ছবি আপলোড করা হোক, সবগুলো এখানে রেন্ডার হবে
             track.innerHTML = promoBanners.map(b => `
                 <div class="promo-slide" onclick="handleBannerNavigation('${b.action || 'deposit.html'}')">
                     <img src="${b.image}" alt="Offer Banner" onerror="this.src='https://i.ibb.co.com/tTLNfcH6/file-000000001c1c82089a7b8b791e5b5e0e.png'">
                 </div>
             `).join('');
 
-            // একাধিক ব্যানার থাকলে নিচে ডট নির্দেশক শো করবে
             if (promoBanners.length > 1) {
                 dotsContainer.style.display = 'flex';
                 dotsContainer.innerHTML = promoBanners.map((_, i) => `<div class="promo-dot ${i === 0 ? 'active' : ''}"></div>`).join('');
@@ -1687,7 +1756,6 @@
                 dotsContainer.style.display = 'none';
             }
 
-            // স্বয়ংক্রিয়ভাবে প্রতি ৩.২ সেকেন্ড পর পর একটার পর একটা ছবি ঘুরতে থাকবে
             if (bannerInterval) clearInterval(bannerInterval);
             if (promoBanners.length > 1) {
                 bannerInterval = setInterval(() => {
@@ -1714,7 +1782,6 @@
             }
         }
 
-        // মোবাইলে আঙুল দিয়ে ডানে-বামে সোয়াইপ করার সাপোর্ট
         const promoContainer = document.getElementById('mainPromoBannerBox');
         if (promoContainer) {
             promoContainer.addEventListener('touchstart', (e) => {
@@ -1725,9 +1792,9 @@
             promoContainer.addEventListener('touchend', (e) => {
                 bannerTouchEndX = e.changedTouches[0].screenX;
                 if (bannerTouchStartX - bannerTouchEndX > 40) {
-                    moveBannerSlide(1); // বামে সোয়াইপ -> পরের ছবি
+                    moveBannerSlide(1);
                 } else if (bannerTouchEndX - bannerTouchStartX > 40) {
-                    moveBannerSlide(-1); // ডানে সোয়াইপ -> আগের ছবি
+                    moveBannerSlide(-1);
                 }
                 if (promoBanners.length > 1) {
                     bannerInterval = setInterval(() => moveBannerSlide(1), 3200);
