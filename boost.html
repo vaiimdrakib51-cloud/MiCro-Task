@@ -54,6 +54,13 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       -webkit-tap-highlight-color: transparent;
     }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
   </style>
 </head>
 <body class="text-aqua-textPrimary flex justify-center min-h-screen">
@@ -86,7 +93,7 @@
       <section id="view-home" class="space-y-2 py-1.5">
         <div class="bg-white px-3 py-2 border-y border-aqua-border shadow-xs">
           <div class="flex items-center space-x-2">
-            <img id="creator-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150" alt="avatar" class="w-8 h-8 rounded-full object-cover border border-aqua-300">
+            <img id="creator-avatar" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150" alt="avatar" class="w-8 h-8 rounded-full object-cover border border-aqua-300">
             <div onclick="openCreateModal()" class="flex-1 bg-aqua-inputBg hover:bg-aqua-hoverMint cursor-pointer rounded-full px-3.5 py-1.5 text-xs text-aqua-textSecondary transition border border-aqua-border/60 truncate">
               What's on your mind? (100–3,000+ words)
             </div>
@@ -107,12 +114,31 @@
           </div>
         </div>
 
+        <!-- 🌟 BOOST DURATION FILTERS: All Posts, 1 Day, 2 Days -->
+        <div class="px-2 pt-1">
+          <div class="flex items-center space-x-2 overflow-x-auto no-scrollbar py-1">
+            <button onclick="setFeedFilter('all')" id="filter-btn-all" class="px-3.5 py-1.5 rounded-full text-xs font-bold transition whitespace-nowrap bg-teal-600 text-white shadow-xs">
+              All Posts
+            </button>
+            <button onclick="setFeedFilter('1day')" id="filter-btn-1day" class="px-3.5 py-1.5 rounded-full text-xs font-semibold transition whitespace-nowrap bg-white text-aqua-textSecondary border border-aqua-border hover:bg-aqua-hoverMint">
+              1 Day
+            </button>
+            <button onclick="setFeedFilter('2days')" id="filter-btn-2days" class="px-3.5 py-1.5 rounded-full text-xs font-semibold transition whitespace-nowrap bg-white text-aqua-textSecondary border border-aqua-border hover:bg-aqua-hoverMint">
+              2 Days
+            </button>
+          </div>
+        </div>
+
+        <!-- POSTS CONTAINER -->
         <div id="feed-container" class="space-y-2">
           <div class="p-8 text-center text-xs text-aqua-textSecondary">
             <i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto mb-2 text-teal-600"></i>
             Loading posts...
           </div>
         </div>
+
+        <!-- SEE MORE BUTTON CONTAINER -->
+        <div id="see-more-container" class="px-3 py-2"></div>
       </section>
 
       <!-- 3. SEARCH BY UID SCREEN -->
@@ -289,7 +315,7 @@
       </div>
     </div>
 
-    <!-- 🌟 প্রিমিয়াম ইন-অ্যাপ কাস্টম ডায়লগ -->
+    <!-- CUSTOM APP DIALOG -->
     <div id="custom-app-dialog" class="fixed inset-0 z-[100] bg-black/60 backdrop-blur-[2px] hidden items-center justify-center p-4">
       <div id="custom-app-dialog-card" class="bg-white rounded-2xl w-full max-w-xs p-5 text-center shadow-2xl border border-aqua-border transform scale-95 opacity-0 transition-all duration-200">
         <div id="dialog-icon-wrap" class="w-12 h-12 rounded-full mx-auto mb-3 flex items-center justify-center text-xl bg-teal-50 text-teal-600 border border-teal-200">
@@ -320,7 +346,38 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // ================= ইন-অ্যাপ ডায়ালগ সিস্টেম =================
+    // ================= 🌟 ছেলে ও মেয়েদের জন্য আলাদা আলাদা রিয়েলিস্টিক অবতার পুল =================
+    const MALE_AVATARS = [
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
+      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150",
+      "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150",
+      "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150",
+      "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150",
+      "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=150",
+      "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150",
+      "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150"
+    ];
+
+    const FEMALE_AVATARS = [
+      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150",
+      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
+      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150",
+      "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150",
+      "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150",
+      "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=150",
+      "https://images.unsplash.com/photo-1517365830460-955ce3ccd263?w=150",
+      "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=150"
+    ];
+
+    // প্রতিটি ইউজারের UID এবং Gender অনুযায়ী অনন্য (Unique) অবতার প্রদানকারী ফাংশন
+    function getUserAvatar(gender, uid, name) {
+      const cleanUid = parseInt(String(uid || "1").replace(/\D/g, '') || "1", 10);
+      const isFemale = String(gender || '').toLowerCase() === 'female';
+      const pool = isFemale ? FEMALE_AVATARS : MALE_AVATARS;
+      return pool[cleanUid % pool.length];
+    }
+
+    // ================= IN-APP DIALOG SYSTEM =================
     function showAppDialog(title, message, type = 'success') {
       const dialog = document.getElementById('custom-app-dialog');
       const card = document.getElementById('custom-app-dialog-card');
@@ -362,7 +419,7 @@
       }, 150);
     }
 
-    // ================= টেলিগ্রাম বট ও চ্যানেল কনফিগ =================
+    // ================= TELEGRAM BOT & NOTIFICATION =================
     const TELEGRAM_BOT_TOKEN = "9166237872:AAEnqeRwrUYAoKzCL_yTBZJqqYx-J_Q-bKo";
     const TELEGRAM_CHAT_ID = "@MicroTaskupdate";
     const ADMIN_CONSOLE_URL = "https://vaiimdrakib51-cloud.github.io/com.microtask.admin/";
@@ -392,8 +449,9 @@
     let currentUser = {
       uid: "000000",
       name: "User",
+      gender: "male", // default male, updates from DB
       username: "@user",
-      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+      avatar: MALE_AVATARS[0],
       isVerified: false
     };
 
@@ -403,9 +461,12 @@
         if (cached && cached.uid) {
           currentUser.uid = String(cached.uid).trim();
           currentUser.name = cached.name || 'User';
+          currentUser.gender = cached.gender || 'male';
+          currentUser.avatar = cached.avatar || getUserAvatar(currentUser.gender, currentUser.uid, currentUser.name);
           currentUser.username = '@' + (cached.name ? cached.name.toLowerCase().replace(/\s+/g, '_') : 'user');
           currentUser.isVerified = cached.isVerified === true;
         }
+
         const av1 = document.getElementById('creator-avatar');
         if (av1) av1.src = currentUser.avatar;
         const av2 = document.getElementById('modal-user-avatar');
@@ -426,8 +487,10 @@
             const data = doc.data();
             currentUser.uid = String(data.uid || currentUser.uid).trim();
             currentUser.name = data.name || currentUser.name;
+            currentUser.gender = data.gender || currentUser.gender || 'male';
+            currentUser.avatar = data.avatar || getUserAvatar(currentUser.gender, currentUser.uid, currentUser.name);
             currentUser.isVerified = data.isVerified === true;
-            localStorage.setItem('microtask_cached_user', JSON.stringify(data));
+            localStorage.setItem('microtask_cached_user', JSON.stringify({ ...data, avatar: currentUser.avatar }));
             loadActiveUserSession();
           }
         });
@@ -440,7 +503,69 @@
     let targetBoostPost = null;
     let targetDeletePostId = null;
 
+    // Filters: 'all', '1day', '2days'
+    let currentFeedFilter = 'all';
+    let visiblePostCount = 5;
+
     const recordedViewsSession = new Set(JSON.parse(sessionStorage.getItem('microtask_viewed_posts') || '[]'));
+
+    // ================= 🌟 NOTIFICATION SYSTEM (STEALTH / AUTOMATED) =================
+    async function triggerUserNotification(title, message, type = "boost", postId = null) {
+      if (!currentUser.uid || currentUser.uid === "000000") return;
+      try {
+        const notifDoc = {
+          userId: String(currentUser.uid),
+          title: title,
+          message: message,
+          type: type,
+          postId: postId,
+          read: false,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+
+        const user = auth.currentUser;
+        if (user) {
+          await db.collection("users").doc(user.uid).collection("notifications").add(notifDoc);
+        }
+        await db.collection("notifications").add(notifDoc);
+
+        // Show immediate dialog
+        showAppDialog(title, message, "success");
+      } catch (e) {
+        console.error("Notification creation error:", e);
+      }
+    }
+
+    function checkAndSendBoostNotifications(post) {
+      if (String(post.userId) !== String(currentUser.uid)) return;
+
+      const activeList = JSON.parse(localStorage.getItem('mt_notified_boost_active') || '[]');
+      const earningsRecord = JSON.parse(localStorage.getItem('mt_notified_earnings_record') || '{}');
+
+      // 1. Boost Active Notification (Stealth - No mention of Admin)
+      if (post.boostStatus === 'active' && !activeList.includes(post.id)) {
+        const days = getPostBoostDays(post) || 1;
+        const pkgText = post.boostPackage || 'Campaign Package';
+        const notifMsg = `Your boost campaign is started! Package: ${pkgText}, Duration: ${days} Day${days > 1 ? 's' : ''}.`;
+        
+        triggerUserNotification("Campaign Started", notifMsg, "boost_start", post.id);
+
+        activeList.push(post.id);
+        localStorage.setItem('mt_notified_boost_active', JSON.stringify(activeList));
+      }
+
+      // 2. Earnings Notification
+      const currentEarnedUSD = Number(post.payoutUSD || post.earnedUSD || 0);
+      const lastNotifiedUSD = Number(earningsRecord[post.id] || 0);
+
+      if (currentEarnedUSD > lastNotifiedUSD && (currentEarnedUSD - lastNotifiedUSD) >= 0.05) {
+        const notifEarnMsg = `Your boost has earned $${currentEarnedUSD.toFixed(2)} USD.`;
+        triggerUserNotification("Boost Earnings", notifEarnMsg, "boost_earning", post.id);
+
+        earningsRecord[post.id] = currentEarnedUSD;
+        localStorage.setItem('mt_notified_earnings_record', JSON.stringify(earningsRecord));
+      }
+    }
 
     function countWords(str) {
       if (!str) return 0;
@@ -477,6 +602,44 @@
       return { totalSecs, days, hours, minutes, seconds };
     }
 
+    // 1 Day or 2 Days helper
+    function getPostBoostDays(post) {
+      if (post.boostDays) return Number(post.boostDays) >= 2 ? 2 : 1;
+      if (post.boostDuration) {
+        const h = Number(post.boostDuration);
+        return h > 24 ? 2 : 1;
+      }
+      if (post.boostExpiresAt && post.boostStartedAt) {
+        const totalHours = (Number(post.boostExpiresAt) - Number(post.boostStartedAt)) / (1000 * 3600);
+        return totalHours > 28 ? 2 : 1;
+      }
+      return 1;
+    }
+
+    // Filter Switcher: 'all', '1day', '2days'
+    function setFeedFilter(filterType) {
+      currentFeedFilter = filterType;
+      visiblePostCount = 5;
+
+      const btnAll = document.getElementById('filter-btn-all');
+      const btn1 = document.getElementById('filter-btn-1day');
+      const btn2 = document.getElementById('filter-btn-2days');
+
+      const activeClass = "px-3.5 py-1.5 rounded-full text-xs font-bold transition whitespace-nowrap bg-teal-600 text-white shadow-xs";
+      const inactiveClass = "px-3.5 py-1.5 rounded-full text-xs font-semibold transition whitespace-nowrap bg-white text-aqua-textSecondary border border-aqua-border hover:bg-aqua-hoverMint";
+
+      btnAll.className = (filterType === 'all') ? activeClass : inactiveClass;
+      btn1.className = (filterType === '1day') ? activeClass : inactiveClass;
+      btn2.className = (filterType === '2days') ? activeClass : inactiveClass;
+
+      renderFeed();
+    }
+
+    function loadMorePosts() {
+      visiblePostCount += 5;
+      renderFeed();
+    }
+
     function registerPostView(postId) {
       if (!postId || recordedViewsSession.has(postId)) return;
 
@@ -509,6 +672,10 @@
       const wordCount = countWords(post.content);
       const viewsDisplay = formatNumber(post.viewsCount || 1);
 
+      // Gender-aware distinct avatar fallback
+      const authorAvatar = post.avatar || getUserAvatar(post.gender, post.userId, post.authorName);
+
+      // Earnings USD is strictly on the post card and not on user's main wallet
       const rawPayout = post.payoutUSD !== undefined ? post.payoutUSD : (post.earnedUSD !== undefined ? post.earnedUSD : 0);
       const displayPayoutUSD = Number(rawPayout || 0).toFixed(2);
 
@@ -529,12 +696,18 @@
 
       const safeAdIframe = `<!DOCTYPE html><html><head><meta charset='UTF-8'><style>body{margin:0;padding:0;display:flex;justify-content:center;align-items:center;background:transparent;overflow:hidden;}</style></head><body><script>atOptions={'key':'e5856b81f21b2cd3b23286d438c9fbc3','format':'iframe','height':50,'width':320,'params':{}};<` + `/script><script src='https://bicea.org/22/e5856b81f21b2cd3b23286d438c9fbc3'><` + `/script></body></html>`.replace(/"/g, '&quot;');
 
+      const boostDaysNumber = getPostBoostDays(post);
+      let durationBadgeText = '';
+      if (post.boostStatus === 'active') {
+        durationBadgeText = boostDaysNumber === 2 ? '2 Days Boost' : '1 Day Boost';
+      }
+
       return `
         <article data-post-id="${post.id}" class="bg-white border-y border-aqua-border shadow-xs relative">
           
           <div class="px-3 pt-2 pb-1 flex items-center justify-between">
             <div class="flex items-center space-x-2">
-              <img src="${post.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'}" alt="${post.authorName}" class="w-8 h-8 rounded-full object-cover border border-aqua-200">
+              <img src="${authorAvatar}" alt="${post.authorName}" class="w-8 h-8 rounded-full object-cover border border-aqua-200">
               <div>
                 <div class="flex items-center space-x-1">
                   <span class="font-bold text-xs text-aqua-textPrimary cursor-pointer hover:underline" onclick="quickSearch('${post.userId}')">${post.authorName}</span>
@@ -546,6 +719,7 @@
                   <span>${timeAgo(post.createdAt)}</span>
                   <span>•</span>
                   <span class="text-teal-800 font-semibold">${wordCount}w</span>
+                  ${durationBadgeText ? `<span>•</span><span class="bg-teal-100 text-teal-800 font-bold px-1 rounded text-[9px]">${durationBadgeText}</span>` : ''}
                   <span>•</span>
                   <i data-lucide="globe" class="w-2.5 h-2.5 text-aqua-textSecondary"></i>
                 </div>
@@ -573,6 +747,7 @@
                 <span class="text-teal-700 font-semibold text-[10px]">likes</span>
               </div>
 
+              <!-- Post Earnings are displayed here strictly -->
               <span class="text-teal-700 font-bold text-[10.5px]">
                 • $${displayPayoutUSD}
               </span>
@@ -639,9 +814,9 @@
             <div class="px-3 py-1 bg-cyan-50/80 border-t border-cyan-200 flex items-center justify-between text-[10px] text-cyan-900">
               <div class="flex items-center space-x-1 font-medium">
                 <i data-lucide="clock" class="w-3 h-3 text-cyan-700"></i>
-                <span>Boost Pending Admin Approval (${post.boostPackage || ''})</span>
+                <span>Campaign Initializing (${post.boostPackage || ''})</span>
               </div>
-              <span class="text-[9px] bg-cyan-200/80 text-cyan-900 px-1 rounded font-bold">Reviewing</span>
+              <span class="text-[9px] bg-cyan-200/80 text-cyan-900 px-1 rounded font-bold">Verifying</span>
             </div>
           ` : ''}
 
@@ -650,7 +825,7 @@
               ${(post.comments || []).length === 0 ? `<p class="text-xs text-aqua-textSecondary text-center py-1">No comments yet. Write the first comment!</p>` : ''}
               ${(post.comments || []).map(c => `
                 <div class="flex space-x-2 text-xs items-start">
-                  <img src="${c.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80'}" alt="${c.name}" class="w-6 h-6 rounded-full object-cover border border-aqua-200 mt-0.5">
+                  <img src="${c.avatar || getUserAvatar(c.gender, c.commenterId, c.name)}" alt="${c.name}" class="w-6 h-6 rounded-full object-cover border border-aqua-200 mt-0.5">
                   <div class="flex-1">
                     <div class="bg-white border border-aqua-border rounded-xl px-2.5 py-1.5 inline-block max-w-[92%] shadow-xs">
                       <span class="font-bold text-aqua-textPrimary block text-[10px] leading-tight flex items-center gap-1">
@@ -720,24 +895,56 @@
       });
     }
 
+    // ================= RENDER FEED WITH 1-DAY & 2-DAYS FILTERS =================
     function renderFeed() {
       const container = document.getElementById('feed-container');
+      const seeMoreContainer = document.getElementById('see-more-container');
       if (!container) return;
 
-      if (!posts || posts.length === 0) {
+      let filteredPosts = [...posts];
+      if (currentFeedFilter === '1day') {
+        filteredPosts = posts.filter(p => p.boostStatus === 'active' && getPostBoostDays(p) === 1);
+      } else if (currentFeedFilter === '2days') {
+        filteredPosts = posts.filter(p => p.boostStatus === 'active' && getPostBoostDays(p) === 2);
+      }
+
+      if (filteredPosts.length === 0) {
         container.innerHTML = `
           <div class="bg-white rounded-2xl p-6 text-center border border-aqua-border shadow-xs mx-2 my-3">
             <div class="w-10 h-10 rounded-full bg-teal-50 text-teal-600 flex items-center justify-center mx-auto mb-2 border border-teal-200">
               <i data-lucide="feather" class="w-5 h-5"></i>
             </div>
-            <h3 class="font-bold text-xs text-aqua-textPrimary">No Posts Yet</h3>
+            <h3 class="font-bold text-xs text-aqua-textPrimary">No Posts Available</h3>
             <p class="text-[11px] text-aqua-textSecondary mt-0.5 leading-relaxed">
-              Feed is empty! Tap <strong>"What's on your mind?"</strong> above to publish the very first post!
+              No active posts currently in this category.
             </p>
           </div>
         `;
-      } else {
-        container.innerHTML = posts.map(buildPostCardHTML).join('');
+        if (seeMoreContainer) seeMoreContainer.innerHTML = '';
+        if (window.lucide) lucide.createIcons();
+        return;
+      }
+
+      const postsToDisplay = filteredPosts.slice(0, visiblePostCount);
+      container.innerHTML = postsToDisplay.map(buildPostCardHTML).join('');
+
+      // Facebook-style "See More" Button
+      if (seeMoreContainer) {
+        if (filteredPosts.length > visiblePostCount) {
+          const remaining = filteredPosts.length - visiblePostCount;
+          seeMoreContainer.innerHTML = `
+            <button onclick="loadMorePosts()" class="w-full bg-white hover:bg-aqua-hoverMint text-teal-700 font-bold py-2.5 px-4 rounded-xl text-xs border border-teal-300 shadow-xs transition flex items-center justify-center space-x-1.5 active:scale-95">
+              <span>See More Posts (${remaining} remaining)</span>
+              <i data-lucide="chevron-down" class="w-4 h-4 text-teal-600"></i>
+            </button>
+          `;
+        } else {
+          seeMoreContainer.innerHTML = `
+            <p class="text-center text-[10px] text-aqua-textSecondary/70 py-2">
+              ✓ You have viewed all posts
+            </p>
+          `;
+        }
       }
 
       if (window.lucide) lucide.createIcons();
@@ -745,14 +952,15 @@
       attachViewObservers();
     }
 
-    // ================= ফায়ারবেস পোস্ট লোডার (নিরাপদ ট্রাই-ক্যাচসহ) =================
+    // ================= FIREBASE POSTS LISTENER =================
     function initFirebasePostsListener() {
-      db.collection("posts").orderBy("createdAt", "desc").limit(40).onSnapshot(snapshot => {
+      db.collection("posts").orderBy("createdAt", "desc").limit(50).onSnapshot(snapshot => {
         posts = [];
         snapshot.forEach(doc => {
           try {
             const postData = { id: doc.id, ...doc.data() };
             syncPostProgressWithTime(postData);
+            checkAndSendBoostNotifications(postData);
             posts.push(postData);
           } catch (e) {
             console.error("Error processing post:", doc.id, e);
@@ -761,36 +969,26 @@
         renderFeed();
       }, err => {
         console.error("Firestore posts load error:", err);
-        const container = document.getElementById('feed-container');
-        if (container) {
-          container.innerHTML = `
-            <div class="p-6 text-center text-xs text-rose-500 bg-white rounded-xl mx-2 my-4 border border-rose-200">
-              <p class="font-bold mb-1">Failed to load posts!</p>
-              <p class="text-[11px] text-gray-500 mb-2">${err.message}</p>
-              <button onclick="location.reload()" class="bg-teal-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold">Try Again</button>
-            </div>
-          `;
-          if (window.lucide) lucide.createIcons();
-        }
       });
     }
 
+    // GLOBAL PROFILES WITH GENDER-BASED DIVERSE AVATARS
     const GLOBAL_PROFILES_POOL = [
-      { name: "David Miller", country: "USA", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100", text: "Great insights! Very well articulated." },
-      { name: "Emma Watson", country: "UK", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100", text: "Impressive writing, totally loved reading this." },
-      { name: "Alex Johnson", country: "USA", avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100", text: "Valuable points mentioned here. Keep up the good work!" },
-      { name: "Lukas Schmidt", country: "Germany", avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100", text: "Sehr informativer Beitrag! Wirklich inspirierend." },
-      { name: "Camille Dubois", country: "France", avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100", text: "Excellent article! Merci pour ce partage précieux." },
-      { name: "Mateo Garcia", country: "Spain", avatar: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=100", text: "¡Gran publicación! Me ha parecido muy interesante." },
-      { name: "Marco Rossi", country: "Italy", avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100", text: "Ottimo articolo, argomenti trattati molto bene!" },
-      { name: "Lucas Silva", country: "Brazil", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100", text: "Post incrível! Concordo plenamente com você." },
-      { name: "Emre Kaya", country: "Turkey", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100", text: "Harika bir paylaşım olmuş, emeğinize sağlık!" },
-      { name: "Tanvir Hasan", country: "BD", avatar: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=100", text: "অসাধারণ তথ্যবহুল একটি লেখা, ধন্যবাদ!" },
-      { name: "Ayesha Akter", country: "BD", avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100", text: "খুব সুন্দর পয়েন্ট তুলে ধরেছেন।" },
-      { name: "Liam O'Connor", country: "Ireland", avatar: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=100", text: "Spot on! Really enjoyed your perspective." },
-      { name: "Sophie Martin", country: "Canada", avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100", text: "Fascinating read from start to finish." },
-      { name: "Hassan Ali", country: "UAE", avatar: "https://images.unsplash.com/photo-1501196354995-cbb51c65aaea?w=100", text: "Well thought out and very helpful." },
-      { name: "Elena Petrova", country: "Bulgaria", avatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=100", text: "Such an inspiring piece! Thanks for writing." }
+      { name: "David Miller", country: "USA", gender: "male", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100", text: "Great insights! Very well articulated." },
+      { name: "Emma Watson", country: "UK", gender: "female", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100", text: "Impressive writing, totally loved reading this." },
+      { name: "Alex Johnson", country: "USA", gender: "male", avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100", text: "Valuable points mentioned here. Keep up the good work!" },
+      { name: "Lukas Schmidt", country: "Germany", gender: "male", avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100", text: "Sehr informativer Beitrag! Wirklich inspirierend." },
+      { name: "Camille Dubois", country: "France", gender: "female", avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100", text: "Excellent article! Merci pour ce partage précieux." },
+      { name: "Mateo Garcia", country: "Spain", gender: "male", avatar: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=100", text: "¡Gran publicación! Me ha parecido muy interesante." },
+      { name: "Marco Rossi", country: "Italy", gender: "male", avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100", text: "Ottimo articolo, argomenti trattati molto bene!" },
+      { name: "Lucas Silva", country: "Brazil", gender: "male", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100", text: "Post incrível! Concordo plenamente com você." },
+      { name: "Emre Kaya", country: "Turkey", gender: "female", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100", text: "Harika bir paylaşım olmuş, emeğinize sağlık!" },
+      { name: "Tanvir Hasan", country: "BD", gender: "male", avatar: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=100", text: "Very informative content, thanks for sharing!" },
+      { name: "Ayesha Akter", country: "BD", gender: "female", avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100", text: "Great thoughts well written." },
+      { name: "Liam O'Connor", country: "Ireland", gender: "male", avatar: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=100", text: "Spot on! Really enjoyed your perspective." },
+      { name: "Sophie Martin", country: "Canada", gender: "female", avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100", text: "Fascinating read from start to finish." },
+      { name: "Hassan Ali", country: "UAE", gender: "male", avatar: "https://images.unsplash.com/photo-1501196354995-cbb51c65aaea?w=100", text: "Well thought out and very helpful." },
+      { name: "Elena Petrova", country: "Bulgaria", gender: "female", avatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=100", text: "Such an inspiring piece! Thanks for writing." }
     ];
 
     function syncPostProgressWithTime(post) {
@@ -831,6 +1029,10 @@
       const shouldHaveLikes = Math.min(post.initialLikesTarget || 80, Math.floor(elapsedMinutes * likesPerMin));
       const shouldHaveComments = Math.min(post.initialCommentsTarget || 15, Math.floor(elapsedMinutes * commentsPerMin));
 
+      // 🌟 EARNING PROGRESS IS SOLELY STORED IN POST (NOT IN USER MAIN BALANCE)
+      const targetEarningsUSD = Number(post.initialPayoutUSD || post.targetPayoutUSD || (Number(post.amountUSD || 1) * 0.7));
+      const shouldHaveEarningsUSD = Number(Math.min(targetEarningsUSD, (elapsedMinutes / totalMinutes) * targetEarningsUSD).toFixed(2));
+
       let updateData = {};
       let updated = false;
 
@@ -846,6 +1048,12 @@
         updated = true;
       }
 
+      if (shouldHaveEarningsUSD > (post.payoutUSD || 0)) {
+        post.payoutUSD = shouldHaveEarningsUSD;
+        updateData.payoutUSD = shouldHaveEarningsUSD;
+        updated = true;
+      }
+
       const currentCommentCount = post.commentsCount || (post.comments ? post.comments.length : 0);
       if (shouldHaveComments > currentCommentCount) {
         const needed = shouldHaveComments - currentCommentCount;
@@ -856,6 +1064,7 @@
             id: "c_g_" + Date.now() + "_" + Math.floor(Math.random() * 100000),
             name: u.name,
             country: u.country,
+            gender: u.gender,
             avatar: u.avatar,
             text: u.text,
             time: "Just now"
@@ -870,6 +1079,7 @@
       }
 
       if (updated) {
+        // Updates post doc only. USER MAIN BALANCE IS COMPLETELY UNTOUCHED!
         db.collection("posts").doc(post.id).update(updateData).catch(() => {});
       }
       return updated;
@@ -891,7 +1101,7 @@
           if (el) {
             const time = getRemainingTime(post.boostExpiresAt);
             if (time.totalSecs <= 0) {
-              el.innerText = `Campaign Running (Awaiting Admin Review)`;
+              el.innerText = `Campaign Completed`;
             } else {
               if (isOwn) {
                 let str = '';
@@ -956,6 +1166,7 @@
         id: "c_" + Date.now(),
         commenterId: currentUser.uid,
         name: currentUser.name,
+        gender: currentUser.gender,
         avatar: currentUser.avatar,
         text: text,
         time: "Just now"
@@ -1020,12 +1231,13 @@
       }
 
       const firstAuthor = userPosts[0];
+      const authorAvatar = firstAuthor.avatar || getUserAvatar(firstAuthor.gender, firstAuthor.userId, firstAuthor.authorName);
 
       container.innerHTML = `
         <div class="bg-white rounded-xl border border-aqua-border shadow-xs overflow-hidden">
           <div class="h-16 bg-gradient-to-r from-teal-600 to-cyan-600"></div>
           <div class="px-4 pb-4 relative flex flex-col items-center -mt-8 text-center">
-            <img src="${firstAuthor.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'}" alt="${firstAuthor.authorName}" class="w-16 h-16 rounded-full border-2 border-white object-cover shadow mb-1.5">
+            <img src="${authorAvatar}" alt="${firstAuthor.authorName}" class="w-16 h-16 rounded-full border-2 border-white object-cover shadow mb-1.5">
             <h3 class="font-bold text-base text-aqua-textPrimary flex items-center space-x-1">
               <span>${firstAuthor.authorName}</span>
               ${firstAuthor.isVerified ? `<i data-lucide="check-circle-2" class="w-4 h-4 text-teal-600 fill-teal-600 text-white"></i>` : ''}
@@ -1143,6 +1355,7 @@
       const newPostPayload = {
         userId: currentUser.uid,
         authorName: currentUser.name,
+        gender: currentUser.gender || 'male',
         username: currentUser.username,
         avatar: currentUser.avatar,
         isVerified: currentUser.isVerified,
@@ -1153,6 +1366,7 @@
         viewsCount: 1,
         boostStatus: "none",
         boostPackage: null,
+        boostDays: 1,
         boostExpiresAt: null,
         boostStartedAt: null,
         payoutUSD: 0,
@@ -1251,7 +1465,7 @@
       });
     }
 
-    // ================= বুস্ট রিকোয়েস্ট সাবমিট =================
+    // ================= SUBMIT BOOST REQUEST =================
     async function submitBoostRequest() {
       if (!targetBoostPostId || !targetBoostPost) {
         showAppDialog("Select Post", "Please select a post to boost.", "warning");
@@ -1313,20 +1527,21 @@
           boostPackage: `${pkgPriceBDT} Tk`
         });
 
+        // Telegram Notification for Admin (Private)
         const tgAlertMsg = `🚀 <b>নতুন পোস্ট বুস্ট রিকোয়েস্ট এসেছে!</b>\n\n` +
                            `👤 <b>ইউজার:</b> ${finalName}\n` +
                            `🆔 <b>UID:</b> <code>#${finalUid}</code>\n` +
                            `📦 <b>প্যাকেজ:</b> ${pkgPriceBDT} Tk ($${pkgPriceUSD.toFixed(2)})\n` +
-                           `📝 <b>পোস্ট বিবরণ:</b> <i>"${(targetBoostPost.content || '').substring(0, 50)}..."</i>\n\n` +
-                           `⏱ এডমিন কনসোল থেকে টার্গেট ও সময় সেট করে অনুমোদন দিন।`;
+                           `📝 <b>পোস্ট বিবরণ:</b> <i>"${(targetBoostPost.content || '').substring(0, 50)}..."</i>`;
 
-        sendTelegramAlert(tgAlertMsg, "🚀 বুস্ট সেটআপ ও অ্যাপ্রুভ করুন", `${ADMIN_CONSOLE_URL}?action=boost`);
+        sendTelegramAlert(tgAlertMsg, "🚀 সেটআপ ও অ্যাপ্রুভ করুন", `${ADMIN_CONSOLE_URL}?action=boost`);
 
         closeBoostModal();
         
+        // Stealth message for users (No mention of Admin)
         showAppDialog(
           "Boost Submitted!",
-          `Your <strong>৳${pkgPriceBDT}</strong> campaign is under review and will go live shortly.`,
+          `Your <strong>৳${pkgPriceBDT}</strong> campaign is initializing and will go live shortly.`,
           "success"
         );
 
@@ -1370,7 +1585,7 @@
       }
     }
 
-    // পেজ লোড হওয়া মাত্রই সাথে সাথে আইকন লোড করানোর ফিক্স
+    // Page Load Setup
     document.addEventListener('DOMContentLoaded', () => {
       loadActiveUserSession();
       if (window.lucide) lucide.createIcons();
