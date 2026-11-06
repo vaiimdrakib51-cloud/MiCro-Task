@@ -348,7 +348,27 @@
         }
         .task-row-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; margin-bottom: 14px; }
         .task-left-meta { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; }
-        .task-symbol-3d { width: 42px; height: 42px; border-radius: 13px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 17px; flex-shrink: 0; }
+        
+        /* 🌟 অ্যাপ লোগো সংবলিত টাস্ক সিম্বল */
+        .task-symbol-3d { 
+            width: 42px; 
+            height: 42px; 
+            border-radius: 13px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            background: #ffffff; 
+            border: 1.5px solid #bae6fd; 
+            padding: 3px; 
+            overflow: hidden; 
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.15);
+            flex-shrink: 0; 
+        }
+        .task-symbol-3d img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
         
         .task-text { display: flex; flex-direction: column; justify-content: center; min-width: 0; line-height: 1.25; overflow: hidden; }
         .task-text h4 { font-size: 15px; font-weight: 850; color: #0c4a6e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -808,6 +828,7 @@
                         </div>
                     </div>
                     <div class="header-actions">
+                        <!-- 🌟 নোটিফিকেশন আইকন (ক্লিক করলে ব্যাজ মুছে যাবে) -->
                         <div class="notif-btn" onclick="openNotificationsPage()" title="Notifications">
                             <i class="fa-regular fa-bell"></i>
                             <span class="notif-badge" id="notifBadgeCount">0</span>
@@ -896,9 +917,9 @@
                 <div class="task-card-3d">
                     <div class="task-row-header">
                         <div class="task-left-meta">
-                            <!-- অ্যাপের লোগো বসানো হয়েছে -->
-                            <div class="task-symbol-3d" style="background:#ffffff; border:1.5px solid #bae6fd; box-shadow:0 4px 10px rgba(2,132,199,0.15); padding:3px; overflow:hidden;">
-                                <img src="https://i.ibb.co.com/5W2f2xg4/pngtree-money-icon-dollar-coins-cash-payment-online-earning-png-image-7589413.png" alt="MicroTask Logo" style="width:100%; height:100%; object-fit:contain;">
+                            <!-- 🌟 আপনার অ্যাপ লোগো সংবলিত আইকন বক্স -->
+                            <div class="task-symbol-3d">
+                                <img src="https://i.ibb.co.com/5W2f2xg4/pngtree-money-icon-dollar-coins-cash-payment-online-earning-png-image-7589413.png" alt="MicroTask Logo">
                             </div>
                             <div class="task-text">
                                 <h4>Tasks & Earn Zone</h4>
@@ -939,8 +960,8 @@
                             <span>Boost</span>
                         </div>
 
-                        <!-- 5. Spin (এখন Coming Soon দেখাবে) -->
-                        <div class="video-card-3d" onclick="showToast('Spin is Coming Soon! 🎁', 'info')">
+                        <!-- 5. Spin 🌟 (Coming Soon অ্যালার্ট শো করবে) -->
+                        <div class="video-card-3d" onclick="showToast('Coming Soon! স্পিন অপশনটি শীঘ্রই আসছে।', 'info')">
                             <div class="video-icon spin-img-box">
                                 <img src="https://i.ibb.co.com/whb9d5kr/file-000000008efc8210bf18d0b93b2aa164.png" alt="Spin">
                             </div>
@@ -1071,7 +1092,7 @@
         let isBalanceHidden = false;
         let userCreatedAtMs = 0;
         let liveEarningsUnsub = null;
-        let activeNotifIds = []; // নোটিফিকেশন আইডি ট্র্যাক করার জন্য
+        let currentUnreadNotifIds = [];
 
         function initDeviceAndAppPermissions() {
             if (localStorage.getItem('microtask_permissions_settled')) return;
@@ -1097,12 +1118,32 @@
             }
         })();
 
+        // 🌟 নির্ভুল তারিখ তৈরি ও মিলিয়ে দেখার ফাংশন
         function getTodayString() {
             const d = new Date();
             const year = d.getFullYear();
             const month = String(d.getMonth() + 1).padStart(2, '0');
             const day = String(d.getDate()).padStart(2, '0');
             return `${year}-${month}-${day}`;
+        }
+
+        function isDateToday(dateVal) {
+            if (!dateVal) return false;
+            const todayStr = getTodayString();
+            if (dateVal === todayStr) return true;
+            if (typeof dateVal === 'string' && dateVal.startsWith(todayStr)) return true;
+            
+            let d = null;
+            if (dateVal.toDate) d = dateVal.toDate();
+            else if (typeof dateVal === 'number' || typeof dateVal === 'string') d = new Date(dateVal);
+            
+            if (d && !isNaN(d.getTime())) {
+                const year = d.getFullYear();
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}` === todayStr;
+            }
+            return false;
         }
 
         function maskUserName(name) {
@@ -1134,8 +1175,7 @@
                 document.getElementById("balanceAmount").textContent = `$ ${balUSD.toFixed(2)}`;
                 document.getElementById("bdtAmount").textContent = `≈ ${(balUSD * USD_TO_BDT).toFixed(2)} BDT`;
 
-                const todayStr = getTodayString();
-                const todayEarn = (cachedUser.lastEarnDate === todayStr) ? Number(cachedUser.todayEarnUSD || 0) : 0;
+                const todayEarn = (cachedUser.lastEarnDate && isDateToday(cachedUser.lastEarnDate)) ? Number(cachedUser.todayEarnUSD || 0) : 0;
                 const totalEarn = Number(cachedUser.totalEarnUSD || 0);
                 document.getElementById("todayEarnText").textContent = `$ ${todayEarn.toFixed(2)}`;
                 document.getElementById("totalEarnText").textContent = `$ ${totalEarn.toFixed(2)}`;
@@ -1154,14 +1194,19 @@
             }
         }
 
+        // 🌟 Today Earn এবং ব্যালেন্স প্রদর্শন ফাংশন
         function updateBalanceDisplay() {
             const balUSD = currentUserDoc ? Number(currentUserDoc.balanceUSD || 0) : 0;
             const bdtEquivalent = (balUSD * USD_TO_BDT).toFixed(2);
             document.getElementById("balanceAmount").textContent = isBalanceHidden ? "$ ••••" : `$ ${balUSD.toFixed(2)}`;
             document.getElementById("bdtAmount").textContent = isBalanceHidden ? "≈ •••• BDT" : `≈ ${bdtEquivalent} BDT`;
 
-            const todayStr = getTodayString();
-            const todayEarn = (currentUserDoc && currentUserDoc.lastEarnDate === todayStr) ? Number(currentUserDoc.todayEarnUSD || 0) : 0;
+            let todayEarn = 0;
+            if (currentUserDoc) {
+                if (!currentUserDoc.lastEarnDate || isDateToday(currentUserDoc.lastEarnDate)) {
+                    todayEarn = Number(currentUserDoc.todayEarnUSD || 0);
+                }
+            }
             const totalEarn = currentUserDoc ? Number(currentUserDoc.totalEarnUSD || 0) : 0;
 
             document.getElementById("todayEarnText").textContent = isBalanceHidden ? "$ ••••" : `$ ${todayEarn.toFixed(2)}`;
@@ -1227,7 +1272,7 @@
                 if (!docSnap.exists) return;
 
                 const uData = docSnap.data();
-                const isToday = (uData.lastEarnDate === todayStr);
+                const isToday = isDateToday(uData.lastEarnDate);
 
                 const currentBal = Number(uData.balanceUSD || 0);
                 const currentTotal = Number(uData.totalEarnUSD || 0);
@@ -1251,15 +1296,11 @@
                     currentUserDoc.todayEarnUSD = res.newToday;
                     currentUserDoc.totalEarnUSD = res.newTotal;
                     currentUserDoc.lastEarnDate = todayStr;
-                    localStorage.setItem('microtask_cached_user', JSON.stringify(currentUserDoc));
                     updateBalanceDisplay();
                 }
 
-                const myUID = currentUserDoc ? String(currentUserDoc.uid).trim() : '';
-
                 db.collection("task_history").add({
                     uid: user.uid,
-                    userUID: myUID,
                     amountUSD: earnAmount,
                     amountBDT: parseFloat((earnAmount * USD_TO_BDT).toFixed(2)),
                     taskType: earningType,
@@ -1274,70 +1315,52 @@
             window.recordUserEarning(amountUSD, taskType, "Task Earn");
         };
 
-        // ================= 🌟 আপডেটেড ও নির্ভুল LIVE EARNINGS LISTENER =================
+        // 🌟 সব উৎস (টাস্ক, পোস্ট, রেফার ইত্যাদি) থেকে লাইভ আয় সিঙ্ক
         function listenToLiveEarnings(userUid) {
             if (liveEarningsUnsub) liveEarningsUnsub();
 
-            const cachedUser = JSON.parse(localStorage.getItem('microtask_cached_user')) || {};
-            const numUid = String(cachedUser.uid || '').trim();
-            const todayStr = getTodayString();
+            const my6DigitUID = currentUserDoc ? String(currentUserDoc.uid || '').trim() : '';
+            const uidList = [userUid];
+            if (my6DigitUID && my6DigitUID !== userUid) uidList.push(my6DigitUID);
 
-            // Auth UID এবং 6-ডিজিট UID উভয় ট্র্যাকিং
-            liveEarningsUnsub = db.collection("task_history").onSnapshot(snap => {
-                let calculatedToday = 0;
-                let calculatedTotal = 0;
+            liveEarningsUnsub = db.collection("task_history")
+                .where("uid", "in", uidList)
+                .onSnapshot(snap => {
+                    const todayStr = getTodayString();
+                    let calculatedToday = 0;
+                    let calculatedTotal = 0;
 
-                snap.forEach(doc => {
-                    const h = doc.data();
-                    const targetUid = String(h.uid || '').trim();
-                    const targetUserUID = String(h.userUID || '').trim();
-
-                    // বর্তমান ইউজারের হিস্ট্রি ফিল্টার
-                    if (targetUid === userUid || (numUid && (targetUid === numUid || targetUserUID === numUid))) {
+                    snap.forEach(doc => {
+                        const h = doc.data();
                         const amount = Number(h.amountUSD || 0);
-                        if (amount > 0) {
-                            calculatedTotal += amount;
+                        calculatedTotal += amount;
+                        if (isDateToday(h.date || h.createdAt)) {
+                            calculatedToday += amount;
+                        }
+                    });
 
-                            let isToday = (h.date === todayStr);
-                            if (!isToday && h.createdAt) {
-                                const hDate = h.createdAt.toDate ? h.createdAt.toDate() : new Date(h.createdAt);
-                                const hDateStr = `${hDate.getFullYear()}-${String(hDate.getMonth()+1).padStart(2,'0')}-${String(hDate.getDate()).padStart(2,'0')}`;
-                                if (hDateStr === todayStr) isToday = true;
-                            }
+                    if (currentUserDoc) {
+                        const existingToday = (currentUserDoc.lastEarnDate && isDateToday(currentUserDoc.lastEarnDate)) ? Number(currentUserDoc.todayEarnUSD || 0) : 0;
+                        const existingTotal = Number(currentUserDoc.totalEarnUSD || 0);
 
-                            if (isToday) {
-                                calculatedToday += amount;
-                            }
+                        const finalToday = Math.max(calculatedToday, existingToday);
+                        const finalTotal = Math.max(calculatedTotal, existingTotal);
+
+                        currentUserDoc.todayEarnUSD = finalToday;
+                        currentUserDoc.totalEarnUSD = finalTotal;
+                        currentUserDoc.lastEarnDate = todayStr;
+
+                        updateBalanceDisplay();
+
+                        if (existingToday < finalToday || existingTotal < finalTotal) {
+                            db.collection("users").doc(userUid).update({
+                                todayEarnUSD: finalToday,
+                                totalEarnUSD: finalTotal,
+                                lastEarnDate: todayStr
+                            }).catch(() => {});
                         }
                     }
-                });
-
-                calculatedToday = parseFloat(calculatedToday.toFixed(4));
-                calculatedTotal = parseFloat(calculatedTotal.toFixed(4));
-
-                if (currentUserDoc) {
-                    const existingToday = (currentUserDoc.lastEarnDate === todayStr) ? Number(currentUserDoc.todayEarnUSD || 0) : 0;
-                    const existingTotal = Number(currentUserDoc.totalEarnUSD || 0);
-
-                    const finalToday = Math.max(calculatedToday, existingToday);
-                    const finalTotal = Math.max(calculatedTotal, existingTotal);
-
-                    currentUserDoc.todayEarnUSD = finalToday;
-                    currentUserDoc.totalEarnUSD = finalTotal;
-                    currentUserDoc.lastEarnDate = todayStr;
-
-                    localStorage.setItem('microtask_cached_user', JSON.stringify(currentUserDoc));
-                    updateBalanceDisplay();
-
-                    if (existingToday < finalToday || existingTotal < finalTotal) {
-                        db.collection("users").doc(userUid).update({
-                            todayEarnUSD: finalToday,
-                            totalEarnUSD: finalTotal,
-                            lastEarnDate: todayStr
-                        }).catch(() => {});
-                    }
-                }
-            }, err => console.log("Earnings listener error:", err));
+                }, err => console.log("Earnings listener error:", err));
         }
 
         function processAccountVerification() {
@@ -1424,7 +1447,7 @@
                         if (!refDocSnap.exists) return;
 
                         const rData = refDocSnap.data();
-                        const isRefToday = (rData.lastEarnDate === todayStr);
+                        const isRefToday = isDateToday(rData.lastEarnDate);
 
                         const currentRefBal = Number(rData.balanceUSD || 0);
                         const currentRefTotal = Number(rData.totalEarnUSD || 0);
@@ -1440,7 +1463,6 @@
 
                     db.collection("task_history").add({
                         uid: snap.docs[0].id,
-                        userUID: refUID,
                         amountUSD: bonusUSD,
                         amountBDT: 40.00,
                         taskType: "referral_bonus",
@@ -1645,9 +1667,11 @@
             showToast(`${provider} login will be available in next update!`, "info");
         }
 
-        // ================= 🌟 আপডেটেড নোটিফিকেশন সিস্টেম =================
+        // 🌟 নোটিফিকেশন সিস্টেম এবং ব্যাজ কাউন্ট
         function initNotificationBadge() {
             const badge = document.getElementById('notifBadgeCount');
+            badge.innerText = '0';
+            badge.style.display = 'none';
 
             db.collection("notifications").onSnapshot(snapshot => {
                 const readIds = JSON.parse(localStorage.getItem('read_notif_ids') || '[]');
@@ -1655,7 +1679,7 @@
                 const cachedUser = JSON.parse(localStorage.getItem('microtask_cached_user')) || {};
                 const myUID = String(cachedUser.uid || '').trim();
                 let unreadCount = 0;
-                activeNotifIds = [];
+                currentUnreadNotifIds = [];
 
                 snapshot.forEach(doc => {
                     if (deletedIds.includes(doc.id)) return;
@@ -1671,9 +1695,9 @@
                     }
 
                     if (isForMe || (isGlobal && isTimeValid)) {
-                        activeNotifIds.push(doc.id);
                         if (!readIds.includes(doc.id)) {
                             unreadCount++;
+                            currentUnreadNotifIds.push(doc.id);
                         }
                     }
                 });
@@ -1688,11 +1712,11 @@
             });
         }
 
-        // 🌟 নোটিফিকেশনে ক্লিক করলে কাউন্ট মুছে যাবে এবং পেজ ওপেন হবে
+        // 🌟 নোটিফিকেশনে ক্লিক করলে কাউন্ট মুছে যাবে এবং নতুন আসলে আবার কাউন্ট হবে
         function openNotificationsPage() {
-            if (activeNotifIds.length > 0) {
+            if (currentUnreadNotifIds.length > 0) {
                 const readIds = JSON.parse(localStorage.getItem('read_notif_ids') || '[]');
-                const updatedReadIds = Array.from(new Set([...readIds, ...activeNotifIds]));
+                const updatedReadIds = Array.from(new Set([...readIds, ...currentUnreadNotifIds]));
                 localStorage.setItem('read_notif_ids', JSON.stringify(updatedReadIds));
             }
 
@@ -1716,7 +1740,8 @@
                         
                         const todayStr = getTodayString();
                         
-                        if (currentUserDoc.lastEarnDate && currentUserDoc.lastEarnDate !== todayStr) {
+                        // নতুন দিন শুরু হলে রিসেট
+                        if (currentUserDoc.lastEarnDate && !isDateToday(currentUserDoc.lastEarnDate)) {
                             currentUserDoc.todayEarnUSD = 0.00;
                             currentUserDoc.lastEarnDate = todayStr;
                             db.collection("users").doc(user.uid).update({ 
@@ -1750,7 +1775,7 @@
 
         setInterval(() => {
             const todayStr = getTodayString();
-            if (currentUserDoc && currentUserDoc.lastEarnDate !== todayStr) {
+            if (currentUserDoc && currentUserDoc.lastEarnDate && !isDateToday(currentUserDoc.lastEarnDate)) {
                 currentUserDoc.todayEarnUSD = 0.00;
                 currentUserDoc.lastEarnDate = todayStr;
                 updateBalanceDisplay();
