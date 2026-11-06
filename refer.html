@@ -347,7 +347,7 @@
             flex-shrink: 0;
         }
 
-        /* CARD 4: TODAY'S BONUS & COMMISSION (শুধুমাত্র তারিখ দেখাবে, টুডে নয়) */
+        /* CARD 4: EARNINGS HISTORY TABLE */
         .card-referrals-table {
             background: #ffffff;
             border: 1px solid #e2e8f0;
@@ -421,7 +421,8 @@
             white-space: nowrap;
         }
         .bonus-badge-tag.verify { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
-        .bonus-badge-tag.comm { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
+        .bonus-badge-tag.comm   { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
+        .bonus-badge-tag.pend   { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
 
         .comm-5pct-text { 
             font-size: 10px; 
@@ -506,7 +507,7 @@
                 </div>
             </div>
 
-            <!-- CARD 2: REFERRAL LINK & ACTIONS (https://microtask.page.gd/) -->
+            <!-- CARD 2: REFERRAL LINK & ACTIONS -->
             <div class="card-refer-link">
                 <div class="card-header-line">
                     <div class="header-circle-icon">
@@ -571,13 +572,13 @@
                 </div>
             </div>
 
-            <!-- CARD 4: TODAY'S BONUS & COMMISSION CHART (ডেমো ছাড়া, শুধু ওই দিনের আসল তারিখ) -->
+            <!-- CARD 4: EARNINGS HISTORY TABLE -->
             <div class="card-referrals-table">
                 <div class="referrals-header-line">
                     <h3>Active Earnings History</h3>
                     <span class="referral-live-counter" id="activeReferralCount">0 Active</span>
                 </div>
-                <span class="chart-subtitle-note">Bonuses and 5% commissions earned on this date</span>
+                <span class="chart-subtitle-note">Bonuses and 5% commissions earned from your referrals</span>
 
                 <table class="clean-table">
                     <thead>
@@ -593,8 +594,8 @@
                             <td colspan="4">
                                 <div class="empty-history-box">
                                     <i class="fa-solid fa-user-plus empty-history-icon"></i>
-                                    <span class="empty-title">No referral earnings yet today</span>
-                                    <span class="empty-sub">Share your referral link to earn 40 BDT bonus + 5% daily commission!</span>
+                                    <span class="empty-title">Loading referral data...</span>
+                                    <span class="empty-sub">Please wait while your referrals are loading.</span>
                                 </div>
                             </td>
                         </tr>
@@ -627,11 +628,12 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
+        const USD_TO_BDT = 120;
+        const BASE_DOMAIN = "https://microtask.page.gd/";
+
         let myReferralUID = "000000";
         let currentUserData = null;
-
-        // আপনার চাওয়া নির্দিষ্ট ডোমেইন
-        const BASE_DOMAIN = "https://microtask.page.gd/";
+        let isSyncingBalance = false;
 
         function maskUserName(name) {
             if (!name) return "User***";
@@ -648,10 +650,32 @@
             return `${year}-${month}-${day}`;
         }
 
-        // "Today" বাদ দিয়ে শুধু ওই দিনের তারিখ ফরম্যাট (যেমন: 29 Oct, 2026)
-        function getFormattedDate(dateObj) {
-            const d = dateObj || new Date();
-            return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+        function getFormattedDate(dateVal) {
+            if (!dateVal) return new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+            let d = null;
+            if (dateVal.toDate) d = dateVal.toDate();
+            else if (typeof dateVal === 'number' || typeof dateVal === 'string') d = new Date(dateVal);
+            if (d && !isNaN(d.getTime())) {
+                return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+            }
+            return String(dateVal);
+        }
+
+        function isDateToday(dateVal) {
+            if (!dateVal) return false;
+            const todayStr = getTodayString();
+            if (dateVal === todayStr) return true;
+            if (typeof dateVal === 'string' && dateVal.startsWith(todayStr)) return true;
+            let d = null;
+            if (dateVal.toDate) d = dateVal.toDate();
+            else if (typeof dateVal === 'number' || typeof dateVal === 'string') d = new Date(dateVal);
+            if (d && !isNaN(d.getTime())) {
+                const y = d.getFullYear();
+                const m = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                return `${y}-${m}-${day}` === todayStr;
+            }
+            return false;
         }
 
         function renderEmptyTable() {
@@ -660,7 +684,7 @@
                     <td colspan="4">
                         <div class="empty-history-box">
                             <i class="fa-solid fa-user-plus empty-history-icon"></i>
-                            <span class="empty-title">No referral earnings yet today</span>
+                            <span class="empty-title">No referrals found yet</span>
                             <span class="empty-sub">Share your referral link to earn 40 BDT bonus + 5% daily commission!</span>
                         </div>
                     </td>
@@ -669,114 +693,12 @@
             document.getElementById('activeReferralCount').innerText = "0 Active";
         }
 
-        // ================= ১. লাইভ রেফারেল ডাটা ও নির্দিষ্ট ডোমেইন লিংক সেট =================
-        auth.onAuthStateChanged(user => {
-            const cachedUser = JSON.parse(localStorage.getItem('microtask_cached_user')) || {};
-            myReferralUID = String(cachedUser.uid || '000000').trim();
-
-            // আপনার চাওয়া ডোমেইনের সাথে লিংক: https://microtask.page.gd/?ref=UID
-            document.getElementById('refLinkInput').value = `${BASE_DOMAIN}?ref=${myReferralUID}`;
-
-            if (user) {
-                db.collection("users").doc(user.uid).onSnapshot(doc => {
-                    if (doc.exists) {
-                        currentUserData = doc.data();
-                        myReferralUID = String(currentUserData.uid || myReferralUID).trim();
-                        document.getElementById('refLinkInput').value = `${BASE_DOMAIN}?ref=${myReferralUID}`;
-                    }
-                });
-
-                listenToTodayReferralEarnings(myReferralUID, user.uid);
-            } else {
-                renderEmptyTable();
+        function updateReferralLink(uid) {
+            if (!uid || uid === "000000") return;
+            const input = document.getElementById('refLinkInput');
+            if (input) {
+                input.value = `${BASE_DOMAIN}?ref=${uid}`;
             }
-        });
-
-        function listenToTodayReferralEarnings(refUID, currentAuthUid) {
-            db.collection("users").where("referredBy", "==", refUID).onSnapshot(snapshot => {
-                const tbody = document.getElementById('referralsTableBody');
-                const totalRefEl = document.getElementById('statTotalReferrals');
-                const activeCounterEl = document.getElementById('activeReferralCount');
-                const todayStr = getTodayString();
-                const todayFormatted = getFormattedDate(new Date());
-
-                if (snapshot.empty) {
-                    renderEmptyTable();
-                    updateStatsUI(0, 0, 0, 0);
-                    return;
-                }
-
-                const totalReferrals = snapshot.size;
-                totalRefEl.innerText = totalReferrals;
-
-                let todayRowsHtml = '';
-                let activeCountToday = 0;
-                let today5PctTotalBDT = 0;
-                let verifiedCount = 0;
-
-                snapshot.forEach(doc => {
-                    const u = doc.data();
-                    const maskedName = maskUserName(u.name || 'Member');
-                    const isVerified = u.isVerified === true;
-                    if (isVerified) verifiedCount++;
-
-                    // ১. আজকে ভেরিফাই হলে -> ৪০ টাকা বোনাস (তারিখ সহ)
-                    if (isVerified && u.verifiedDate === todayStr) {
-                        activeCountToday++;
-                        todayRowsHtml += `
-                            <tr>
-                                <td>
-                                    <div class="user-flex">
-                                        <div class="avatar-small"><i class="fa-solid fa-user"></i></div>
-                                        <span class="user-id-text">${maskedName}</span>
-                                    </div>
-                                </td>
-                                <td><span class="date-text">${todayFormatted}</span></td>
-                                <td><span class="bonus-badge-tag verify">Verify Bonus</span></td>
-                                <td style="text-align: right;"><span class="comm-5pct-text">+40.00 BDT</span></td>
-                            </tr>
-                        `;
-                    }
-
-                    // ২. আজকে কাজ করলে -> কাজের ৫% কমিশন (তারিখ সহ)
-                    if (u.lastEarnDate === todayStr && (u.todayEarnUSD || 0) > 0) {
-                        const user5PctBDT = parseFloat((u.todayEarnUSD * 120 * 0.05).toFixed(2));
-                        if (user5PctBDT > 0) {
-                            today5PctTotalBDT += user5PctBDT;
-                            activeCountToday++;
-
-                            todayRowsHtml += `
-                                <tr>
-                                    <td>
-                                        <div class="user-flex">
-                                            <div class="avatar-small"><i class="fa-solid fa-user"></i></div>
-                                            <span class="user-id-text">${maskedName}</span>
-                                        </div>
-                                    </td>
-                                    <td><span class="date-text">${todayFormatted}</span></td>
-                                    <td><span class="bonus-badge-tag comm">5% Comm.</span></td>
-                                    <td style="text-align: right;"><span class="comm-5pct-text">+${user5PctBDT.toFixed(2)} BDT</span></td>
-                                </tr>
-                            `;
-                        }
-                    }
-                });
-
-                if (activeCountToday === 0) {
-                    renderEmptyTable();
-                } else {
-                    tbody.innerHTML = todayRowsHtml;
-                    activeCounterEl.innerText = `${activeCountToday} Active`;
-                }
-
-                // স্ট্যাটাস হিসাব
-                const verificationBonusTotalBDT = verifiedCount * 40;
-                const totalComm5PctBDT = parseFloat(((currentUserData ? currentUserData.referralComm5PctUSD || 0 : 0) * 120).toFixed(2));
-                const grandTotalEarningsBDT = verificationBonusTotalBDT + totalComm5PctBDT;
-
-                updateStatsUI(totalReferrals, totalComm5PctBDT, grandTotalEarningsBDT, today5PctTotalBDT);
-                checkAndCreditMidnightCommission(currentAuthUid, today5PctTotalBDT, todayStr);
-            }, () => renderEmptyTable());
         }
 
         function updateStatsUI(totalRef, comm5Pct, totalEarn, pendingComm) {
@@ -786,32 +708,254 @@
             document.getElementById('statPendingCommission').innerText = `${pendingComm.toFixed(2)} BDT`;
         }
 
-        // ================= ২. রাত ১২টার পর স্বয়ংক্রিয় ৫% কমিশন মেইন ব্যালেন্সে ক্রেডিট =================
-        function checkAndCreditMidnightCommission(authUid, pendingBDT, todayStr) {
-            if (!currentUserData || pendingBDT <= 0) return;
+        // ================= ১. লাইভ রেফারেল ডাটা এবং মেইন ব্যালেন্স অটো-সিঙ্ক =================
+        auth.onAuthStateChanged(user => {
+            if (!user) {
+                renderEmptyTable();
+                updateStatsUI(0, 0, 0, 0);
+                return;
+            }
 
-            const lastCreditDate = currentUserData.lastMidnightCommDate || '';
-            const now = new Date();
-            const currentHour = now.getHours();
+            const cachedUser = JSON.parse(localStorage.getItem('microtask_cached_user')) || {};
+            if (cachedUser && cachedUser.uid) {
+                myReferralUID = String(cachedUser.uid).trim();
+                updateReferralLink(myReferralUID);
+            }
 
-            if (lastCreditDate !== todayStr && currentHour >= 0) {
-                const commissionUSD = parseFloat((pendingBDT / 120).toFixed(4));
+            // ইউজারের রিয়েল-টাইম প্রোফাইল ডাটা লোড
+            db.collection("users").doc(user.uid).onSnapshot(doc => {
+                if (doc.exists) {
+                    currentUserData = doc.data();
+                    myReferralUID = String(currentUserData.uid || myReferralUID).trim();
+                    updateReferralLink(myReferralUID);
 
-                db.collection("users").doc(authUid).update({
-                    balanceUSD: firebase.firestore.FieldValue.increment(commissionUSD),
-                    totalEarnUSD: firebase.firestore.FieldValue.increment(commissionUSD),
-                    referralComm5PctUSD: firebase.firestore.FieldValue.increment(commissionUSD),
-                    lastMidnightCommDate: todayStr
-                }).then(() => {
-                    db.collection("notifications").add({
-                        targetUid: myReferralUID,
-                        category: "referral",
-                        title: "🎉 দৈনিক ৫% রেফারেল কমিশন জমা হয়েছে!",
-                        message: `আপনার রেফারেলদের সারাদিনের উপার্জনের ৫% কমিশন (${pendingBDT.toFixed(2)} BDT) রাত ১২টায় স্বয়ংক্রিয়ভাবে মেইন ব্যালেন্সে জমা হয়েছে!`,
+                    listenToAllReferrals(myReferralUID, user.uid);
+                }
+            });
+        });
+
+        function listenToAllReferrals(sixDigitUID, authUid) {
+            if (!sixDigitUID || sixDigitUID === "000000") return;
+
+            // ৬ ডিজিট UID, Auth UID এবং সংখ্যা - সবগুলোকে সাপোর্টে রাখা হয়েছে
+            const validRefIds = [String(sixDigitUID).trim()];
+            if (authUid && authUid !== sixDigitUID) validRefIds.push(String(authUid).trim());
+            if (!isNaN(Number(sixDigitUID))) validRefIds.push(Number(sixDigitUID));
+
+            db.collection("users").where("referredBy", "in", validRefIds).onSnapshot(async snapshot => {
+                const tbody = document.getElementById('referralsTableBody');
+                const activeCounterEl = document.getElementById('activeReferralCount');
+                const todayStr = getTodayString();
+
+                if (snapshot.empty) {
+                    renderEmptyTable();
+                    updateStatsUI(0, 0, 0, 0);
+                    return;
+                }
+
+                const totalReferrals = snapshot.size;
+                let rowsHtml = '';
+                let activeCount = 0;
+                let verifiedCount = 0;
+                let totalReferralsWorkUSD = 0;
+                let todayPendingCommissionBDT = 0;
+
+                snapshot.forEach(doc => {
+                    const u = doc.data();
+                    const maskedName = maskUserName(u.name || 'Member');
+                    const isVerified = (u.isVerified === true);
+                    const userTotalEarnUSD = Number(u.totalEarnUSD || 0);
+                    const userTodayEarnUSD = (u.lastEarnDate && isDateToday(u.lastEarnDate)) ? Number(u.todayEarnUSD || 0) : 0;
+
+                    totalReferralsWorkUSD += userTotalEarnUSD;
+
+                    if (userTodayEarnUSD > 0) {
+                        todayPendingCommissionBDT += parseFloat((userTodayEarnUSD * USD_TO_BDT * 0.05).toFixed(2));
+                    }
+
+                    // ১. একাউন্ট ভেরিফাই থাকলে -> ৪০ টাকা বোনাস রো
+                    if (isVerified) {
+                        verifiedCount++;
+                        activeCount++;
+                        const verifiedDateFormatted = getFormattedDate(u.verifiedDate || u.createdAt);
+                        rowsHtml += `
+                            <tr>
+                                <td>
+                                    <div class="user-flex">
+                                        <div class="avatar-small"><i class="fa-solid fa-user-check"></i></div>
+                                        <span class="user-id-text">${maskedName}</span>
+                                    </div>
+                                </td>
+                                <td><span class="date-text">${verifiedDateFormatted}</span></td>
+                                <td><span class="bonus-badge-tag verify">Verify Bonus</span></td>
+                                <td style="text-align: right;"><span class="comm-5pct-text">+40.00 BDT</span></td>
+                            </tr>
+                        `;
+                    }
+
+                    // ২. মেম্বার কাজ করে আয় করলে -> ৫% কমিশন রো
+                    if (userTotalEarnUSD > 0) {
+                        activeCount++;
+                        const userCommBDT = parseFloat((userTotalEarnUSD * USD_TO_BDT * 0.05).toFixed(2));
+                        const earnDateFormatted = getFormattedDate(u.lastEarnDate || u.createdAt);
+                        rowsHtml += `
+                            <tr>
+                                <td>
+                                    <div class="user-flex">
+                                        <div class="avatar-small"><i class="fa-solid fa-coins"></i></div>
+                                        <span class="user-id-text">${maskedName}</span>
+                                    </div>
+                                </td>
+                                <td><span class="date-text">${earnDateFormatted}</span></td>
+                                <td><span class="bonus-badge-tag comm">5% Comm.</span></td>
+                                <td style="text-align: right;"><span class="comm-5pct-text">+${userCommBDT.toFixed(2)} BDT</span></td>
+                            </tr>
+                        `;
+                    }
+
+                    // ৩. মেম্বার এখনো ভেরিফাই না করলে -> পেন্ডিং রো
+                    if (!isVerified && userTotalEarnUSD <= 0) {
+                        const joinDateFormatted = getFormattedDate(u.createdAt);
+                        rowsHtml += `
+                            <tr>
+                                <td>
+                                    <div class="user-flex">
+                                        <div class="avatar-small"><i class="fa-solid fa-user-clock"></i></div>
+                                        <span class="user-id-text">${maskedName}</span>
+                                    </div>
+                                </td>
+                                <td><span class="date-text">${joinDateFormatted}</span></td>
+                                <td><span class="bonus-badge-tag pend">Pending Verify</span></td>
+                                <td style="text-align: right;"><span class="date-text">0.00 BDT</span></td>
+                            </tr>
+                        `;
+                    }
+                });
+
+                tbody.innerHTML = rowsHtml;
+                activeCounterEl.innerText = `${activeCount} Active`;
+
+                // মোট হিসাব
+                const verificationBonusTotalBDT = verifiedCount * 40;
+                const totalComm5PctBDT = parseFloat((totalReferralsWorkUSD * USD_TO_BDT * 0.05).toFixed(2));
+                const grandTotalEarningsBDT = verificationBonusTotalBDT + totalComm5PctBDT;
+
+                updateStatsUI(totalReferrals, totalComm5PctBDT, grandTotalEarningsBDT, todayPendingCommissionBDT);
+
+                // 🌟 মেইন ব্যালেন্সে মিসিং বোনাস ও ৫% কমিশন অটো-ক্রেডিট
+                syncAndCreditMissingEarnings(authUid, sixDigitUID, verifiedCount, totalReferralsWorkUSD);
+
+            }, err => {
+                console.error("Referral fetch error:", err);
+                renderEmptyTable();
+            });
+        }
+
+        // ================= ২. মেইন ব্যালেন্সে অটো-ক্রেডিট ও টাস্ক হিস্ট্রি সিঙ্ক =================
+        async function syncAndCreditMissingEarnings(authUid, sixDigitUID, totalVerifiedMembers, totalWorkUSD) {
+            if (isSyncingBalance || !authUid) return;
+            isSyncingBalance = true;
+
+            try {
+                // টাস্ক হিস্ট্রি চেক করা হচ্ছে যাতে ডাবল ক্রেডিট না হয়
+                const historySnap = await db.collection("task_history").where("uid", "==", authUid).get();
+                
+                let creditedBonusCount = 0;
+                let creditedCommUSD = 0;
+
+                historySnap.forEach(hDoc => {
+                    const h = hDoc.data();
+                    if (h.taskType === "referral_bonus") {
+                        creditedBonusCount++;
+                    } else if (h.taskType === "referral_commission") {
+                        creditedCommUSD += Number(h.amountUSD || 0);
+                    }
+                });
+
+                const todayStr = getTodayString();
+                let balanceIncrementUSD = 0;
+
+                // ১. যদি কোনো মেম্বারের ৳৪০ বোনাস ব্যালেন্সে যোগ না হয়ে থাকে:
+                const missingBonusCount = Math.max(0, totalVerifiedMembers - creditedBonusCount);
+                if (missingBonusCount > 0) {
+                    const singleBonusUSD = parseFloat((40 / USD_TO_BDT).toFixed(4));
+                    const totalMissingBonusUSD = parseFloat((missingBonusCount * singleBonusUSD).toFixed(4));
+                    balanceIncrementUSD += totalMissingBonusUSD;
+
+                    for (let i = 0; i < missingBonusCount; i++) {
+                        await db.collection("task_history").add({
+                            uid: authUid,
+                            amountUSD: singleBonusUSD,
+                            amountBDT: 40.00,
+                            taskType: "referral_bonus",
+                            title: "Referral Bonus",
+                            date: todayStr,
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    }
+
+                    await db.collection("notifications").add({
+                        targetUid: String(sixDigitUID),
+                        category: "earnings",
+                        method: "referral_bonus",
+                        title: "🎉 ৳" + (missingBonusCount * 40) + " রেফারেল বোনাস জমা হয়েছে!",
+                        message: `আপনার রেফারেল মেম্বার অ্যাকাউন্ট ভেরিফাই করায় আপনার অ্যাকাউন্টে মোট ৳${missingBonusCount * 40} যোগ হয়েছে!`,
                         actionUrl: "refer.html",
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
-                }).catch(e => console.log("Midnight credit sync:", e));
+                }
+
+                // ২. যদি কোনো কাজের ৫% কমিশন মেইন ব্যালেন্সে যোগ না হয়ে থাকে:
+                const totalEligibleCommUSD = parseFloat((totalWorkUSD * 0.05).toFixed(4));
+                const missingCommUSD = parseFloat(Math.max(0, totalEligibleCommUSD - creditedCommUSD).toFixed(4));
+
+                if (missingCommUSD >= 0.005) { // সামান্যতম ইনকাম থাকলেও স্বয়ংক্রিয় জমা হবে
+                    balanceIncrementUSD += missingCommUSD;
+                    const missingCommBDT = parseFloat((missingCommUSD * USD_TO_BDT).toFixed(2));
+
+                    await db.collection("task_history").add({
+                        uid: authUid,
+                        amountUSD: missingCommUSD,
+                        amountBDT: missingCommBDT,
+                        taskType: "referral_commission",
+                        title: "5% Referral Commission",
+                        date: todayStr,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+
+                    await db.collection("notifications").add({
+                        targetUid: String(sixDigitUID),
+                        category: "referral",
+                        title: "🎉 ৫% রেফারেল কমিশন জমা হয়েছে!",
+                        message: `আপনার রেফারেলদের কাজের ৫% কমিশন হিসেবে ৳${missingCommBDT} ($${missingCommUSD.toFixed(2)}) আপনার মেইন ব্যালেন্সে জমা হয়েছে!`,
+                        actionUrl: "refer.html",
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+
+                // ৩. মেইন ব্যালেন্স ও ক্যাশ আপডেট
+                if (balanceIncrementUSD > 0) {
+                    await db.collection("users").doc(authUid).update({
+                        balanceUSD: firebase.firestore.FieldValue.increment(balanceIncrementUSD),
+                        totalEarnUSD: firebase.firestore.FieldValue.increment(balanceIncrementUSD),
+                        todayEarnUSD: firebase.firestore.FieldValue.increment(balanceIncrementUSD),
+                        lastEarnDate: todayStr
+                    });
+
+                    if (currentUserData) {
+                        currentUserData.balanceUSD = parseFloat((Number(currentUserData.balanceUSD || 0) + balanceIncrementUSD).toFixed(4));
+                        currentUserData.todayEarnUSD = parseFloat((Number(currentUserData.todayEarnUSD || 0) + balanceIncrementUSD).toFixed(4));
+                        currentUserData.totalEarnUSD = parseFloat((Number(currentUserData.totalEarnUSD || 0) + balanceIncrementUSD).toFixed(4));
+                        localStorage.setItem('microtask_cached_user', JSON.stringify(currentUserData));
+                    }
+
+                    showToastNotification("New referral earnings added to your balance!");
+                }
+
+            } catch (err) {
+                console.error("Sync referral error:", err);
+            } finally {
+                isSyncingBalance = false;
             }
         }
 
