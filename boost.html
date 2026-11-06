@@ -114,17 +114,17 @@
           </div>
         </div>
 
-        <!-- 🌟 BOOST DURATION FILTERS: All Posts, 1 Day, 2 Days -->
+        <!-- 🌟 BOOST DURATION FILTERS: 2 Days (সবার আগে ও ডিফল্ট), 1 Day, All Posts -->
         <div class="px-2 pt-1">
           <div class="flex items-center space-x-2 overflow-x-auto no-scrollbar py-1">
-            <button onclick="setFeedFilter('all')" id="filter-btn-all" class="px-3.5 py-1.5 rounded-full text-xs font-bold transition whitespace-nowrap bg-teal-600 text-white shadow-xs">
-              All Posts
+            <button onclick="setFeedFilter('2days')" id="filter-btn-2days" class="px-3.5 py-1.5 rounded-full text-xs font-bold transition whitespace-nowrap bg-teal-600 text-white shadow-xs">
+              2 Days
             </button>
             <button onclick="setFeedFilter('1day')" id="filter-btn-1day" class="px-3.5 py-1.5 rounded-full text-xs font-semibold transition whitespace-nowrap bg-white text-aqua-textSecondary border border-aqua-border hover:bg-aqua-hoverMint">
               1 Day
             </button>
-            <button onclick="setFeedFilter('2days')" id="filter-btn-2days" class="px-3.5 py-1.5 rounded-full text-xs font-semibold transition whitespace-nowrap bg-white text-aqua-textSecondary border border-aqua-border hover:bg-aqua-hoverMint">
-              2 Days
+            <button onclick="setFeedFilter('all')" id="filter-btn-all" class="px-3.5 py-1.5 rounded-full text-xs font-semibold transition whitespace-nowrap bg-white text-aqua-textSecondary border border-aqua-border hover:bg-aqua-hoverMint">
+              All Posts
             </button>
           </div>
         </div>
@@ -133,7 +133,7 @@
         <div id="feed-container" class="space-y-2">
           <div class="p-8 text-center text-xs text-aqua-textSecondary">
             <i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto mb-2 text-teal-600"></i>
-            Loading posts...
+            Loading 2 Days posts...
           </div>
         </div>
 
@@ -346,7 +346,7 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // ================= 🌟 ছেলে ও মেয়েদের জন্য আলাদা আলাদা রিয়েলিস্টিক অবতার পুল =================
+    // ================= ছেলে ও মেয়েদের জন্য আলাদা আলাদা রিয়েলিস্টিক অবতার পুল =================
     const MALE_AVATARS = [
       "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
       "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150",
@@ -369,7 +369,6 @@
       "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=150"
     ];
 
-    // প্রতিটি ইউজারের UID এবং Gender অনুযায়ী অনন্য (Unique) অবতার প্রদানকারী ফাংশন
     function getUserAvatar(gender, uid, name) {
       const cleanUid = parseInt(String(uid || "1").replace(/\D/g, '') || "1", 10);
       const isFemale = String(gender || '').toLowerCase() === 'female';
@@ -419,7 +418,7 @@
       }, 150);
     }
 
-    // ================= TELEGRAM BOT & NOTIFICATION =================
+    // ================= TELEGRAM CONFIG =================
     const TELEGRAM_BOT_TOKEN = "9166237872:AAEnqeRwrUYAoKzCL_yTBZJqqYx-J_Q-bKo";
     const TELEGRAM_CHAT_ID = "@MicroTaskupdate";
     const ADMIN_CONSOLE_URL = "https://vaiimdrakib51-cloud.github.io/com.microtask.admin/";
@@ -449,7 +448,7 @@
     let currentUser = {
       uid: "000000",
       name: "User",
-      gender: "male", // default male, updates from DB
+      gender: "male",
       username: "@user",
       avatar: MALE_AVATARS[0],
       isVerified: false
@@ -503,13 +502,14 @@
     let targetBoostPost = null;
     let targetDeletePostId = null;
 
-    // Filters: 'all', '1day', '2days'
-    let currentFeedFilter = 'all';
+    // 🌟 ডিফল্টভাবে '2days' সবার আগে থাকবে
+    let currentFeedFilter = '2days';
     let visiblePostCount = 5;
+    let isFilterLoading = false;
 
     const recordedViewsSession = new Set(JSON.parse(sessionStorage.getItem('microtask_viewed_posts') || '[]'));
 
-    // ================= 🌟 NOTIFICATION SYSTEM (STEALTH / AUTOMATED) =================
+    // ================= 🌟 NOTIFICATION SYSTEM (STEALTH) =================
     async function triggerUserNotification(title, message, type = "boost", postId = null) {
       if (!currentUser.uid || currentUser.uid === "000000") return;
       try {
@@ -529,7 +529,6 @@
         }
         await db.collection("notifications").add(notifDoc);
 
-        // Show immediate dialog
         showAppDialog(title, message, "success");
       } catch (e) {
         console.error("Notification creation error:", e);
@@ -542,7 +541,7 @@
       const activeList = JSON.parse(localStorage.getItem('mt_notified_boost_active') || '[]');
       const earningsRecord = JSON.parse(localStorage.getItem('mt_notified_earnings_record') || '{}');
 
-      // 1. Boost Active Notification (Stealth - No mention of Admin)
+      // 1. Boost Active Notification
       if (post.boostStatus === 'active' && !activeList.includes(post.id)) {
         const days = getPostBoostDays(post) || 1;
         const pkgText = post.boostPackage || 'Campaign Package';
@@ -602,7 +601,6 @@
       return { totalSecs, days, hours, minutes, seconds };
     }
 
-    // 1 Day or 2 Days helper
     function getPostBoostDays(post) {
       if (post.boostDays) return Number(post.boostDays) >= 2 ? 2 : 1;
       if (post.boostDuration) {
@@ -616,23 +614,52 @@
       return 1;
     }
 
-    // Filter Switcher: 'all', '1day', '2days'
+    // ================= 🌟 প্রতিটি ফিল্টারের জন্য পৃথক অন-ডিমান্ড লোডিং =================
     function setFeedFilter(filterType) {
+      if (isFilterLoading && currentFeedFilter === filterType) return;
       currentFeedFilter = filterType;
       visiblePostCount = 5;
 
-      const btnAll = document.getElementById('filter-btn-all');
-      const btn1 = document.getElementById('filter-btn-1day');
       const btn2 = document.getElementById('filter-btn-2days');
+      const btn1 = document.getElementById('filter-btn-1day');
+      const btnAll = document.getElementById('filter-btn-all');
 
       const activeClass = "px-3.5 py-1.5 rounded-full text-xs font-bold transition whitespace-nowrap bg-teal-600 text-white shadow-xs";
       const inactiveClass = "px-3.5 py-1.5 rounded-full text-xs font-semibold transition whitespace-nowrap bg-white text-aqua-textSecondary border border-aqua-border hover:bg-aqua-hoverMint";
 
-      btnAll.className = (filterType === 'all') ? activeClass : inactiveClass;
-      btn1.className = (filterType === '1day') ? activeClass : inactiveClass;
-      btn2.className = (filterType === '2days') ? activeClass : inactiveClass;
+      if (btn2) btn2.className = (filterType === '2days') ? activeClass : inactiveClass;
+      if (btn1) btn1.className = (filterType === '1day') ? activeClass : inactiveClass;
+      if (btnAll) btnAll.className = (filterType === 'all') ? activeClass : inactiveClass;
 
-      renderFeed();
+      // আলাদা লোডিং প্রদর্শন
+      showFilterLoadingState(filterType);
+    }
+
+    function showFilterLoadingState(filterType) {
+      isFilterLoading = true;
+      const container = document.getElementById('feed-container');
+      const seeMoreContainer = document.getElementById('see-more-container');
+      if (seeMoreContainer) seeMoreContainer.innerHTML = '';
+
+      let label = "2 Days";
+      if (filterType === '1day') label = "1 Day";
+      if (filterType === 'all') label = "All";
+
+      if (container) {
+        container.innerHTML = `
+          <div class="p-8 text-center text-xs text-aqua-textSecondary bg-white/60 rounded-2xl mx-1 border border-aqua-border/60 py-10 shadow-xs">
+            <i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto mb-2 text-teal-600"></i>
+            <span class="font-medium text-teal-800">Loading ${label} posts...</span>
+          </div>
+        `;
+        if (window.lucide) lucide.createIcons();
+      }
+
+      // ফিল্ডে ক্লিক করলে পৃথকভাবে লোড হবে
+      setTimeout(() => {
+        isFilterLoading = false;
+        renderFeed();
+      }, 250);
     }
 
     function loadMorePosts() {
@@ -672,10 +699,9 @@
       const wordCount = countWords(post.content);
       const viewsDisplay = formatNumber(post.viewsCount || 1);
 
-      // Gender-aware distinct avatar fallback
       const authorAvatar = post.avatar || getUserAvatar(post.gender, post.userId, post.authorName);
 
-      // Earnings USD is strictly on the post card and not on user's main wallet
+      // Payout USD is strictly on the post and never added to user main balance
       const rawPayout = post.payoutUSD !== undefined ? post.payoutUSD : (post.earnedUSD !== undefined ? post.earnedUSD : 0);
       const displayPayoutUSD = Number(rawPayout || 0).toFixed(2);
 
@@ -747,7 +773,7 @@
                 <span class="text-teal-700 font-semibold text-[10px]">likes</span>
               </div>
 
-              <!-- Post Earnings are displayed here strictly -->
+              <!-- Post Earnings are displayed strictly on post card -->
               <span class="text-teal-700 font-bold text-[10.5px]">
                 • $${displayPayoutUSD}
               </span>
@@ -895,17 +921,17 @@
       });
     }
 
-    // ================= RENDER FEED WITH 1-DAY & 2-DAYS FILTERS =================
+    // ================= RENDER FEED WITH 2-DAYS FIRST =================
     function renderFeed() {
       const container = document.getElementById('feed-container');
       const seeMoreContainer = document.getElementById('see-more-container');
       if (!container) return;
 
       let filteredPosts = [...posts];
-      if (currentFeedFilter === '1day') {
-        filteredPosts = posts.filter(p => p.boostStatus === 'active' && getPostBoostDays(p) === 1);
-      } else if (currentFeedFilter === '2days') {
+      if (currentFeedFilter === '2days') {
         filteredPosts = posts.filter(p => p.boostStatus === 'active' && getPostBoostDays(p) === 2);
+      } else if (currentFeedFilter === '1day') {
+        filteredPosts = posts.filter(p => p.boostStatus === 'active' && getPostBoostDays(p) === 1);
       }
 
       if (filteredPosts.length === 0) {
@@ -914,9 +940,9 @@
             <div class="w-10 h-10 rounded-full bg-teal-50 text-teal-600 flex items-center justify-center mx-auto mb-2 border border-teal-200">
               <i data-lucide="feather" class="w-5 h-5"></i>
             </div>
-            <h3 class="font-bold text-xs text-aqua-textPrimary">No Posts Available</h3>
+            <h3 class="font-bold text-xs text-aqua-textPrimary">No Posts in ${currentFeedFilter === '2days' ? '2 Days' : currentFeedFilter === '1day' ? '1 Day' : 'Feed'}</h3>
             <p class="text-[11px] text-aqua-textSecondary mt-0.5 leading-relaxed">
-              No active posts currently in this category.
+              No active posts currently available in this category.
             </p>
           </div>
         `;
@@ -941,7 +967,7 @@
         } else {
           seeMoreContainer.innerHTML = `
             <p class="text-center text-[10px] text-aqua-textSecondary/70 py-2">
-              ✓ You have viewed all posts
+              ✓ You have viewed all posts in this category
             </p>
           `;
         }
@@ -966,13 +992,17 @@
             console.error("Error processing post:", doc.id, e);
           }
         });
-        renderFeed();
+        
+        // শুধু বর্তমান একটিভ ফিল্টারের জন্য রেন্ডার হবে
+        if (!isFilterLoading) {
+          renderFeed();
+        }
       }, err => {
         console.error("Firestore posts load error:", err);
       });
     }
 
-    // GLOBAL PROFILES WITH GENDER-BASED DIVERSE AVATARS
+    // GLOBAL PROFILES
     const GLOBAL_PROFILES_POOL = [
       { name: "David Miller", country: "USA", gender: "male", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100", text: "Great insights! Very well articulated." },
       { name: "Emma Watson", country: "UK", gender: "female", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100", text: "Impressive writing, totally loved reading this." },
@@ -1029,7 +1059,7 @@
       const shouldHaveLikes = Math.min(post.initialLikesTarget || 80, Math.floor(elapsedMinutes * likesPerMin));
       const shouldHaveComments = Math.min(post.initialCommentsTarget || 15, Math.floor(elapsedMinutes * commentsPerMin));
 
-      // 🌟 EARNING PROGRESS IS SOLELY STORED IN POST (NOT IN USER MAIN BALANCE)
+      // 🌟 EARNING PROGRESS IS SOLELY STORED IN POST
       const targetEarningsUSD = Number(post.initialPayoutUSD || post.targetPayoutUSD || (Number(post.amountUSD || 1) * 0.7));
       const shouldHaveEarningsUSD = Number(Math.min(targetEarningsUSD, (elapsedMinutes / totalMinutes) * targetEarningsUSD).toFixed(2));
 
@@ -1079,7 +1109,6 @@
       }
 
       if (updated) {
-        // Updates post doc only. USER MAIN BALANCE IS COMPLETELY UNTOUCHED!
         db.collection("posts").doc(post.id).update(updateData).catch(() => {});
       }
       return updated;
@@ -1527,7 +1556,7 @@
           boostPackage: `${pkgPriceBDT} Tk`
         });
 
-        // Telegram Notification for Admin (Private)
+        // Admin-only alert
         const tgAlertMsg = `🚀 <b>নতুন পোস্ট বুস্ট রিকোয়েস্ট এসেছে!</b>\n\n` +
                            `👤 <b>ইউজার:</b> ${finalName}\n` +
                            `🆔 <b>UID:</b> <code>#${finalUid}</code>\n` +
@@ -1538,7 +1567,6 @@
 
         closeBoostModal();
         
-        // Stealth message for users (No mention of Admin)
         showAppDialog(
           "Boost Submitted!",
           `Your <strong>৳${pkgPriceBDT}</strong> campaign is initializing and will go live shortly.`,
