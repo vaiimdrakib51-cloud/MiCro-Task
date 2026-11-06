@@ -338,43 +338,77 @@
         .action-wide-card.deposit-card span { color: #047857; }
         .action-wide-card.withdraw-card span { color: #0369a1; }
 
-        /* 3D Task Cards */
+        /* 3D Task Card: Tasks & Earnings Zone */
         .task-card-3d { 
             background: var(--card-3d); 
             border: 1.5px solid var(--card-border); 
             border-radius: 20px; 
-            padding: 12px 14px; 
+            padding: 16px 14px; 
             box-shadow: var(--shadow-3d); 
         }
-        .task-row-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; }
+        .task-row-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; margin-bottom: 14px; }
         .task-left-meta { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; }
         .task-symbol-3d { width: 42px; height: 42px; border-radius: 13px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 17px; flex-shrink: 0; }
         .task-symbol-3d.cyan { background: linear-gradient(135deg, #0284c7, #0d9488); }
-        .task-symbol-3d.purple { background: linear-gradient(135deg, #8b5cf6, #6366f1); }
-        .task-symbol-3d.telegram-blue { background: linear-gradient(135deg, #0088cc, #0284c7); }
         
         .task-text { display: flex; flex-direction: column; justify-content: center; min-width: 0; line-height: 1.25; overflow: hidden; }
-        .task-text h4 { font-size: 14.5px; font-weight: 850; color: #0c4a6e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .task-text h4 { font-size: 15px; font-weight: 850; color: #0c4a6e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .task-text p { font-size: 11px; color: #64748b; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
         
         .task-pill { display: inline-flex; align-items: center; gap: 5px; padding: 4px 11px; border-radius: 18px; font-size: 11.5px; font-weight: 800; white-space: nowrap; margin-left: auto; cursor: pointer; flex-shrink: 0; }
         .task-pill.green-pill { background: #dcfce7; color: #047857; border: 1px solid #86efac; }
-        .task-pill.blue-pill { background: #e0f2fe; color: #0369a1; border: 1px solid #7dd3fc; }
-        .task-pill.claimed-pill { background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; }
 
-        /* 4 Cards: YouTube, Facebook, Instagram, Boost */
-        .video-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 10px; }
-        .video-card-3d { background: #ffffff; border: 1.5px solid #cce5f5; border-radius: 16px; padding: 10px 4px 8px; display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; box-shadow: 0 3px 8px rgba(2, 132, 199, 0.06); }
-        .video-card-3d:active { transform: scale(0.95); }
-        .video-icon { width: 38px; height: 38px; border-radius: 11px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #fff; }
-        .video-icon.yt { background: #ff0000; }
-        .video-icon.fb { background: #1877f2; }
-        .video-icon.ig { background: linear-gradient(45deg, #f09433, #dc2743, #bc1888); }
+        /* Clean Icon Buttons Grid */
+        .video-grid { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 14px 6px; 
+            padding: 4px 2px 2px;
+        }
+        .video-card-3d { 
+            background: transparent; 
+            border: none; 
+            padding: 4px 2px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center;
+            gap: 6px; 
+            cursor: pointer; 
+            box-shadow: none; 
+            transition: transform 0.15s ease;
+        }
+        .video-card-3d:active { transform: scale(0.90); }
+        
+        .video-icon { 
+            width: 48px; 
+            height: 48px; 
+            border-radius: 15px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 21px; 
+            color: #fff; 
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.10);
+            transition: transform 0.15s ease;
+            overflow: hidden;
+            position: relative;
+        }
+        .video-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 15px;
+        }
+
+        .video-icon.yt { background: #ff0000; box-shadow: 0 4px 14px rgba(255, 0, 0, 0.32); }
+        .video-icon.fb { background: #1877f2; box-shadow: 0 4px 14px rgba(24, 119, 242, 0.32); }
+        .video-icon.ig { background: linear-gradient(45deg, #f09433, #dc2743, #bc1888); box-shadow: 0 4px 14px rgba(220, 39, 67, 0.32); }
         
         .video-icon.boost-box { 
             background: linear-gradient(135deg, #f59e0b, #d97706); 
-            padding: 5px;
-            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.35);
+            padding: 6px;
+            box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
         }
         .video-icon.boost-box img {
             width: 100%;
@@ -382,8 +416,33 @@
             object-fit: contain;
         }
 
-        .video-card-3d span { font-size: 11px; color: #0f172a; font-weight: 800; margin-top: 2px; }
-        .video-card-3d small { font-size: 9.5px; color: #059669; font-weight: 850; }
+        .video-icon.spin-img-box {
+            background: #ffffff;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+            padding: 2px;
+        }
+        .video-icon.spin-img-box img {
+            object-fit: contain;
+        }
+
+        .video-icon.movie-img-box {
+            background: #000;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+        }
+
+        .video-icon.typing-img-box {
+            background: #000;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+        }
+
+        .video-card-3d span { 
+            font-size: 11.5px; 
+            color: #1e293b; 
+            font-weight: 800; 
+            letter-spacing: -0.2px; 
+            line-height: 1.1;
+        }
 
         /* PROMO BANNER SLIDER */
         .promo-banner-container { 
@@ -794,7 +853,7 @@
                                 <i class="fa-solid fa-arrow-trend-up"></i>
                             </div>
                             <div class="sub-stat-labels">
-                                <span>Today</span>
+                                <span>Today Earn</span>
                                 <strong id="todayEarnText">$ 0.00</strong>
                             </div>
                         </div>
@@ -804,7 +863,7 @@
                                 <i class="fa-solid fa-sack-dollar"></i>
                             </div>
                             <div class="sub-stat-labels">
-                                <span>Total</span>
+                                <span>Total Earn</span>
                                 <strong id="totalEarnText">$ 0.00</strong>
                             </div>
                         </div>
@@ -834,87 +893,74 @@
                     </div>
                 </div>
 
-                <!-- 3D Task Card 1: Videos -->
+                <!-- 3D Task Card: Tasks & Earnings Zone -->
                 <div class="task-card-3d">
                     <div class="task-row-header">
                         <div class="task-left-meta">
                             <div class="task-symbol-3d cyan">
-                                <i class="fa-solid fa-circle-play"></i>
+                                <i class="fa-solid fa-cubes-stacked"></i>
                             </div>
                             <div class="task-text">
-                                <h4>Watch Videos & Earn</h4>
-                                <p>Watch videos from popular platforms</p>
+                                <h4>Tasks & Earn Zone</h4>
+                                <p>Choose your favorite task & earn money</p>
                             </div>
                         </div>
                         <div class="task-pill green-pill">
-                            <span>$0.05 – $0.30</span>
+                            <span>$0.05 – $5.00</span>
                             <i class="fa-solid fa-chevron-right"></i>
                         </div>
                     </div>
 
+                    <!-- বাটনসমূহ: বর্ডার ছাড়া শুধু আইকন ও নাম -->
                     <div class="video-grid">
+                        <!-- 1. YouTube -->
                         <div class="video-card-3d" onclick="handleSecureNav('youtube-tasks.html')">
                             <div class="video-icon yt"><i class="fa-brands fa-youtube"></i></div>
                             <span>YouTube</span>
-                            <small>+ Earn</small>
                         </div>
                         
+                        <!-- 2. Facebook -->
                         <div class="video-card-3d" onclick="handleSecureNav('facebook-tasks.html')">
                             <div class="video-icon fb"><i class="fa-brands fa-facebook-f"></i></div>
                             <span>Facebook</span>
-                            <small>+ Earn</small>
                         </div>
                         
+                        <!-- 3. Instagram -->
                         <div class="video-card-3d" onclick="handleSecureNav('instagram-tasks.html')">
                             <div class="video-icon ig"><i class="fa-brands fa-instagram"></i></div>
                             <span>Instagram</span>
-                            <small>+ Earn</small>
                         </div>
                         
+                        <!-- 4. Boost -->
                         <div class="video-card-3d" onclick="handleSecureNav('boost.html')">
                             <div class="video-icon boost-box">
                                 <img src="https://i.ibb.co.com/S71wYZrD/capital-gain.png" alt="Boost">
                             </div>
                             <span>Boost</span>
-                            <small>+ Earn</small>
                         </div>
-                    </div>
-                </div>
 
-                <!-- 3D Task Card 2: Typing -->
-                <div class="task-card-3d" onclick="handleSecureNav('typing')" style="cursor:pointer;">
-                    <div class="task-row-header">
-                        <div class="task-left-meta">
-                            <div class="task-symbol-3d purple">
-                                <i class="fa-solid fa-keyboard"></i>
+                        <!-- 5. Spin -->
+                        <div class="video-card-3d" onclick="handleSecureNav('lucky.html')">
+                            <div class="video-icon spin-img-box">
+                                <img src="https://i.ibb.co.com/whb9d5kr/file-000000008efc8210bf18d0b93b2aa164.png" alt="Spin">
                             </div>
-                            <div class="task-text">
-                                <h4>Typing Task</h4>
-                                <p>Paragraphs & Poems • Professional Writing</p>
-                            </div>
+                            <span>Spin</span>
                         </div>
-                        <div class="task-pill blue-pill">
-                            <span>৳100 – ৳3,600</span>
-                            <i class="fa-solid fa-chevron-right"></i>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- 3D Task Card 3: Telegram Bonus -->
-                <div class="task-card-3d" id="taskTelegramBox" onclick="handleTelegramTaskClick()" style="cursor:pointer;">
-                    <div class="task-row-header">
-                        <div class="task-left-meta">
-                            <div class="task-symbol-3d telegram-blue">
-                                <i class="fa-brands fa-telegram"></i>
+                        <!-- 6. Movie -->
+                        <div class="video-card-3d" onclick="handleSecureNav('movie-tasks.html')">
+                            <div class="video-icon movie-img-box">
+                                <img src="https://i.ibb.co.com/V0LGhhB5/images-2-4.jpg" alt="Movie">
                             </div>
-                            <div class="task-text">
-                                <h4>Telegram Join Bonus</h4>
-                                <p>Join our official channel & claim bonus</p>
-                            </div>
+                            <span>Movie</span>
                         </div>
-                        <div class="task-pill green-pill" id="telegramPillBadge">
-                            <span>+$0.10</span>
-                            <i class="fa-solid fa-gift"></i>
+
+                        <!-- 7. Typing (আপনার দেওয়া আসল কিবোর্ড লোগো) -->
+                        <div class="video-card-3d" onclick="handleSecureNav('typing-tasks.html')">
+                            <div class="video-icon typing-img-box">
+                                <img src="https://i.ibb.co.com/cK16XNwK/images-2-7.jpg" alt="Typing">
+                            </div>
+                            <span>Typing</span>
                         </div>
                     </div>
                 </div>
@@ -1020,10 +1066,11 @@
 
         auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 
+        const USD_TO_BDT = 120;
         let currentUserDoc = null;
         let isBalanceHidden = false;
         let userCreatedAtMs = 0;
-        let todayTaskHistoryUnsub = null;
+        let liveEarningsUnsub = null;
 
         function initDeviceAndAppPermissions() {
             if (localStorage.getItem('microtask_permissions_settled')) return;
@@ -1049,7 +1096,6 @@
             }
         })();
 
-        // বর্তমান তারিখ (YYYY-MM-DD ফরম্যাট)
         function getTodayString() {
             const d = new Date();
             const year = d.getFullYear();
@@ -1065,7 +1111,6 @@
             return name.slice(0, 2) + "****";
         }
 
-        // ইনস্ট্যান্ট সেশন রিস্টোর
         (function restoreSessionInstantly() {
             const cachedUser = JSON.parse(localStorage.getItem('microtask_cached_user'));
             if (cachedUser && cachedUser.uid) {
@@ -1086,7 +1131,7 @@
 
                 const balUSD = Number(cachedUser.balanceUSD || 0);
                 document.getElementById("balanceAmount").textContent = `$ ${balUSD.toFixed(2)}`;
-                document.getElementById("bdtAmount").textContent = `≈ ${(balUSD * 120).toFixed(2)} BDT`;
+                document.getElementById("bdtAmount").textContent = `≈ ${(balUSD * USD_TO_BDT).toFixed(2)} BDT`;
 
                 const todayStr = getTodayString();
                 const todayEarn = (cachedUser.lastEarnDate === todayStr) ? Number(cachedUser.todayEarnUSD || 0) : 0;
@@ -1095,16 +1140,6 @@
                 document.getElementById("totalEarnText").textContent = `$ ${totalEarn.toFixed(2)}`;
             }
         })();
-
-        function triggerNativeAppOpen(targetUrl) {
-            const anchor = document.createElement('a');
-            anchor.href = targetUrl;
-            anchor.target = '_blank';
-            anchor.rel = 'noopener noreferrer';
-            document.body.appendChild(anchor);
-            anchor.click();
-            document.body.removeChild(anchor);
-        }
 
         function toggleInvezoPassword(id, btn) {
             const input = document.getElementById(id);
@@ -1118,10 +1153,9 @@
             }
         }
 
-        // ব্যালেন্স ও আজকের ইনকাম ডিসপ্লে আপডেট
         function updateBalanceDisplay() {
             const balUSD = currentUserDoc ? Number(currentUserDoc.balanceUSD || 0) : 0;
-            const bdtEquivalent = (balUSD * 120).toFixed(2);
+            const bdtEquivalent = (balUSD * USD_TO_BDT).toFixed(2);
             document.getElementById("balanceAmount").textContent = isBalanceHidden ? "$ ••••" : `$ ${balUSD.toFixed(2)}`;
             document.getElementById("bdtAmount").textContent = isBalanceHidden ? "≈ •••• BDT" : `≈ ${bdtEquivalent} BDT`;
 
@@ -1173,85 +1207,109 @@
                 openVerifyModal();
                 return;
             }
-            if (destinationUrl === 'typing') {
-                showToast("Loading typing tasks...", "info");
-            } else {
-                window.location.href = destinationUrl;
-            }
+            window.location.href = destinationUrl;
         }
 
-        // ================= আজকের ইনকাম এবং টোটাল ইনকাম নির্ভুল গণনার ফাংশন =================
-        window.addEarningToUser = function(amountUSD, taskType = 'general') {
+        // ================= সর্বজনীন আয় রেকর্ড ও ক্যালকুলেশন =================
+        window.recordUserEarning = function(amountUSD, earningType = 'task', title = 'Earning') {
             const user = auth.currentUser;
             if (!user || !currentUserDoc) return;
 
+            const earnAmount = parseFloat(Number(amountUSD).toFixed(4));
+            if (isNaN(earnAmount) || earnAmount <= 0) return;
+
             const todayStr = getTodayString();
-            const currentBal = Number(currentUserDoc.balanceUSD || 0);
-            const currentTotal = Number(currentUserDoc.totalEarnUSD || 0);
-            
-            // যদি আজকের তারিখ ভিন্ন হয় তবে 0 থেকে যোগ হবে
-            let currentToday = (currentUserDoc.lastEarnDate === todayStr) ? Number(currentUserDoc.todayEarnUSD || 0) : 0;
+            const userRef = db.collection("users").doc(user.uid);
 
-            const updatedBal = parseFloat((currentBal + amountUSD).toFixed(4));
-            const updatedToday = parseFloat((currentToday + amountUSD).toFixed(4));
-            const updatedTotal = parseFloat((currentTotal + amountUSD).toFixed(4));
+            db.runTransaction(async (transaction) => {
+                const docSnap = await transaction.get(userRef);
+                if (!docSnap.exists) return;
 
-            currentUserDoc.balanceUSD = updatedBal;
-            currentUserDoc.todayEarnUSD = updatedToday;
-            currentUserDoc.totalEarnUSD = updatedTotal;
-            currentUserDoc.lastEarnDate = todayStr;
+                const uData = docSnap.data();
+                const isToday = (uData.lastEarnDate === todayStr);
 
-            updateBalanceDisplay();
+                const currentBal = Number(uData.balanceUSD || 0);
+                const currentTotal = Number(uData.totalEarnUSD || 0);
+                const currentToday = isToday ? Number(uData.todayEarnUSD || 0) : 0;
 
-            db.collection("users").doc(user.uid).update({
-                balanceUSD: updatedBal,
-                todayEarnUSD: updatedToday,
-                totalEarnUSD: updatedTotal,
-                lastEarnDate: todayStr
-            }).catch(e => console.error("Earn update error:", e));
+                const newBal = parseFloat((currentBal + earnAmount).toFixed(4));
+                const newTotal = parseFloat((currentTotal + earnAmount).toFixed(4));
+                const newToday = parseFloat((currentToday + earnAmount).toFixed(4));
 
-            db.collection("task_history").add({
-                uid: user.uid,
-                amountUSD: amountUSD,
-                amountBDT: parseFloat((amountUSD * 120).toFixed(2)),
-                taskType: taskType,
-                date: todayStr,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            }).catch(e => console.error(e));
+                transaction.update(userRef, {
+                    balanceUSD: newBal,
+                    todayEarnUSD: newToday,
+                    totalEarnUSD: newTotal,
+                    lastEarnDate: todayStr
+                });
+
+                return { newBal, newToday, newTotal };
+            }).then((res) => {
+                if (res && currentUserDoc) {
+                    currentUserDoc.balanceUSD = res.newBal;
+                    currentUserDoc.todayEarnUSD = res.newToday;
+                    currentUserDoc.totalEarnUSD = res.newTotal;
+                    currentUserDoc.lastEarnDate = todayStr;
+                    updateBalanceDisplay();
+                }
+
+                db.collection("task_history").add({
+                    uid: user.uid,
+                    amountUSD: earnAmount,
+                    amountBDT: parseFloat((earnAmount * USD_TO_BDT).toFixed(2)),
+                    taskType: earningType,
+                    title: title,
+                    date: todayStr,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                }).catch(e => console.error("History logging error:", e));
+            }).catch(e => console.error("Earning transaction error:", e));
         };
 
-        // রিয়েল-টাইমে আজকের হিস্টোরি থেকে Today Earn লাইভ নিশ্চিত করার লিসেনার
-        function listenToTodayTaskHistory(userUid) {
-            if (todayTaskHistoryUnsub) todayTaskHistoryUnsub();
+        window.addEarningToUser = function(amountUSD, taskType = 'general') {
+            window.recordUserEarning(amountUSD, taskType, "Task Earn");
+        };
 
-            const todayStr = getTodayString();
-            todayTaskHistoryUnsub = db.collection("task_history")
+        function listenToLiveEarnings(userUid) {
+            if (liveEarningsUnsub) liveEarningsUnsub();
+
+            liveEarningsUnsub = db.collection("task_history")
                 .where("uid", "==", userUid)
-                .where("date", "==", todayStr)
                 .onSnapshot(snap => {
+                    const todayStr = getTodayString();
                     let calculatedToday = 0;
+                    let calculatedTotal = 0;
+
                     snap.forEach(doc => {
                         const h = doc.data();
-                        calculatedToday += Number(h.amountUSD || 0);
+                        const amount = Number(h.amountUSD || 0);
+                        calculatedTotal += amount;
+                        if (h.date === todayStr) {
+                            calculatedToday += amount;
+                        }
                     });
 
                     if (currentUserDoc) {
                         const existingToday = (currentUserDoc.lastEarnDate === todayStr) ? Number(currentUserDoc.todayEarnUSD || 0) : 0;
+                        const existingTotal = Number(currentUserDoc.totalEarnUSD || 0);
+
                         const finalToday = Math.max(calculatedToday, existingToday);
+                        const finalTotal = Math.max(calculatedTotal, existingTotal);
 
                         currentUserDoc.todayEarnUSD = finalToday;
+                        currentUserDoc.totalEarnUSD = finalTotal;
                         currentUserDoc.lastEarnDate = todayStr;
-                        
-                        document.getElementById("todayEarnText").textContent = isBalanceHidden ? "$ ••••" : `$ ${finalToday.toFixed(2)}`;
 
-                        if (existingToday < finalToday) {
+                        updateBalanceDisplay();
+
+                        if (existingToday < finalToday || existingTotal < finalTotal) {
                             db.collection("users").doc(userUid).update({
                                 todayEarnUSD: finalToday,
+                                totalEarnUSD: finalTotal,
                                 lastEarnDate: todayStr
                             }).catch(() => {});
                         }
                     }
-                }, err => console.log("Today task listen error:", err));
+                }, err => console.log("Earnings listener error:", err));
         }
 
         function processAccountVerification() {
@@ -1262,7 +1320,7 @@
             }
 
             const feeBDT = 50;
-            const feeUSD = parseFloat((feeBDT / 120).toFixed(4));
+            const feeUSD = parseFloat((feeBDT / USD_TO_BDT).toFixed(4));
             const currentBal = currentUserDoc ? Number(currentUserDoc.balanceUSD || 0) : 0;
 
             if (currentBal < feeUSD) {
@@ -1279,74 +1337,105 @@
             btn.innerText = "Processing...";
 
             const todayStr = getTodayString();
+            const userRef = db.collection("users").doc(user.uid);
 
-            db.collection("users").doc(user.uid).update({
-                balanceUSD: firebase.firestore.FieldValue.increment(-feeUSD),
-                isVerified: true,
-                verifiedDate: todayStr
-            }).then(() => {
+            db.runTransaction(async (transaction) => {
+                const userSnapshot = await transaction.get(userRef);
+                if (!userSnapshot.exists) {
+                    throw new Error("User document does not exist!");
+                }
+
+                const userData = userSnapshot.data();
+                if (userData.isVerified) {
+                    throw new Error("Account is already verified!");
+                }
+
+                const liveBal = Number(userData.balanceUSD || 0);
+                if (liveBal < feeUSD) {
+                    throw new Error("Insufficient Balance! Need at least ৳50.");
+                }
+
+                transaction.update(userRef, {
+                    balanceUSD: parseFloat((liveBal - feeUSD).toFixed(4)),
+                    isVerified: true,
+                    verifiedDate: todayStr
+                });
+
+                return userData;
+            }).then(async (verifiedUserData) => {
                 if (currentUserDoc) {
                     currentUserDoc.isVerified = true;
                     currentUserDoc.verifiedDate = todayStr;
+                    currentUserDoc.balanceUSD = parseFloat((Number(currentUserDoc.balanceUSD || 0) - feeUSD).toFixed(4));
                 }
                 const cached = JSON.parse(localStorage.getItem('microtask_cached_user')) || {};
                 cached.isVerified = true;
                 cached.verifiedDate = todayStr;
+                cached.balanceUSD = currentUserDoc ? currentUserDoc.balanceUSD : 0;
                 localStorage.setItem('microtask_cached_user', JSON.stringify(cached));
 
                 updateVerificationUI();
+                updateBalanceDisplay();
                 closeVerifyModal();
                 showToast("Account Verified! ৳50 ($0.42) deducted.", "success");
 
-                // রেফারেল বোনাস ৳৪০ যোগ হওয়া
-                if (currentUserDoc && currentUserDoc.referredBy) {
-                    const refUID = String(currentUserDoc.referredBy).trim();
-                    const bonusUSD = parseFloat((40 / 120).toFixed(4));
-                    const maskedUser = maskUserName(currentUserDoc.name || 'Member');
+                const refUID = verifiedUserData.referredBy ? String(verifiedUserData.referredBy).trim() : null;
+                if (!refUID) return;
 
-                    db.collection("users").where("uid", "==", refUID).get().then(snap => {
-                        if (!snap.empty) {
-                            const referrerDoc = snap.docs[0];
-                            const refData = referrerDoc.data();
-                            const isRefToday = (refData.lastEarnDate === todayStr);
+                const bonusUSD = parseFloat((40 / USD_TO_BDT).toFixed(4));
+                const maskedUser = maskUserName(verifiedUserData.name || 'Member');
 
-                            let refUpdatePayload = {
-                                balanceUSD: firebase.firestore.FieldValue.increment(bonusUSD),
-                                totalEarnUSD: firebase.firestore.FieldValue.increment(bonusUSD),
-                                lastEarnDate: todayStr
-                            };
+                try {
+                    const snap = await db.collection("users").where("uid", "==", refUID).limit(1).get();
+                    if (snap.empty) return;
 
-                            if (isRefToday) {
-                                refUpdatePayload.todayEarnUSD = firebase.firestore.FieldValue.increment(bonusUSD);
-                            } else {
-                                refUpdatePayload.todayEarnUSD = bonusUSD; // নতুন দিন হলে আজকেই প্রথম
-                            }
+                    const referrerDocRef = snap.docs[0].ref;
 
-                            referrerDoc.ref.update(refUpdatePayload);
+                    await db.runTransaction(async (transaction) => {
+                        const refDocSnap = await transaction.get(referrerDocRef);
+                        if (!refDocSnap.exists) return;
 
-                            db.collection("task_history").add({
-                                uid: referrerDoc.id,
-                                amountUSD: bonusUSD,
-                                amountBDT: 40.00,
-                                taskType: "referral_bonus",
-                                date: todayStr,
-                                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                            });
+                        const rData = refDocSnap.data();
+                        const isRefToday = (rData.lastEarnDate === todayStr);
 
-                            db.collection("notifications").add({
-                                targetUid: refUID,
-                                category: "earnings",
-                                method: "referral_bonus",
-                                title: "🎉 ৳৪০ রেফারেল বোনাস জমা হয়েছে!",
-                                message: `অভিনন্দন! আপনার রেফারেল ${maskedUser} অ্যাকাউন্ট ৫০ টাকায় ভেরিফাই করেছে। আপনার অ্যাকাউন্টে ৳৪০ ($0.33) বোনাস যোগ হয়েছে!`,
-                                actionUrl: "refer.html",
-                                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                            });
-                        }
-                    }).catch(e => console.error("Referral bonus error:", e));
+                        const currentRefBal = Number(rData.balanceUSD || 0);
+                        const currentRefTotal = Number(rData.totalEarnUSD || 0);
+                        const currentRefToday = isRefToday ? Number(rData.todayEarnUSD || 0) : 0;
+
+                        transaction.update(referrerDocRef, {
+                            balanceUSD: parseFloat((currentRefBal + bonusUSD).toFixed(4)),
+                            totalEarnUSD: parseFloat((currentRefTotal + bonusUSD).toFixed(4)),
+                            todayEarnUSD: parseFloat((currentRefToday + bonusUSD).toFixed(4)),
+                            lastEarnDate: todayStr
+                        });
+                    });
+
+                    db.collection("task_history").add({
+                        uid: snap.docs[0].id,
+                        amountUSD: bonusUSD,
+                        amountBDT: 40.00,
+                        taskType: "referral_bonus",
+                        title: "Referral Bonus",
+                        date: todayStr,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+
+                    db.collection("notifications").add({
+                        targetUid: refUID,
+                        category: "earnings",
+                        method: "referral_bonus",
+                        title: "🎉 ৳৪০ রেফারেল বোনাস জমা হয়েছে!",
+                        message: `অভিনন্দন! আপনার রেফারেল ${maskedUser} অ্যাকাউন্ট ৫০ টাকায় ভেরিফাই করেছে। আপনার অ্যাকাউন্টে ৳৪০ ($0.33) বোনাস যোগ হয়েছে!`,
+                        actionUrl: "refer.html",
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+
+                } catch (refErr) {
+                    console.error("Referral bonus error:", refErr);
                 }
+
             }).catch(err => {
-                showToast("Verification failed: " + err.message, "error");
+                showToast(err.message || "Verification failed!", "error");
             }).finally(() => {
                 btn.disabled = false;
                 btn.innerHTML = `<i class="fa-solid fa-lock-open"></i> Pay ৳50 & Verify Now`;
@@ -1371,35 +1460,6 @@
             textarea.select();
             try { document.execCommand('copy'); showToast("UID copied: " + text, "success"); } catch (err) { showToast("Failed to copy!", "error"); }
             document.body.removeChild(textarea);
-        }
-
-        function checkTelegramClaimState() {
-            const pill = document.getElementById('telegramPillBadge');
-            if (currentUserDoc && currentUserDoc.telegramClaimed) {
-                pill.className = "task-pill claimed-pill";
-                pill.innerHTML = `<span>Claimed</span> <i class="fa-solid fa-check"></i>`;
-            }
-        }
-
-        function handleTelegramTaskClick() {
-            if (!isUserVerified()) {
-                showToast("Verify account with 50 BDT to claim task bonus!", "error");
-                openVerifyModal();
-                return;
-            }
-            const user = auth.currentUser;
-            if (!user) return;
-
-            triggerNativeAppOpen('https://t.me/OnlineBD77R');
-
-            if (currentUserDoc && currentUserDoc.telegramClaimed) return;
-
-            setTimeout(() => {
-                addEarningToUser(0.10, "telegram_bonus");
-                db.collection("users").doc(user.uid).update({ telegramClaimed: true }).then(() => {
-                    showToast("$0.10 Telegram bonus added!", "success");
-                });
-            }, 1500);
         }
 
         function openLogoutModal() { document.getElementById('logoutModal').classList.add('active'); }
@@ -1447,7 +1507,6 @@
             });
         }
 
-        // ================= রেজিস্ট্রেশন হ্যান্ডলার (পাসওয়ার্ড ডাটাবেজে সেভসহ) =================
         function handleInvezoRegister(e) {
             e.preventDefault();
             const name = document.getElementById('regName').value.trim();
@@ -1473,18 +1532,16 @@
                     const randomUID = Math.floor(100000 + Math.random() * 900000).toString();
                     const todayStr = getTodayString();
 
-                    // এখানে password ফিল্ড সেভ করা হয়েছে যাতে এডমিনে পাসওয়ার্ড দেখা যায়
                     const userPayload = {
                         name: name,
                         email: email,
-                        password: password, // <--- পাসওয়ার্ড ডাটাবেজে সেভ হচ্ছে
+                        password: password,
                         uid: randomUID,
                         balanceUSD: 0.00,
                         todayEarnUSD: 0.00,
                         totalEarnUSD: 0.00,
                         lastEarnDate: todayStr,
                         isVerified: false,
-                        telegramClaimed: false,
                         referredBy: referCode || null,
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     };
@@ -1603,7 +1660,6 @@
             window.location.href = 'notifications.html';
         }
 
-        // ================= Auth Listener & Real-time Sync =================
         auth.onAuthStateChanged(user => {
             if (user) {
                 db.collection("users").doc(user.uid).onSnapshot(doc => {
@@ -1615,7 +1671,6 @@
                         
                         const todayStr = getTodayString();
                         
-                        // পরদিন (নতুন দিনে) Today Earn অটোমেটিক $0.00 এ রিসেট হবে
                         if (currentUserDoc.lastEarnDate && currentUserDoc.lastEarnDate !== todayStr) {
                             currentUserDoc.todayEarnUSD = 0.00;
                             currentUserDoc.lastEarnDate = todayStr;
@@ -1634,15 +1689,13 @@
 
                         updateBalanceDisplay();
                         updateVerificationUI();
-                        checkTelegramClaimState();
                         initNotificationBadge();
 
-                        // আজকের ইনকাম রিয়েল-টাইম হিস্টোরি থেকে নিশ্চিত করা
-                        listenToTodayTaskHistory(user.uid);
+                        listenToLiveEarnings(user.uid);
                     }
                 });
             } else {
-                if (todayTaskHistoryUnsub) todayTaskHistoryUnsub();
+                if (liveEarningsUnsub) liveEarningsUnsub();
                 if (!localStorage.getItem('microtask_cached_user')) {
                     document.getElementById('mainDashboard').style.display = 'none';
                     document.getElementById('authScreen').style.display = 'flex';
@@ -1650,7 +1703,6 @@
             }
         });
 
-        // প্রতি ১ মিনিট পর পর চেক করবে রাত ১২টা পার হয়ে নতুন দিন শুরু হয়েছে কি না
         setInterval(() => {
             const todayStr = getTodayString();
             if (currentUserDoc && currentUserDoc.lastEarnDate !== todayStr) {
@@ -1662,12 +1714,11 @@
                         todayEarnUSD: 0.00,
                         lastEarnDate: todayStr
                     }).catch(() => {});
-                    listenToTodayTaskHistory(auth.currentUser.uid);
+                    listenToLiveEarnings(auth.currentUser.uid);
                 }
             }
         }, 60000);
 
-        // মোবাইল পুল-টু-রিফ্রেশ
         let touchStartY = 0;
         let touchDiffY = 0;
         const refreshIndicator = document.getElementById('pullRefreshIndicator');
@@ -1695,7 +1746,6 @@
             touchDiffY = 0;
         });
 
-        // ================= ব্যানার স্লাইডার =================
         let promoBanners = [];
         let currentBannerIdx = 0;
         let bannerInterval = null;
