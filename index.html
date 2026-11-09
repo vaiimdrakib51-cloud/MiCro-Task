@@ -218,14 +218,14 @@
             box-shadow: 0 4px 12px rgba(2, 132, 199, 0.28);
         }
 
-        /* 3D Balance Card */
+        /* 🌟 3D Balance Card: সাদা থিম (White Clean 3D Card) */
         .balance-card {
-            background: linear-gradient(135deg, #0284c7 0%, #0d9488 55%, #059669 100%);
+            background: #ffffff;
             border-radius: 24px;
             padding: 16px 18px 14px;
-            box-shadow: 0 10px 24px rgba(13, 148, 136, 0.28), inset 0 1px 1px rgba(255, 255, 255, 0.45);
-            border: 1.5px solid rgba(255, 255, 255, 0.4);
-            color: #ffffff;
+            box-shadow: 0 8px 24px rgba(12, 74, 110, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04);
+            border: 1.5px solid #dbeafe;
+            color: #0f172a;
             display: flex;
             flex-direction: column;
             gap: 12px;
@@ -238,60 +238,60 @@
             width: 52px;
             height: 52px;
             border-radius: 16px;
-            background: rgba(255, 255, 255, 0.22);
-            backdrop-filter: blur(8px);
+            background: #f0f9ff;
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 1.5px solid rgba(255, 255, 255, 0.5);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+            border: 1.5px solid #bae6fd;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.12);
             flex-shrink: 0;
-            padding: 5px;
+            padding: 6px;
             overflow: hidden;
         }
         .wallet-circle-3d img {
             width: 100%;
             height: 100%;
             object-fit: contain;
-            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.22));
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.12));
         }
         
         .balance-text-group { display: flex; flex-direction: column; gap: 2px; line-height: 1.2; }
-        .balance-label-line { display: flex; align-items: center; gap: 7px; font-size: 11.5px; font-weight: 700; color: #ccfbf1; text-transform: uppercase; letter-spacing: 0.4px; }
-        .eye-toggle-btn { cursor: pointer; color: #99f6e4; font-size: 13px; }
-        .balance-amount-line { font-size: 26px; font-weight: 900; color: #ffffff; letter-spacing: -0.5px; white-space: nowrap; line-height: 1.15; margin: 2px 0; }
-        .balance-bdt-line { font-size: 12px; font-weight: 700; color: #d1fae5; letter-spacing: 0.2px; }
+        .balance-label-line { display: flex; align-items: center; gap: 7px; font-size: 11.5px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.4px; }
+        .eye-toggle-btn { cursor: pointer; color: #0284c7; font-size: 13px; }
+        .balance-amount-line { font-size: 26px; font-weight: 900; color: #0f172a; letter-spacing: -0.5px; white-space: nowrap; line-height: 1.15; margin: 2px 0; }
+        .balance-bdt-line { font-size: 12px; font-weight: 750; color: #059669; letter-spacing: 0.2px; }
 
         .user-meta-right { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
-        .user-name-text { font-size: 15px; font-weight: 850; color: #ffffff; max-width: 140px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; }
-        .uid-chip-3d { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 800; color: #ffffff; background: rgba(0, 0, 0, 0.28); border: 1.2px solid rgba(255, 255, 255, 0.4); padding: 3px 10px; border-radius: 16px; cursor: pointer; }
+        .user-name-text { font-size: 15px; font-weight: 850; color: #0f172a; max-width: 140px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; }
+        .uid-chip-3d { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 800; color: #0284c7; background: #e0f2fe; border: 1.2px solid #bae6fd; padding: 3px 10px; border-radius: 16px; cursor: pointer; }
 
         /* 3-Column Sub Stats Grid */
         .balance-sub-stats-grid {
             display: grid;
             grid-template-columns: 1fr 1fr 1.1fr;
             gap: 7px;
-            background: rgba(0, 0, 0, 0.24);
+            background: #f8fafc;
             border-radius: 14px;
             padding: 7px;
-            border: 1px solid rgba(255, 255, 255, 0.18);
+            border: 1px solid #e2e8f0;
         }
-        .sub-stat-box { display: flex; align-items: center; gap: 7px; min-width: 0; background: rgba(255, 255, 255, 0.09); border-radius: 10px; padding: 6px 8px; }
+        .sub-stat-box { display: flex; align-items: center; gap: 7px; min-width: 0; background: #ffffff; border-radius: 10px; padding: 6px 8px; border: 1px solid #eef2f6; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
         .sub-stat-mini-icon { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 13px; color: #fff; }
         .sub-stat-mini-icon.green-glow { background: #10b981; }
         .sub-stat-mini-icon.blue-glow { background: #0284c7; }
         .sub-stat-labels { display: flex; flex-direction: column; justify-content: center; line-height: 1.2; min-width: 0; overflow: hidden; }
-        .sub-stat-labels span { font-size: 8.5px; color: #ccfbf1; font-weight: 700; text-transform: uppercase; }
-        .sub-stat-labels strong { font-size: 11.5px; color: #ffffff; font-weight: 850; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .sub-stat-labels span { font-size: 8.5px; color: #64748b; font-weight: 700; text-transform: uppercase; }
+        .sub-stat-labels strong { font-size: 11.5px; color: #0f172a; font-weight: 850; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        .verify-badge-pill { display: flex; align-items: center; gap: 6px; min-width: 0; background: rgba(239, 68, 68, 0.28); border: 1.2px solid #f87171; border-radius: 10px; padding: 6px 8px; cursor: pointer; }
-        .verify-badge-pill.verified { background: rgba(16, 185, 129, 0.28); border-color: #34d399; }
+        .verify-badge-pill { display: flex; align-items: center; gap: 6px; min-width: 0; background: #fef2f2; border: 1.2px solid #fecaca; border-radius: 10px; padding: 6px 8px; cursor: pointer; }
+        .verify-badge-pill.verified { background: #ecfdf5; border-color: #a7f3d0; }
         .verify-pill-icon { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #ffffff; flex-shrink: 0; background: #ef4444; }
         .verify-badge-pill.verified .verify-pill-icon { background: #10b981; }
         .verify-pill-text { display: flex; flex-direction: column; justify-content: center; line-height: 1.15; min-width: 0; }
-        .verify-pill-text span { font-size: 8px; font-weight: 700; color: #fecaca; text-transform: uppercase; }
-        .verify-badge-pill.verified .verify-pill-text span { color: #a7f3d0; }
-        .verify-pill-text strong { font-size: 10.5px; font-weight: 850; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .verify-pill-text span { font-size: 8px; font-weight: 700; color: #dc2626; text-transform: uppercase; }
+        .verify-badge-pill.verified .verify-pill-text span { color: #059669; }
+        .verify-pill-text strong { font-size: 10.5px; font-weight: 850; color: #991b1b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .verify-badge-pill.verified .verify-pill-text strong { color: #065f46; }
 
         /* Actions Grid */
         .actions-wide-grid {
@@ -349,7 +349,6 @@
         .task-row-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; margin-bottom: 14px; }
         .task-left-meta { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; }
         
-        /* 🌟 অ্যাপ লোগো সংবলিত টাস্ক সিম্বল */
         .task-symbol-3d { 
             width: 42px; 
             height: 42px; 
@@ -828,7 +827,6 @@
                         </div>
                     </div>
                     <div class="header-actions">
-                        <!-- 🌟 নোটিফিকেশন আইকন (ক্লিক করলে ব্যাজ মুছে যাবে) -->
                         <div class="notif-btn" onclick="openNotificationsPage()" title="Notifications">
                             <i class="fa-regular fa-bell"></i>
                             <span class="notif-badge" id="notifBadgeCount">0</span>
@@ -841,7 +839,7 @@
                     </div>
                 </div>
 
-                <!-- 3D Balance Card -->
+                <!-- 🌟 3D Balance Card: শুভ্র ও পরিষ্কার সাদা থিম -->
                 <div class="balance-card">
                     <div class="balance-top-row">
                         <div class="balance-left-content">
@@ -917,7 +915,6 @@
                 <div class="task-card-3d">
                     <div class="task-row-header">
                         <div class="task-left-meta">
-                            <!-- 🌟 আপনার অ্যাপ লোগো সংবলিত আইকন বক্স -->
                             <div class="task-symbol-3d">
                                 <img src="https://i.ibb.co.com/5W2f2xg4/pngtree-money-icon-dollar-coins-cash-payment-online-earning-png-image-7589413.png" alt="MicroTask Logo">
                             </div>
@@ -932,7 +929,6 @@
                         </div>
                     </div>
 
-                    <!-- বাটনসমূহ: বর্ডার ছাড়া শুধু আইকন ও নাম -->
                     <div class="video-grid">
                         <!-- 1. YouTube -->
                         <div class="video-card-3d" onclick="handleSecureNav('youtube-tasks.html')">
@@ -960,7 +956,7 @@
                             <span>Boost</span>
                         </div>
 
-                        <!-- 5. Spin 🌟 (Coming Soon অ্যালার্ট শো করবে) -->
+                        <!-- 5. Spin -->
                         <div class="video-card-3d" onclick="showToast('Coming Soon! স্পিন অপশনটি শীঘ্রই আসছে।', 'info')">
                             <div class="video-icon spin-img-box">
                                 <img src="https://i.ibb.co.com/whb9d5kr/file-000000008efc8210bf18d0b93b2aa164.png" alt="Spin">
@@ -1118,7 +1114,7 @@
             }
         })();
 
-        // 🌟 নির্ভুল তারিখ তৈরি ও মিলিয়ে দেখার ফাংশন
+        // 🌟 নির্ভুল ও শক্তিশালি তারিখ যাচাইকরণ ফাংশন (যেকোনো ফরম্যাট সাপোর্ট করবে)
         function getTodayString() {
             const d = new Date();
             const year = d.getFullYear();
@@ -1129,19 +1125,39 @@
 
         function isDateToday(dateVal) {
             if (!dateVal) return false;
-            const todayStr = getTodayString();
-            if (dateVal === todayStr) return true;
-            if (typeof dateVal === 'string' && dateVal.startsWith(todayStr)) return true;
+            const now = new Date();
+            const todayY = now.getFullYear();
+            const todayM = now.getMonth();
+            const todayD = now.getDate();
             
             let d = null;
-            if (dateVal.toDate) d = dateVal.toDate();
-            else if (typeof dateVal === 'number' || typeof dateVal === 'string') d = new Date(dateVal);
+            if (typeof dateVal === 'object' && dateVal !== null && typeof dateVal.toDate === 'function') {
+                d = dateVal.toDate();
+            } else if (dateVal instanceof Date) {
+                d = dateVal;
+            } else if (typeof dateVal === 'number') {
+                d = new Date(dateVal);
+            } else if (typeof dateVal === 'string') {
+                const trimmed = dateVal.trim();
+                const parts = trimmed.split(/[-/]/);
+                if (parts.length === 3) {
+                    if (parts[0].length === 4) {
+                        const y = parseInt(parts[0], 10);
+                        const m = parseInt(parts[1], 10) - 1;
+                        const day = parseInt(parts[2], 10);
+                        return y === todayY && m === todayM && day === todayD;
+                    } else if (parts[2].length === 4) {
+                        const day = parseInt(parts[0], 10);
+                        const m = parseInt(parts[1], 10) - 1;
+                        const y = parseInt(parts[2], 10);
+                        return y === todayY && m === todayM && day === todayD;
+                    }
+                }
+                d = new Date(trimmed);
+            }
             
             if (d && !isNaN(d.getTime())) {
-                const year = d.getFullYear();
-                const month = String(d.getMonth() + 1).padStart(2, '0');
-                const day = String(d.getDate()).padStart(2, '0');
-                return `${year}-${month}-${day}` === todayStr;
+                return d.getFullYear() === todayY && d.getMonth() === todayM && d.getDate() === todayD;
             }
             return false;
         }
@@ -1175,7 +1191,7 @@
                 document.getElementById("balanceAmount").textContent = `$ ${balUSD.toFixed(2)}`;
                 document.getElementById("bdtAmount").textContent = `≈ ${(balUSD * USD_TO_BDT).toFixed(2)} BDT`;
 
-                const todayEarn = (cachedUser.lastEarnDate && isDateToday(cachedUser.lastEarnDate)) ? Number(cachedUser.todayEarnUSD || 0) : 0;
+                const todayEarn = (!cachedUser.lastEarnDate || isDateToday(cachedUser.lastEarnDate)) ? Number(cachedUser.todayEarnUSD || 0) : 0;
                 const totalEarn = Number(cachedUser.totalEarnUSD || 0);
                 document.getElementById("todayEarnText").textContent = `$ ${todayEarn.toFixed(2)}`;
                 document.getElementById("totalEarnText").textContent = `$ ${totalEarn.toFixed(2)}`;
@@ -1194,7 +1210,7 @@
             }
         }
 
-        // 🌟 Today Earn এবং ব্যালেন্স প্রদর্শন ফাংশন
+        // 🌟 ব্যালেন্স ও Today Earn সুন্দরভাবে ডিসপ্লে করা
         function updateBalanceDisplay() {
             const balUSD = currentUserDoc ? Number(currentUserDoc.balanceUSD || 0) : 0;
             const bdtEquivalent = (balUSD * USD_TO_BDT).toFixed(2);
@@ -1256,10 +1272,10 @@
             window.location.href = destinationUrl;
         }
 
-        // ================= সর্বজনীন আয় রেকর্ড ও ক্যালকুলেশন =================
+        // ================= সর্বজনীন আয় রেকর্ড ও রিয়েলটাইম ক্যালকুলেশন =================
         window.recordUserEarning = function(amountUSD, earningType = 'task', title = 'Earning') {
             const user = auth.currentUser;
-            if (!user || !currentUserDoc) return;
+            if (!user) return;
 
             const earnAmount = parseFloat(Number(amountUSD).toFixed(4));
             if (isNaN(earnAmount) || earnAmount <= 0) return;
@@ -1297,6 +1313,13 @@
                     currentUserDoc.totalEarnUSD = res.newTotal;
                     currentUserDoc.lastEarnDate = todayStr;
                     updateBalanceDisplay();
+
+                    const cached = JSON.parse(localStorage.getItem('microtask_cached_user')) || {};
+                    cached.balanceUSD = res.newBal;
+                    cached.todayEarnUSD = res.newToday;
+                    cached.totalEarnUSD = res.newTotal;
+                    cached.lastEarnDate = todayStr;
+                    localStorage.setItem('microtask_cached_user', JSON.stringify(cached));
                 }
 
                 db.collection("task_history").add({
@@ -1315,9 +1338,13 @@
             window.recordUserEarning(amountUSD, taskType, "Task Earn");
         };
 
-        // 🌟 সব উৎস (টাস্ক, পোস্ট, রেফার ইত্যাদি) থেকে লাইভ আয় সিঙ্ক
+        // 🌟 সব উৎস থেকে লাইভ আয় সিঙ্ক এবং Today Earn নির্ভুলভাবে কাউন্ট
         function listenToLiveEarnings(userUid) {
-            if (liveEarningsUnsub) liveEarningsUnsub();
+            if (liveEarningsUnsub) {
+                liveEarningsUnsub();
+                liveEarningsUnsub = null;
+            }
+            if (!userUid) return;
 
             const my6DigitUID = currentUserDoc ? String(currentUserDoc.uid || '').trim() : '';
             const uidList = [userUid];
@@ -1332,10 +1359,13 @@
 
                     snap.forEach(doc => {
                         const h = doc.data();
-                        const amount = Number(h.amountUSD || 0);
-                        calculatedTotal += amount;
-                        if (isDateToday(h.date || h.createdAt)) {
-                            calculatedToday += amount;
+                        const amount = Number(h.amountUSD || h.amount || h.reward || h.earn || 0);
+                        if (amount > 0) {
+                            calculatedTotal += amount;
+                            const itemDate = h.date || h.createdAt || h.timestamp;
+                            if (isDateToday(itemDate) || (!itemDate && doc.metadata && doc.metadata.hasPendingWrites)) {
+                                calculatedToday += amount;
+                            }
                         }
                     });
 
@@ -1343,14 +1373,20 @@
                         const existingToday = (currentUserDoc.lastEarnDate && isDateToday(currentUserDoc.lastEarnDate)) ? Number(currentUserDoc.todayEarnUSD || 0) : 0;
                         const existingTotal = Number(currentUserDoc.totalEarnUSD || 0);
 
-                        const finalToday = Math.max(calculatedToday, existingToday);
-                        const finalTotal = Math.max(calculatedTotal, existingTotal);
+                        const finalToday = parseFloat(Math.max(calculatedToday, existingToday).toFixed(4));
+                        const finalTotal = parseFloat(Math.max(calculatedTotal, existingTotal).toFixed(4));
 
                         currentUserDoc.todayEarnUSD = finalToday;
                         currentUserDoc.totalEarnUSD = finalTotal;
                         currentUserDoc.lastEarnDate = todayStr;
 
                         updateBalanceDisplay();
+
+                        const cached = JSON.parse(localStorage.getItem('microtask_cached_user')) || {};
+                        cached.todayEarnUSD = finalToday;
+                        cached.totalEarnUSD = finalTotal;
+                        cached.lastEarnDate = todayStr;
+                        localStorage.setItem('microtask_cached_user', JSON.stringify(cached));
 
                         if (existingToday < finalToday || existingTotal < finalTotal) {
                             db.collection("users").doc(userUid).update({
@@ -1667,7 +1703,6 @@
             showToast(`${provider} login will be available in next update!`, "info");
         }
 
-        // 🌟 নোটিফিকেশন সিস্টেম এবং ব্যাজ কাউন্ট
         function initNotificationBadge() {
             const badge = document.getElementById('notifBadgeCount');
             badge.innerText = '0';
@@ -1712,7 +1747,6 @@
             });
         }
 
-        // 🌟 নোটিফিকেশনে ক্লিক করলে কাউন্ট মুছে যাবে এবং নতুন আসলে আবার কাউন্ট হবে
         function openNotificationsPage() {
             if (currentUnreadNotifIds.length > 0) {
                 const readIds = JSON.parse(localStorage.getItem('read_notif_ids') || '[]');
@@ -1761,11 +1795,16 @@
                         updateVerificationUI();
                         initNotificationBadge();
 
-                        listenToLiveEarnings(user.uid);
+                        if (!liveEarningsUnsub) {
+                            listenToLiveEarnings(user.uid);
+                        }
                     }
                 });
             } else {
-                if (liveEarningsUnsub) liveEarningsUnsub();
+                if (liveEarningsUnsub) {
+                    liveEarningsUnsub();
+                    liveEarningsUnsub = null;
+                }
                 if (!localStorage.getItem('microtask_cached_user')) {
                     document.getElementById('mainDashboard').style.display = 'none';
                     document.getElementById('authScreen').style.display = 'flex';
