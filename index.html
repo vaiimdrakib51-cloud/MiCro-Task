@@ -218,7 +218,7 @@
             box-shadow: 0 4px 12px rgba(2, 132, 199, 0.28);
         }
 
-        /* 🌟 3D Balance Card: সাদা থিম (White Clean 3D Card) */
+        /* 🌟 3D Balance Card */
         .balance-card {
             background: #ffffff;
             border-radius: 24px;
@@ -338,7 +338,7 @@
         .action-wide-card.deposit-card span { color: #047857; }
         .action-wide-card.withdraw-card span { color: #0369a1; }
 
-        /* 3D Task Card: Tasks & Earnings Zone */
+        /* 3D Task Card */
         .task-card-3d { 
             background: var(--card-3d); 
             border: 1.5px solid var(--card-border); 
@@ -376,7 +376,6 @@
         .task-pill { display: inline-flex; align-items: center; gap: 5px; padding: 4px 11px; border-radius: 18px; font-size: 11.5px; font-weight: 800; white-space: nowrap; margin-left: auto; cursor: pointer; flex-shrink: 0; }
         .task-pill.green-pill { background: #dcfce7; color: #047857; border: 1px solid #86efac; }
 
-        /* Clean Icon Buttons Grid */
         .video-grid { 
             display: grid; 
             grid-template-columns: repeat(4, 1fr); 
@@ -428,11 +427,7 @@
             padding: 6px;
             box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
         }
-        .video-icon.boost-box img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
+        .video-icon.boost-box img { width: 100%; height: 100%; object-fit: contain; }
 
         .video-icon.spin-img-box {
             background: #ffffff;
@@ -440,19 +435,9 @@
             box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
             padding: 2px;
         }
-        .video-icon.spin-img-box img {
-            object-fit: contain;
-        }
-
-        .video-icon.movie-img-box {
-            background: #000;
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
-        }
-
-        .video-icon.typing-img-box {
-            background: #000;
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
-        }
+        .video-icon.spin-img-box img { object-fit: contain; }
+        .video-icon.movie-img-box { background: #000; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25); }
+        .video-icon.typing-img-box { background: #000; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25); }
 
         .video-card-3d span { 
             font-size: 11.5px; 
@@ -656,6 +641,123 @@
         .btn-cancel-logout { flex: 1; padding: 9px; border-radius: 12px; border: 1px solid #cbd5e1; background: #f8fafc; font-weight: 700; font-size: 12px; cursor: pointer; }
         .btn-confirm-logout { flex: 1; padding: 9px; border-radius: 12px; border: none; background: #ef4444; color: #fff; font-weight: 700; font-size: 12px; cursor: pointer; }
 
+        /* 🛑 🌟 অ্যাকাউন্ট ব্লক ও ব্যালেন্স বাজেয়াপ্ত স্ক্রিন */
+        .blocked-screen-overlay {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at center, #1e0509 0%, #050103 100%);
+            backdrop-filter: blur(16px);
+            z-index: 999999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            user-select: none;
+        }
+        .blocked-screen-overlay.active { display: flex; }
+
+        .blocked-card-3d {
+            width: 100%;
+            max-width: 340px;
+            background: linear-gradient(165deg, #24080e 0%, #120306 100%);
+            border: 2px solid #ef4444;
+            border-radius: 26px;
+            padding: 28px 20px 22px;
+            text-align: center;
+            box-shadow: 0 25px 60px rgba(239, 68, 68, 0.4), inset 0 0 15px rgba(239, 68, 68, 0.2);
+            animation: sheetUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            color: #ffffff;
+        }
+
+        .blocked-icon-box {
+            width: 66px;
+            height: 66px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            margin: 0 auto 14px;
+            box-shadow: 0 0 30px rgba(239, 68, 68, 0.6);
+            border: 2.5px solid #fecaca;
+        }
+
+        .blocked-card-3d h2 {
+            font-size: 18px;
+            font-weight: 850;
+            color: #ffffff;
+            margin-bottom: 6px;
+        }
+
+        .blocked-badge-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid #ef4444;
+            color: #fca5a5;
+            font-size: 11px;
+            font-weight: 850;
+            padding: 3px 14px;
+            border-radius: 20px;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .blocked-msg-box {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(239, 68, 68, 0.35);
+            border-radius: 14px;
+            padding: 12px 14px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .blocked-msg-box p {
+            font-size: 12.5px;
+            color: #fecaca;
+            line-height: 1.6;
+            font-weight: 600;
+        }
+
+        .blocked-actions-row {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .btn-blocked-support {
+            width: 100%;
+            padding: 11px 0;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 850;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(2, 132, 199, 0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+        }
+
+        .btn-blocked-logout {
+            width: 100%;
+            padding: 10px 0;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            background: transparent;
+            color: #94a3b8;
+            font-size: 12px;
+            font-weight: 750;
+            cursor: pointer;
+        }
+
         /* Toast */
         .toast { position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%) translateY(100px); background: #0f172a; color: #FFF; padding: 10px 18px; border-radius: 25px; font-size: 12px; font-weight: 600; transition: all 0.3s ease; z-index: 2500; opacity: 0; white-space: nowrap; box-shadow: 0 8px 24px rgba(0,0,0,0.28); }
         .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
@@ -839,7 +941,7 @@
                     </div>
                 </div>
 
-                <!-- 🌟 3D Balance Card: শুভ্র ও পরিষ্কার সাদা থিম -->
+                <!-- 🌟 3D Balance Card -->
                 <div class="balance-card">
                     <div class="balance-top-row">
                         <div class="balance-left-content">
@@ -1023,6 +1125,33 @@
 
     </div>
 
+    <!-- 🛑 🌟 অ্যাকাউন্ট ব্লক ও ব্যালেন্স বাজেয়াপ্ত স্ক্রিন (FULL-SCREEN LOCK) -->
+    <div class="blocked-screen-overlay" id="accountBlockedScreen">
+        <div class="blocked-card-3d">
+            <div class="blocked-icon-box">
+                <i class="fa-solid fa-ban"></i>
+            </div>
+            <h2>অ্যাকাউন্ট স্থগিত করা হয়েছে</h2>
+            <div class="blocked-badge-tag">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <span>Account Suspended</span>
+            </div>
+            
+            <div class="blocked-msg-box">
+                <p>আমরা আপনার অ্যাকাউন্টে অবৈধ কার্যকলাপ উপলব্ধ করেছি, সেকারণে আপনার অ্যাকাউন্ট ও সেখানে থাকা ব্যালেন্স বাজেয়াপ্ত করা হয়েছে।</p>
+            </div>
+
+            <div class="blocked-actions-row">
+                <button type="button" class="btn-blocked-support" onclick="window.location.href='support.html'">
+                    <i class="fa-solid fa-headset"></i> কন্টাক্ট সাপোর্ট (Support)
+                </button>
+                <button type="button" class="btn-blocked-logout" onclick="confirmLogout()">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i> লগআউট করুন
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- 50 BDT VERIFICATION MODAL -->
     <div class="verify-modal-overlay" id="verificationModal">
         <div class="verify-modal-card">
@@ -1114,7 +1243,6 @@
             }
         })();
 
-        // 🌟 নির্ভুল ও শক্তিশালি তারিখ যাচাইকরণ ফাংশন (যেকোনো ফরম্যাট সাপোর্ট করবে)
         function getTodayString() {
             const d = new Date();
             const year = d.getFullYear();
@@ -1169,10 +1297,17 @@
             return name.slice(0, 2) + "****";
         }
 
+        // 🌟 তাৎক্ষণিক সেশন রিস্টোর
         (function restoreSessionInstantly() {
             const cachedUser = JSON.parse(localStorage.getItem('microtask_cached_user'));
             if (cachedUser && cachedUser.uid) {
                 currentUserDoc = cachedUser;
+                
+                // ব্লক চেক
+                if (cachedUser.isBlocked === true) {
+                    document.getElementById('accountBlockedScreen').classList.add('active');
+                }
+
                 document.getElementById('authScreen').style.display = 'none';
                 document.getElementById('mainDashboard').style.display = 'block';
                 document.getElementById('dashboardUserName').innerText = cachedUser.name || 'User';
@@ -1338,7 +1473,7 @@
             window.recordUserEarning(amountUSD, taskType, "Task Earn");
         };
 
-        // 🌟 সব উৎস থেকে লাইভ আয় সিঙ্ক এবং Today Earn নির্ভুলভাবে কাউন্ট
+        // 🌟 সব উৎস থেকে লাইভ আয় সিঙ্ক
         function listenToLiveEarnings(userUid) {
             if (liveEarningsUnsub) {
                 liveEarningsUnsub();
@@ -1399,6 +1534,7 @@
                 }, err => console.log("Earnings listener error:", err));
         }
 
+        // ================= 🌟 ৫০ টাকা অ্যাকাউন্ট ভেরিফিকেশন =================
         function processAccountVerification() {
             const user = auth.currentUser;
             if (!user) {
@@ -1442,23 +1578,25 @@
                     throw new Error("Insufficient Balance! Need at least ৳50.");
                 }
 
+                const newBalanceAfterVerify = parseFloat((liveBal - feeUSD).toFixed(4));
+
                 transaction.update(userRef, {
-                    balanceUSD: parseFloat((liveBal - feeUSD).toFixed(4)),
+                    balanceUSD: newBalanceAfterVerify,
                     isVerified: true,
                     verifiedDate: todayStr
                 });
 
-                return userData;
-            }).then(async (verifiedUserData) => {
+                return { ...userData, newBalanceAfterVerify };
+            }).then(async (resData) => {
                 if (currentUserDoc) {
                     currentUserDoc.isVerified = true;
                     currentUserDoc.verifiedDate = todayStr;
-                    currentUserDoc.balanceUSD = parseFloat((Number(currentUserDoc.balanceUSD || 0) - feeUSD).toFixed(4));
+                    currentUserDoc.balanceUSD = resData.newBalanceAfterVerify;
                 }
                 const cached = JSON.parse(localStorage.getItem('microtask_cached_user')) || {};
                 cached.isVerified = true;
                 cached.verifiedDate = todayStr;
-                cached.balanceUSD = currentUserDoc ? currentUserDoc.balanceUSD : 0;
+                cached.balanceUSD = resData.newBalanceAfterVerify;
                 localStorage.setItem('microtask_cached_user', JSON.stringify(cached));
 
                 updateVerificationUI();
@@ -1466,11 +1604,11 @@
                 closeVerifyModal();
                 showToast("Account Verified! ৳50 ($0.42) deducted.", "success");
 
-                const refUID = verifiedUserData.referredBy ? String(verifiedUserData.referredBy).trim() : null;
+                const refUID = resData.referredBy ? String(resData.referredBy).trim() : null;
                 if (!refUID) return;
 
                 const bonusUSD = parseFloat((40 / USD_TO_BDT).toFixed(4));
-                const maskedUser = maskUserName(verifiedUserData.name || 'Member');
+                const maskedUser = maskUserName(resData.name || 'Member');
 
                 try {
                     const snap = await db.collection("users").where("uid", "==", refUID).limit(1).get();
@@ -1556,6 +1694,7 @@
             closeLogoutModal();
             auth.signOut().then(() => {
                 localStorage.removeItem('microtask_cached_user');
+                document.getElementById('accountBlockedScreen').classList.remove('active');
                 document.getElementById('mainDashboard').style.display = 'none';
                 document.getElementById('authScreen').style.display = 'flex';
                 showToast('Logged out successfully.', 'info');
@@ -1629,6 +1768,7 @@
                         totalEarnUSD: 0.00,
                         lastEarnDate: todayStr,
                         isVerified: false,
+                        isBlocked: false,
                         referredBy: referCode || null,
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     };
@@ -1763,11 +1903,24 @@
             window.location.href = 'notifications.html';
         }
 
+        // ================= 🌟 ফায়ারবেস থেকে লাইভ ব্যালেন্স ও ব্লক সিঙ্ক =================
         auth.onAuthStateChanged(user => {
             if (user) {
                 db.collection("users").doc(user.uid).onSnapshot(doc => {
                     if (doc.exists) {
                         currentUserDoc = doc.data();
+                        
+                        // 🛑 ১. ব্লক চেক: এডমিন ব্লক করলে তাৎক্ষণিক পুরো ড্যাশবোর্ড লক হবে
+                        if (currentUserDoc.isBlocked === true) {
+                            document.getElementById('accountBlockedScreen').classList.add('active');
+                        } else {
+                            document.getElementById('accountBlockedScreen').classList.remove('active');
+                        }
+
+                        // 💰 ২. রিয়েল ব্যালেন্স সিঙ্ক (ক্যাশ আটকে থাকবে না)
+                        const liveBalUSD = Number(currentUserDoc.balanceUSD || 0);
+                        currentUserDoc.balanceUSD = liveBalUSD;
+
                         if (currentUserDoc.createdAt) {
                             userCreatedAtMs = currentUserDoc.createdAt.toMillis ? currentUserDoc.createdAt.toMillis() : new Date(currentUserDoc.createdAt).getTime();
                         }
@@ -1799,16 +1952,16 @@
                             listenToLiveEarnings(user.uid);
                         }
                     }
-                });
+                }, err => console.log("User live snapshot error:", err));
             } else {
                 if (liveEarningsUnsub) {
                     liveEarningsUnsub();
                     liveEarningsUnsub = null;
                 }
-                if (!localStorage.getItem('microtask_cached_user')) {
-                    document.getElementById('mainDashboard').style.display = 'none';
-                    document.getElementById('authScreen').style.display = 'flex';
-                }
+                localStorage.removeItem('microtask_cached_user');
+                document.getElementById('accountBlockedScreen').classList.remove('active');
+                document.getElementById('mainDashboard').style.display = 'none';
+                document.getElementById('authScreen').style.display = 'flex';
             }
         });
 
