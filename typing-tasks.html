@@ -121,7 +121,7 @@
             letter-spacing: -0.3px;
         }
 
-        /* 🌟 ২টা উপরে ২টা নিচে গ্রিড লেআউট (2x2 Grid) */
+        /* ২টা উপরে ২টা নিচে গ্রিড লেআউট */
         .packages-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -273,7 +273,7 @@
         .card-vip .hex-icon-wrapper { background: linear-gradient(180deg, #f97316 0%, #c2410c 100%); }
         .card-vip .buy-now-btn { background: linear-gradient(180deg, #ea580c 0%, #c2410c 100%); box-shadow: 0 3px 10px rgba(234, 88, 12, 0.3); }
 
-        /* ================= 📜 নিয়মাবলী সেকশন (RULES & GUIDELINES) ================= */
+        /* ================= 📜 নিয়মাবলী সেকশন ================= */
         .rules-wrapper-card {
             width: 100%;
             max-width: 600px;
@@ -294,23 +294,10 @@
             padding-bottom: 8px;
         }
 
-        .rules-header i {
-            color: #0284c7;
-            font-size: 16px;
-        }
+        .rules-header i { color: #0284c7; font-size: 16px; }
+        .rules-header h3 { font-size: 14px; font-weight: 850; color: #0c4a6e; }
 
-        .rules-header h3 {
-            font-size: 14px;
-            font-weight: 850;
-            color: #0c4a6e;
-        }
-
-        .rules-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
+        .rules-list { display: flex; flex-direction: column; gap: 8px; }
         .rule-item {
             display: flex;
             align-items: flex-start;
@@ -321,28 +308,11 @@
             border-radius: 12px;
         }
 
-        .rule-icon {
-            color: #0284c7;
-            font-size: 12px;
-            margin-top: 2px;
-            flex-shrink: 0;
-        }
+        .rule-icon { color: #0284c7; font-size: 12px; margin-top: 2px; flex-shrink: 0; }
+        .rule-text h4 { font-size: 11.5px; font-weight: 800; color: #0f172a; margin-bottom: 2px; }
+        .rule-text p { font-size: 10.5px; color: #64748b; line-height: 1.4; font-weight: 600; }
 
-        .rule-text h4 {
-            font-size: 11.5px;
-            font-weight: 800;
-            color: #0f172a;
-            margin-bottom: 2px;
-        }
-
-        .rule-text p {
-            font-size: 10.5px;
-            color: #64748b;
-            line-height: 1.4;
-            font-weight: 600;
-        }
-
-        /* ================= 🌟 ৩ডি মাল্টি-কার্ড ড্রপ স্ক্রিন ================= */
+        /* ================= 🌟 ৩ডি ড্রপ স্ক্রিন ================= */
         .envelope-game-overlay {
             position: fixed;
             inset: 0;
@@ -373,13 +343,7 @@
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
         }
 
-        .game-title-box h3 {
-            color: #ffd700;
-            font-size: 15px;
-            font-weight: 900;
-            text-shadow: 0 0 14px rgba(255, 215, 0, 0.6);
-        }
-
+        .game-title-box h3 { color: #ffd700; font-size: 15px; font-weight: 900; }
         .game-title-box p { color: #e2e8f0; font-size: 11px; font-weight: 600; }
 
         .game-close-btn {
@@ -394,10 +358,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s;
         }
 
-        .game-close-btn:hover { background: #ef4444; }
         .envelope-rain-stage { position: absolute; inset: 0; overflow: hidden; transform-style: preserve-3d; }
 
         .falling-card-item {
@@ -415,9 +377,6 @@
             transform-style: preserve-3d;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
         }
-
-        .falling-card-item:hover { filter: brightness(1.25); }
-        .falling-card-item:active { transform: scale(0.92); }
 
         .falling-card-item.model-crimson {
             background: linear-gradient(135deg, #ff1744 0%, #c50024 60%, #590010 100%);
@@ -489,7 +448,7 @@
             100% { transform: translateY(118vh) rotateX(-360deg) rotateY(-360deg) rotateZ(-360deg) scale(0.95); opacity: 0.95; }
         }
 
-        /* ================= ছোট ও আধুনিক রিওয়ার্ড টিকেট ================= */
+        /* ================= রিওয়ার্ড টিকেট ================= */
         .reward-popup-card {
             position: absolute;
             top: 50%;
@@ -630,7 +589,7 @@
             white-space: nowrap;
         }
 
-        .task-spec-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+        .task-spec-tags { display: flex; flex-wrap: gap; gap: 6px; }
         .spec-tag {
             background: #f1f5f9;
             border: 1px solid #cbd5e1;
@@ -829,6 +788,130 @@
             box-shadow: 0 4px 14px rgba(2, 132, 199, 0.3);
         }
 
+        /* ================= 🌟 আধুনিক সাবমিশন সাকসেস মডেল (পেন্ডিং রিভিউ) ================= */
+        .submit-success-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.90);
+            backdrop-filter: blur(10px);
+            z-index: 215000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+        .submit-success-overlay.active { display: flex; }
+
+        .submit-success-card {
+            width: 100%;
+            max-width: 335px;
+            background: #ffffff;
+            border-radius: 26px;
+            padding: 24px 20px 20px;
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.35);
+            border: 1.5px solid #fef08a;
+            animation: popUpScale 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .submit-success-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            margin: 0 auto 12px;
+            box-shadow: 0 8px 20px rgba(245, 158, 11, 0.35);
+            border: 2px solid #fde68a;
+        }
+
+        .submit-success-card h3 {
+            font-size: 17.5px;
+            font-weight: 850;
+            color: #0f172a;
+            margin-bottom: 4px;
+        }
+
+        .submit-pending-status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #fefce8;
+            color: #b45309;
+            font-size: 12px;
+            font-weight: 900;
+            padding: 5px 14px;
+            border-radius: 30px;
+            margin: 6px 0 12px;
+            border: 1.2px solid #fef08a;
+        }
+
+        .submit-success-info-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 10px 12px;
+            text-align: left;
+            margin-bottom: 14px;
+        }
+
+        .submit-info-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #475569;
+            margin-bottom: 4px;
+        }
+        .submit-info-row:last-child { margin-bottom: 0; }
+        .submit-info-row strong { color: #0284c7; }
+
+        .submit-success-card p {
+            font-size: 11.5px;
+            color: #64748b;
+            line-height: 1.45;
+            margin-bottom: 18px;
+            font-weight: 600;
+        }
+
+        .submit-actions-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .btn-view-history {
+            width: 100%;
+            padding: 10.5px 0;
+            border: none;
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 850;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-close-submit-modal {
+            width: 100%;
+            padding: 9px 0;
+            border: 1.5px solid #cbd5e1;
+            background: #f8fafc;
+            color: #334155;
+            font-size: 12px;
+            font-weight: 800;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+
         /* ================= ⏳ ২৪ ঘণ্টা লক অ্যালার্ট মডেল ================= */
         .lock-modal-overlay {
             position: fixed;
@@ -921,7 +1004,7 @@
         </div>
 
         <div class="packages-grid">
-            <!-- ১. Basic (টপ-বাম) -->
+            <!-- ১. Basic -->
             <div class="package-card card-basic">
                 <div class="ribbon-banner"><span>Basic</span></div>
                 <div class="hex-icon-wrapper"><i class="fa-solid fa-gem"></i></div>
@@ -937,7 +1020,7 @@
                 </button>
             </div>
 
-            <!-- ২. Standard (টপ-ডান) -->
+            <!-- ২. Standard -->
             <div class="package-card card-standard">
                 <div class="ribbon-banner"><span>Standard</span></div>
                 <div class="hex-icon-wrapper"><i class="fa-solid fa-star"></i></div>
@@ -953,7 +1036,7 @@
                 </button>
             </div>
 
-            <!-- ৩. Premium (নিচে-বাম) -->
+            <!-- ৩. Premium -->
             <div class="package-card card-premium">
                 <div class="popular-badge-top">Popular</div>
                 <div class="ribbon-banner"><span>Premium</span></div>
@@ -970,7 +1053,7 @@
                 </button>
             </div>
 
-            <!-- ৪. VIP (নিচে-ডান) -->
+            <!-- ৪. VIP -->
             <div class="package-card card-vip">
                 <div class="ribbon-banner"><span>VIP</span></div>
                 <div class="hex-icon-wrapper"><i class="fa-solid fa-crown"></i></div>
@@ -988,7 +1071,7 @@
         </div>
     </div>
 
-    <!-- ================= 📜 নিয়মাবলী সেকশন (RULES & GUIDELINES) ================= -->
+    <!-- ================= 📜 নিয়মাবলী সেকশন ================= -->
     <div class="rules-wrapper-card">
         <div class="rules-header">
             <i class="fa-solid fa-shield-halved"></i>
@@ -999,7 +1082,15 @@
             <div class="rule-item">
                 <i class="fa-solid fa-circle-check rule-icon"></i>
                 <div class="rule-text">
-                    <h4>১. দৈনিক কাজের সীমাবদ্ধতা (Daily Limit)</h4>
+                    <h4>১. অ্যাডমিন ভেরিফিকেশন (Admin Review)</h4>
+                    <p>টাস্ক জমা দেওয়ার পর তা সরাসরি অ্যাডমিন প্যানেলে জমা হবে। অ্যাডমিন দেখে একসেপ্ট করলে প্রফিট যুক্ত হবে এবং হিস্টোরিতে Success দেখাবে। রিজেক্ট হলে Rejected দেখাবে।</p>
+                </div>
+            </div>
+
+            <div class="rule-item">
+                <i class="fa-solid fa-circle-check rule-icon"></i>
+                <div class="rule-text">
+                    <h4>২. দৈনিক কাজের সীমাবদ্ধতা (Daily Limit)</h4>
                     <p>প্রতিজন সদস্য ২৪ ঘণ্টার মধ্যে শুধুমাত্র ১টি প্যাকেজের কাজ সম্পন্ন করতে পারবেন। টাস্ক জমা দেওয়ার পর পরবর্তী ২৪ ঘণ্টার জন্য নতুন প্যাকেজ লক থাকবে।</p>
                 </div>
             </div>
@@ -1007,16 +1098,8 @@
             <div class="rule-item">
                 <i class="fa-solid fa-circle-check rule-icon"></i>
                 <div class="rule-text">
-                    <h4>২. কপি-পেস্ট সম্পূর্ণ নিষিদ্ধ (No Copy-Paste)</h4>
-                    <p>কোনো ওয়েবসাইট বা AI থেকে কপি করে পেস্ট করা যাবে না। নিজ হাতে নির্ধারিত ভাষায় টাইপ করতে হবে, অন্যথায় রিওয়ার্ড বাতিল হতে পারে।</p>
-                </div>
-            </div>
-
-            <div class="rule-item">
-                <i class="fa-solid fa-circle-check rule-icon"></i>
-                <div class="rule-text">
-                    <h4>৩. ভাষা ও ওয়ার্ড লিমিট (Language & Words)</h4>
-                    <p>খাম ওপেন করার পর যে দেশের ভাষা (যেমন: English, Spanish, ইত্যাদি) ও ওয়ার্ড সংখ্যা দেওয়া হবে, ঠিক সেই অনুযায়ী প্যারাগ্রাফ বা স্টোরি লিখতে হবে।</p>
+                    <h4>৩. কপি-পেস্ট সম্পূর্ণ নিষিদ্ধ (No Copy-Paste)</h4>
+                    <p>কোনো ওয়েবসাইট বা AI থেকে কপি করে পেস্ট করা যাবে না। নিজ হাতে নির্ধারিত ভাষায় টাইপ করতে হবে, অন্যথায় টাস্ক রিজেক্ট করা হবে।</p>
                 </div>
             </div>
 
@@ -1024,7 +1107,7 @@
                 <i class="fa-solid fa-circle-check rule-icon"></i>
                 <div class="rule-text">
                     <h4>৪. ১০০% ইনস্ট্যান্ট রিফান্ড (Instant Refund)</h4>
-                    <p>টাইপিং করার সময় যদি কাজ সম্পন্ন না করতে চান, তবে উপরে ক্রস (✕) বাটনে চাপ দিয়ে যেকোনো সময় বাতিল করলে পুরো টাকা মূল ব্যালেন্সে সাথে সাথে ফেরত দেওয়া হবে।</p>
+                    <p>টাইপিং করার সময় যদি কাজ সম্পন্ন না করতে চান, তবে উপরে ক্রস (✕) বাটনে চাপ দিয়ে বাতিল করলে পুরো টাকা মূল ব্যালেন্সে সাথে সাথে ফেরত দেওয়া হবে।</p>
                 </div>
             </div>
         </div>
@@ -1139,6 +1222,47 @@
         </div>
     </div>
 
+    <!-- ================= 🌟 আধুনিক সাবমিশন সাকসেস মডেল (পেন্ডিং রিভিউ) ================= -->
+    <div class="submit-success-overlay" id="submitSuccessModal">
+        <div class="submit-success-card">
+            <div class="submit-success-icon">
+                <i class="fa-solid fa-hourglass-half"></i>
+            </div>
+            <h3>Task Submitted!</h3>
+            
+            <div class="submit-pending-status-pill">
+                <i class="fa-solid fa-circle-dot" style="animation: pulseGlow 1.5s infinite;"></i>
+                <span>Status: Pending Review</span>
+            </div>
+
+            <div class="submit-success-info-box">
+                <div class="submit-info-row">
+                    <span>Expected Profit:</span>
+                    <strong id="modalExpectedProfit">৳540</strong>
+                </div>
+                <div class="submit-info-row">
+                    <span>Task Category:</span>
+                    <strong id="modalTaskCat">Paragraph</strong>
+                </div>
+                <div class="submit-info-row">
+                    <span>Words Submitted:</span>
+                    <strong id="modalWordsCount">520 Words</strong>
+                </div>
+            </div>
+
+            <p>আপনার লেখাটি অ্যাডমিন প্যানেলে সফলভাবে জমা হয়েছে। অ্যাডমিন পর্যালোচনা করে অ্যাকসেপ্ট (Accept) করলে আপনার মূল অ্যাকাউন্টে ব্যালেন্স যুক্ত হবে।</p>
+
+            <div class="submit-actions-group">
+                <button type="button" class="btn-view-history" onclick="window.location.href='history.html'">
+                    <i class="fa-solid fa-clock-rotate-left"></i> View History
+                </button>
+                <button type="button" class="btn-close-submit-modal" onclick="closeSubmitSuccessModal()">
+                    Back to Packages
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- ================= ⏳ ২৪ ঘণ্টা লক অ্যালার্ট মডেল ================= -->
     <div class="lock-modal-overlay" id="lockModal24h">
         <div class="lock-modal-card">
@@ -1203,6 +1327,14 @@
             'Premium': [{ val: 1600, weight: 60 }, { val: 1630, weight: 25 }, { val: 1660, weight: 10 }, { val: 1700, weight: 5 }],
             'VIP': [{ val: 2200, weight: 60 }, { val: 2250, weight: 25 }, { val: 2300, weight: 10 }, { val: 2360, weight: 5 }]
         };
+
+        function getTodayString() {
+            const d = new Date();
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
 
         auth.onAuthStateChanged(user => {
             if (user) {
@@ -1375,51 +1507,68 @@
 
             if (words >= currentTask.minWords) {
                 submitBtn.disabled = false;
-                submitBtnText.innerText = `Submit Task & Claim ৳${currentTask.wonAmount}`;
+                submitBtnText.innerText = `Submit Task for Review (৳${currentTask.wonAmount})`;
             } else {
                 submitBtn.disabled = true;
                 submitBtnText.innerText = `Need ${currentTask.minWords - words} More Words`;
             }
         }
 
+        // 🌟 টাস্ক সাবমিট: অ্যাকাউন্টে সরাসরি টাকা না দিয়ে History-তে 'pending' স্ট্যাটাস রাখা
         function submitUserTask() {
             if (!currentUser) return;
 
+            const text = document.getElementById('typingTextarea').value.trim();
+            const words = text ? text.split(/\s+/).filter(Boolean).length : 0;
             const rewardUSD = parseFloat((currentTask.wonAmount / USD_TO_BDT).toFixed(4));
-            const userRef = db.collection("users").doc(currentUser.uid);
+            const todayStr = getTodayString();
 
-            db.runTransaction(async (transaction) => {
-                const docSnap = await transaction.get(userRef);
-                if (!docSnap.exists) return;
+            const btn = document.getElementById('btnSubmitTask');
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Submitting Task...`;
 
-                const uData = docSnap.data();
-                const curBal = Number(uData.balanceUSD || 0);
-                const curTotal = Number(uData.totalEarnUSD || 0);
-                const curToday = Number(uData.todayEarnUSD || 0);
-
-                transaction.update(userRef, {
-                    balanceUSD: parseFloat((curBal + rewardUSD).toFixed(4)),
-                    totalEarnUSD: parseFloat((curTotal + rewardUSD).toFixed(4)),
-                    todayEarnUSD: parseFloat((curToday + rewardUSD).toFixed(4))
-                });
+            // হিস্ট্রি লগ: status: "pending"
+            db.collection("task_history").add({
+                uid: currentUser.uid,
+                amountUSD: 0, // অ্যাপ্রুভ হওয়ার আগ পর্যন্ত ০ থাকবে
+                rewardUSD: rewardUSD, // জিতা পরিমাণ সংরক্ষণ
+                amountBDT: currentTask.wonAmount,
+                rewardBDT: currentTask.wonAmount,
+                taskType: "typing_task",
+                title: `Typing - ${currentTask.type}`,
+                topic: currentTask.topic,
+                language: currentTask.language,
+                submittedText: text,
+                wordCount: words,
+                targetWords: currentTask.minWords,
+                status: "pending", // 🟡 পেন্ডিং
+                date: todayStr,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
             }).then(() => {
-                db.collection("task_history").add({
-                    uid: currentUser.uid,
-                    amountUSD: rewardUSD,
-                    amountBDT: currentTask.wonAmount,
-                    taskType: "typing_task",
-                    title: `Typing - ${currentTask.type}`,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-
+                // ২৪ ঘণ্টার লক সক্রিয় করা
                 const lockTime = Date.now() + (24 * 60 * 60 * 1000);
                 localStorage.setItem('typing_task_lock_until_' + currentUser.uid, lockTime);
 
-                alert(`🎉 Congratulations!\n৳${currentTask.wonAmount} has been added to your main balance!`);
+                // টাইপিং স্ক্রিন বন্ধ
                 document.getElementById('writingModal').classList.remove('active');
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> <span id="submitBtnText">Submit Task</span>`;
+
+                // 🌟 আধুনিক সাবমিশন সাকসেস মডেল ওপেন
+                document.getElementById('modalExpectedProfit').innerText = `৳${currentTask.wonAmount}`;
+                document.getElementById('modalTaskCat').innerText = currentTask.type;
+                document.getElementById('modalWordsCount').innerText = `${words} Words`;
+                document.getElementById('submitSuccessModal').classList.add('active');
+
             }).catch(e => {
-                alert("Error saving reward: " + e.message);
+                btn.disabled = false;
+                btn.innerText = "Submit Task";
+                alert("Error submitting task: " + e.message);
             });
+        }
+
+        function closeSubmitSuccessModal() {
+            document.getElementById('submitSuccessModal').classList.remove('active');
         }
 
         function openCancelModal() { document.getElementById('cancelConfirmModal').classList.add('active'); }
