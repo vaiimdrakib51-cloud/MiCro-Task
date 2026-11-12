@@ -136,7 +136,7 @@
       box-shadow: 0 3px 8px rgba(2, 132, 199, 0.2);
     }
 
-    /* সরু ও কমপ্যাক্ট নোটিফিকেশন কার্ড লিস্ট */
+    /* নোটিফিকেশন কার্ড লিস্ট */
     .notification-list {
       display: flex;
       flex-direction: column;
@@ -164,11 +164,10 @@
       border-color: #bae6fd;
     }
 
-    /* বামদিকের ওপরের কোনায় ব্র্যান্ড লোগো বক্স */
     .brand-logo-box {
-      width: 32px;
-      height: 32px;
-      border-radius: 9px;
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -183,11 +182,8 @@
     .brand-logo-box img {
       width: 100%;
       height: 100%;
-      object-fit: contain;
-    }
-    .brand-logo-box i {
-      font-size: 15px;
-      color: #ffffff;
+      object-fit: cover;
+      border-radius: 6px;
     }
 
     .card-content { 
@@ -215,7 +211,7 @@
     .tag {
       font-size: 8px;
       font-weight: 800;
-      padding: 1.5px 5px;
+      padding: 1.5px 6px;
       border-radius: 5px;
       text-transform: capitalize;
     }
@@ -224,6 +220,8 @@
     .tag-support { background: #ccfbf1; color: #0f766e; }
     .tag-referral { background: #f3e8ff; color: #7e22ce; }
     .tag-system { background: #ffedd5; color: #c2410c; }
+    .tag-rejected { background: #fee2e2; color: #b91c1c; }
+    .tag-pending { background: #fef9c3; color: #854d0e; }
 
     .card-desc {
       font-size: 10.5px;
@@ -319,16 +317,16 @@
     <!-- ক্যাটাগরি ফিল্টার -->
     <div class="filters">
       <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="earnings"><i class="fa-solid fa-wallet"></i> Earnings</button>
       <button class="filter-btn" data-filter="system"><i class="fa-solid fa-bullhorn"></i> System</button>
       <button class="filter-btn" data-filter="support"><i class="fa-solid fa-headset"></i> Support</button>
       <button class="filter-btn" data-filter="referral"><i class="fa-solid fa-user-group"></i> Referral</button>
-      <button class="filter-btn" data-filter="earnings"><i class="fa-solid fa-wallet"></i> Earnings</button>
     </div>
 
     <!-- নোটিফিকেশন লিস্ট -->
     <div class="notification-list" id="notificationList"></div>
 
-    <!-- কোনো নোটিফিকেশন না থাকলে দেখাবে -->
+    <!-- খালি থাকলে দেখাবে -->
     <div class="empty-msg" id="emptyMsg">
       <i class="fa-regular fa-bell-slash"></i>
       <p>No notifications found</p>
@@ -385,7 +383,6 @@
       if (isNaN(millis) || millis <= 0) return 'Just now';
 
       const diffSec = Math.floor((Date.now() - millis) / 1000);
-
       if (diffSec < 60) return 'Just now';
       if (diffSec < 3600) return `${Math.floor(diffSec / 60)}m ago`;
       if (diffSec < 86400) return `${Math.floor(diffSec / 3600)}h ago`;
@@ -397,13 +394,44 @@
       return new Date(millis).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
     }
 
-    // সেক্টর অনুযায়ী আসল ব্র্যান্ড লোগো
+    // 🌟 সেক্টর অনুযায়ী লোগো ও ব্র্যান্ডিং (টাইপিং সহ)
     function getNotificationLogoMeta(n) {
       const title = (n.title || '').toLowerCase();
       const msg = (n.message || '').toLowerCase();
       const cat = (n.category || '').toLowerCase();
       const method = (n.method || '').toLowerCase();
       const platform = (n.platform || '').toLowerCase();
+
+      // ⌨️ ১. টাইপিং নোটিফিকেশন (Typing Approved, Rejected, Refunded)
+      if (method.includes('typing') || platform.includes('typing') || cat === 'typing' || title.includes('typing') || title.includes('টাইপিং')) {
+        const isRejected = title.includes('রিজেক্ট') || title.includes('reject') || msg.includes('রিজেক্ট') || title.includes('বাতিল');
+        const isApproved = title.includes('অনুমোদিত') || title.includes('approved') || title.includes('জমা হয়েছে') || title.includes('সফল');
+        
+        let tagText = 'Typing';
+        let tagClass = 'tag-earnings';
+        let borderColor = '#0284c7';
+
+        if (isRejected) {
+          tagText = 'Rejected';
+          tagClass = 'tag-rejected';
+          borderColor = '#ef4444';
+        } else if (isApproved) {
+          tagText = 'Approved';
+          tagClass = 'tag-earnings';
+          borderColor = '#10b981';
+        } else {
+          tagText = 'Reviewing';
+          tagClass = 'tag-pending';
+          borderColor = '#f59e0b';
+        }
+
+        return {
+          html: `<img src="https://i.ibb.co.com/cK16XNwK/images-2-7.jpg" alt="Typing">`,
+          borderColor: borderColor,
+          tagText: tagText,
+          tagClass: tagClass
+        };
+      }
 
       // নগদ
       if (method.includes('nagad') || title.includes('nagad') || msg.includes('nagad') || title.includes('নগদ') || msg.includes('নগদ')) {
@@ -465,7 +493,7 @@
         };
       }
 
-      // ওয়ালেট / আর্নিংস
+      // আর্নিংস / ওয়ালেট
       if (cat === 'earnings' || cat === 'deposit' || cat === 'withdraw' || title.includes('deposit') || title.includes('withdraw') || title.includes('ডিপোজিট') || title.includes('উইথড্র') || title.includes('বোনাস')) {
         return {
           html: `<img src="https://i.ibb.co.com/CpmVs7PB/wallet.png" alt="Wallet">`,
@@ -475,7 +503,7 @@
         };
       }
 
-      // সিস্টেম নোটিশ
+      // ডিফল্ট সিস্টেম
       return {
         html: `<img src="https://i.ibb.co.com/5W2f2xg4/pngtree-money-icon-dollar-coins-cash-payment-online-earning-png-image-7589413.png" alt="MicroTask">`,
         borderColor: '#0284c7',
@@ -495,7 +523,8 @@
           if (deletedIds.includes(n.id)) return false;
 
           let notifCat = (n.category || 'system').toLowerCase();
-          if (notifCat === 'deposit' || notifCat === 'withdraw') {
+          // টাইপিং, ডিপোজিট এবং উইথড্র সব আর্নিংসের আওতায় থাকবে
+          if (notifCat === 'deposit' || notifCat === 'withdraw' || notifCat === 'typing') {
             notifCat = 'earnings';
           }
 
@@ -503,7 +532,6 @@
           const isPersonal = target !== '' && (target === myUID || (auth.currentUser && target === auth.currentUser.uid));
           const isGlobalSystem = (!n.targetUid || target === 'all');
 
-          // নতুন রেজিস্ট্রেশন করার পূর্বের গ্লোবাল নোটিশ বাদ দেওয়া
           let isTimeValid = true;
           if (isGlobalSystem && userSignupTime > 0 && n.createdAt) {
               const notifTime = n.createdAt.toMillis ? n.createdAt.toMillis() : new Date(n.createdAt).getTime();
@@ -530,7 +558,7 @@
         emptyMsg.style.display = 'none';
         notifContainer.innerHTML = filtered.map(n => {
           let cat = (n.category || 'system').toLowerCase();
-          if (cat === 'deposit' || cat === 'withdraw') cat = 'earnings';
+          if (cat === 'deposit' || cat === 'withdraw' || cat === 'typing') cat = 'earnings';
           
           const visual = getNotificationLogoMeta(n);
           const isUnread = !readIds.includes(n.id);
@@ -574,12 +602,10 @@
             window.location.href = url;
         } else if (category === 'support') {
             window.location.href = 'support.html';
-        } else if (category === 'earnings') {
+        } else if (category === 'earnings' || category === 'typing') {
             window.location.href = 'history.html';
         } else if (category === 'referral') {
             window.location.href = 'refer.html';
-        } else if (category === 'system') {
-            window.location.href = 'index.html';
         } else {
             window.location.href = 'index.html';
         }
@@ -616,7 +642,7 @@
       renderNotifications();
     }, 30000);
 
-    // ফায়ারবেস লাইভ লিসেনার (ড্যাশবোর্ডের সাথে লাইভ সিঙ্ক)
+    // ফায়ারবেস লাইভ লিসেনার
     auth.onAuthStateChanged(user => {
       if (user) {
         db.collection("users").doc(user.uid).get().then(doc => {
