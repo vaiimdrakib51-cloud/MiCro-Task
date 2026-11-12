@@ -35,7 +35,7 @@
         /* টপ নেভিগেশন বার */
         .top-navbar {
             width: 100%;
-            max-width: 820px;
+            max-width: 600px;
             background: #ffffff;
             padding: 12px 16px;
             display: flex;
@@ -87,17 +87,17 @@
             gap: 6px;
         }
 
-        /* মূল প্যাকেজ কন্টেইনার */
+        /* মূল কন্টেইনার */
         .packages-main-wrapper {
             width: 100%;
-            max-width: 820px;
+            max-width: 600px;
             background: #ffffff;
             border-radius: 22px;
             padding: 16px 14px;
             box-shadow: 0 6px 20px rgba(37, 99, 235, 0.07);
             border: 1.5px solid #dbeafe;
             position: relative;
-            margin: 16px 10px 0;
+            margin: 14px 10px 0;
         }
 
         .packages-header {
@@ -121,32 +121,16 @@
             letter-spacing: -0.3px;
         }
 
-        /* কার্ড গ্রিড */
+        /* 🌟 ২টা উপরে ২টা নিচে গ্রিড লেআউট (2x2 Grid) */
         .packages-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            overflow-x: auto;
-            padding-bottom: 4px;
-        }
-
-        @media (max-width: 680px) {
-            .packages-grid {
-                display: flex;
-                overflow-x: auto;
-                scroll-snap-type: x mandatory;
-                padding-bottom: 8px;
-            }
-            .package-card {
-                min-width: 165px;
-                flex-shrink: 0;
-                scroll-snap-align: start;
-            }
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
         }
 
         .package-card {
             border-radius: 16px;
-            padding: 18px 10px 12px;
+            padding: 18px 8px 12px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -165,9 +149,9 @@
             top: -2px;
             left: 50%;
             transform: translateX(-50%);
-            padding: 2.5px 14px;
+            padding: 2.5px 12px;
             color: #ffffff;
-            font-size: 10px;
+            font-size: 9.5px;
             font-weight: 850;
             letter-spacing: 0.2px;
             border-radius: 3px 3px 10px 10px;
@@ -195,9 +179,9 @@
         }
 
         .hex-icon-wrapper {
-            width: 44px;
-            height: 44px;
-            margin: 10px 0 8px;
+            width: 42px;
+            height: 42px;
+            margin: 8px 0 6px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -205,40 +189,41 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
-        .hex-icon-wrapper i { color: #ffffff; font-size: 16px; }
-        .price-text { font-size: 19px; font-weight: 900; color: #0b192c; line-height: 1.1; }
-        .task-count-text { font-size: 11px; font-weight: 800; color: #1e293b; margin: 4px 0 10px; }
+        .hex-icon-wrapper i { color: #ffffff; font-size: 15px; }
+        .price-text { font-size: 18px; font-weight: 900; color: #0b192c; line-height: 1.1; }
+        .task-count-text { font-size: 10.5px; font-weight: 800; color: #1e293b; margin: 3px 0 8px; }
 
         .features-list {
             list-style: none;
             width: 100%;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 5px;
         }
 
         .features-list li {
-            font-size: 10.5px;
+            font-size: 9.5px;
             font-weight: 750;
             color: #1e293b;
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
             text-align: left;
             white-space: nowrap;
+            justify-content: flex-start;
         }
 
         .check-badge {
-            width: 13px;
-            height: 13px;
+            width: 12px;
+            height: 12px;
             background: #16a34a;
             color: #fff;
             border-radius: 50%;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            font-size: 7.5px;
+            font-size: 7px;
             flex-shrink: 0;
         }
 
@@ -246,15 +231,15 @@
             width: 100%;
             border: none;
             border-radius: 999px;
-            padding: 7.5px 0;
+            padding: 7px 0;
             color: #ffffff;
-            font-size: 11.5px;
+            font-size: 11px;
             font-weight: 850;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 5px;
+            gap: 4px;
             transition: transform 0.15s ease;
             margin-top: auto;
         }
@@ -274,8 +259,8 @@
         .card-standard .hex-icon-wrapper { background: linear-gradient(180deg, #8b5cf6 0%, #6d28d9 100%); }
         .card-standard .buy-now-btn { background: linear-gradient(180deg, #8b5cf6 0%, #6d28d9 100%); box-shadow: 0 3px 10px rgba(124, 58, 237, 0.3); }
 
-        .card-premium { background: linear-gradient(180deg, #e7fbf0 0%, #f2fcf6 50%, #ffffff 100%); border: 1.5px solid #22c55e; box-shadow: 0 6px 18px rgba(34, 197, 94, 0.2); padding-top: 24px; }
-        .popular-badge-top { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: linear-gradient(180deg, #f59e0b 0%, #d97706 100%); color: #ffffff; font-size: 8.5px; font-weight: 900; padding: 2px 10px; border-radius: 999px; box-shadow: 0 2px 6px rgba(217, 119, 6, 0.3); text-transform: uppercase; letter-spacing: 0.4px; z-index: 5; }
+        .card-premium { background: linear-gradient(180deg, #e7fbf0 0%, #f2fcf6 50%, #ffffff 100%); border: 1.5px solid #22c55e; box-shadow: 0 6px 18px rgba(34, 197, 94, 0.2); padding-top: 22px; }
+        .popular-badge-top { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: linear-gradient(180deg, #f59e0b 0%, #d97706 100%); color: #ffffff; font-size: 8px; font-weight: 900; padding: 2px 10px; border-radius: 999px; box-shadow: 0 2px 6px rgba(217, 119, 6, 0.3); text-transform: uppercase; letter-spacing: 0.4px; z-index: 5; }
         .card-premium .ribbon-banner { top: 6px; background: #16a34a; color: #16a34a; }
         .card-premium .ribbon-banner span { color: #fff; }
         .card-premium .hex-icon-wrapper { background: linear-gradient(180deg, #22c55e 0%, #15803d 100%); }
@@ -287,6 +272,75 @@
         .card-vip .ribbon-banner span { color: #fff; }
         .card-vip .hex-icon-wrapper { background: linear-gradient(180deg, #f97316 0%, #c2410c 100%); }
         .card-vip .buy-now-btn { background: linear-gradient(180deg, #ea580c 0%, #c2410c 100%); box-shadow: 0 3px 10px rgba(234, 88, 12, 0.3); }
+
+        /* ================= 📜 নিয়মাবলী সেকশন (RULES & GUIDELINES) ================= */
+        .rules-wrapper-card {
+            width: 100%;
+            max-width: 600px;
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 16px 14px;
+            margin: 14px 10px 0;
+            border: 1.5px solid #dbeafe;
+            box-shadow: 0 4px 16px rgba(2, 132, 199, 0.05);
+        }
+
+        .rules-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #f1f5f9;
+            padding-bottom: 8px;
+        }
+
+        .rules-header i {
+            color: #0284c7;
+            font-size: 16px;
+        }
+
+        .rules-header h3 {
+            font-size: 14px;
+            font-weight: 850;
+            color: #0c4a6e;
+        }
+
+        .rules-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .rule-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            background: #f8fafc;
+            border: 1px solid #eef2f6;
+            padding: 8px 10px;
+            border-radius: 12px;
+        }
+
+        .rule-icon {
+            color: #0284c7;
+            font-size: 12px;
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+
+        .rule-text h4 {
+            font-size: 11.5px;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 2px;
+        }
+
+        .rule-text p {
+            font-size: 10.5px;
+            color: #64748b;
+            line-height: 1.4;
+            font-weight: 600;
+        }
 
         /* ================= 🌟 ৩ডি মাল্টি-কার্ড ড্রপ স্ক্রিন ================= */
         .envelope-game-overlay {
@@ -844,7 +898,7 @@
 </head>
 <body>
 
-    <!-- টপ নেভবার (ড্যাশবোর্ডে ফেরার ব্যাক বাটন সহ) -->
+    <!-- টপ নেভবার -->
     <header class="top-navbar">
         <a href="index.html" class="nav-back-btn" title="Back to Dashboard">
             <i class="fa-solid fa-arrow-left"></i>
@@ -859,7 +913,7 @@
         </div>
     </header>
 
-    <!-- প্যাকেজ মডিউল -->
+    <!-- প্যাকেজ মডিউল (২টা উপরে ২টা নিচে) -->
     <div class="packages-main-wrapper">
         <div class="packages-header">
             <i class="fa-solid fa-crown header-crown-icon"></i>
@@ -867,7 +921,7 @@
         </div>
 
         <div class="packages-grid">
-            <!-- 1. Basic -->
+            <!-- ১. Basic (টপ-বাম) -->
             <div class="package-card card-basic">
                 <div class="ribbon-banner"><span>Basic</span></div>
                 <div class="hex-icon-wrapper"><i class="fa-solid fa-gem"></i></div>
@@ -883,7 +937,7 @@
                 </button>
             </div>
 
-            <!-- 2. Standard -->
+            <!-- ২. Standard (টপ-ডান) -->
             <div class="package-card card-standard">
                 <div class="ribbon-banner"><span>Standard</span></div>
                 <div class="hex-icon-wrapper"><i class="fa-solid fa-star"></i></div>
@@ -899,7 +953,7 @@
                 </button>
             </div>
 
-            <!-- 3. Premium -->
+            <!-- ৩. Premium (নিচে-বাম) -->
             <div class="package-card card-premium">
                 <div class="popular-badge-top">Popular</div>
                 <div class="ribbon-banner"><span>Premium</span></div>
@@ -916,7 +970,7 @@
                 </button>
             </div>
 
-            <!-- 4. VIP -->
+            <!-- ৪. VIP (নিচে-ডান) -->
             <div class="package-card card-vip">
                 <div class="ribbon-banner"><span>VIP</span></div>
                 <div class="hex-icon-wrapper"><i class="fa-solid fa-crown"></i></div>
@@ -930,6 +984,48 @@
                 <button type="button" class="buy-now-btn" onclick="handlePackageClick('VIP', 2000, 5000, 6000)">
                     <i class="fa-solid fa-cart-shopping"></i> Buy Now
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= 📜 নিয়মাবলী সেকশন (RULES & GUIDELINES) ================= -->
+    <div class="rules-wrapper-card">
+        <div class="rules-header">
+            <i class="fa-solid fa-shield-halved"></i>
+            <h3>Typing Rules & Guidelines (কাজের নিয়মাবলী)</h3>
+        </div>
+
+        <div class="rules-list">
+            <div class="rule-item">
+                <i class="fa-solid fa-circle-check rule-icon"></i>
+                <div class="rule-text">
+                    <h4>১. দৈনিক কাজের সীমাবদ্ধতা (Daily Limit)</h4>
+                    <p>প্রতিজন সদস্য ২৪ ঘণ্টার মধ্যে শুধুমাত্র ১টি প্যাকেজের কাজ সম্পন্ন করতে পারবেন। টাস্ক জমা দেওয়ার পর পরবর্তী ২৪ ঘণ্টার জন্য নতুন প্যাকেজ লক থাকবে।</p>
+                </div>
+            </div>
+
+            <div class="rule-item">
+                <i class="fa-solid fa-circle-check rule-icon"></i>
+                <div class="rule-text">
+                    <h4>২. কপি-পেস্ট সম্পূর্ণ নিষিদ্ধ (No Copy-Paste)</h4>
+                    <p>কোনো ওয়েবসাইট বা AI থেকে কপি করে পেস্ট করা যাবে না। নিজ হাতে নির্ধারিত ভাষায় টাইপ করতে হবে, অন্যথায় রিওয়ার্ড বাতিল হতে পারে।</p>
+                </div>
+            </div>
+
+            <div class="rule-item">
+                <i class="fa-solid fa-circle-check rule-icon"></i>
+                <div class="rule-text">
+                    <h4>৩. ভাষা ও ওয়ার্ড লিমিট (Language & Words)</h4>
+                    <p>খাম ওপেন করার পর যে দেশের ভাষা (যেমন: English, Spanish, ইত্যাদি) ও ওয়ার্ড সংখ্যা দেওয়া হবে, ঠিক সেই অনুযায়ী প্যারাগ্রাফ বা স্টোরি লিখতে হবে।</p>
+                </div>
+            </div>
+
+            <div class="rule-item">
+                <i class="fa-solid fa-circle-check rule-icon"></i>
+                <div class="rule-text">
+                    <h4>৪. ১০০% ইনস্ট্যান্ট রিফান্ড (Instant Refund)</h4>
+                    <p>টাইপিং করার সময় যদি কাজ সম্পন্ন না করতে চান, তবে উপরে ক্রস (✕) বাটনে চাপ দিয়ে যেকোনো সময় বাতিল করলে পুরো টাকা মূল ব্যালেন্সে সাথে সাথে ফেরত দেওয়া হবে।</p>
+                </div>
             </div>
         </div>
     </div>
@@ -1030,7 +1126,7 @@
         </div>
     </div>
 
-    <!-- ================= 💰 আধুনিক রিফান্ড সাকসেস মডেল ================= -->
+    <!-- ================= 💰 রিফান্ড সাকসেস মডেল ================= -->
     <div class="refund-modal-overlay" id="refundSuccessModal">
         <div class="refund-modal-card">
             <div class="refund-modal-icon"><i class="fa-solid fa-wallet"></i></div>
@@ -1108,7 +1204,6 @@
             'VIP': [{ val: 2200, weight: 60 }, { val: 2250, weight: 25 }, { val: 2300, weight: 10 }, { val: 2360, weight: 5 }]
         };
 
-        // Firebase Auth ও লাইভ ব্যালেন্স সিঙ্ক
         auth.onAuthStateChanged(user => {
             if (user) {
                 currentUser = user;
@@ -1136,14 +1231,12 @@
             return list[0].val;
         }
 
-        // প্যাকেজে ক্লিক
         function handlePackageClick(pkgKey, price, minWords, maxWords) {
             if (!currentUserData) {
                 alert("Loading your profile... Please wait a second.");
                 return;
             }
 
-            // ২৪ ঘণ্টার লক চেক
             const lockUntil = localStorage.getItem('typing_task_lock_until_' + (currentUser ? currentUser.uid : ''));
             const now = Date.now();
             if (lockUntil && Number(lockUntil) > now) {
@@ -1151,7 +1244,6 @@
                 return;
             }
 
-            // ব্যালেন্স পর্যাপ্ত আছে কি না যাচাই
             const currentBalBDT = Number(currentUserData.balanceUSD || 0) * USD_TO_BDT;
             if (currentBalBDT < price) {
                 alert(`❌ Insufficient Balance!\nYou need at least ৳${price} to buy this package. Please deposit first.`);
@@ -1159,7 +1251,6 @@
                 return;
             }
 
-            // প্যাকেজের ফি কাটা (Deduct balance)
             const priceUSD = parseFloat((price / USD_TO_BDT).toFixed(4));
             const newBalUSD = parseFloat((Number(currentUserData.balanceUSD || 0) - priceUSD).toFixed(4));
             
@@ -1291,7 +1382,6 @@
             }
         }
 
-        // টাস্ক সাবমিট এবং অ্যাকাউন্টে রিওয়ার্ড যুক্ত করা
         function submitUserTask() {
             if (!currentUser) return;
 
@@ -1313,7 +1403,6 @@
                     todayEarnUSD: parseFloat((curToday + rewardUSD).toFixed(4))
                 });
             }).then(() => {
-                // হিস্ট্রি লগ
                 db.collection("task_history").add({
                     uid: currentUser.uid,
                     amountUSD: rewardUSD,
@@ -1323,7 +1412,6 @@
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                // ২৪ ঘণ্টা লক সেট
                 const lockTime = Date.now() + (24 * 60 * 60 * 1000);
                 localStorage.setItem('typing_task_lock_until_' + currentUser.uid, lockTime);
 
@@ -1334,7 +1422,6 @@
             });
         }
 
-        // ক্যানসেল ও রিফান্ড সিস্টেম
         function openCancelModal() { document.getElementById('cancelConfirmModal').classList.add('active'); }
         function closeCancelModal() { document.getElementById('cancelConfirmModal').classList.remove('active'); }
 
@@ -1343,7 +1430,6 @@
             document.getElementById('writingModal').classList.remove('active');
             document.getElementById('typingTextarea').value = '';
 
-            // অ্যাকাউন্টে মূল টাকা রিফান্ড
             if (currentUser && currentUserData) {
                 const refundUSD = parseFloat((currentTask.price / USD_TO_BDT).toFixed(4));
                 const userRef = db.collection("users").doc(currentUser.uid);
@@ -1359,7 +1445,6 @@
 
         function closeRefundSuccessModal() { document.getElementById('refundSuccessModal').classList.remove('active'); }
 
-        // ২৪ ঘণ্টা লক কাউন্টডাউন
         function openLockModal(lockUntilTimestamp) {
             const lockModal = document.getElementById('lockModal24h');
             const countdownEl = document.getElementById('lockCountdownText');
