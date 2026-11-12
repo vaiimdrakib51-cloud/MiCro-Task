@@ -87,6 +87,7 @@
         .icon-nagad-box { background: #ffffff; border-color: #f97316; }
         .icon-binance-box { background: #181a20; border-color: #f59e0b; }
         .icon-referral { background: #ffffff; border-color: #8b5cf6; }
+        .icon-typing-box { background: #ffffff; border-color: #0284c7; }
 
         .item-info { min-width: 0; line-height: 1.2; }
         .item-info h4 { font-size: 11px; font-weight: 700; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -304,6 +305,10 @@
             const m = (method || '').toLowerCase();
             const cat = (category || '').toLowerCase();
 
+            // ⌨️ টাইপিং টাস্ক (Typing)
+            if (m.includes('typing') || cat === 'typing') {
+                return { boxClass: 'icon-typing-box', innerHtml: `<img src="https://i.ibb.co.com/cK16XNwK/images-2-7.jpg" alt="Typing" class="brand-logo-img">` };
+            }
             // নগদ
             if (m.includes('nagad')) {
                 return { boxClass: 'icon-nagad-box', innerHtml: `<img src="https://i.ibb.co.com/gZSnQ6Xb/nagad-com-bd-logo.png" alt="Nagad" class="brand-logo-img">` };
@@ -353,114 +358,138 @@
                 db.collection("deposits").where("uid", "in", validUids).onSnapshot(depSnap => {
                     // খ. উইথড্র কালেকশন
                     db.collection("withdrawals").where("uid", "in", validUids).onSnapshot(withSnap => {
-                        // গ. ভিডিও টাস্ক সাবমিশন কালেকশন (ইউটিউব, ফেসবুক, ইনস্টাগ্রাম)
+                        // গ. ভিডিও টাস্ক সাবমিশন কালেকশন
                         db.collection("task_submissions").where("uid", "in", validUids).onSnapshot(taskSnap => {
                             // ঘ. বুস্ট রিকোয়েস্ট কালেকশন
                             db.collection("boost_requests").where("userId", "in", validUids).onSnapshot(boostSnap => {
-                                // ঙ. রেফারেল মেম্বারদের ডাটা
-                                db.collection("users").where("referredBy", "==", sixDigitUid).onSnapshot(refSnap => {
-                                    
-                                    let cloudList = [];
+                                // ঙ. টাইপিং টাস্ক কালেকশন (task_history)
+                                db.collection("task_history").where("uid", "in", validUids).onSnapshot(typingSnap => {
+                                    // চ. রেফারেল মেম্বারদের ডাটা
+                                    db.collection("users").where("referredBy", "==", sixDigitUid).onSnapshot(refSnap => {
+                                        
+                                        let cloudList = [];
 
-                                    // ডিপোজিট
-                                    depSnap.forEach(doc => {
-                                        const d = doc.data();
-                                        cloudList.push({
-                                            title: `${(d.method || 'Online').toUpperCase()} Deposit`,
-                                            desc: `TrxID: ${d.trxId || ''}`,
-                                            amount: `${Number(d.amountBDT || 0).toFixed(2)} BDT`,
-                                            type: 'plus',
-                                            category: 'deposit',
-                                            method: d.method,
-                                            status: d.status || 'pending',
-                                            time: d.createdAt ? new Date(d.createdAt.toDate ? d.createdAt.toDate() : d.createdAt).toLocaleDateString('en-GB') : 'Recent',
-                                            date: d.createdAt ? formatDateISO(d.createdAt.toDate ? d.createdAt.toDate() : new Date(d.createdAt)) : formatDateISO(new Date()),
-                                            txnId: d.trxId || doc.id,
-                                            timestamp: d.createdAt ? (d.createdAt.toMillis ? d.createdAt.toMillis() : new Date(d.createdAt).getTime()) : 0
-                                        });
-                                    });
-
-                                    // উইথড্র
-                                    withSnap.forEach(doc => {
-                                        const w = doc.data();
-                                        cloudList.push({
-                                            title: `${(w.provider || 'Wallet').toUpperCase()} Withdraw`,
-                                            desc: `Account: ${w.accountNumber || ''}`,
-                                            amount: `${Number(w.amountBDT || 0).toFixed(2)} BDT`,
-                                            type: 'minus',
-                                            category: 'withdraw',
-                                            method: w.provider,
-                                            status: w.status || 'pending',
-                                            time: w.createdAt ? new Date(w.createdAt.toDate ? w.createdAt.toDate() : w.createdAt).toLocaleDateString('en-GB') : 'Recent',
-                                            date: w.createdAt ? formatDateISO(w.createdAt.toDate ? w.createdAt.toDate() : new Date(w.createdAt)) : formatDateISO(new Date()),
-                                            txnId: w.trxId || doc.id,
-                                            timestamp: w.createdAt ? (w.createdAt.toMillis ? w.createdAt.toMillis() : new Date(w.createdAt).getTime()) : 0
-                                        });
-                                    });
-
-                                    // ভিডিও টাস্ক (ফেসবুক, ইউটিউব, ইনস্টাগ্রাম)
-                                    taskSnap.forEach(doc => {
-                                        const t = doc.data();
-                                        const rewardBDT = (Number(t.rewardUSD || 0.20) * 120).toFixed(2);
-                                        cloudList.push({
-                                            title: `${(t.platform || 'Social').toUpperCase()} Video Task`,
-                                            desc: `Screenshots submitted for review`,
-                                            amount: `${rewardBDT} BDT`,
-                                            type: 'plus',
-                                            category: 'tasks',
-                                            method: t.platform,
-                                            status: t.status || 'pending',
-                                            time: t.createdAt ? new Date(t.createdAt.toDate ? t.createdAt.toDate() : t.createdAt).toLocaleDateString('en-GB') : 'Recent',
-                                            date: t.createdAt ? formatDateISO(t.createdAt.toDate ? t.createdAt.toDate() : new Date(t.createdAt)) : formatDateISO(new Date()),
-                                            txnId: doc.id,
-                                            timestamp: t.createdAt ? (t.createdAt.toMillis ? t.createdAt.toMillis() : new Date(t.createdAt).getTime()) : 0
-                                        });
-                                    });
-
-                                    // বুস্ট ক্যাম্পেইন টাস্ক
-                                    boostSnap.forEach(doc => {
-                                        const b = doc.data();
-                                        cloudList.push({
-                                            title: `Boost Campaign (${b.boostPackage || 'Promotion'})`,
-                                            desc: `Campaign submitted for Admin review`,
-                                            amount: `${b.amountBDT || 100} BDT`,
-                                            type: 'minus',
-                                            category: 'tasks',
-                                            method: 'boost',
-                                            status: b.status || 'pending',
-                                            time: b.createdAt ? new Date(b.createdAt.toDate ? b.createdAt.toDate() : b.createdAt).toLocaleDateString('en-GB') : 'Recent',
-                                            date: b.createdAt ? formatDateISO(b.createdAt.toDate ? b.createdAt.toDate() : new Date(b.createdAt)) : formatDateISO(new Date()),
-                                            txnId: doc.id,
-                                            timestamp: b.createdAt ? (b.createdAt.toMillis ? b.createdAt.toMillis() : new Date(b.createdAt).getTime()) : 0
-                                        });
-                                    });
-
-                                    // রেফারেল বোনাস
-                                    refSnap.forEach(doc => {
-                                        const r = doc.data();
-                                        if (r.isVerified === true) {
+                                        // ডিপোজিট
+                                        depSnap.forEach(doc => {
+                                            const d = doc.data();
                                             cloudList.push({
-                                                title: `Referral Verify Bonus (${maskUserName(r.name)})`,
-                                                desc: `User verified account with 50 BDT`,
-                                                amount: `40.00 BDT`,
+                                                title: `${(d.method || 'Online').toUpperCase()} Deposit`,
+                                                desc: `TrxID: ${d.trxId || ''}`,
+                                                amount: `${Number(d.amountBDT || 0).toFixed(2)} BDT`,
                                                 type: 'plus',
-                                                category: 'referral',
-                                                method: 'referral',
-                                                status: 'success',
-                                                time: r.createdAt ? new Date(r.createdAt.toDate ? r.createdAt.toDate() : r.createdAt).toLocaleDateString('en-GB') : 'Recent',
-                                                date: r.createdAt ? formatDateISO(r.createdAt.toDate ? r.createdAt.toDate() : new Date(r.createdAt)) : formatDateISO(new Date()),
-                                                txnId: `REF-${doc.id.slice(0, 8)}`,
-                                                timestamp: r.createdAt ? (r.createdAt.toMillis ? r.createdAt.toMillis() : new Date(r.createdAt).getTime()) : 0
+                                                category: 'deposit',
+                                                method: d.method,
+                                                status: d.status || 'pending',
+                                                time: d.createdAt ? new Date(d.createdAt.toDate ? d.createdAt.toDate() : d.createdAt).toLocaleDateString('en-GB') : 'Recent',
+                                                date: d.createdAt ? formatDateISO(d.createdAt.toDate ? d.createdAt.toDate() : new Date(d.createdAt)) : formatDateISO(new Date()),
+                                                txnId: d.trxId || doc.id,
+                                                timestamp: d.createdAt ? (d.createdAt.toMillis ? d.createdAt.toMillis() : new Date(d.createdAt).getTime()) : 0
                                             });
-                                        }
+                                        });
+
+                                        // উইথড্র
+                                        withSnap.forEach(doc => {
+                                            const w = doc.data();
+                                            cloudList.push({
+                                                title: `${(w.provider || 'Wallet').toUpperCase()} Withdraw`,
+                                                desc: `Account: ${w.accountNumber || ''}`,
+                                                amount: `${Number(w.amountBDT || 0).toFixed(2)} BDT`,
+                                                type: 'minus',
+                                                category: 'withdraw',
+                                                method: w.provider,
+                                                status: w.status || 'pending',
+                                                time: w.createdAt ? new Date(w.createdAt.toDate ? w.createdAt.toDate() : w.createdAt).toLocaleDateString('en-GB') : 'Recent',
+                                                date: w.createdAt ? formatDateISO(w.createdAt.toDate ? w.createdAt.toDate() : new Date(w.createdAt)) : formatDateISO(new Date()),
+                                                txnId: w.trxId || doc.id,
+                                                timestamp: w.createdAt ? (w.createdAt.toMillis ? w.createdAt.toMillis() : new Date(w.createdAt).getTime()) : 0
+                                            });
+                                        });
+
+                                        // ভিডিও টাস্ক (ফেসবুক, ইউটিউব, ইনস্টাগ্রাম)
+                                        taskSnap.forEach(doc => {
+                                            const t = doc.data();
+                                            const rewardBDT = (Number(t.rewardUSD || 0.20) * 120).toFixed(2);
+                                            cloudList.push({
+                                                title: `${(t.platform || 'Social').toUpperCase()} Video Task`,
+                                                desc: `Screenshots submitted for review`,
+                                                amount: `${rewardBDT} BDT`,
+                                                type: 'plus',
+                                                category: 'tasks',
+                                                method: t.platform,
+                                                status: t.status || 'pending',
+                                                time: t.createdAt ? new Date(t.createdAt.toDate ? t.createdAt.toDate() : t.createdAt).toLocaleDateString('en-GB') : 'Recent',
+                                                date: t.createdAt ? formatDateISO(t.createdAt.toDate ? t.createdAt.toDate() : new Date(t.createdAt)) : formatDateISO(new Date()),
+                                                txnId: doc.id,
+                                                timestamp: t.createdAt ? (t.createdAt.toMillis ? t.createdAt.toMillis() : new Date(t.createdAt).getTime()) : 0
+                                            });
+                                        });
+
+                                        // ⌨️ টাইপিং টাস্ক (Typing Task History)
+                                        typingSnap.forEach(doc => {
+                                            const ty = doc.data();
+                                            if (ty.taskType === 'typing_task' || ty.category === 'typing') {
+                                                const amt = Number(ty.amountBDT || ty.rewardBDT || 0).toFixed(2);
+                                                cloudList.push({
+                                                    title: ty.title || 'Typing Task',
+                                                    desc: `Topic: ${ty.topic || 'General'} (${ty.wordCount || 0} Words)`,
+                                                    amount: `${amt} BDT`,
+                                                    type: 'plus',
+                                                    category: 'tasks', // 🌟 Tasks ট্যাবের অন্তর্ভুক্ত
+                                                    method: 'typing',
+                                                    status: ty.status || 'pending', // 🌟 Pending, Success, বা Rejected
+                                                    time: ty.createdAt ? new Date(ty.createdAt.toDate ? ty.createdAt.toDate() : ty.createdAt).toLocaleDateString('en-GB') : (ty.date || 'Recent'),
+                                                    date: ty.createdAt ? formatDateISO(ty.createdAt.toDate ? ty.createdAt.toDate() : new Date(ty.createdAt)) : (ty.date || formatDateISO(new Date())),
+                                                    txnId: doc.id,
+                                                    timestamp: ty.createdAt ? (ty.createdAt.toMillis ? ty.createdAt.toMillis() : new Date(ty.createdAt).getTime()) : 0
+                                                });
+                                            }
+                                        });
+
+                                        // বুস্ট ক্যাম্পেইন টাস্ক
+                                        boostSnap.forEach(doc => {
+                                            const b = doc.data();
+                                            cloudList.push({
+                                                title: `Boost Campaign (${b.boostPackage || 'Promotion'})`,
+                                                desc: `Campaign submitted for Admin review`,
+                                                amount: `${b.amountBDT || 100} BDT`,
+                                                type: 'minus',
+                                                category: 'tasks',
+                                                method: 'boost',
+                                                status: b.status || 'pending',
+                                                time: b.createdAt ? new Date(b.createdAt.toDate ? b.createdAt.toDate() : b.createdAt).toLocaleDateString('en-GB') : 'Recent',
+                                                date: b.createdAt ? formatDateISO(b.createdAt.toDate ? b.createdAt.toDate() : new Date(b.createdAt)) : formatDateISO(new Date()),
+                                                txnId: doc.id,
+                                                timestamp: b.createdAt ? (b.createdAt.toMillis ? b.createdAt.toMillis() : new Date(b.createdAt).getTime()) : 0
+                                            });
+                                        });
+
+                                        // রেফারেল বোনাস
+                                        refSnap.forEach(doc => {
+                                            const r = doc.data();
+                                            if (r.isVerified === true) {
+                                                cloudList.push({
+                                                    title: `Referral Verify Bonus (${maskUserName(r.name)})`,
+                                                    desc: `User verified account with 50 BDT`,
+                                                    amount: `40.00 BDT`,
+                                                    type: 'plus',
+                                                    category: 'referral',
+                                                    method: 'referral',
+                                                    status: 'success',
+                                                    time: r.createdAt ? new Date(r.createdAt.toDate ? r.createdAt.toDate() : r.createdAt).toLocaleDateString('en-GB') : 'Recent',
+                                                    date: r.createdAt ? formatDateISO(r.createdAt.toDate ? r.createdAt.toDate() : new Date(r.createdAt)) : formatDateISO(new Date()),
+                                                    txnId: `REF-${doc.id.slice(0, 8)}`,
+                                                    timestamp: r.createdAt ? (r.createdAt.toMillis ? r.createdAt.toMillis() : new Date(r.createdAt).getTime()) : 0
+                                                });
+                                            }
+                                        });
+
+                                        // নতুন থেকে পুরোনো সাজানো
+                                        cloudList.sort((a, b) => b.timestamp - a.timestamp);
+
+                                        allTransactions = cloudList;
+                                        refreshSummaryStats();
+                                        loadTransactions(allTransactions);
                                     });
-
-                                    // নতুন থেকে পুরোনো সাজানো
-                                    cloudList.sort((a, b) => b.timestamp - a.timestamp);
-
-                                    allTransactions = cloudList;
-                                    refreshSummaryStats();
-                                    loadTransactions(allTransactions);
                                 });
                             });
                         });
