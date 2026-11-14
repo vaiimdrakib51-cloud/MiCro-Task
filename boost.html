@@ -114,7 +114,7 @@
           </div>
         </div>
 
-        <!-- 🌟 BOOST DURATION FILTERS: 2 Days (সবার আগে ও ডিফল্ট), 1 Day, All Posts -->
+        <!-- BOOST DURATION FILTERS -->
         <div class="px-2 pt-1">
           <div class="flex items-center space-x-2 overflow-x-auto no-scrollbar py-1">
             <button onclick="setFeedFilter('2days')" id="filter-btn-2days" class="px-3.5 py-1.5 rounded-full text-xs font-bold transition whitespace-nowrap bg-teal-600 text-white shadow-xs">
@@ -346,7 +346,6 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // ================= ছেলে ও মেয়েদের জন্য আলাদা আলাদা রিয়েলিস্টিক অবতার পুল =================
     const MALE_AVATARS = [
       "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
       "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150",
@@ -376,7 +375,6 @@
       return pool[cleanUid % pool.length];
     }
 
-    // ================= IN-APP DIALOG SYSTEM =================
     function showAppDialog(title, message, type = 'success') {
       const dialog = document.getElementById('custom-app-dialog');
       const card = document.getElementById('custom-app-dialog-card');
@@ -418,7 +416,6 @@
       }, 150);
     }
 
-    // ================= TELEGRAM CONFIG =================
     const TELEGRAM_BOT_TOKEN = "9166237872:AAEnqeRwrUYAoKzCL_yTBZJqqYx-J_Q-bKo";
     const TELEGRAM_CHAT_ID = "@MicroTaskupdate";
     const ADMIN_CONSOLE_URL = "https://vaiimdrakib51-cloud.github.io/com.microtask.admin/";
@@ -502,67 +499,76 @@
     let targetBoostPost = null;
     let targetDeletePostId = null;
 
-    // 🌟 ডিফল্টভাবে '2days' সবার আগে থাকবে
     let currentFeedFilter = '2days';
     let visiblePostCount = 5;
     let isFilterLoading = false;
 
     const recordedViewsSession = new Set(JSON.parse(sessionStorage.getItem('microtask_viewed_posts') || '[]'));
 
-    // ================= 🌟 NOTIFICATION SYSTEM (STEALTH) =================
-    async function triggerUserNotification(title, message, type = "boost", postId = null) {
-      if (!currentUser.uid || currentUser.uid === "000000") return;
+    // ================= 🌟 ফিক্সড পারসোনাল নোটিফিকেশন সিস্টেম =================
+    // targetUid নিশ্চিত করায় শুধুমাত্র সেই পোস্টের মালিক ইউজারই নোটিফিকেশন পাবে, অন্য কেউ নয়!
+    async function triggerUserNotification(targetUid, title, message, type = "boost", postId = null) {
+      const cleanTarget = String(targetUid || '').trim();
+      if (!cleanTarget || cleanTarget === "000000") return;
+
       try {
         const notifDoc = {
-          userId: String(currentUser.uid),
+          targetUid: cleanTarget, // 🌟 এটিই নোটিফিকেশনকে ব্যক্তিগত রাখবে
+          userId: cleanTarget,
+          category: "earnings", // 🌟 notifications.html এ আর্নিংস ক্যাটাগরিতে শো করবে
+          method: "boost_earning",
+          platform: "boost",
           title: title,
           message: message,
           type: type,
           postId: postId,
+          actionUrl: "boost.html",
           read: false,
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
         };
 
-        const user = auth.currentUser;
-        if (user) {
-          await db.collection("users").doc(user.uid).collection("notifications").add(notifDoc);
-        }
+        // গ্লোবাল notifications কালেকশনে সেভ হবে নির্দিষ্ট targetUid সহ
         await db.collection("notifications").add(notifDoc);
-
-        showAppDialog(title, message, "success");
       } catch (e) {
         console.error("Notification creation error:", e);
       }
     }
 
+    // 🌟 শুধুমাত্র পোস্টের মালিকের ডিভাইসেই রান হবে
     function checkAndSendBoostNotifications(post) {
-      if (String(post.userId) !== String(currentUser.uid)) return;
+      if (!currentUser.uid || currentUser.uid === "000000") return;
+      
+      // পোস্টের মালিক এবং বর্তমান ইউজার হুবহু এক না হলে নোটিফিকেশন তৈরি হবে না
+      if (String(post.userId).trim() !== String(currentUser.uid).trim()) return;
 
-      const activeList = JSON.parse(localStorage.getItem('mt_notified_boost_active') || '[]');
-      const earningsRecord = JSON.parse(localStorage.getItem('mt_notified_earnings_record') || '{}');
+      const activeList = JSON.parse(localStorage.getItem('mt_notified_boost_active_' + currentUser.uid) || '[]');
+      const earningsRecord = JSON.parse(localStorage.getItem('mt_notified_earnings_record_' + currentUser.uid) || '{}');
 
-      // 1. Boost Active Notification
+      // ১. বুস্ট শুরু হওয়ার নোটিফিকেশন (শুধুমাত্র মালিকের জন্য)
       if (post.boostStatus === 'active' && !activeList.includes(post.id)) {
         const days = getPostBoostDays(post) || 1;
         const pkgText = post.boostPackage || 'Campaign Package';
-        const notifMsg = `Your boost campaign is started! Package: ${pkgText}, Duration: ${days} Day${days > 1 ? 's' : ''}.`;
+        const notifMsg = `আপনার বুস্ট ক্যাম্পেইন চালু হয়েছে! প্যাকেজ: ${pkgText}, মেয়াদ: ${days} দিন।`;
         
-        triggerUserNotification("Campaign Started", notifMsg, "boost_start", post.id);
+        triggerUserNotification(post.userId, "🚀 ক্যাম্পেইন শুরু হয়েছে", notifMsg, "boost_start", post.id);
 
         activeList.push(post.id);
-        localStorage.setItem('mt_notified_boost_active', JSON.stringify(activeList));
+        localStorage.setItem('mt_notified_boost_active_' + currentUser.uid, JSON.stringify(activeList));
       }
 
-      // 2. Earnings Notification
+      // ২. বুস্ট ইনকাম বৃদ্ধির নোটিফিকেশন (শুধুমাত্র মালিকের জন্য)
       const currentEarnedUSD = Number(post.payoutUSD || post.earnedUSD || 0);
       const lastNotifiedUSD = Number(earningsRecord[post.id] || 0);
 
+      // প্রতি $০.০৫ (≈ ৬ টাকা) ইনকাম বাড়লে নোটিফিকেশন যাবে
       if (currentEarnedUSD > lastNotifiedUSD && (currentEarnedUSD - lastNotifiedUSD) >= 0.05) {
-        const notifEarnMsg = `Your boost has earned $${currentEarnedUSD.toFixed(2)} USD.`;
-        triggerUserNotification("Boost Earnings", notifEarnMsg, "boost_earning", post.id);
+        const earnedBDT = (currentEarnedUSD * 120).toFixed(2);
+        const notifEarnMsg = `আপনার বুস্ট পোস্ট থেকে নতুন $${currentEarnedUSD.toFixed(2)} (≈ ৳${earnedBDT}) ইনকাম অর্জিত হয়েছে।`;
+        
+        triggerUserNotification(post.userId, "💰 বুস্ট ইনকাম আপডেট", notifEarnMsg, "boost_earning", post.id);
 
         earningsRecord[post.id] = currentEarnedUSD;
-        localStorage.setItem('mt_notified_earnings_record', JSON.stringify(earningsRecord));
+        localStorage.setItem('mt_notified_earnings_record_' + currentUser.uid, JSON.stringify(earningsRecord));
       }
     }
 
@@ -614,7 +620,6 @@
       return 1;
     }
 
-    // ================= 🌟 প্রতিটি ফিল্টারের জন্য পৃথক অন-ডিমান্ড লোডিং =================
     function setFeedFilter(filterType) {
       if (isFilterLoading && currentFeedFilter === filterType) return;
       currentFeedFilter = filterType;
@@ -631,7 +636,6 @@
       if (btn1) btn1.className = (filterType === '1day') ? activeClass : inactiveClass;
       if (btnAll) btnAll.className = (filterType === 'all') ? activeClass : inactiveClass;
 
-      // আলাদা লোডিং প্রদর্শন
       showFilterLoadingState(filterType);
     }
 
@@ -655,7 +659,6 @@
         if (window.lucide) lucide.createIcons();
       }
 
-      // ফিল্ডে ক্লিক করলে পৃথকভাবে লোড হবে
       setTimeout(() => {
         isFilterLoading = false;
         renderFeed();
@@ -700,8 +703,6 @@
       const viewsDisplay = formatNumber(post.viewsCount || 1);
 
       const authorAvatar = post.avatar || getUserAvatar(post.gender, post.userId, post.authorName);
-
-      // Payout USD is strictly on the post and never added to user main balance
       const rawPayout = post.payoutUSD !== undefined ? post.payoutUSD : (post.earnedUSD !== undefined ? post.earnedUSD : 0);
       const displayPayoutUSD = Number(rawPayout || 0).toFixed(2);
 
@@ -773,7 +774,6 @@
                 <span class="text-teal-700 font-semibold text-[10px]">likes</span>
               </div>
 
-              <!-- Post Earnings are displayed strictly on post card -->
               <span class="text-teal-700 font-bold text-[10.5px]">
                 • $${displayPayoutUSD}
               </span>
@@ -921,7 +921,6 @@
       });
     }
 
-    // ================= RENDER FEED WITH 2-DAYS FIRST =================
     function renderFeed() {
       const container = document.getElementById('feed-container');
       const seeMoreContainer = document.getElementById('see-more-container');
@@ -954,7 +953,6 @@
       const postsToDisplay = filteredPosts.slice(0, visiblePostCount);
       container.innerHTML = postsToDisplay.map(buildPostCardHTML).join('');
 
-      // Facebook-style "See More" Button
       if (seeMoreContainer) {
         if (filteredPosts.length > visiblePostCount) {
           const remaining = filteredPosts.length - visiblePostCount;
@@ -978,7 +976,6 @@
       attachViewObservers();
     }
 
-    // ================= FIREBASE POSTS LISTENER =================
     function initFirebasePostsListener() {
       db.collection("posts").orderBy("createdAt", "desc").limit(50).onSnapshot(snapshot => {
         posts = [];
@@ -993,7 +990,6 @@
           }
         });
         
-        // শুধু বর্তমান একটিভ ফিল্টারের জন্য রেন্ডার হবে
         if (!isFilterLoading) {
           renderFeed();
         }
@@ -1002,7 +998,6 @@
       });
     }
 
-    // GLOBAL PROFILES
     const GLOBAL_PROFILES_POOL = [
       { name: "David Miller", country: "USA", gender: "male", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100", text: "Great insights! Very well articulated." },
       { name: "Emma Watson", country: "UK", gender: "female", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100", text: "Impressive writing, totally loved reading this." },
@@ -1059,7 +1054,6 @@
       const shouldHaveLikes = Math.min(post.initialLikesTarget || 80, Math.floor(elapsedMinutes * likesPerMin));
       const shouldHaveComments = Math.min(post.initialCommentsTarget || 15, Math.floor(elapsedMinutes * commentsPerMin));
 
-      // 🌟 EARNING PROGRESS IS SOLELY STORED IN POST
       const targetEarningsUSD = Number(post.initialPayoutUSD || post.targetPayoutUSD || (Number(post.amountUSD || 1) * 0.7));
       const shouldHaveEarningsUSD = Number(Math.min(targetEarningsUSD, (elapsedMinutes / totalMinutes) * targetEarningsUSD).toFixed(2));
 
@@ -1555,6 +1549,15 @@
           boostStatus: "pending",
           boostPackage: `${pkgPriceBDT} Tk`
         });
+
+        // 🌟 শুধু সাবমিটকারী ইউজারের ইনবক্সের জন্য ব্যক্তিগত নোটিফিকেশন
+        await triggerUserNotification(
+          finalUid,
+          "🚀 বুস্ট রিকোয়েস্ট সফল!",
+          `আপনার ৳${pkgPriceBDT} ($${pkgPriceUSD.toFixed(2)}) বুস্ট ক্যাম্পেইনের রিকোয়েস্ট জমা হয়েছে।`,
+          "boost_submit",
+          targetBoostPost.id
+        );
 
         // Admin-only alert
         const tgAlertMsg = `🚀 <b>নতুন পোস্ট বুস্ট রিকোয়েস্ট এসেছে!</b>\n\n` +
