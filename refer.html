@@ -469,6 +469,7 @@
         .comm-5pct-text { 
             font-size: 10.5px; 
             font-weight: 900; 
+            color: #059669; 
             white-space: nowrap; 
         }
 
@@ -543,7 +544,7 @@
 
                 <div class="mini-stat-card orange">
                     <div class="stat-icon">5%</div>
-                    <div class="stat-label">Today's 5% Comm.</div>
+                    <div class="stat-label">Today's 5% Profit</div>
                     <div class="stat-num" id="statReferralCommission">0.00 BDT</div>
                 </div>
             </div>
@@ -556,7 +557,7 @@
                     </div>
                     <div class="header-title-text">
                         <h3>Your Referral Link</h3>
-                        <p>Share this link with friends and earn 40 BDT + 5% work commission!</p>
+                        <p>Share this link with friends and earn 40 BDT + 5% profit commission!</p>
                     </div>
                 </div>
 
@@ -609,18 +610,18 @@
 
                     <div class="single-step">
                         <div class="step-badge">3</div>
-                        <div class="step-text">Get 5% commission on their work profit</div>
+                        <div class="step-text">Get 5% commission on their net profit</div>
                     </div>
                 </div>
             </div>
 
-            <!-- CARD 4: TODAY'S LIVE EARNINGS TABLE (শুধুমাত্র আজকের অর্জিত আয়) -->
+            <!-- CARD 4: TODAY'S LIVE EARNINGS TABLE -->
             <div class="card-referrals-table">
                 <div class="referrals-header-line">
                     <h3>Today's Earnings History</h3>
                     <span class="referral-live-counter" id="activeReferralCount">0 Today</span>
                 </div>
-                <span class="chart-subtitle-note" id="todaySubtitleNote">Only bonuses & 5% commissions earned today</span>
+                <span class="chart-subtitle-note" id="todaySubtitleNote">Showing only bonuses & 5% profit commissions earned today</span>
 
                 <!-- ফিল্টার ট্যাব -->
                 <div class="referral-tab-strip">
@@ -629,7 +630,7 @@
                     <button type="button" class="tab-btn" onclick="filterReferralView('comm', this)">5% Comm.</button>
                 </div>
 
-                <!-- 🌟 সর্বোচ্চ ১০টি রো এর পর স্ক্রল হবে -->
+                <!-- 🌟 সর্বোচ্চ ১০টি রো দেখার পর স্ক্রলবার আসবে -->
                 <div class="table-scroll-container">
                     <table class="clean-table">
                         <thead>
@@ -703,7 +704,6 @@
             return `${year}-${month}-${day}`;
         }
 
-        // 🌟 তারিখটি আজকের (চলতি দিনের) কি না তা নির্ভুল যাচাই
         function isDateToday(dateVal) {
             if (!dateVal) return false;
             const todayStr = getTodayString();
@@ -723,7 +723,7 @@
             return false;
         }
 
-        // 🌟 index.html ছাড়া ফিক্সড microtask.page.gd লিংক
+        // 🌟 index.html ছাড়া সরাসরি লিংক তৈরি
         function generateLiveReferralUrl(uid) {
             return `https://microtask.page.gd/?ref=${uid}`;
         }
@@ -758,6 +758,24 @@
             document.getElementById('statReferralCommission').innerText = `৳${todayCommBDT.toFixed(2)}`;
         }
 
+        // 🌟 টাইপিং কাজের খাঁটি লাভ (Net Profit) বের করার ফাংশন
+        // (প্যাকেজ ফি বাদ দিয়ে শুধুমাত্র লাভটুকু হিসাব হবে)
+        function calculateNetProfitBDT(task) {
+            const totalReturn = Number(task.amountBDT || task.rewardBDT || (Number(task.amountUSD || 0) * USD_TO_BDT) || 0);
+            
+            if (task.taskType === 'typing_task' || (task.title && task.title.toLowerCase().includes('typing'))) {
+                let pkgFee = Number(task.packagePriceBDT || 0);
+                if (!pkgFee) {
+                    if (totalReturn >= 2000) pkgFee = 2000;
+                    else if (totalReturn >= 1500) pkgFee = 1500;
+                    else if (totalReturn >= 1000) pkgFee = 1000;
+                    else if (totalReturn >= 500) pkgFee = 500;
+                }
+                return Math.max(0, totalReturn - pkgFee);
+            }
+            return totalReturn;
+        }
+
         // ================= ১. লাইভ রেফারেল ডাটা ফেচিং =================
         auth.onAuthStateChanged(user => {
             if (!user) {
@@ -783,7 +801,6 @@
             });
         });
 
-        // 🌟 শুধুমাত্র আজকের অর্জিত বোনাস ও কমিশনের রিয়েল-টাইম ট্র্যাকিং
         function listenToTodayReferrals(sixDigitUID, authUid) {
             if (!sixDigitUID || sixDigitUID === "000000") return;
 
@@ -806,12 +823,19 @@
                 let verifiedCount = 0;
                 let todayCommissionBDT = 0;
                 let entries = [];
+                const referredUserAuthUids = [];
+                const referredUserMap = {};
 
                 snapshot.forEach(doc => {
                     const u = doc.data();
                     const maskedName = maskUserName(u.name || 'Member');
                     const userUID = String(u.uid || '000000');
                     const isVerified = (u.isVerified === true);
+
+                    referredUserAuthUids.push(doc.id);
+                    referredUserAuthUids.push(userUID);
+                    referredUserMap[doc.id] = { name: maskedName, uid: userUID };
+                    referredUserMap[userUID] = { name: maskedName, uid: userUID };
 
                     if (isVerified) verifiedCount++;
 
@@ -826,30 +850,41 @@
                             amountHtml: `<span class="comm-5pct-text" style="color:#15803d;">+৳40.00</span>`
                         });
                     }
-
-                    // ২. শুধুমাত্র আজকের অর্জিত কাজের লাভের ৫% কমিশন
-                    // (প্যাকেজ ফি নয়, কাজ থেকে আসল ইনকাম todayEarnUSD ব্যালেন্সে ঢুকলেই কেবল কমিশন হবে)
-                    let userTodayProfitUSD = 0;
-                    if (u.lastEarnDate && isDateToday(u.lastEarnDate)) {
-                        userTodayProfitUSD = Number(u.todayEarnUSD || 0);
-                    }
-
-                    if (userTodayProfitUSD > 0) {
-                        const commTodayBDT = parseFloat((userTodayProfitUSD * USD_TO_BDT * 0.05).toFixed(2));
-                        todayCommissionBDT += commTodayBDT;
-
-                        entries.push({
-                            type: 'comm',
-                            name: maskedName,
-                            uid: userUID,
-                            date: 'Today',
-                            badgeHtml: `<span class="bonus-badge-tag comm"><i class="fa-solid fa-coins"></i> 5% Comm.</span>`,
-                            amountHtml: `<span class="comm-5pct-text" style="color:#0369a1;">+৳${commTodayBDT.toFixed(2)}</span>`
-                        });
-                    }
-
-                    // ৩. যারা আন-ভেরিফাইড বা আজকে কোনো আয় করেনি, তারা এই টেবিলে আসবে না
                 });
+
+                // ২. অনুমোদিত কাজের নিট লাভের ৫% কমিশন (শুধুমাত্র আজকের এপ্রুভ হওয়া কাজের লাভ থেকে)
+                try {
+                    const tasksSnap = await db.collection("task_history")
+                        .where("uid", "in", referredUserAuthUids.slice(0, 10))
+                        .get();
+
+                    tasksSnap.forEach(tDoc => {
+                        const t = tDoc.data();
+                        const isApproved = (t.status === 'success' || t.status === 'completed' || (!t.status && t.amountUSD > 0));
+
+                        // কাজ অনুমোদিত এবং আজকের তারিখে হওয়া আবশ্যক
+                        if (isApproved && isDateToday(t.createdAt || t.date)) {
+                            const netProfitBDT = calculateNetProfitBDT(t);
+                            if (netProfitBDT > 0) {
+                                const commBDT = parseFloat((netProfitBDT * 0.05).toFixed(2));
+                                todayCommissionBDT += commBDT;
+
+                                const userInfo = referredUserMap[t.uid] || { name: 'Member', uid: '000000' };
+
+                                entries.push({
+                                    type: 'comm',
+                                    name: userInfo.name,
+                                    uid: userInfo.uid,
+                                    date: 'Today',
+                                    badgeHtml: `<span class="bonus-badge-tag comm"><i class="fa-solid fa-coins"></i> 5% Comm.</span>`,
+                                    amountHtml: `<span class="comm-5pct-text" style="color:#0369a1;">+৳${commBDT.toFixed(2)}</span>`
+                                });
+                            }
+                        }
+                    });
+                } catch(e) {
+                    console.log("Tasks commission read error:", e);
+                }
 
                 todayEarningsEntries = entries;
                 renderFilteredTable();
@@ -859,7 +894,7 @@
                 updateStatsUI(totalReferrals, verifiedCount, totalBonusBDT, todayCommissionBDT);
 
                 // মেইন ব্যালেন্সে মিসিং ব্যালেন্স জমা দেওয়া
-                syncAndCreditMissingEarnings(authUid, clean6Digit, verifiedCount, snapshot);
+                syncAndCreditMissingEarnings(authUid, clean6Digit, verifiedCount, todayCommissionBDT);
 
             }, err => {
                 console.error("Referral fetch error:", err);
@@ -910,7 +945,7 @@
         }
 
         // ================= ৩. মেইন ব্যালেন্সে অটো-ক্রেডিট সিঙ্ক =================
-        async function syncAndCreditMissingEarnings(authUid, sixDigitUID, totalVerifiedMembers, snapshot) {
+        async function syncAndCreditMissingEarnings(authUid, sixDigitUID, totalVerifiedMembers, todayCommBDT) {
             if (isSyncingBalance || !authUid) return;
             isSyncingBalance = true;
 
@@ -918,14 +953,14 @@
                 const historySnap = await db.collection("task_history").where("uid", "==", authUid).get();
                 
                 let creditedBonusCount = 0;
-                let creditedCommUSD = 0;
+                let creditedCommTodayBDT = 0;
 
                 historySnap.forEach(hDoc => {
                     const h = hDoc.data();
                     if (h.taskType === "referral_bonus") {
                         creditedBonusCount++;
-                    } else if (h.taskType === "referral_commission") {
-                        creditedCommUSD += Number(h.amountUSD || h.rewardUSD || 0);
+                    } else if (h.taskType === "referral_commission" && isDateToday(h.createdAt || h.date)) {
+                        creditedCommTodayBDT += Number(h.amountBDT || 0);
                     }
                 });
 
@@ -962,26 +997,18 @@
                     });
                 }
 
-                // ২. কাজের নিট লাভের ৫% কমিশন (শুধুমাত্র ইউজার কাজ করে ব্যালেন্স পাওয়ার পর)
-                let totalWorkProfitsUSD = 0;
-                snapshot.forEach(doc => {
-                    const u = doc.data();
-                    totalWorkProfitsUSD += Number(u.totalEarnUSD || 0);
-                });
-
-                const totalEligibleCommUSD = parseFloat((totalWorkProfitsUSD * 0.05).toFixed(4));
-                const missingCommUSD = parseFloat(Math.max(0, totalEligibleCommUSD - creditedCommUSD).toFixed(4));
-
-                if (missingCommUSD >= 0.002) {
-                    balanceIncrementUSD += missingCommUSD;
-                    const missingCommBDT = parseFloat((missingCommUSD * USD_TO_BDT).toFixed(2));
+                // ২. শুধুমাত্র আজকের খাঁটি লাভের ৫% কমিশন ওয়ালেটে জমা
+                const missingCommBDT = parseFloat(Math.max(0, todayCommBDT - creditedCommTodayBDT).toFixed(2));
+                if (missingCommBDT >= 0.5) {
+                    const commUSD = parseFloat((missingCommBDT / USD_TO_BDT).toFixed(4));
+                    balanceIncrementUSD += commUSD;
 
                     await db.collection("task_history").add({
                         uid: authUid,
-                        amountUSD: missingCommUSD,
+                        amountUSD: commUSD,
                         amountBDT: missingCommBDT,
                         taskType: "referral_commission",
-                        title: "5% Referral Commission",
+                        title: "5% Referral Profit Commission",
                         date: todayStr,
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
@@ -990,8 +1017,8 @@
                         targetUid: String(sixDigitUID),
                         category: "earnings",
                         method: "referral_commission",
-                        title: "🎉 ৫% রেফারেল কমিশন জমা হয়েছে!",
-                        message: `আপনার রেফারেলদের কাজের নিট লাভের ৫% কমিশন হিসেবে ৳${missingCommBDT} ($${missingCommUSD.toFixed(3)}) আপনার মূল ব্যালেন্সে জমা হয়েছে!`,
+                        title: "🎉 ৫% রেফারেল লাভ কমিশন জমা হয়েছে!",
+                        message: `আপনার রেফারেলদের আজকের কাজের লাভের ৫% কমিশন হিসেবে ৳${missingCommBDT} আপনার মূল ব্যালেন্সে জমা হয়েছে!`,
                         actionUrl: "refer.html",
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
@@ -1013,7 +1040,7 @@
                         localStorage.setItem('microtask_cached_user', JSON.stringify(currentUserData));
                     }
 
-                    showToastNotification("New referral bonus/commission added to balance!");
+                    showToastNotification("New referral earnings added to balance!");
                 }
 
             } catch (err) {
